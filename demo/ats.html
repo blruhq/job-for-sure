@@ -6,38 +6,30 @@
   <title>Job For Sure · ATS Optimizer &amp; Resume Editor</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
     /* ─── tokens ───────────────────────────────────────────────────────── */
     :root {
-      --bg:           #FBFBFA;              /* warm light cream */
+      --bg:           #F7F6F2;              /* warm paper off-white */
       --surface:      #FFFFFF;              /* pure white cards */
       --surface-card: #FFFFFF;
-      --fg:           #1A1A18;              /* deep off-black primary text */
-      --fg-2:         #5F5F5E;              /* warm charcoal secondary text */
-      --muted:        #8E8E8C;              /* tertiary — placeholders, metadata */
-      --meta:         #8E8E8C;              /* quaternary — timestamps, disabled */
-      --border:       #EAEAEA;              /* default light borders */
-      --border-soft:  #F2F2F0;              /* ultra-subtle divider */
-      --accent:       #D96245;              /* warm terracotta/rust primary */
+      --fg:           #1C1B16;              /* warm off-black primary */
+      --fg-2:         #71706A;              /* warm secondary */
+      --muted:        #9F9E98;              /* warm tertiary */
+      --meta:         #9F9E98;              /* timestamps */
+      --border:       #E6E5DF;              /* warm border */
+      --border-soft:  #F0EFEA;              /* subtle warm divider */
+      --accent:       #5B6ABF;              /* steel-blue primary */
       --accent-on:    #ffffff;
-      --accent-hover: #E87053;              /* lighter warm terracotta */
-      --accent-active:#C25035;              /* darker terracotta */
+      --accent-hover: #6B7AD0;              /* lighter steel-blue */
+      --accent-active:#4A59A8;              /* darker steel-blue */
+      --accent-soft:  rgba(91, 106, 191, 0.08);
       --success:      #2B5F45;              /* deep forest green */
       --warn:         #D4A316;
       --danger:       #C24535;
       --danger-soft:  #fee2e2;
       --chat-bg:      #FFFFFF;
-      
-      /* Resume Specific Variables (bound in :root to pass checklist) */
-      --resume-bg:    #FFFFFF;
-      --resume-fg:    #1D1D1F;
-      --resume-muted: #6B7280;
-      --resume-border:#E5E5E7;
-      --resume-highlight: rgba(43, 95, 69, 0.08);
-      --resume-highlight-border: #2B5F45;
 
-      --font-display: "Instrument Serif", Georgia, serif;
       --font-body:    "Inter Variable", "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       --font-mono:    "JetBrains Mono", ui-monospace, monospace;
       --gap-xs:       8px;
@@ -50,7 +42,6 @@
       --radius-sm:    6px;
       --radius-md:    8px;
       --radius-lg:    12px;
-      --radius-pill:  9999px;
       --motion-fast:  150ms;
       --motion-base:  200ms;
     }
@@ -97,8 +88,8 @@
       padding-inline: 24px;
     }
     .topnav .logo-container { display: flex; align-items: center; gap: 10px; text-decoration: none; color: inherit; }
-    .topnav .logo-mark { width: 16px; height: 16px; background: var(--accent); border-radius: 4px; box-shadow: 0 2px 8px rgba(217, 98, 69, 0.2); }
-    .topnav .logo-text { font-family: var(--font-display); font-size: 16px; font-weight: 600; letter-spacing: -0.01em; }
+    .topnav .logo-mark { width: 16px; height: 16px; background: var(--accent); border-radius: 4px; }
+    .topnav .logo-text { font-weight: 600; font-size: 16px; letter-spacing: -0.01em; }
     .topnav nav { display: flex; gap: 32px; }
     .topnav nav a { font-size: 13px; color: var(--muted); text-decoration: none; transition: color var(--motion-fast); position: relative; }
     .topnav nav a:hover { color: var(--fg); }
@@ -652,25 +643,25 @@
 
     /* ─── Dark Mode Overrides ─── */
     body.dark-mode {
-      --bg:           #0B0D0E;              /* dark page background */
-      --surface:      #141618;              /* elevated surfaces */
-      --surface-card: #1C1E20;
-      --panel:        #141618;              /* sidebar panel background */
-      --console-bg:   #0B0D0E;              /* chat area background */
-      --border:       rgba(255, 255, 255, 0.06);
+      --bg:           #131312;              /* warm dark */
+      --surface:      #1A1A18;              /* warm surface */
+      --surface-card: #21211E;
+      --panel:        #1A1A18;              /* warm panel */
+      --console-bg:   #131312;
+      --border:       rgba(255, 255, 255, 0.07);
       --border-soft:  rgba(255, 255, 255, 0.04);
-      --fg:           #EDEEF0;
-      --fg-2:         #9BA0A8;
-      --muted:        #656A72;
-      --meta:         #656A72;
-      --accent:       #E87053;              /* terracotta in dark mode */
-      --accent-on:    #120703;
-      --accent-hover: #FF8C72;
-      --accent-active:#D96245;
-      --success:      #22C55E;
+      --fg:           #EFEEE9;
+      --fg-2:         #A5A49D;
+      --muted:        #7D7C76;
+      --meta:         #7D7C76;
+      --accent:       #7B8AD8;              /* lighter steel-blue for dark contrast */
+      --accent-on:    #ffffff;
+      --accent-hover: #8B9AE8;
+      --accent-active:#5B6ABF;
+      --success:      #4ADE80;
       --warn:         #EAB308;
       --danger:       #EF4444;
-      --chat-bg:      #0B0D0E;
+      --chat-bg:      #131312;
     }
 
     body.dark-mode .chat-input {
