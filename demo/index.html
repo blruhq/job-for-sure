@@ -3,1609 +3,1216 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Job For Sure · Workspace Dashboard</title>
+  <title>Job For Sure · Workspace</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
-    /* ═══════════════════════════════════════════════════════════════════════
-       Tokens
-       ═══════════════════════════════════════════════════════════════════════ */
+    /* ═══════════════════════════════════════════════════════════════════
+       TOKENS
+       ════════════════════════════════════════════════════════════════════ */
     :root {
-      --bg:           #F7F6F2;              /* warm paper off-white */
-      --surface:      #FFFFFF;              /* pure white cards */
-      --surface-hover:#F5F4EF;              /* subtle warm hover tint */
-      --panel:        #F0EFEA;              /* warm panel bg */
-      --fg:           #1C1B16;              /* warm off-black primary */
-      --fg-2:         #71706A;              /* warm secondary */
-      --muted:        #9F9E98;              /* warm tertiary */
-      --meta:         #9F9E98;              /* timestamps */
-      --border:       #E6E5DF;              /* warm border */
-      --border-soft:  #F0EFEA;              /* subtle warm divider */
-      --accent:       #5B6ABF;              /* steel-blue primary */
-      --accent-hover: #6B7AD0;              /* lighter steel-blue */
-      --accent-active:#4A59A8;              /* darker steel-blue */
-      --accent-soft:  rgba(91, 106, 191, 0.08);  /* subtle accent tint */
-      --success:      #2B5F45;              /* deep forest green */
+      --bg:           #F7F6F2;
+      --surface:      #FFFFFF;
+      --sidebar-bg:   #EFEEE9;
+      --sidebar-hover:#E8E7E1;
+      --sidebar-active:#E2E1DA;
+      --fg:           #1C1B16;
+      --fg-2:         #71706A;
+      --muted:        #9F9E98;
+      --border:       #E6E5DF;
+      --border-soft:  #F0EFEA;
+      --accent:       #5B6ABF;
+      --accent-hover: #6B7AD0;
+      --accent-soft:  rgba(91, 106, 191, 0.08);
+      --success:      #2B5F45;
+      --success-soft: rgba(43, 95, 69, 0.08);
       --warn:         #D4A316;
+      --warn-soft:    rgba(212, 163, 22, 0.08);
       --danger:       #DC2626;
-      --font-body:    "Inter Variable", "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      --font-body:    "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       --font-mono:    "JetBrains Mono", ui-monospace, monospace;
+      --text-xs:      11px;
+      --text-sm:      12px;
+      --text-base:    13px;
+      --text-md:      14px;
+      --text-lg:      16px;
+      --text-xl:      18px;
+      --text-2xl:     22px;
       --radius-xs:    4px;
       --radius-sm:    6px;
       --radius-md:    8px;
-      --motion-fast:  150ms;
+      --motion-fast:  120ms;
       --motion-base:  200ms;
-      --ease-standard: cubic-bezier(0.2, 0, 0, 1);
-      --topnav-h:     64px;
+      --ease:         cubic-bezier(0.2, 0, 0, 1);
+      --sidebar-w:    200px;
+      --topbar-h:     48px;
     }
 
-    /* ─── Subtle dot-grid signature pattern ─── */
-    .dot-grid-bg {
-      background-image: radial-gradient(circle, var(--border) 0.8px, transparent 0.8px);
-      background-size: 16px 16px;
-    }
-
-    *, *::before, *::after { box-sizing: border-box; }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; }
     body {
-      margin: 0;
-      background: var(--bg);
-      color: var(--fg);
       font-family: var(--font-body);
-      font-feature-settings: "cv01" on, "ss03" on;
-      font-size: 14px;
-      line-height: 1.55;
+      font-size: var(--text-base);
+      line-height: 1.5;
+      color: var(--fg);
+      background: var(--bg);
       -webkit-font-smoothing: antialiased;
-      overflow: hidden;
       height: 100vh;
+      overflow: hidden;
     }
-    img, svg { display: block; }
     a { color: inherit; text-decoration: none; }
-    button { font: inherit; cursor: pointer; border: none; background: none; padding: 0; }
-    p { margin: 0; }
-    h1, h2, h3, h4 { margin: 0; }
+    button { font: inherit; cursor: pointer; border: none; background: none; padding: 0; color: inherit; }
+    svg { display: block; }
+    h1,h2,h3,h4 { font-weight: 600; letter-spacing: -0.01em; }
 
-    /* ═══════════════════════════════════════════════════════════════════════
-       Layout
-       ═══════════════════════════════════════════════════════════════════════ */
-    .app-viewport {
+    /* ════════════════════════════════════════════════════════════════════
+       APP SHELL
+       ════════════════════════════════════════════════════════════════════ */
+    .app {
       display: flex;
       flex-direction: column;
       height: 100vh;
-      width: 100vw;
     }
 
-    /* ─── Topnav ─── */
-    .topnav {
-      height: var(--topnav-h);
+    /* ─── Topbar ─── */
+    .topbar {
+      height: var(--topbar-h);
       background: var(--surface);
       border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      padding: 0 16px;
+      gap: 12px;
       flex-shrink: 0;
       z-index: 100;
     }
-    .topnav-inner {
+    .topbar-brand {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      width: calc(var(--sidebar-w) - 16px);
+      flex-shrink: 0;
+    }
+    .brand-mark {
+      width: 14px; height: 14px;
+      background: var(--accent);
+      border-radius: 3px;
+      flex-shrink: 0;
+    }
+    .brand-name {
+      font-size: var(--text-md);
+      font-weight: 600;
+      letter-spacing: -0.02em;
+    }
+    .topbar-search {
+      flex-grow: 1;
+      max-width: 320px;
+      position: relative;
+    }
+    .topbar-search input {
+      width: 100%;
+      height: 30px;
+      padding: 0 10px 0 30px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      font-family: var(--font-body);
+      font-size: var(--text-sm);
+      color: var(--fg);
+      outline: none;
+      transition: border-color var(--motion-fast);
+    }
+    .topbar-search input:focus { border-color: var(--accent); }
+    .topbar-search input::placeholder { color: var(--muted); }
+    .topbar-search svg {
+      position: absolute;
+      left: 8px; top: 50%;
+      transform: translateY(-50%);
+      color: var(--muted);
+    }
+    .topbar-actions {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      margin-left: auto;
+    }
+    .icon-btn {
+      width: 30px; height: 30px;
+      display: flex; align-items: center; justify-content: center;
+      border-radius: var(--radius-sm);
+      color: var(--fg-2);
+      transition: all var(--motion-fast);
+    }
+    .icon-btn:hover { background: var(--bg); color: var(--fg); }
+    .avatar {
+      width: 26px; height: 26px;
+      border-radius: 50%;
+      background: var(--accent);
+      color: white;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 10px; font-weight: 600;
+      flex-shrink: 0;
+      margin-left: 4px;
+    }
+
+    /* ─── App Body ─── */
+    .app-body {
+      display: flex;
+      flex-grow: 1;
+      overflow: hidden;
+    }
+
+    /* ─── Sidebar ─── */
+    .sidebar {
+      width: var(--sidebar-w);
+      background: var(--sidebar-bg);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+      padding: 8px;
+    }
+    .nav-group-label {
+      font-size: 10px;
+      font-family: var(--font-mono);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--muted);
+      padding: 12px 8px 4px 8px;
+    }
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 8px;
+      border-radius: var(--radius-sm);
+      font-size: var(--text-sm);
+      font-weight: 500;
+      color: var(--fg-2);
+      transition: all var(--motion-fast);
+      margin-bottom: 1px;
+      cursor: pointer;
+    }
+    .nav-item:hover { background: var(--sidebar-hover); color: var(--fg); }
+    .nav-item.active { background: var(--sidebar-active); color: var(--fg); font-weight: 600; }
+    .nav-item svg { flex-shrink: 0; opacity: 0.7; }
+    .nav-item.active svg { opacity: 1; color: var(--accent); }
+    .nav-badge {
+      margin-left: auto;
+      font-size: 10px;
+      font-family: var(--font-mono);
+      background: var(--accent-soft);
+      color: var(--accent);
+      padding: 1px 6px;
+      border-radius: var(--radius-xs);
+      font-weight: 600;
+    }
+    .sidebar-footer {
+      margin-top: auto;
+      padding: 8px;
+      border-top: 1px solid var(--border);
+    }
+    .sidebar-user {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 4px;
+      border-radius: var(--radius-sm);
+    }
+    .sidebar-user-info {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+    .sidebar-user-name { font-size: var(--text-sm); font-weight: 600; }
+    .sidebar-user-plan { font-size: 10px; color: var(--muted); font-family: var(--font-mono); }
+
+    /* ─── Main Content ─── */
+    .main {
+      flex-grow: 1;
+      overflow-y: auto;
+      padding: 24px 32px;
+      min-width: 0;
+    }
+
+    /* ─── Views ─── */
+    .view { display: none; }
+    .view.active { display: block; }
+
+    /* ─── Page Header ─── */
+    .page-head {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      height: 100%;
-      padding-inline: 24px;
+      margin-bottom: 24px;
     }
-    .logo-container {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      color: inherit;
-    }
-    .logo-mark {
-      width: 16px;
-      height: 16px;
-      background: var(--accent);
-      border-radius: var(--radius-xs);
-      flex-shrink: 0;
-    }
-    .logo-text {
+    .page-head h1 {
+      font-size: var(--text-xl);
       font-weight: 600;
-      font-size: 16px;
-      letter-spacing: -0.01em;
     }
-    .topnav nav {
-      display: flex;
-      gap: 32px;
-    }
-    .topnav nav a {
-      font-size: 13px;
+    .page-head .subtitle {
+      font-size: var(--text-sm);
       color: var(--muted);
-      transition: color var(--motion-fast);
-      position: relative;
-    }
-    .topnav nav a:hover { color: var(--fg); }
-    .topnav nav a.active {
-      color: var(--fg);
-      font-weight: 510;
-    }
-    .topnav nav a.active::after {
-      content: '';
-      position: absolute;
-      bottom: -22px;
-      left: 0;
-      right: 0;
-      height: 2px;
-      background: var(--accent);
-    }
-    .nav-actions {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-    .nav-icon-btn {
-      padding: 6px;
-      border-radius: 50%;
-      width: 28px;
-      height: 28px;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      color: var(--muted);
-      transition: color var(--motion-fast), background var(--motion-fast);
-    }
-    .nav-icon-btn:hover {
-      color: var(--fg);
-      background: var(--panel);
+      margin-top: 2px;
     }
 
     /* ─── Buttons ─── */
     .btn {
-      display: inline-flex; align-items: center; gap: 6px;
-      padding: 8px 16px;
+      display: inline-flex; align-items: center; gap: 5px;
+      padding: 6px 12px;
       border-radius: var(--radius-sm);
-      font-size: 13px;
-      font-weight: 510;
+      font-size: var(--text-sm);
+      font-weight: 500;
       transition: all var(--motion-fast);
       white-space: nowrap;
       border: 1px solid transparent;
-      font-family: inherit;
-      line-height: 1;
+      font-family: var(--font-body);
+      line-height: 1.3;
     }
     .btn:active { transform: translateY(1px); }
-    .btn-primary { background: var(--accent); color: white; border-color: var(--accent); }
-    .btn-primary:hover { background: var(--accent-hover); border-color: var(--accent-hover); }
+    .btn-primary { background: var(--accent); color: white; }
+    .btn-primary:hover { background: var(--accent-hover); }
     .btn-secondary { background: var(--surface); color: var(--fg-2); border-color: var(--border); }
-    .btn-secondary:hover { background: var(--panel); color: var(--fg); }
-    .btn-ghost { color: var(--muted); background: transparent; }
-    .btn-ghost:hover { color: var(--fg); background: var(--panel); }
-    .btn-sm { padding: 6px 12px; font-size: 12px; }
+    .btn-secondary:hover { background: var(--bg); color: var(--fg); }
+    .btn-ghost { color: var(--fg-2); }
+    .btn-ghost:hover { background: var(--bg); color: var(--fg); }
 
-    /* ─── Main Dashboard Layout ─── */
-    .dashboard {
-      display: flex;
-      flex-grow: 1;
-      overflow: hidden;
-    }
-
-    /* ─── Main Content Area ─── */
-    .main-content {
-      flex-grow: 1;
-      overflow-y: auto;
-      min-width: 0;
-      padding: 32px 40px 0 40px;
-    }
-
-    /* ─── AI Coach Sidebar (right) ─── */
-    .coach-sidebar {
-      width: 320px;
-      background: var(--surface);
-      border-left: 1px solid var(--border);
-      display: flex;
-      flex-direction: column;
-      flex-shrink: 0;
-    }
-    .coach-header {
-      padding: 20px 24px;
-      border-bottom: 1px solid var(--border);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      flex-shrink: 0;
-    }
-    .coach-header-left {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-    .coach-avatar {
-      width: 28px;
-      height: 28px;
-      border-radius: 50%;
-      background: var(--accent);
-      color: white;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 600;
-      font-size: 11px;
-      flex-shrink: 0;
-    }
-    .coach-name {
-      font-size: 14px;
-      font-weight: 600;
-      color: var(--fg);
-    }
-    .coach-status {
-      font-size: 11px;
-      color: var(--success);
-      display: flex;
-      align-items: center;
-      gap: 4px;
-      margin-top: 1px;
-    }
-    .coach-status::before {
-      content: '';
-      width: 6px;
-      height: 6px;
-      background: var(--success);
-      border-radius: 50%;
-      display: inline-block;
-    }
-    .coach-body {
-      flex-grow: 1;
-      overflow-y: auto;
-      padding: 24px;
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-    }
-    .coach-message {
-      max-width: 100%;
-      padding: 12px 16px;
-      border-radius: var(--radius-sm);
-      font-size: 13px;
-      line-height: 1.55;
-    }
-    .coach-message.assistant {
-      background: var(--bg);
-      border: 1px solid var(--border);
-      color: var(--fg-2);
-      align-self: flex-start;
-    }
-    .coach-message.user {
-      background: var(--accent);
-      color: white;
-      align-self: flex-end;
-    }
-    .coach-pills {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin-top: 4px;
-    }
-    .coach-pill {
-      font-size: 12px;
-      padding: 6px 12px;
-      border-radius: var(--radius-sm);
-      background: var(--surface);
-      border: 1px solid var(--border);
-      color: var(--fg-2);
-      cursor: pointer;
-      transition: all var(--motion-fast);
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-    }
-    .coach-pill:hover {
-      border-color: var(--accent);
-      color: var(--accent);
-      background: var(--accent-soft);
-    }
-    .coach-typing {
-      display: flex;
-      gap: 4px;
-      align-items: center;
-      padding: 12px 16px;
-      background: var(--bg);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-sm);
-      align-self: flex-start;
-    }
-    .coach-typing-dot {
-      width: 5px;
-      height: 5px;
-      background: var(--muted);
-      border-radius: 50%;
-      animation: coachTyping 1.4s infinite;
-    }
-    .coach-typing-dot:nth-child(2) { animation-delay: 0.2s; }
-    .coach-typing-dot:nth-child(3) { animation-delay: 0.4s; }
-    @keyframes coachTyping {
-      0%, 100% { opacity: 0.2; transform: translateY(0); }
-      50% { opacity: 1; transform: translateY(-2px); }
-    }
-    .coach-footer {
-      padding: 16px 20px;
-      border-top: 1px solid var(--border);
-      flex-shrink: 0;
-    }
-    .coach-input-row {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      background: var(--bg);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-sm);
-      padding: 6px 12px;
-    }
-    .coach-input-row:focus-within {
-      border-color: var(--accent);
-    }
-    .coach-input {
-      flex-grow: 1;
-      background: transparent;
-      border: none;
-      color: var(--fg);
-      font-family: var(--font-body);
-      font-size: 13px;
-      outline: none;
-      padding: 0;
-    }
-    .coach-input::placeholder { color: var(--muted); }
-    .coach-send {
-      color: var(--accent);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 4px;
-      transition: color var(--motion-fast);
-    }
-    .coach-send:hover { color: var(--accent-hover); }
-
-    /* ─── Stats Bar ─── */
-    .stats-bar {
+    /* ─── Stats Row ─── */
+    .stats {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
-      gap: 16px;
-      margin-bottom: 32px;
+      gap: 12px;
+      margin-bottom: 24px;
     }
-    .stat-card {
+    .stat {
       background: var(--surface);
       border: 1px solid var(--border);
       border-radius: var(--radius-sm);
-      padding: 20px;
+      padding: 14px 16px;
     }
     .stat-val {
       font-family: var(--font-mono);
-      font-size: 26px;
+      font-size: var(--text-2xl);
       font-weight: 500;
-      color: var(--fg);
-      margin-bottom: 4px;
+      line-height: 1.1;
     }
     .stat-lbl {
+      font-size: var(--text-xs);
       color: var(--muted);
-      font-size: 11px;
       font-family: var(--font-mono);
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
+      margin-top: 2px;
     }
 
-    /* ─── Section Headers ─── */
-    .section-header {
+    /* ─── Section ─── */
+    .section { margin-bottom: 28px; }
+    .section-head {
       display: flex;
-      justify-content: space-between;
       align-items: center;
-      margin-bottom: 20px;
+      justify-content: space-between;
+      margin-bottom: 12px;
     }
     .section-title {
-      font-size: 13px;
+      font-size: var(--text-md);
       font-weight: 600;
-      color: var(--fg);
     }
-    .section-action {
-      font-size: 12px;
+    .section-link {
+      font-size: var(--text-sm);
       color: var(--accent);
-      font-weight: 510;
+      font-weight: 500;
       cursor: pointer;
-      transition: color var(--motion-fast);
-      display: flex;
-      align-items: center;
-      gap: 4px;
     }
-    .section-action:hover { color: var(--accent-hover); }
+    .section-link:hover { color: var(--accent-hover); }
 
-    /* ─── Resume Gallery ─── */
-    .gallery-section {
-      margin-bottom: 40px;
-    }
-    .resume-gallery {
+    /* ─── Resume Cards ─── */
+    .resume-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 16px;
+      gap: 12px;
     }
     .resume-card {
       background: var(--surface);
       border: 1px solid var(--border);
       border-radius: var(--radius-sm);
-      padding: 0;
-      cursor: pointer;
-      transition: border-color var(--motion-fast), transform var(--motion-fast), box-shadow var(--motion-fast);
       overflow: hidden;
+      cursor: pointer;
+      transition: border-color var(--motion-fast), transform var(--motion-fast);
     }
-    .resume-card:hover {
-      border-color: var(--accent);
-      transform: translateY(-2px);
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
-    }
+    .resume-card:hover { border-color: var(--accent); transform: translateY(-1px); }
     .resume-preview {
-      height: 140px;
-      background: var(--panel);
+      height: 110px;
+      background: var(--sidebar-bg);
       border-bottom: 1px solid var(--border);
-      padding: 14px 18px;
-      display: flex;
-      flex-direction: column;
+      padding: 10px 14px;
       position: relative;
       overflow: hidden;
+      font-family: var(--font-mono);
+      font-size: 9px;
+      color: var(--muted);
     }
     .resume-preview::after {
       content: '';
-      position: absolute;
-      inset: 0;
-      background-image: radial-gradient(circle, var(--border) 0.6px, transparent 0.6px);
-      background-size: 18px 18px;
-      opacity: 0.5;
+      position: absolute; inset: 0;
+      background-image: radial-gradient(circle, var(--border) 0.5px, transparent 0.5px);
+      background-size: 14px 14px;
+      opacity: 0.4;
       pointer-events: none;
     }
-    .resume-preview-name {
-      font-size: 12px;
-      font-weight: 600;
-      color: var(--fg);
-      margin-bottom: 1px;
-      position: relative;
-      z-index: 1;
-    }
-    .resume-preview-role {
-      font-size: 10px;
-      color: var(--fg-2);
-      margin-bottom: 8px;
-      position: relative;
-      z-index: 1;
-    }
-    .resume-preview-bullets {
-      display: flex;
-      flex-direction: column;
-      gap: 3px;
-      flex-grow: 1;
-      position: relative;
-      z-index: 1;
-    }
-    .resume-preview-bullet {
-      display: flex;
-      gap: 5px;
-      font-size: 9px;
-      color: var(--muted);
-      line-height: 1.3;
-    }
-    .resume-preview-bullet::before {
-      content: '—';
-      color: var(--muted);
-      flex-shrink: 0;
-    }
-    .resume-preview-skills {
-      display: flex;
-      gap: 4px;
-      flex-wrap: wrap;
-      margin-top: auto;
-      position: relative;
-      z-index: 1;
-    }
-    .resume-preview-skill {
-      font-size: 7px;
-      padding: 1px 5px;
-      border-radius: 2px;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      color: var(--fg-2);
-      text-transform: uppercase;
-      letter-spacing: 0.03em;
-    }
-    .resume-card-body {
-      padding: 16px 20px;
-    }
-    .resume-card-top {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      margin-bottom: 6px;
-    }
-    .resume-role {
-      font-size: 14px;
-      font-weight: 600;
-      color: var(--fg);
-      line-height: 1.3;
-    }
-    .resume-score-badge {
+    .rp-name { font-family: var(--font-body); font-size: 10px; font-weight: 600; color: var(--fg); position: relative; z-index: 1; }
+    .rp-role { font-family: var(--font-body); font-size: 9px; color: var(--fg-2); margin-bottom: 6px; position: relative; z-index: 1; }
+    .rp-bullet { display: flex; gap: 4px; line-height: 1.4; margin-bottom: 1px; position: relative; z-index: 1; }
+    .rp-bullet::before { content: '·'; flex-shrink: 0; }
+    .rp-skills { display: flex; gap: 3px; margin-top: 4px; position: relative; z-index: 1; }
+    .rp-skill { background: var(--surface); border: 1px solid var(--border); padding: 0 4px; border-radius: 2px; font-size: 7px; text-transform: uppercase; letter-spacing: 0.02em; }
+    .resume-info { padding: 12px 14px; }
+    .resume-info-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2px; }
+    .resume-info-title { font-size: var(--text-md); font-weight: 600; }
+    .resume-score {
       font-family: var(--font-mono);
-      font-size: 11px;
+      font-size: var(--text-xs);
       font-weight: 600;
-      color: var(--success);
-      background: rgba(43, 95, 69, 0.08);
-      padding: 2px 8px;
+      padding: 1px 6px;
       border-radius: var(--radius-xs);
-      flex-shrink: 0;
     }
-    .resume-meta {
-      font-size: 12px;
-      color: var(--muted);
-    }
-    .resume-tags {
-      display: flex;
-      gap: 6px;
-      margin-top: 8px;
-      flex-wrap: wrap;
-    }
-    .resume-tag {
-      font-size: 10px;
-      padding: 2px 6px;
-      border-radius: var(--radius-xs);
-      background: var(--panel);
-      color: var(--fg-2);
-      border: 1px solid var(--border);
-    }
+    .resume-score.high { background: var(--success-soft); color: var(--success); }
+    .resume-score.mid { background: var(--warn-soft); color: var(--warn); }
+    .resume-meta { font-size: var(--text-xs); color: var(--muted); }
 
     /* ─── Pipeline Kanban ─── */
-    .pipeline-section {
-      margin-bottom: 32px;
-    }
-    .kanban-board {
+    .kanban {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
-      gap: 16px;
+      gap: 12px;
       align-items: start;
     }
     .kanban-col {
       background: var(--surface);
       border: 1px solid var(--border);
       border-radius: var(--radius-sm);
-      padding: 16px;
-      min-height: 360px;
+      padding: 10px;
+      min-height: 300px;
     }
-    .kanban-col-header {
+    .kanban-col-head {
       display: flex;
-      justify-content: space-between;
       align-items: center;
-      margin-bottom: 16px;
-      padding-bottom: 10px;
+      justify-content: space-between;
+      padding-bottom: 8px;
       border-bottom: 1px solid var(--border-soft);
+      margin-bottom: 8px;
     }
-    .kanban-col-title {
-      font-size: 12px;
+    .kanban-col-name {
+      font-size: var(--text-xs);
       font-family: var(--font-mono);
-      font-weight: 600;
-      color: var(--muted);
       text-transform: uppercase;
       letter-spacing: 0.05em;
+      color: var(--muted);
+      font-weight: 600;
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 6px;
     }
-    .kanban-dot {
-      width: 6px;
-      height: 6px;
-      border-radius: 50%;
-      flex-shrink: 0;
-    }
+    .kanban-dot { width: 6px; height: 6px; border-radius: 50%; }
     .kanban-count {
-      font-size: 11px;
+      font-size: 10px;
       font-family: var(--font-mono);
-      background: var(--panel);
       color: var(--muted);
-      padding: 2px 6px;
+      background: var(--bg);
+      padding: 1px 5px;
       border-radius: var(--radius-xs);
     }
-    .job-card {
+
+    /* ─── Job Card ─── */
+    .job {
       background: var(--surface);
       border: 1px solid var(--border);
       border-radius: var(--radius-xs);
-      padding: 14px;
-      margin-bottom: 10px;
+      padding: 10px;
+      margin-bottom: 6px;
+      transition: border-color var(--motion-fast);
       cursor: pointer;
-      transition: border-color var(--motion-fast), background var(--motion-fast), transform var(--motion-fast);
     }
-    .job-card:hover {
-      border-color: var(--accent);
-      background: var(--surface-hover);
-      transform: translateY(-1px);
-    }
-    .job-card-top {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 8px;
-    }
-    .job-slug {
+    .job:hover { border-color: var(--accent); }
+    .job-top { display: flex; align-items: center; gap: 6px; margin-bottom: 6px; }
+    .job-logo {
+      width: 20px; height: 20px;
+      border-radius: var(--radius-xs);
+      display: flex; align-items: center; justify-content: center;
       font-family: var(--font-mono);
-      font-size: 10px;
-      color: var(--muted);
-      text-transform: uppercase;
+      font-size: 8px;
+      font-weight: 700;
+      color: white;
+      flex-shrink: 0;
     }
+    .job-company { font-size: var(--text-xs); font-weight: 600; color: var(--fg); }
     .job-score {
-      font-size: 10px;
+      margin-left: auto;
       font-family: var(--font-mono);
-      padding: 2px 6px;
-      border-radius: var(--radius-xs);
-    }
-    .job-score.high { background: rgba(43, 95, 69, 0.08); color: var(--success); }
-    .job-score.mid { background: rgba(212, 163, 22, 0.08); color: var(--warn); }
-    .job-card-title {
-      font-size: 13px;
-      font-weight: 600;
-      color: var(--fg);
-      margin-bottom: 2px;
-    }
-    .job-card-comp {
-      font-size: 12px;
-      color: var(--muted);
-      margin-bottom: 10px;
-    }
-    .job-card-footer {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      border-top: 1px solid var(--border-soft);
-      padding-top: 8px;
-      font-size: 11px;
-      color: var(--meta);
-    }
-    .job-tag {
       font-size: 10px;
-      padding: 2px 6px;
+      font-weight: 600;
+      padding: 1px 5px;
       border-radius: var(--radius-xs);
-      border: 1px solid var(--border);
-      color: var(--muted);
     }
+    .job-score.high { background: var(--success-soft); color: var(--success); }
+    .job-score.mid { background: var(--warn-soft); color: var(--warn); }
+    .job-title { font-size: var(--text-sm); font-weight: 500; margin-bottom: 4px; }
+    .job-loc { font-size: var(--text-xs); color: var(--muted); margin-bottom: 8px; }
+    .job-foot {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-top: 6px;
+      border-top: 1px solid var(--border-soft);
+    }
+    .job-time { font-size: 10px; color: var(--muted); font-family: var(--font-mono); }
+    .job-apply {
+      font-size: var(--text-xs);
+      color: var(--accent);
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 2px;
+    }
+    .job-apply:hover { color: var(--accent-hover); }
+
+    /* ─── Coach View ─── */
+    .coach-view {
+      max-width: 640px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .coach-msg {
+      max-width: 80%;
+      padding: 10px 14px;
+      border-radius: var(--radius-sm);
+      font-size: var(--text-sm);
+      line-height: 1.5;
+    }
+    .coach-msg.assistant {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      align-self: flex-start;
+    }
+    .coach-msg.user {
+      background: var(--accent);
+      color: white;
+      align-self: flex-end;
+    }
+    .coach-pills { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+    .coach-pill {
+      font-size: var(--text-xs);
+      padding: 4px 10px;
+      border-radius: var(--radius-sm);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--fg-2);
+      cursor: pointer;
+      transition: all var(--motion-fast);
+    }
+    .coach-pill:hover { border-color: var(--accent); color: var(--accent); }
+    .coach-input-bar {
+      position: sticky;
+      bottom: 0;
+      background: var(--bg);
+      padding: 12px 0;
+      border-top: 1px solid var(--border);
+    }
+    .coach-input-row {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 4px 4px 4px 12px;
+    }
+    .coach-input-row:focus-within { border-color: var(--accent); }
+    .coach-input {
+      flex-grow: 1;
+      border: none;
+      outline: none;
+      background: transparent;
+      font-family: var(--font-body);
+      font-size: var(--text-sm);
+      color: var(--fg);
+    }
+    .coach-input::placeholder { color: var(--muted); }
+
+    /* ─── Settings View ─── */
+    .settings-group {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      margin-bottom: 16px;
+    }
+    .setting-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--border-soft);
+    }
+    .setting-row:last-child { border-bottom: none; }
+    .setting-label { font-size: var(--text-sm); font-weight: 500; }
+    .setting-desc { font-size: var(--text-xs); color: var(--muted); margin-top: 1px; }
 
     /* ─── Drawer (Resume Preview + ATS) ─── */
     .drawer-overlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(0, 0, 0, 0.3);
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.25);
       z-index: 200;
-      opacity: 0;
-      pointer-events: none;
+      opacity: 0; pointer-events: none;
       transition: opacity var(--motion-base);
     }
-    .drawer-overlay.open {
-      opacity: 1;
-      pointer-events: auto;
-    }
+    .drawer-overlay.open { opacity: 1; pointer-events: auto; }
     .drawer {
-      position: fixed;
-      top: 0;
-      right: -720px;
-      width: 720px;
-      max-width: 100vw;
+      position: fixed; top: 0; right: -680px;
+      width: 680px; max-width: 100vw;
       height: 100vh;
       background: var(--surface);
       border-left: 1px solid var(--border);
       z-index: 201;
-      display: flex;
-      flex-direction: column;
-      transition: right var(--motion-base) var(--ease-standard);
+      display: flex; flex-direction: column;
+      transition: right var(--motion-base) var(--ease);
     }
-    .drawer.open {
-      right: 0;
-    }
-    .drawer-header {
-      padding: 20px 28px;
+    .drawer.open { right: 0; }
+    .drawer-head {
+      padding: 12px 20px;
       border-bottom: 1px solid var(--border);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
+      display: flex; align-items: center; justify-content: space-between;
       flex-shrink: 0;
     }
-    .drawer-title-group {
-      display: flex;
-      flex-direction: column;
-      gap: 2px;
-    }
-    .drawer-title {
-      font-size: 16px;
-      font-weight: 600;
-    }
-    .drawer-subtitle {
-      font-family: var(--font-mono);
-      font-size: 11px;
-      color: var(--muted);
-    }
-    .drawer-close {
-      padding: 6px;
-      border-radius: 50%;
-      color: var(--muted);
-      transition: all var(--motion-fast);
-    }
-    .drawer-close:hover {
-      color: var(--fg);
-      background: var(--panel);
-    }
+    .drawer-head-title { font-size: var(--text-md); font-weight: 600; }
+    .drawer-head-sub { font-size: var(--text-xs); color: var(--muted); font-family: var(--font-mono); }
     .drawer-body {
       flex-grow: 1;
       overflow-y: auto;
-      padding: 28px;
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 28px;
     }
-    /* Left: Resume preview */
     .drawer-resume {
-      background: #FDFCF9;
-      border: 1px solid var(--border);
-      border-radius: var(--radius-xs);
-      padding: 32px 28px;
+      padding: 24px;
       font-family: Georgia, serif;
+      font-size: 12px;
       color: var(--fg);
-      font-size: 13px;
-      line-height: 1.5;
+      border-right: 1px solid var(--border);
     }
-    .drawer-resume-header {
-      text-align: center;
-      margin-bottom: 24px;
-    }
-    .drawer-resume-name {
-      font-size: 24px;
-      font-weight: 500;
-      color: var(--fg);
-      margin-bottom: 4px;
-    }
-    .drawer-resume-contact {
+    .dr-header { text-align: center; margin-bottom: 20px; }
+    .dr-name { font-size: 20px; font-weight: 500; margin-bottom: 2px; }
+    .dr-contact { font-family: var(--font-body); font-size: 10px; color: var(--fg-2); }
+    .dr-section { margin-bottom: 16px; }
+    .dr-section-title {
       font-family: var(--font-body);
-      font-size: 11px;
-      color: var(--fg-2);
-    }
-    .drawer-resume-section {
-      margin-bottom: 20px;
-    }
-    .drawer-resume-section-title {
-      font-family: var(--font-body);
-      font-size: 11px;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
+      font-size: 10px; font-weight: 600;
+      text-transform: uppercase; letter-spacing: 0.06em;
       color: var(--accent);
       border-bottom: 1px solid var(--border-soft);
-      padding-bottom: 6px;
-      margin-bottom: 12px;
+      padding-bottom: 4px; margin-bottom: 8px;
     }
-    .drawer-resume-item {
-      margin-bottom: 16px;
+    .dr-item { margin-bottom: 10px; }
+    .dr-item-head { display: flex; justify-content: space-between; font-weight: 600; font-size: 12px; }
+    .dr-item-role { font-family: var(--font-body); font-size: 11px; color: var(--fg-2); }
+    .dr-item-date { font-family: var(--font-body); font-size: 10px; color: var(--muted); }
+    .dr-bullets { margin: 4px 0 0 0; padding-left: 16px; font-size: 11px; }
+    .dr-bullets li { margin-bottom: 2px; }
+    .dr-skills { display: flex; flex-wrap: wrap; gap: 4px; }
+    .dr-skill { background: var(--sidebar-bg); border: 1px solid var(--border); padding: 2px 6px; border-radius: 3px; font-family: var(--font-body); font-size: 10px; }
+    .drawer-ats { padding: 24px; display: flex; flex-direction: column; gap: 20px; }
+    .ats-score-box {
+      display: flex; align-items: center; gap: 16px;
+      background: var(--bg); border: 1px solid var(--border);
+      border-radius: var(--radius-sm); padding: 16px;
     }
-    .drawer-resume-item-header {
-      display: flex;
-      justify-content: space-between;
-      font-weight: 600;
-      font-size: 13px;
-      margin-bottom: 2px;
-    }
-    .drawer-resume-item-role {
-      font-family: var(--font-body);
-      font-size: 12px;
-      color: var(--fg-2);
-    }
-    .drawer-resume-item-date {
-      font-family: var(--font-body);
-      font-size: 11px;
-      color: var(--muted);
-    }
-    .drawer-resume ul {
-      margin: 6px 0 0 0;
-      padding-left: 18px;
-    }
-    .drawer-resume li {
-      margin-bottom: 4px;
-    }
-    .drawer-resume-skills {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-    }
-    .drawer-resume-skill {
-      background: var(--panel);
-      padding: 3px 8px;
-      border-radius: var(--radius-xs);
-      font-family: var(--font-body);
-      font-size: 11px;
-    }
+    .ats-ring { position: relative; width: 56px; height: 56px; flex-shrink: 0; }
+    .ats-ring svg { transform: rotate(-90deg); }
+    .ats-ring-bg-c { fill: none; stroke: var(--border); stroke-width: 4; }
+    .ats-ring-fill-c { fill: none; stroke: var(--success); stroke-width: 4; stroke-linecap: round; transition: stroke-dashoffset 0.8s var(--ease); }
+    .ats-ring-num { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); font-family: var(--font-mono); font-size: 13px; font-weight: 600; }
+    .ats-score-info h3 { font-size: var(--text-sm); }
+    .ats-score-info p { font-size: var(--text-xs); color: var(--fg-2); }
+    .ats-kw-head { font-family: var(--font-mono); font-size: 10px; text-transform: uppercase; color: var(--muted); border-bottom: 1px solid var(--border-soft); padding-bottom: 4px; display: flex; justify-content: space-between; margin-bottom: 8px; }
+    .ats-kw-grid { display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 12px; }
+    .ats-kw { font-size: 10px; font-family: var(--font-mono); padding: 2px 8px; border-radius: var(--radius-xs); }
+    .ats-kw.matched { background: var(--success-soft); color: var(--success); }
+    .ats-kw.missing { background: rgba(220,38,38,0.06); color: var(--danger); }
 
-    /* Right: ATS Panel */
-    .drawer-ats {
-      display: flex;
-      flex-direction: column;
-      gap: 24px;
-    }
-    .ats-score-card {
-      background: var(--bg);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-sm);
-      padding: 24px;
-      display: flex;
-      align-items: center;
-      gap: 20px;
-    }
-    .ats-score-ring {
-      position: relative;
-      width: 72px;
-      height: 72px;
-      flex-shrink: 0;
-    }
-    .ats-score-ring svg {
-      transform: rotate(-90deg);
-      width: 72px;
-      height: 72px;
-    }
-    .ats-ring-bg {
-      fill: none;
-      stroke: var(--border);
-      stroke-width: 5;
-    }
-    .ats-ring-fill {
-      fill: none;
-      stroke: var(--success);
-      stroke-width: 5;
-      stroke-linecap: round;
-      stroke-dasharray: 200;
-      stroke-dashoffset: calc(200 - (91 / 100 * 200));
-      transition: stroke-dashoffset 1s var(--ease-standard), stroke var(--motion-base);
-    }
-    .ats-score-num {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      font-family: var(--font-mono);
-      font-size: 18px;
-      font-weight: 600;
-      color: var(--fg);
-    }
-    .ats-score-info h3 {
-      font-size: 14px;
-      font-weight: 600;
-      margin-bottom: 4px;
-    }
-    .ats-score-info p {
-      font-size: 12px;
-      color: var(--fg-2);
-    }
-    .ats-keywords {
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-    }
-    .ats-kw-header {
-      font-family: var(--font-mono);
-      font-size: 10px;
-      color: var(--muted);
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      border-bottom: 1px solid var(--border-soft);
-      padding-bottom: 6px;
-      display: flex;
-      justify-content: space-between;
-    }
-    .ats-kw-grid {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-    }
-    .ats-kw {
-      font-size: 11px;
-      font-family: var(--font-mono);
-      padding: 4px 10px;
-      border-radius: var(--radius-xs);
-    }
-    .ats-kw.matched {
-      background: rgba(43, 95, 69, 0.08);
-      color: var(--success);
-      border: 1px solid rgba(43, 95, 69, 0.15);
-    }
-    .ats-kw.missing {
-      background: rgba(220, 38, 38, 0.06);
-      color: var(--danger);
-      border: 1px solid rgba(220, 38, 38, 0.12);
-    }
-    .ats-actions {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-
-    /* ─── Footer ─── */
-    .app-footer {
-      flex-shrink: 0;
-      padding: 12px 24px;
-      border-top: 1px solid var(--border-soft);
-      color: var(--meta);
-      font-size: 12px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      background: var(--surface);
-    }
-
-    /* ─── Dark Mode ─── */
-    body.dark-mode {
-      --bg:           #131312;              /* warm dark */
-      --surface:      #1A1A18;              /* warm surface */
-      --surface-hover:#21211E;              /* warm hover */
-      --panel:        #1A1A18;              /* warm panel */
-      --border:       rgba(255, 255, 255, 0.07);
-      --border-soft:  rgba(255, 255, 255, 0.04);
+    /* ════════════════════════════════════════════════════════════════════
+       DARK MODE
+       ════════════════════════════════════════════════════════════════════ */
+    body.dark {
+      --bg:           #131312;
+      --surface:      #1A1A18;
+      --sidebar-bg:   #161614;
+      --sidebar-hover:#1F1F1D;
+      --sidebar-active:#252522;
       --fg:           #EFEEE9;
       --fg-2:         #A5A49D;
       --muted:        #7D7C76;
-      --meta:         #7D7C76;
-      --accent:       #7B8AD8;              /* lighter steel-blue for dark contrast */
+      --border:       rgba(255,255,255,0.07);
+      --border-soft:  rgba(255,255,255,0.04);
+      --accent:       #7B8AD8;
       --accent-hover: #8B9AE8;
-      --accent-active:#5B6ABF;
-      --accent-soft:  rgba(123, 138, 216, 0.12);
+      --accent-soft:  rgba(123,138,216,0.12);
       --success:      #4ADE80;
-    }
-    body.dark-mode .coach-message.assistant {
-      background: rgba(255,255,255,0.02);
-    }
-    body.dark-mode .drawer-resume {
-      background: var(--surface);
-      color: var(--fg);
-    }
-    body.dark-mode .drawer-resume-section-title {
-      border-bottom-color: var(--border);
-    }
-    body.dark-mode .drawer-resume-skill {
-      background: var(--panel);
-      color: var(--fg);
+      --success-soft: rgba(74,222,128,0.10);
     }
 
-    /* ─── Responsive ─── */
-    @media (max-width: 1200px) {
-      .resume-gallery { grid-template-columns: repeat(2, 1fr); }
-      .kanban-board { grid-template-columns: repeat(2, 1fr); }
-    }
+    /* ════════════════════════════════════════════════════════════════════
+       RESPONSIVE
+       ════════════════════════════════════════════════════════════════════ */
     @media (max-width: 1024px) {
-      .coach-sidebar {
-        position: fixed;
-        right: 0;
-        top: var(--topnav-h);
-        bottom: 0;
-        z-index: 50;
-        box-shadow: -4px 0 16px rgba(0,0,0,0.08);
-      }
-      .coach-sidebar.collapsed {
-        width: 0;
-        border-left: none;
-        overflow: hidden;
-      }
+      .resume-grid { grid-template-columns: repeat(2, 1fr); }
+      .kanban { grid-template-columns: repeat(2, 1fr); }
+      .drawer-body { grid-template-columns: 1fr; }
     }
     @media (max-width: 768px) {
-      .main-content { padding: 24px 16px 0 16px; }
-      .stats-bar { grid-template-columns: repeat(2, 1fr); }
-      .resume-gallery { grid-template-columns: 1fr; }
-      .kanban-board { grid-template-columns: 1fr; }
+      .sidebar { display: none; }
+      .topbar-brand { width: auto; }
+      .stats { grid-template-columns: repeat(2, 1fr); }
+      .resume-grid { grid-template-columns: 1fr; }
+      .kanban { grid-template-columns: 1fr; }
+      .main { padding: 16px; }
       .drawer { width: 100vw; }
-      .drawer-body { grid-template-columns: 1fr; }
     }
   </style>
 </head>
 <body>
-  <div class="app-viewport">
+<div class="app">
 
-    <!-- ═══════════ Topnav ═══════════ -->
-    <header class="topnav">
-      <div class="topnav-inner">
-        <a href="index.html" class="logo-container">
-          <div class="logo-mark"></div>
-          <span class="logo-text">JOB FOR SURE</span>
-        </a>
-        <nav>
-          <a href="landing.html">Product</a>
-          <a href="index.html" class="active">Dashboard</a>
-          <a href="agency.html">Workspace</a>
-          <a href="ats.html">ATS Optimizer</a>
-        </nav>
-        <div class="nav-actions">
-          <button id="themeToggle" class="nav-icon-btn" title="Toggle Light/Dark Theme">
-            <svg id="themeMoon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
-            <svg id="themeSun" style="display:none;" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
-          </button>
-          <a href="agency.html" class="btn btn-primary">Open Workspace</a>
+  <!-- ════ TOPBAR ════ -->
+  <header class="topbar">
+    <div class="topbar-brand">
+      <div class="brand-mark"></div>
+      <span class="brand-name">JOB FOR SURE</span>
+    </div>
+    <div class="topbar-search">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input type="text" placeholder="Search resumes, jobs, companies..." />
+    </div>
+    <div class="topbar-actions">
+      <button class="icon-btn" id="themeToggle" title="Toggle theme">
+        <svg id="iconMoon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        <svg id="iconSun" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+      </button>
+      <a href="landing.html" class="icon-btn" title="Marketing site">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+      </a>
+      <div class="avatar">JD</div>
+    </div>
+  </header>
+
+  <!-- ════ APP BODY ════ -->
+  <div class="app-body">
+
+    <!-- ════ SIDEBAR ════ -->
+    <aside class="sidebar">
+      <div class="nav-group-label">Workspace</div>
+      <div class="nav-item active" data-view="dashboard">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+        Dashboard
+      </div>
+      <div class="nav-item" data-view="resumes">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        Resumes
+        <span class="nav-badge">3</span>
+      </div>
+      <div class="nav-item" data-view="pipeline">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="1"/><line x1="9" y1="3" x2="9" y2="21"/><line x1="15" y1="3" x2="15" y2="21"/></svg>
+        Pipeline
+        <span class="nav-badge">6</span>
+      </div>
+      <div class="nav-item" data-view="coach">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        Coach
+      </div>
+
+      <div class="nav-group-label">Account</div>
+      <div class="nav-item" data-view="settings">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        Settings
+      </div>
+
+      <div class="sidebar-footer">
+        <div class="sidebar-user">
+          <div class="avatar">JD</div>
+          <div class="sidebar-user-info">
+            <span class="sidebar-user-name">John Doe</span>
+            <span class="sidebar-user-plan">FREE PLAN</span>
+          </div>
         </div>
       </div>
-    </header>
+    </aside>
 
-    <!-- ═══════════ Dashboard ═══════════ -->
-    <div class="dashboard">
+    <!-- ════ MAIN CONTENT ════ -->
+    <main class="main">
 
-      <!-- Main Content Area -->
-      <main class="main-content">
-
-        <!-- Stats Bar -->
-        <div class="stats-bar">
-          <div class="stat-card">
-            <div class="stat-val">12</div>
-            <div class="stat-lbl">Active Applications</div>
+      <!-- ─── DASHBOARD VIEW ─── -->
+      <section class="view active" id="view-dashboard">
+        <div class="page-head">
+          <div>
+            <h1>Dashboard</h1>
+            <div class="subtitle">Welcome back, John · Here's your job search at a glance</div>
           </div>
-          <div class="stat-card">
+          <button class="btn btn-primary" onclick="switchView('resumes')">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+            Create Resume
+          </button>
+        </div>
+
+        <div class="stats">
+          <div class="stat">
+            <div class="stat-val">12</div>
+            <div class="stat-lbl">Active Apps</div>
+          </div>
+          <div class="stat">
             <div class="stat-val">3</div>
             <div class="stat-lbl">Interviews</div>
           </div>
-          <div class="stat-card">
+          <div class="stat">
             <div class="stat-val">91%</div>
-            <div class="stat-lbl">Avg Match Score</div>
+            <div class="stat-lbl">Avg Match</div>
           </div>
-          <div class="stat-card">
-            <div class="stat-val">6</div>
-            <div class="stat-lbl">Resume Versions</div>
+          <div class="stat">
+            <div class="stat-val">3</div>
+            <div class="stat-lbl">Resumes</div>
           </div>
         </div>
 
-        <!-- Resume Gallery Section -->
-        <section class="gallery-section">
-          <div class="section-header">
+        <div class="section">
+          <div class="section-head">
             <span class="section-title">Resume Gallery</span>
-            <span class="section-action" onclick="alert('Upload new resume — drag & drop PDF or DOCX')">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
-              Add Resume
-            </span>
+            <span class="section-link" onclick="switchView('resumes')">View all →</span>
           </div>
-          <div class="resume-gallery" id="resumeGallery">
-            <!-- Rendered via JS -->
-          </div>
-        </section>
-
-        <!-- Pipeline Kanban Section -->
-        <section class="pipeline-section">
-          <div class="section-header">
-            <span class="section-title">Job Pipeline</span>
-            <span class="section-action" onclick="alert('Import job from URL or LinkedIn')">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
-              Add Job
-            </span>
-          </div>
-          <div class="kanban-board" id="kanbanBoard">
-            <!-- Rendered via JS -->
-          </div>
-        </section>
-
-      </main>
-
-      <!-- AI Coach Sidebar (always visible) -->
-      <aside class="coach-sidebar" id="coachSidebar">
-        <div class="coach-header">
-          <div class="coach-header-left">
-            <div class="coach-avatar">AI</div>
-            <div>
-              <div class="coach-name">Career Coach</div>
-              <div class="coach-status">Online · Ready to help</div>
-            </div>
-          </div>
-          <button class="nav-icon-btn" onclick="toggleCoach()" title="Toggle Coach Panel">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <line x1="18" y1="6" x2="6" y2="18"></line>
-              <line x1="6" y1="6" x2="18" y2="18"></line>
-            </svg>
-          </button>
+          <div class="resume-grid" id="dashGallery"></div>
         </div>
 
-        <div class="coach-body" id="coachBody">
-          <!-- Welcome message -->
-          <div class="coach-message assistant">
-            Hey! I'm your AI Career Coach. I track your resumes and applications. Try one of these:
+        <div class="section">
+          <div class="section-head">
+            <span class="section-title">Pipeline Overview</span>
+            <span class="section-link" onclick="switchView('pipeline')">View board →</span>
+          </div>
+          <div class="kanban" id="dashKanban"></div>
+        </div>
+      </section>
+
+      <!-- ─── RESUMES VIEW ─── -->
+      <section class="view" id="view-resumes">
+        <div class="page-head">
+          <div>
+            <h1>Resumes</h1>
+            <div class="subtitle">Manage your tailored resume versions for different roles</div>
+          </div>
+          <button class="btn btn-primary" onclick="alert('Resume builder — upload PDF or start from template')">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+            Create Resume
+          </button>
+        </div>
+        <div class="resume-grid" id="resumesGallery"></div>
+      </section>
+
+      <!-- ─── PIPELINE VIEW ─── -->
+      <section class="view" id="view-pipeline">
+        <div class="page-head">
+          <div>
+            <h1>Pipeline</h1>
+            <div class="subtitle">Track applications across companies · click any card for details</div>
+          </div>
+          <button class="btn btn-secondary" onclick="alert('Paste a job URL to import')">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+            Import Job
+          </button>
+        </div>
+        <div class="kanban" id="pipelineBoard"></div>
+      </section>
+
+      <!-- ─── COACH VIEW ─── -->
+      <section class="view" id="view-coach">
+        <div class="page-head">
+          <div>
+            <h1>AI Career Coach</h1>
+            <div class="subtitle">Ask about resumes, interviews, salary negotiation, or job strategy</div>
+          </div>
+        </div>
+        <div class="coach-view" id="coachMessages">
+          <div class="coach-msg assistant">
+            Hey John! I'm tracking 3 resumes and 6 active applications. Your strongest match is <strong>Lead Frontend Engineer at Linear (94%)</strong>. How can I help?
             <div class="coach-pills">
-              <button class="coach-pill" onclick="coachAction('score')">📊 Score Resume</button>
-              <button class="coach-pill" onclick="coachAction('summary')">✍️ Write Summary</button>
-              <button class="coach-pill" onclick="coachAction('optimize')">🎯 Optimize for JD</button>
+              <button class="coach-pill" onclick="coachAct('score')">Score my resume</button>
+              <button class="coach-pill" onclick="coachAct('interview')">Prep for interview</button>
+              <button class="coach-pill" onclick="coachAct('outreach')">Draft outreach</button>
+              <button class="coach-pill" onclick="coachAct('salary')">Salary advice</button>
             </div>
           </div>
         </div>
-
-        <div class="coach-footer">
+        <div class="coach-input-bar">
           <div class="coach-input-row">
-            <input type="text" class="coach-input" id="coachInput" placeholder="Ask your coach..." />
-            <button class="coach-send" onclick="sendCoachMessage()" title="Send">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <line x1="22" y1="2" x2="11" y2="13"></line>
-                <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
-              </svg>
-            </button>
+            <input type="text" class="coach-input" id="coachInput" placeholder="Ask your coach anything..." />
+            <button class="btn btn-primary" onclick="sendCoach()">Send</button>
           </div>
         </div>
-      </aside>
+      </section>
 
-    </div>
-
-    <!-- ═══════════ Footer ═══════════ -->
-    <footer class="app-footer">
-      <span>© 2026 Job For Sure. Built for the modern job seeker.</span>
-      <span>Inter Variable · Enterprise Steel Theme</span>
-    </footer>
-
-  </div>
-
-  <!-- ═══════════ Drawer (Resume Preview + ATS) ═══════════ -->
-  <div class="drawer-overlay" id="drawerOverlay" onclick="closeDrawerOutside(event)"></div>
-  <div class="drawer" id="drawer">
-    <div class="drawer-header">
-      <div class="drawer-title-group">
-        <span class="drawer-title" id="drawerTitle">Resume Preview</span>
-        <span class="drawer-subtitle" id="drawerSubtitle">Loading...</span>
-      </div>
-      <button class="drawer-close" onclick="closeDrawer()">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <line x1="18" y1="6" x2="6" y2="18"></line>
-          <line x1="6" y1="6" x2="18" y2="18"></line>
-        </svg>
-      </button>
-    </div>
-    <div class="drawer-body">
-      <!-- Left: Resume Paper Preview -->
-      <div class="drawer-resume" id="drawerResume">
-        <!-- Populated by JS -->
-      </div>
-      <!-- Right: ATS Analysis -->
-      <div class="drawer-ats">
-        <div class="ats-score-card">
-          <div class="ats-score-ring">
-            <svg viewBox="0 0 36 36">
-              <circle class="ats-ring-bg" cx="18" cy="18" r="15.9"/>
-              <circle class="ats-ring-fill" id="atsRingFill" cx="18" cy="18" r="15.9"/>
-            </svg>
-            <div class="ats-score-num" id="atsScoreNum">91%</div>
-          </div>
-          <div class="ats-score-info">
-            <h3 id="atsMatchLabel">Strong Match</h3>
-            <p id="atsMatchDesc">Your resume aligns well with target roles. Minor optimizations recommended.</p>
-          </div>
-        </div>
-
-        <div class="ats-keywords">
+      <!-- ─── SETTINGS VIEW ─── -->
+      <section class="view" id="view-settings">
+        <div class="page-head">
           <div>
-            <div class="ats-kw-header">
-              <span>Matched Keywords</span>
-              <span id="matchedCount">8</span>
-            </div>
-            <div class="ats-kw-grid" id="matchedKeywords">
-              <!-- Rendered by JS -->
-            </div>
-          </div>
-          <div>
-            <div class="ats-kw-header">
-              <span>Missing Keywords</span>
-              <span id="missingCount">3</span>
-            </div>
-            <div class="ats-kw-grid" id="missingKeywords">
-              <!-- Rendered by JS -->
-            </div>
+            <h1>Settings</h1>
+            <div class="subtitle">Manage your account and preferences</div>
           </div>
         </div>
+        <div class="settings-group">
+          <div class="setting-row">
+            <div>
+              <div class="setting-label">Theme</div>
+              <div class="setting-desc">Switch between light and dark mode</div>
+            </div>
+            <button class="btn btn-secondary" id="themeToggle2" onclick="toggleTheme()">Toggle</button>
+          </div>
+          <div class="setting-row">
+            <div>
+              <div class="setting-label">LinkedIn Import</div>
+              <div class="setting-desc">Auto-populate profile from LinkedIn</div>
+            </div>
+            <button class="btn btn-secondary" onclick="alert('Connect LinkedIn')">Connect</button>
+          </div>
+          <div class="setting-row">
+            <div>
+              <div class="setting-label">Chrome Extension</div>
+              <div class="setting-desc">Import jobs directly from any career page</div>
+            </div>
+            <button class="btn btn-secondary" onclick="alert('Install extension')">Install</button>
+          </div>
+        </div>
+        <div class="settings-group">
+          <div class="setting-row">
+            <div>
+              <div class="setting-label">Plan</div>
+              <div class="setting-desc">Free tier · 3 resumes · upgrade for unlimited</div>
+            </div>
+            <button class="btn btn-primary" onclick="alert('Upgrade to Pro')">Upgrade to Pro</button>
+          </div>
+        </div>
+      </section>
 
-        <div class="ats-actions">
-          <button class="btn btn-primary" onclick="alert('Opening ATS Optimizer for detailed editing...')">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m12 3-1.912 5.886L4.202 9l5.886 1.912L12 16.798l1.912-5.886 5.886-1.912-5.886-1.912zM5 3v4M3 5h4M19 17v4M17 19h4"/></svg>
-            Open ATS Optimizer
-          </button>
-          <button class="btn btn-secondary" onclick="openDrawerPipeline()">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg>
-            View in Pipeline
-          </button>
+    </main>
+  </div>
+</div>
+
+<!-- ════ DRAWER ════ -->
+<div class="drawer-overlay" id="drawerOverlay" onclick="closeDrawer()"></div>
+<div class="drawer" id="drawer">
+  <div class="drawer-head">
+    <div>
+      <div class="drawer-head-title" id="drawerTitle">Resume</div>
+      <div class="drawer-head-sub" id="drawerSub">Loading...</div>
+    </div>
+    <button class="icon-btn" onclick="closeDrawer()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+  </div>
+  <div class="drawer-body">
+    <div class="drawer-resume" id="drawerResume"></div>
+    <div class="drawer-ats">
+      <div class="ats-score-box">
+        <div class="ats-ring">
+          <svg width="56" height="56" viewBox="0 0 36 36">
+            <circle class="ats-ring-bg-c" cx="18" cy="18" r="15.9"/>
+            <circle class="ats-ring-fill-c" id="atsRing" cx="18" cy="18" r="15.9"/>
+          </svg>
+          <div class="ats-ring-num" id="atsNum">--</div>
         </div>
+        <div class="ats-score-info">
+          <h3 id="atsLabel">Analyzing...</h3>
+          <p id="atsDesc">Running keyword analysis</p>
+        </div>
+      </div>
+      <div>
+        <div class="ats-kw-head"><span>Matched</span><span id="matchedN">0</span></div>
+        <div class="ats-kw-grid" id="matchedKW"></div>
+      </div>
+      <div>
+        <div class="ats-kw-head"><span>Missing</span><span id="missingN">0</span></div>
+        <div class="ats-kw-grid" id="missingKW"></div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:6px">
+        <a href="ats.html" class="btn btn-primary" style="justify-content:center">Open ATS Optimizer</a>
       </div>
     </div>
   </div>
+</div>
 
-  <script>
-    // ═══════════════════════════════════════════════════════════════════════
-    // Data
-    // ═══════════════════════════════════════════════════════════════════════
+<script>
+// ═══════════════════════════════════════════════════════════════════════
+// DATA
+// ═══════════════════════════════════════════════════════════════════════
+const RESUMES = [
+  {
+    id:1, role:'Lead Frontend Developer', persona:'React / TypeScript', score:94, level:'high',
+    updated:'2h ago', tags:['React','TypeScript','Next.js'],
+    name:'John Doe', contact:'john.doe@email.com · SF, CA',
+    summary:'Lead Frontend Engineer with 6+ years building visual interfaces, styling tokens, and reactive dashboard architectures.',
+    experience:[
+      {role:'Lead Frontend Architect', company:'Velo Technologies', date:'2023 - Present', bullets:['Designed visual styling systems using container-queries and CSS clamping.','Built client-side JSONB resume pipeline parser reducing latency by 300ms.','Implemented compiler rules for visual assets across internal platforms.']},
+      {role:'Senior UI Developer', company:'Stripe', date:'2020 - 2023', bullets:['Owned checkout components loading in under 120ms.','Maintained CSS layout guidelines and refactored responsive grids.']}
+    ],
+    skills:['JavaScript','HTML5','CSS Grid','Tailwind','React','Figma','JSONB'],
+    matchedKw:['React','TypeScript','CSS','HTML5','JavaScript','Frontend','UI','Responsive'],
+    missingKw:['PostgreSQL','Cloudflare Workers','WebSockets']
+  },
+  {
+    id:2, role:'Full-Stack Architect', persona:'Go / Postgres', score:92, level:'high',
+    updated:'4h ago', tags:['Go','PostgreSQL','Node.js'],
+    name:'John Doe', contact:'john.doe@email.com · SF, CA',
+    summary:'Systems architect specializing in distributed databases, Postgres schemas, and server-side TypeScript rendering.',
+    experience:[
+      {role:'Full-Stack Tech Lead', company:'Velo Tech', date:'2022 - 2024', bullets:['Migrated databases to Neon Postgres with real-time JSONB indexing.','Established automated client pipelines with Node.js and SQLite.','Architected split-layout preview components for file parsers.']}
+    ],
+    skills:['Node.js','TypeScript','PostgreSQL','JSONB','SQLite','Docker','React'],
+    matchedKw:['Go','PostgreSQL','Node.js','TypeScript','SQL','Docker','API','Backend'],
+    missingKw:['Kubernetes','GraphQL','Redis']
+  },
+  {
+    id:3, role:'Product Designer', persona:'Figma / Design Systems', score:88, level:'mid',
+    updated:'1d ago', tags:['Figma','UX','Prototyping'],
+    name:'John Doe', contact:'john.doe@email.com · SF, CA',
+    summary:'Product designer with engineering background. Creating tools, high-fidelity prototypes, and visual systems.',
+    experience:[
+      {role:'Lead Interaction Designer', company:'Figma', date:'2021 - 2023', bullets:['Reshaped design-system docs for 10x faster developer handoffs.','Co-created typography templates ensuring visual consistency.']}
+    ],
+    skills:['Figma','UI Design','Visual Systems','Typography','Prototyping','CSS'],
+    matchedKw:['Figma','UI Design','Typography','Prototyping','CSS','Design Systems'],
+    missingKw:['User Research','HTML','Analytics']
+  }
+];
 
-    const resumeData = [
-      {
-        id: 1,
-        role: 'Lead Frontend Developer',
-        persona: 'React / TypeScript',
-        score: '94%',
-        updated: '2h ago',
-        tags: ['React', 'TypeScript', 'Next.js'],
-        fileName: 'John_Doe_Frontend_React_Linear.pdf',
-        contact: 'john.doe@email.com · SF, CA',
-        summary: 'Lead Frontend Engineer with 6+ years constructing visual interfaces, styling tokens, and reactive dashboard architectures.',
-        experience: [
-          {
-            role: 'Lead Frontend Architect',
-            company: 'Velo Technologies',
-            date: '2023 - Present',
-            bullets: [
-              'Designed visual styling systems using container-queries, CSS clamping, and custom variables.',
-              'Built client-side JSONB resume pipeline parser reducing backend latency by 300ms.',
-              'Implemented custom compiler rules for visual assets across internal platforms.'
-            ]
-          },
-          {
-            role: 'Senior UI Developer',
-            company: 'Stripe',
-            date: '2020 - 2023',
-            bullets: [
-              'Owned checkout components loading in under 120ms for global merchants.',
-              'Maintained CSS layout guidelines and refactored responsive grids.'
-            ]
-          }
-        ],
-        skills: ['JavaScript', 'HTML5', 'CSS Grid', 'Tailwind', 'React', 'Figma', 'JSONB', 'Neon Postgres'],
-        matchedKw: ['React', 'TypeScript', 'CSS', 'HTML5', 'JavaScript', 'Frontend', 'UI', 'Responsive'],
-        missingKw: ['PostgreSQL', 'Cloudflare Workers', 'WebSockets']
-      },
-      {
-        id: 2,
-        role: 'Full-Stack Architect',
-        persona: 'Go / Postgres',
-        score: '92%',
-        updated: '4h ago',
-        tags: ['Go', 'PostgreSQL', 'Node.js'],
-        fileName: 'John_Doe_FullStack_Go_Postgres.pdf',
-        contact: 'john.doe@email.com · SF, CA',
-        summary: 'Systems architect specializing in distributed databases, Neon Postgres schemas, and server-side TypeScript rendering.',
-        experience: [
-          {
-            role: 'Full-Stack Tech Lead',
-            company: 'Velo Tech',
-            date: '2022 - 2024',
-            bullets: [
-              'Migrated application databases to Neon Postgres with real-time JSONB indexing.',
-              'Established automated client pipelines with Node.js and SQLite.',
-              'Architected split-layout preview components for custom file parsers.'
-            ]
-          }
-        ],
-        skills: ['Node.js', 'TypeScript', 'PostgreSQL', 'JSONB', 'SQLite', 'Docker', 'React'],
-        matchedKw: ['Go', 'PostgreSQL', 'Node.js', 'TypeScript', 'SQL', 'Docker', 'API', 'Backend'],
-        missingKw: ['Kubernetes', 'GraphQL', 'Redis']
-      },
-      {
-        id: 3,
-        role: 'Product Designer',
-        persona: 'Figma / Design Systems',
-        score: '88%',
-        updated: '1d ago',
-        tags: ['Figma', 'Design Systems', 'UX'],
-        fileName: 'John_Doe_Product_Design_Figma.pdf',
-        contact: 'john.doe@email.com · SF, CA',
-        summary: 'Product designer with engineering background. Creating beautiful tools, high-fidelity prototypes, and visual systems.',
-        experience: [
-          {
-            role: 'Lead Interaction Designer',
-            company: 'Figma',
-            date: '2021 - 2023',
-            bullets: [
-              'Reshaped design-system documentation, facilitating 10x faster developer handoffs.',
-              'Co-created typography templates ensuring consistent visual aesthetics across products.'
-            ]
-          }
-        ],
-        skills: ['Figma', 'UI Design', 'Visual Systems', 'Typography', 'Prototyping', 'CSS', 'Motion Design'],
-        matchedKw: ['Figma', 'UI Design', 'Typography', 'Prototyping', 'CSS', 'Design Systems'],
-        missingKw: ['User Research', 'HTML', 'Analytics']
-      }
-    ];
+const PIPELINE = [
+  { col:'Sandbox', dot:'#9F9E98', jobs:[
+    {logo:'LN', color:'#5E6AD2', company:'Linear', title:'Lead Frontend Engineer', loc:'Remote', score:94, level:'high', time:'1h ago', url:'https://linear.app/careers'},
+    {logo:'ST', color:'#635BFF', company:'Stripe', title:'UI Engineer', loc:'South San Francisco', score:86, level:'high', time:'4h ago', url:'https://stripe.com/jobs'}
+  ]},
+  { col:'Applied', dot:'#5B6ABF', jobs:[
+    {logo:'VC', color:'#000000', company:'Vercel', title:'Frontend Architect', loc:'Remote', score:90, level:'high', time:'2d ago', url:'https://vercel.com/careers'},
+    {logo:'SB', color:'#3ECF8E', company:'Supabase', title:'Database Engineer', loc:'Remote', score:82, level:'mid', time:'4d ago', url:'https://supabase.com/careers'}
+  ]},
+  { col:'Interviewing', dot:'#D4A316', jobs:[
+    {logo:'CF', color:'#F38020', company:'Cloudflare', title:'Developer Advocate', loc:'Austin, TX', score:92, level:'high', time:'Tomorrow', url:'https://cloudflare.com/careers'}
+  ]},
+  { col:'Offers', dot:'#2B5F45', jobs:[
+    {logo:'FL', color:'#7B3FF2', company:'Fly.io', title:'Platform UI Designer', loc:'Remote', score:89, level:'high', time:'Received', url:'https://fly.io/about'}
+  ]}
+];
 
-    const pipelineData = [
-      {
-        col: 'Sandbox',
-        dot: '#9CA3AF',
-        jobs: [
-          { slug: 'LN', title: 'Lead Frontend Engineer', comp: 'Linear · Remote', score: '94%', level: 'high', tag: 'LinkedIn Import', time: '1h ago' },
-          { slug: 'ST', title: 'UI Engineer', comp: 'Stripe · South SF', score: '86%', level: 'high', tag: 'LinkedIn Import', time: '4h ago' }
-        ]
-      },
-      {
-        col: 'Applied',
-        dot: '#5B6ABF',
-        jobs: [
-          { slug: 'VC', title: 'Frontend Architect', comp: 'Vercel · Remote', score: '90%', level: 'high', tag: 'Direct Portal', time: '2d ago' },
-          { slug: 'SB', title: 'Database Engineer', comp: 'Supabase · Remote', score: '82%', level: 'mid', tag: 'Direct Portal', time: '4d ago' }
-        ]
-      },
-      {
-        col: 'Interviewing',
-        dot: '#D4A316',
-        jobs: [
-          { slug: 'CF', title: 'Developer Advocate', comp: 'Cloudflare · Austin', score: '92%', level: 'high', tag: 'Tech Prep', time: 'Tomorrow' }
-        ]
-      },
-      {
-        col: 'Offers',
-        dot: '#2B5F45',
-        jobs: [
-          { slug: 'FL', title: 'Platform UI Designer', comp: 'Fly.io · Remote', score: '89%', level: 'high', tag: 'Offer', time: 'Received' }
-        ]
-      }
-    ];
+// Company colors for job logos
+const COMPANY_COLORS = {
+  'Linear':'#5E6AD2','Stripe':'#635BFF','Vercel':'#000000','Supabase':'#3ECF8E',
+  'Cloudflare':'#F38020','Fly.io':'#7B3FF2'
+};
 
-    // ═══════════════════════════════════════════════════════════════════════
-    // Render Resume Gallery
-    // ═══════════════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════════════
+// VIEW SWITCHING
+// ═══════════════════════════════════════════════════════════════════════
+function switchView(name) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const view = document.getElementById('view-' + name);
+  if (view) view.classList.add('active');
+  const nav = document.querySelector(`.nav-item[data-view="${name}"]`);
+  if (nav) nav.classList.add('active');
+  document.querySelector('.main').scrollTop = 0;
+}
 
-    function renderGallery() {
-      const container = document.getElementById('resumeGallery');
-      container.innerHTML = resumeData.map(r => `
-        <div class="resume-card" onclick="openDrawer(${r.id})">
-          <div class="resume-preview">
-            <div class="resume-preview-name">John Doe</div>
-            <div class="resume-preview-role">${r.role}</div>
-            <div class="resume-preview-bullets">
-              <div class="resume-preview-bullet">${r.experience[0].company} — ${r.experience[0].role}</div>
-              <div class="resume-preview-bullet">${r.experience[1] ? r.experience[1].company + ' — ' + r.experience[1].role : r.experience[0].bullets[0].substring(0, 40) + '...'}</div>
-            </div>
-            <div class="resume-preview-skills">
-              ${r.skills.slice(0, 4).map(s => `<span class="resume-preview-skill">${s}</span>`).join('')}
-            </div>
+document.querySelectorAll('.nav-item').forEach(item => {
+  item.addEventListener('click', () => switchView(item.dataset.view));
+});
+
+// ═══════════════════════════════════════════════════════════════════════
+// RENDER RESUMES
+// ═══════════════════════════════════════════════════════════════════════
+function renderResumes(containerId) {
+  const el = document.getElementById(containerId);
+  if (!el) return;
+  el.innerHTML = RESUMES.map(r => `
+    <div class="resume-card" onclick="openDrawer(${r.id})">
+      <div class="resume-preview">
+        <div class="rp-name">${r.name}</div>
+        <div class="rp-role">${r.role}</div>
+        <div class="rp-bullet">${r.experience[0].company} — ${r.experience[0].role}</div>
+        <div class="rp-bullet">${r.experience[1] ? r.experience[1].company + ' — ' + r.experience[1].role : r.summary.substring(0,45)+'...'}</div>
+        <div class="rp-skills">
+          ${r.skills.slice(0,4).map(s => `<span class="rp-skill">${s}</span>`).join('')}
+        </div>
+      </div>
+      <div class="resume-info">
+        <div class="resume-info-top">
+          <span class="resume-info-title">${r.role}</span>
+          <span class="resume-score ${r.level}">${r.score}%</span>
+        </div>
+        <div class="resume-meta">${r.persona} · ${r.updated}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// RENDER PIPELINE
+// ═══════════════════════════════════════════════════════════════════════
+function renderPipeline(containerId) {
+  const el = document.getElementById(containerId);
+  if (!el) return;
+  el.innerHTML = PIPELINE.map(col => `
+    <div class="kanban-col">
+      <div class="kanban-col-head">
+        <span class="kanban-col-name">
+          <span class="kanban-dot" style="background:${col.dot}"></span>
+          ${col.col}
+        </span>
+        <span class="kanban-count">${col.jobs.length}</span>
+      </div>
+      ${col.jobs.map(job => `
+        <div class="job" onclick="window.open('${job.url}', '_blank')">
+          <div class="job-top">
+            <div class="job-logo" style="background:${COMPANY_COLORS[job.company]||'#666'}">${job.logo}</div>
+            <span class="job-company">${job.company}</span>
+            <span class="job-score ${job.level}">${job.score}%</span>
           </div>
-          <div class="resume-card-body">
-            <div class="resume-card-top">
-              <span class="resume-role">${r.role}</span>
-              <span class="resume-score-badge">${r.score}</span>
-            </div>
-            <div class="resume-meta">${r.persona} · Updated ${r.updated}</div>
-            <div class="resume-tags">
-              ${r.tags.map(t => `<span class="resume-tag">${t}</span>`).join('')}
-            </div>
+          <div class="job-title">${job.title}</div>
+          <div class="job-loc">${job.loc}</div>
+          <div class="job-foot">
+            <span class="job-time">${job.time}</span>
+            <span class="job-apply">Apply <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg></span>
           </div>
         </div>
-      `).join('');
-    }
+      `).join('')}
+    </div>
+  `).join('');
+}
 
-    // ═══════════════════════════════════════════════════════════════════════
-    // Render Pipeline Kanban
-    // ═══════════════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════════════
+// DRAWER (Resume Preview + ATS)
+// ═══════════════════════════════════════════════════════════════════════
+function openDrawer(id) {
+  const r = RESUMES.find(d => d.id === id);
+  if (!r) return;
 
-    function renderPipeline() {
-      const board = document.getElementById('kanbanBoard');
-      board.innerHTML = pipelineData.map(col => `
-        <div class="kanban-col">
-          <div class="kanban-col-header">
-            <span class="kanban-col-title">
-              <span class="kanban-dot" style="background:${col.dot}"></span>
-              ${col.col}
-            </span>
-            <span class="kanban-count">${col.jobs.length}</span>
-          </div>
-          ${col.jobs.map(job => `
-            <div class="job-card" onclick="alert('Open: ${job.title} at ${job.comp}')">
-              <div class="job-card-top">
-                <span class="job-slug">${job.slug}</span>
-                <span class="job-score ${job.level}">${job.score}</span>
-              </div>
-              <div class="job-card-title">${job.title}</div>
-              <div class="job-card-comp">${job.comp}</div>
-              <div class="job-card-footer">
-                <span class="job-tag">${job.tag}</span>
-                <span>${job.time}</span>
-              </div>
-            </div>
-          `).join('')}
-        </div>
-      `).join('');
-    }
+  document.getElementById('drawerTitle').textContent = r.role;
+  document.getElementById('drawerSub').textContent = r.persona;
+  document.getElementById('atsNum').textContent = r.score + '%';
 
-    // ═══════════════════════════════════════════════════════════════════════
-    // Drawer (Resume Preview + ATS)
-    // ═══════════════════════════════════════════════════════════════════════
+  // Resume preview
+  let html = `
+    <div class="dr-header">
+      <div class="dr-name">${r.name}</div>
+      <div class="dr-contact">${r.contact}</div>
+    </div>
+    <div class="dr-section"><div class="dr-section-title">Summary</div><p>${r.summary}</p></div>
+    <div class="dr-section"><div class="dr-section-title">Experience</div>
+  `;
+  r.experience.forEach(e => {
+    html += `<div class="dr-item">
+      <div class="dr-item-head"><span>${e.company}</span><span class="dr-item-date">${e.date}</span></div>
+      <div class="dr-item-role">${e.role}</div>
+      <ul class="dr-bullets">${e.bullets.map(b => `<li>${b}</li>`).join('')}</ul>
+    </div>`;
+  });
+  html += `</div><div class="dr-section"><div class="dr-section-title">Skills</div>
+    <div class="dr-skills">${r.skills.map(s => `<span class="dr-skill">${s}</span>`).join('')}</div></div>`;
+  document.getElementById('drawerResume').innerHTML = html;
 
-    function openDrawer(id) {
-      const r = resumeData.find(d => d.id === id);
-      if (!r) return;
+  // ATS
+  document.getElementById('matchedKW').innerHTML = r.matchedKw.map(k => `<span class="ats-kw matched">${k}</span>`).join('');
+  document.getElementById('missingKW').innerHTML = r.missingKw.map(k => `<span class="ats-kw missing">${k}</span>`).join('');
+  document.getElementById('matchedN').textContent = r.matchedKw.length;
+  document.getElementById('missingN').textContent = r.missingKw.length;
 
-      document.getElementById('drawerTitle').textContent = r.role;
-      document.getElementById('drawerSubtitle').textContent = r.fileName.replace(/_/g, ' ');
-      document.getElementById('atsScoreNum').textContent = r.score;
+  // Ring
+  const ring = document.getElementById('atsRing');
+  const circ = 99.9; // 2*PI*15.9 ≈ 99.9
+  ring.style.strokeDasharray = circ;
+  ring.style.strokeDashoffset = circ - (r.score / 100 * circ);
+  ring.style.stroke = r.score >= 90 ? 'var(--success)' : r.score >= 80 ? 'var(--warn)' : 'var(--danger)';
 
-      // Resume preview (left)
-      let docHTML = `
-        <div class="drawer-resume-header">
-          <div class="drawer-resume-name">${r.role}</div>
-          <div class="drawer-resume-contact">${r.contact}</div>
-        </div>
-        <div class="drawer-resume-section">
-          <div class="drawer-resume-section-title">Summary</div>
-          <p>${r.summary}</p>
-        </div>
-        <div class="drawer-resume-section">
-          <div class="drawer-resume-section-title">Experience</div>
-      `;
-      r.experience.forEach(exp => {
-        docHTML += `
-          <div class="drawer-resume-item">
-            <div class="drawer-resume-item-header">
-              <span>${exp.company}</span>
-              <span class="drawer-resume-item-date">${exp.date}</span>
-            </div>
-            <div class="drawer-resume-item-role">${exp.role}</div>
-            <ul>
-              ${exp.bullets.map(b => `<li>${b}</li>`).join('')}
-            </ul>
-          </div>
-        `;
-      });
-      docHTML += `
-        </div>
-        <div class="drawer-resume-section">
-          <div class="drawer-resume-section-title">Skills</div>
-          <div class="drawer-resume-skills">
-            ${r.skills.map(s => `<span class="drawer-resume-skill">${s}</span>`).join('')}
-          </div>
-        </div>
-      `;
-      document.getElementById('drawerResume').innerHTML = docHTML;
+  document.getElementById('atsLabel').textContent = r.score >= 90 ? 'Excellent Match' : r.score >= 80 ? 'Good Match' : 'Needs Work';
+  document.getElementById('atsDesc').textContent = r.score >= 90 ? 'Highly aligned. Ready to apply.' : r.score >= 80 ? 'Minor keyword gaps. A few tweaks recommended.' : 'Significant gaps. Open ATS Optimizer.';
 
-      // ATS panel (right)
-      document.getElementById('matchedKeywords').innerHTML = r.matchedKw.map(k =>
-        `<span class="ats-kw matched">${k}</span>`
-      ).join('');
-      document.getElementById('missingKeywords').innerHTML = r.missingKw.map(k =>
-        `<span class="ats-kw missing">${k}</span>`
-      ).join('');
-      document.getElementById('matchedCount').textContent = r.matchedKw.length;
-      document.getElementById('missingCount').textContent = r.missingKw.length;
+  document.getElementById('drawerOverlay').classList.add('open');
+  document.getElementById('drawer').classList.add('open');
+}
 
-      // Update score ring
-      const scoreVal = parseInt(r.score);
-      const ring = document.getElementById('atsRingFill');
-      const circumference = 200;
-      const offset = circumference - (scoreVal / 100 * circumference);
-      ring.style.strokeDashoffset = offset;
-      if (scoreVal >= 90) {
-        ring.style.stroke = 'var(--success)';
-        document.getElementById('atsMatchLabel').textContent = 'Excellent Match';
-        document.getElementById('atsMatchDesc').textContent = 'Your resume is highly aligned. Ready to apply!';
-      } else if (scoreVal >= 80) {
-        ring.style.stroke = 'var(--warn)';
-        document.getElementById('atsMatchLabel').textContent = 'Good Match';
-        document.getElementById('atsMatchDesc').textContent = 'Minor optimizations recommended for best results.';
-      } else {
-        ring.style.stroke = 'var(--danger)';
-        document.getElementById('atsMatchLabel').textContent = 'Needs Work';
-        document.getElementById('atsMatchDesc').textContent = 'Significant keyword gaps detected. Open ATS Optimizer.';
-      }
+function closeDrawer() {
+  document.getElementById('drawerOverlay').classList.remove('open');
+  document.getElementById('drawer').classList.remove('open');
+}
 
-      document.getElementById('drawerOverlay').classList.add('open');
-      document.getElementById('drawer').classList.add('open');
-    }
+// ═══════════════════════════════════════════════════════════════════════
+// COACH
+// ═══════════════════════════════════════════════════════════════════════
+function addCoachMsg(text, sender) {
+  const container = document.getElementById('coachMessages');
+  const msg = document.createElement('div');
+  msg.className = `coach-msg ${sender}`;
+  msg.innerHTML = text;
+  container.appendChild(msg);
+  container.scrollTop = container.scrollHeight;
+}
 
-    function closeDrawer() {
-      document.getElementById('drawerOverlay').classList.remove('open');
-      document.getElementById('drawer').classList.remove('open');
-    }
+function sendCoach() {
+  const input = document.getElementById('coachInput');
+  const text = input.value.trim();
+  if (!text) return;
+  addCoachMsg(text, 'user');
+  input.value = '';
 
-    function closeDrawerOutside(e) {
-      if (e.target === document.getElementById('drawerOverlay')) {
-        closeDrawer();
-      }
-    }
+  const lower = text.toLowerCase();
+  let reply = 'I can help with resume optimization, interview prep, salary negotiation, or job strategy. What do you need?';
+  if (lower.includes('score') || lower.includes('resume')) {
+    reply = 'Your <strong>Lead Frontend</strong> resume scores <strong>94%</strong>. Strong keyword coverage. Main gaps: PostgreSQL, Cloudflare Workers, WebSockets. Want me to suggest where to add them?';
+  } else if (lower.includes('interview') || lower.includes('prep')) {
+    reply = 'For the <strong>Cloudflare Developer Advocate</strong> interview (tomorrow): expect questions on edge computing, Workers architecture, and developer community building. Key prep: review Durable Objects docs and prepare a demo.';
+  } else if (lower.includes('outreach') || lower.includes('draft') || lower.includes('email')) {
+    reply = 'Here\'s a draft for Linear:\n\n<em>"Hi Karri, I applied for the Lead Frontend Engineer role. With 6+ years building React/TypeScript systems at scale — including performance work at Stripe — I\'d love to discuss how I can contribute to Linear\'s speed-focused culture."</em>';
+  } else if (lower.includes('salary') || lower.includes('offer') || lower.includes('pay')) {
+    reply = 'For Lead Frontend roles at top-tier companies (Linear, Vercel, Stripe): expect \$180-240k base + equity. The Fly.io offer — what\'s the package? I can help negotiate.';
+  } else if (lower.includes('hello') || lower.includes('hi')) {
+    reply = 'Hi John! You have 6 active applications, 1 interview tomorrow at Cloudflare, and 1 offer from Fly.io. What should we tackle?';
+  }
 
-    function openDrawerPipeline() {
-      closeDrawer();
-      document.querySelector('.pipeline-section').scrollIntoView({ behavior: 'smooth' });
-    }
+  setTimeout(() => addCoachMsg(reply, 'assistant'), 600);
+}
 
-    // ═══════════════════════════════════════════════════════════════════════
-    // AI Coach
-    // ═══════════════════════════════════════════════════════════════════════
+function coachAct(type) {
+  const msgs = {
+    score: 'Analyzing your resumes... Your <strong>Frontend</strong> variant is strongest at 94%. The <strong>Designer</strong> variant could use work at 88%. Want specifics?',
+    interview: 'Next interview: <strong>Cloudflare Developer Advocate</strong> (tomorrow). Expect: edge computing architecture, community building, live coding. I recommend prepping a Workers demo.',
+    outreach: 'Draft for Linear hiring manager:\n\n<em>"Hi Karri, I noticed the Lead Frontend Engineer opening. My experience at Stripe optimizing checkout performance (sub-120ms load) aligns directly with Linear\'s speed-first approach. Would love to chat."</em>',
+    salary: 'Market rates for your target roles: Linear $200-250k, Vercel $190-240k, Stripe $180-230k (base + equity). The Fly.io offer — what number did they give?'
+  };
+  addCoachMsg(msgs[type] || 'How can I help?', 'assistant');
+}
 
-    let coachInitialized = false;
+document.getElementById('coachInput').addEventListener('keypress', e => {
+  if (e.key === 'Enter') sendCoach();
+});
 
-    function addCoachMessage(text, sender) {
-      const body = document.getElementById('coachBody');
-      const msg = document.createElement('div');
-      msg.className = `coach-message ${sender}`;
-      msg.textContent = text;
-      body.appendChild(msg);
-      body.scrollTop = body.scrollHeight;
-    }
+// ═══════════════════════════════════════════════════════════════════════
+// THEME
+// ═══════════════════════════════════════════════════════════════════════
+function toggleTheme() {
+  document.body.classList.toggle('dark');
+  const dark = document.body.classList.contains('dark');
+  localStorage.setItem('theme', dark ? 'dark' : 'light');
+  document.getElementById('iconMoon').style.display = dark ? 'none' : 'block';
+  document.getElementById('iconSun').style.display = dark ? 'block' : 'none';
+}
 
-    function showCoachTyping() {
-      const body = document.getElementById('coachBody');
-      const indicator = document.createElement('div');
-      indicator.className = 'coach-typing';
-      indicator.id = 'coachTyping';
-      indicator.innerHTML = '<div class="coach-typing-dot"></div><div class="coach-typing-dot"></div><div class="coach-typing-dot"></div>';
-      body.appendChild(indicator);
-      body.scrollTop = body.scrollHeight;
-    }
+if (localStorage.getItem('theme') === 'dark') toggleTheme();
+document.getElementById('themeToggle').addEventListener('click', toggleTheme);
 
-    function hideCoachTyping() {
-      const el = document.getElementById('coachTyping');
-      if (el) el.remove();
-    }
-
-    function coachReply(text) {
-      showCoachTyping();
-      setTimeout(() => {
-        hideCoachTyping();
-        addCoachMessage(text, 'assistant');
-      }, 800);
-    }
-
-    function sendCoachMessage() {
-      const input = document.getElementById('coachInput');
-      const text = input.value.trim();
-      if (!text) return;
-      addCoachMessage(text, 'user');
-      input.value = '';
-
-      const lower = text.toLowerCase();
-      let reply = "I'm here to help with your job search. Try asking about resume optimization, interview prep, or application strategy.";
-      if (lower.includes('score') || lower.includes('resume')) {
-        reply = "Your Lead Frontend Developer resume scores 94% against target roles. The ATS panel highlights strong keyword coverage. Want me to suggest improvements?";
-      } else if (lower.includes('interview') || lower.includes('prepare') || lower.includes('question')) {
-        reply = "For frontend roles, expect questions on React patterns, CSS architecture, and system design. I recommend reviewing: component composition, state management strategies, and Core Web Vitals.";
-      } else if (lower.includes('optimize') || lower.includes('ats')) {
-        reply = "Your main gaps are PostgreSQL, Cloudflare Workers, and WebSockets. Open the ATS Optimizer to inject these keywords naturally into your experience bullets.";
-      } else if (lower.includes('hello') || lower.includes('hi')) {
-        reply = "Hi! Ready to optimize your job search. Click a resume card to see the ATS breakdown, or ask me anything.";
-      }
-      coachReply(reply);
-    }
-
-    function coachAction(type) {
-      const messages = {
-        score: "📊 Analyzing your active resume personas... Your Lead Frontend resume scores 94% — strong match. The Product Designer variant could use some work at 88%. Want me to drill into specifics?",
-        summary: "✍️ Here's a suggested professional summary for your target role:\n\n\"Frontend Engineer with 6+ years building high-performance web applications. Specialized in React, TypeScript, and responsive design systems. Proven track record of optimizing UI performance and shipping developer tooling.\"",
-        optimize: "🎯 To optimize for the Linear role: inject PostgreSQL experience, Cloudflare Workers familiarity, and WebSocket architecture knowledge. Your current 94% is strong — we can push to 98% with targeted edits."
-      };
-      addCoachMessage(messages[type] || 'How can I help?', 'assistant');
-    }
-
-    // Coach input: Enter key
-    document.getElementById('coachInput').addEventListener('keypress', (e) => {
-      if (e.key === 'Enter') sendCoachMessage();
-    });
-
-    function toggleCoach() {
-      const sidebar = document.getElementById('coachSidebar');
-      sidebar.classList.toggle('collapsed');
-    }
-
-    // ═══════════════════════════════════════════════════════════════════════
-    // Theme Switcher
-    // ═══════════════════════════════════════════════════════════════════════
-
-    const themeToggle = document.getElementById('themeToggle');
-    const themeMoon = document.getElementById('themeMoon');
-    const themeSun = document.getElementById('themeSun');
-
-    const currentTheme = localStorage.getItem('theme') || 'light';
-    if (currentTheme === 'dark') {
-      document.body.classList.add('dark-mode');
-      if (themeMoon) themeMoon.style.display = 'none';
-      if (themeSun) themeSun.style.display = 'block';
-    } else {
-      document.body.classList.remove('dark-mode');
-      if (themeMoon) themeMoon.style.display = 'block';
-      if (themeSun) themeSun.style.display = 'none';
-    }
-
-    if (themeToggle) {
-      themeToggle.addEventListener('click', () => {
-        document.body.classList.toggle('dark-mode');
-        const theme = document.body.classList.contains('dark-mode') ? 'dark' : 'light';
-        localStorage.setItem('theme', theme);
-        if (theme === 'dark') {
-          if (themeMoon) themeMoon.style.display = 'none';
-          if (themeSun) themeSun.style.display = 'block';
-        } else {
-          if (themeMoon) themeMoon.style.display = 'block';
-          if (themeSun) themeSun.style.display = 'none';
-        }
-      });
-    }
-
-    // ═══════════════════════════════════════════════════════════════════════
-    // Init
-    // ═══════════════════════════════════════════════════════════════════════
-
-    renderGallery();
-    renderPipeline();
-  </script>
+// ═══════════════════════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════════════════════
+renderResumes('dashGallery');
+renderResumes('resumesGallery');
+renderPipeline('dashKanban');
+renderPipeline('pipelineBoard');
+</script>
 </body>
 </html>
