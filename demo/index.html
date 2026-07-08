@@ -3,31 +3,41 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Job For Sure · Workspace Launcher</title>
+  <title>Job For Sure · Workspace Dashboard</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
+    /* ═══════════════════════════════════════════════════════════════════════
+       Tokens
+       ═══════════════════════════════════════════════════════════════════════ */
     :root {
-      --bg:           #FBFBFA;              /* warm light cream */
+      --bg:           #F8F9FB;              /* cool off-white page bg */
       --surface:      #FFFFFF;              /* pure white cards */
-      --surface-card: #FFFFFF;
-      --fg:           #1A1A18;              /* deep off-black primary text */
-      --fg-2:         #5F5F5E;              /* warm charcoal secondary text */
-      --muted:        #8E8E8C;              /* tertiary — placeholders, metadata */
-      --meta:         #8E8E8C;              /* quaternary — timestamps, disabled */
-      --border:       #EAEAEA;              /* default light borders */
-      --border-soft:  #F2F2F0;              /* ultra-subtle divider */
-      --accent:       #D96245;              /* warm terracotta/rust primary */
-      --accent-hover: #E87053;
-      --accent-active:#C25035;
-      --font-display: "Instrument Serif", Georgia, serif;
+      --surface-hover:#F9FAFB;              /* subtle hover tint */
+      --panel:        #F3F4F6;              /* sidebar/panel bg */
+      --fg:           #111827;              /* deep gray primary text */
+      --fg-2:         #6B7280;              /* secondary text */
+      --muted:        #9CA3AF;              /* tertiary — placeholders */
+      --meta:         #9CA3AF;              /* timestamps, disabled */
+      --border:       #E5E7EB;              /* default border */
+      --border-soft:  #F0F1F3;              /* ultra-subtle divider */
+      --accent:       #5B6ABF;              /* steel-blue primary */
+      --accent-hover: #6B7AD0;              /* lighter steel-blue */
+      --accent-active:#4A59A8;              /* darker steel-blue */
+      --accent-soft:  rgba(91, 106, 191, 0.08);  /* subtle accent tint */
+      --success:      #2B5F45;              /* deep forest green */
+      --warn:         #D4A316;
+      --danger:       #DC2626;
       --font-body:    "Inter Variable", "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       --font-mono:    "JetBrains Mono", ui-monospace, monospace;
+      --radius-xs:    4px;
       --radius-sm:    6px;
       --radius-md:    8px;
-      --radius-lg:    12px;
-      --radius-pill:  9999px;
+      --motion-fast:  150ms;
+      --motion-base:  200ms;
+      --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+      --topnav-h:     64px;
     }
 
     *, *::before, *::after { box-sizing: border-box; }
@@ -37,60 +47,60 @@
       color: var(--fg);
       font-family: var(--font-body);
       font-feature-settings: "cv01" on, "ss03" on;
+      font-size: 14px;
       line-height: 1.55;
       -webkit-font-smoothing: antialiased;
-      padding: 0;
+      overflow: hidden;
+      height: 100vh;
     }
-    
-    .workspace-wrapper {
-      min-height: 100vh;
+    img, svg { display: block; }
+    a { color: inherit; text-decoration: none; }
+    button { font: inherit; cursor: pointer; border: none; background: none; padding: 0; }
+    p { margin: 0; }
+    h1, h2, h3, h4 { margin: 0; }
+
+    /* ═══════════════════════════════════════════════════════════════════════
+       Layout
+       ═══════════════════════════════════════════════════════════════════════ */
+    .app-viewport {
       display: flex;
       flex-direction: column;
-      justify-content: space-between;
-    }
-
-    .container {
-      max-width: 1200px;
-      margin-inline: auto;
-      padding-inline: 24px;
-      width: 100%;
+      height: 100vh;
+      width: 100vw;
     }
 
     /* ─── Topnav ─── */
     .topnav {
-      border-bottom: 1px solid var(--border);
+      height: var(--topnav-h);
       background: var(--surface);
-      position: sticky;
-      top: 0;
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
       z-index: 100;
-      height: 64px;
     }
     .topnav-inner {
       display: flex;
-      justify-content: space-between;
       align-items: center;
+      justify-content: space-between;
       height: 100%;
+      padding-inline: 24px;
     }
     .logo-container {
       display: flex;
       align-items: center;
       gap: 10px;
-      text-decoration: none;
       color: inherit;
     }
     .logo-mark {
       width: 16px;
       height: 16px;
       background: var(--accent);
-      border-radius: 4px;
-      display: inline-block;
-      box-shadow: 0 2px 8px rgba(217, 98, 69, 0.2);
+      border-radius: var(--radius-xs);
+      flex-shrink: 0;
     }
     .logo-text {
-      font-family: var(--font-display);
       font-weight: 600;
-      letter-spacing: -0.01em;
       font-size: 16px;
+      letter-spacing: -0.01em;
     }
     .topnav nav {
       display: flex;
@@ -99,13 +109,10 @@
     .topnav nav a {
       font-size: 13px;
       color: var(--muted);
-      text-decoration: none;
       transition: color var(--motion-fast);
       position: relative;
     }
-    .topnav nav a:hover {
-      color: var(--fg);
-    }
+    .topnav nav a:hover { color: var(--fg); }
     .topnav nav a.active {
       color: var(--fg);
       font-weight: 510;
@@ -119,174 +126,6 @@
       height: 2px;
       background: var(--accent);
     }
-    .status-badge {
-      font-family: var(--font-mono);
-      font-size: 11px;
-      color: var(--muted);
-      border: 1px solid var(--border);
-      padding: 4px 10px;
-      border-radius: var(--radius-pill);
-      background: var(--surface-card);
-    }
-
-    /* Main Content */
-    main {
-      padding-block: 80px;
-      flex-grow: 1;
-    }
-    
-    .hero-section {
-      margin-bottom: 64px;
-      max-width: 680px;
-    }
-    .eyebrow {
-      font-family: var(--font-mono);
-      font-size: 12px;
-      color: var(--accent-hover);
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      margin-bottom: 16px;
-    }
-    h1 {
-      font-size: 40px;
-      font-weight: 510;
-      letter-spacing: -0.022em;
-      line-height: 1.1;
-      margin: 0 0 16px 0;
-    }
-    .subtitle {
-      color: var(--fg-2);
-      font-size: 18px;
-      line-height: 1.5;
-      margin: 0;
-    }
-
-    /* Cards Grid */
-    .screens-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 24px;
-    }
-    @media (max-width: 768px) {
-      .screens-grid {
-        grid-template-columns: 1fr;
-      }
-    }
-
-    .screen-card {
-      background: rgba(255, 255, 255, 0.02);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-lg);
-      padding: 32px;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      transition: background var(--motion-fast), border-color var(--motion-fast), transform var(--motion-fast);
-      cursor: pointer;
-      text-decoration: none;
-      color: inherit;
-    }
-    .screen-card:hover {
-      background: rgba(255, 255, 255, 0.04);
-      border-color: rgba(255, 255, 255, 0.15);
-      transform: translateY(-2px);
-    }
-    
-    .card-top {
-      margin-bottom: 32px;
-    }
-    .card-num {
-      font-family: var(--font-mono);
-      font-size: 12px;
-      color: var(--muted);
-      margin-bottom: 12px;
-    }
-    h2 {
-      font-size: 22px;
-      font-weight: 510;
-      margin: 0 0 8px 0;
-      letter-spacing: -0.01em;
-    }
-    .card-desc {
-      color: var(--muted);
-      font-size: 14px;
-      line-height: 1.5;
-      margin: 0;
-    }
-    .card-features {
-      list-style: none;
-      padding: 0;
-      margin: 20px 0 0 0;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-    }
-    .card-features li {
-      font-size: 11px;
-      font-family: var(--font-mono);
-      color: var(--fg-2);
-      background: rgba(255, 255, 255, 0.05);
-      padding: 4px 8px;
-      border-radius: 4px;
-      border: 1px solid rgba(255, 255, 255, 0.03);
-    }
-    
-    .card-bottom {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      border-top: 1px solid var(--border-soft);
-      padding-top: 20px;
-    }
-    .launch-btn {
-      color: var(--fg);
-      font-size: 13px;
-      font-weight: 500;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-    .screen-card:hover .launch-btn {
-      color: var(--accent-hover);
-    }
-    .arrow-icon {
-      transition: transform var(--motion-fast);
-    }
-    .screen-card:hover .arrow-icon {
-      transform: translateX(4px);
-    }
-    .badge-interactive {
-      background: rgba(217, 98, 69, 0.08);
-      color: var(--accent);
-      border: 1px solid rgba(217, 98, 69, 0.15);
-      font-size: 10px;
-      font-family: var(--font-mono);
-      padding: 2px 8px;
-      border-radius: var(--radius-pill);
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-    }
-
-    /* Buttons */
-    .btn {
-      display: inline-flex; align-items: center; gap: 8px;
-      padding: 10px 18px;
-      border-radius: var(--radius-sm);
-      font-size: 14px;
-      font-weight: 510;
-      transition: transform 0.05s ease, background var(--motion-fast), border-color var(--motion-fast);
-      text-decoration: none;
-      white-space: nowrap;
-      cursor: pointer;
-      border: 1px solid transparent;
-      background: none;
-      font-family: inherit;
-    }
-    .btn:active { transform: translateY(1px); }
-    .btn-primary { background: var(--accent); color: white; border-color: var(--accent); }
-    .btn-primary:hover { background: var(--accent-hover); border-color: var(--accent-hover); }
-    .btn-ghost { color: var(--muted); border-color: transparent; }
-    .btn-ghost:hover { color: var(--fg); }
     .nav-actions {
       display: flex;
       align-items: center;
@@ -300,188 +139,841 @@
       display: inline-flex;
       align-items: center;
       justify-content: center;
+      color: var(--muted);
+      transition: color var(--motion-fast), background var(--motion-fast);
+    }
+    .nav-icon-btn:hover {
+      color: var(--fg);
+      background: var(--panel);
     }
 
-    /* Footer */
-    footer {
-      border-top: 1px solid var(--border-soft);
-      padding-block: 40px;
-      color: var(--meta);
+    /* ─── Buttons ─── */
+    .btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 8px 16px;
+      border-radius: var(--radius-sm);
       font-size: 13px;
+      font-weight: 510;
+      transition: all var(--motion-fast);
+      white-space: nowrap;
+      border: 1px solid transparent;
+      font-family: inherit;
+      line-height: 1;
     }
-    .footer-inner {
+    .btn:active { transform: translateY(1px); }
+    .btn-primary { background: var(--accent); color: white; border-color: var(--accent); }
+    .btn-primary:hover { background: var(--accent-hover); border-color: var(--accent-hover); }
+    .btn-secondary { background: var(--surface); color: var(--fg-2); border-color: var(--border); }
+    .btn-secondary:hover { background: var(--panel); color: var(--fg); }
+    .btn-ghost { color: var(--muted); background: transparent; }
+    .btn-ghost:hover { color: var(--fg); background: var(--panel); }
+    .btn-sm { padding: 6px 12px; font-size: 12px; }
+
+    /* ─── Main Dashboard Layout ─── */
+    .dashboard {
       display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 16px;
+      flex-grow: 1;
+      overflow: hidden;
     }
 
-    /* Floating AI Chat Widget */
-    .chat-widget {
-      position: fixed;
-      bottom: 24px;
-      right: 24px;
-      z-index: 1000;
-      font-family: var(--font-body);
+    /* ─── Main Content Area ─── */
+    .main-content {
+      flex-grow: 1;
+      overflow-y: auto;
+      min-width: 0;
+      padding: 32px 40px 0 40px;
     }
-    .chat-trigger {
-      width: 48px; height: 48px;
+
+    /* ─── AI Coach Sidebar (right) ─── */
+    .coach-sidebar {
+      width: 360px;
+      background: var(--surface);
+      border-left: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+    }
+    .coach-header {
+      padding: 20px 24px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-shrink: 0;
+    }
+    .coach-header-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .coach-avatar {
+      width: 28px;
+      height: 28px;
       border-radius: 50%;
       background: var(--accent);
       color: white;
-      display: flex; align-items: center; justify-content: center;
-      box-shadow: 0 4px 16px rgba(0,0,0,0.3), 0 0 0 1px rgba(255,255,255,0.08);
-      cursor: pointer;
-      transition: all var(--motion-fast);
-      position: relative;
-      border: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      font-size: 11px;
+      flex-shrink: 0;
     }
-    .chat-trigger:hover {
-      background: var(--accent-hover);
-      transform: scale(1.05);
+    .coach-name {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--fg);
     }
-    .chat-trigger svg { width: 20px; height: 20px; }
-    .chat-badge {
-      position: absolute; top: 0; right: 0;
-      width: 10px; height: 10px;
+    .coach-status {
+      font-size: 11px;
+      color: var(--success);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      margin-top: 1px;
+    }
+    .coach-status::before {
+      content: '';
+      width: 6px;
+      height: 6px;
       background: var(--success);
       border-radius: 50%;
-      border: 2px solid var(--bg);
+      display: inline-block;
     }
-    .chat-window {
-      position: absolute;
-      bottom: 60px; right: 0;
-      width: 340px; height: 420px;
-      background: var(--surface-card);
+    .coach-body {
+      flex-grow: 1;
+      overflow-y: auto;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .coach-message {
+      max-width: 100%;
+      padding: 12px 16px;
+      border-radius: var(--radius-sm);
+      font-size: 13px;
+      line-height: 1.55;
+    }
+    .coach-message.assistant {
+      background: var(--bg);
       border: 1px solid var(--border);
-      border-radius: var(--radius-lg);
-      display: flex; flex-direction: column;
-      overflow: hidden;
-      opacity: 0; pointer-events: none;
-      transform: translateY(10px) scale(0.98);
-      transition: all 0.2s cubic-bezier(0.16,1,0.3,1);
+      color: var(--fg-2);
+      align-self: flex-start;
     }
-    .chat-window.open {
-      opacity: 1; pointer-events: auto;
-      transform: translateY(0) scale(1);
-    }
-    .chat-header {
-      background: var(--surface);
-      padding: 14px 16px;
-      border-bottom: 1px solid var(--border-soft);
-      display: flex; justify-content: space-between; align-items: center;
-    }
-    .chat-coach-info { display: flex; align-items: center; gap: 10px; }
-    .chat-avatar {
-      width: 28px; height: 28px;
+    .coach-message.user {
       background: var(--accent);
-      border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 11px; font-weight: 600; color: white;
-    }
-    .chat-coach-name { font-size: 13px; font-weight: 510; color: var(--fg); }
-    .chat-coach-status {
-      font-size: 11px; color: var(--success);
-      display: flex; align-items: center; gap: 4px;
-    }
-    .chat-coach-status::before {
-      content: ''; width: 6px; height: 6px;
-      background: var(--success); border-radius: 50%; display: inline-block;
-    }
-    .chat-close {
-      color: var(--muted); font-size: 18px; cursor: pointer; background: none; border: none; font-family: inherit;
-    }
-    .chat-close:hover { color: var(--fg); }
-    .chat-body {
-      flex-grow: 1; padding: 16px;
-      overflow-y: auto; display: flex; flex-direction: column;
-      gap: 12px; background: var(--surface-card);
-    }
-    .chat-message {
-      max-width: 85%; padding: 10px 14px;
-      border-radius: var(--radius-sm); font-size: 13px; line-height: 1.45;
-    }
-    .chat-message.coach {
-      background: var(--surface); border: 1px solid var(--border-soft);
-      color: var(--fg-2); align-self: flex-start;
-    }
-    .chat-message.user {
-      background: var(--accent); color: white;
+      color: white;
       align-self: flex-end;
     }
-    .chat-typing-indicator {
-      display: flex; gap: 4px; padding: 10px 14px;
-      background: var(--surface); border: 1px solid var(--border-soft);
-      align-self: flex-start; border-radius: var(--radius-sm);
+    .coach-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 4px;
     }
-    .typing-dot {
-      width: 6px; height: 6px; background: var(--muted);
-      border-radius: 50%; animation: typing 1.4s infinite;
+    .coach-pill {
+      font-size: 12px;
+      padding: 6px 12px;
+      border-radius: var(--radius-sm);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--fg-2);
+      cursor: pointer;
+      transition: all var(--motion-fast);
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
     }
-    .typing-dot:nth-child(2) { animation-delay: 0.2s; }
-    .typing-dot:nth-child(3) { animation-delay: 0.4s; }
-    @keyframes typing {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-4px); }
+    .coach-pill:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+      background: var(--accent-soft);
     }
-    .chat-footer {
-      padding: 12px; background: var(--surface);
-      border-top: 1px solid var(--border-soft); display: flex; gap: 8px;
+    .coach-typing {
+      display: flex;
+      gap: 4px;
+      align-items: center;
+      padding: 12px 16px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      align-self: flex-start;
     }
-    .chat-input {
-      flex-grow: 1; background: var(--bg);
-      border: 1px solid var(--border); border-radius: var(--radius-sm);
-      padding: 8px 12px; color: var(--fg); font-size: 13px; font-family: inherit;
+    .coach-typing-dot {
+      width: 5px;
+      height: 5px;
+      background: var(--muted);
+      border-radius: 50%;
+      animation: coachTyping 1.4s infinite;
     }
-    .chat-input:focus { outline: none; border-color: var(--accent-hover); }
-    .chat-send {
-      background: var(--accent); color: white;
-      padding: 8px 12px; border-radius: var(--radius-sm);
-      font-size: 13px; font-weight: 510; cursor: pointer; border: none; font-family: inherit;
+    .coach-typing-dot:nth-child(2) { animation-delay: 0.2s; }
+    .coach-typing-dot:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes coachTyping {
+      0%, 100% { opacity: 0.2; transform: translateY(0); }
+      50% { opacity: 1; transform: translateY(-2px); }
     }
-    .chat-send:hover { background: var(--accent-hover); }
+    .coach-footer {
+      padding: 16px 20px;
+      border-top: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+    .coach-input-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 6px 12px;
+    }
+    .coach-input-row:focus-within {
+      border-color: var(--accent);
+    }
+    .coach-input {
+      flex-grow: 1;
+      background: transparent;
+      border: none;
+      color: var(--fg);
+      font-family: var(--font-body);
+      font-size: 13px;
+      outline: none;
+      padding: 0;
+    }
+    .coach-input::placeholder { color: var(--muted); }
+    .coach-send {
+      color: var(--accent);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 4px;
+      transition: color var(--motion-fast);
+    }
+    .coach-send:hover { color: var(--accent-hover); }
 
-    /* ─── Dark Mode Overrides ─── */
+    /* ─── Stats Bar ─── */
+    .stats-bar {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 32px;
+    }
+    .stat-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 20px;
+    }
+    .stat-val {
+      font-family: var(--font-mono);
+      font-size: 26px;
+      font-weight: 500;
+      color: var(--fg);
+      margin-bottom: 4px;
+    }
+    .stat-lbl {
+      color: var(--muted);
+      font-size: 11px;
+      font-family: var(--font-mono);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    /* ─── Section Headers ─── */
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    .section-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--fg);
+    }
+    .section-action {
+      font-size: 12px;
+      color: var(--accent);
+      font-weight: 510;
+      cursor: pointer;
+      transition: color var(--motion-fast);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .section-action:hover { color: var(--accent-hover); }
+
+    /* ─── Resume Gallery ─── */
+    .gallery-section {
+      margin-bottom: 40px;
+    }
+    .resume-gallery {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+    .resume-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 0;
+      cursor: pointer;
+      transition: border-color var(--motion-fast);
+      overflow: hidden;
+    }
+    .resume-card:hover {
+      border-color: var(--accent);
+    }
+    .resume-preview {
+      height: 140px;
+      background: var(--panel);
+      border-bottom: 1px solid var(--border);
+      padding: 16px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      font-family: var(--font-mono);
+      font-size: 10px;
+      color: var(--muted);
+      position: relative;
+      overflow: hidden;
+    }
+    .resume-preview-line {
+      height: 6px;
+      background: var(--border);
+      border-radius: 2px;
+      width: 100%;
+    }
+    .resume-preview-line:nth-child(2) { width: 85%; }
+    .resume-preview-line:nth-child(3) { width: 70%; }
+    .resume-preview-line:nth-child(4) { width: 90%; }
+    .resume-preview-line:nth-child(5) { width: 60%; }
+    .resume-preview-line:nth-child(6) { width: 75%; }
+    .resume-preview-line:nth-child(7) { width: 45%; }
+    .resume-preview-line.accent {
+      background: var(--accent-soft);
+      height: 8px;
+    }
+    .resume-preview-label {
+      position: absolute;
+      bottom: 12px;
+      right: 16px;
+      font-size: 9px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      background: var(--surface);
+      padding: 2px 8px;
+      border-radius: var(--radius-xs);
+      border: 1px solid var(--border);
+    }
+    .resume-card-body {
+      padding: 16px 20px;
+    }
+    .resume-card-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 6px;
+    }
+    .resume-role {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--fg);
+      line-height: 1.3;
+    }
+    .resume-score-badge {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--success);
+      background: rgba(43, 95, 69, 0.08);
+      padding: 2px 8px;
+      border-radius: var(--radius-xs);
+      flex-shrink: 0;
+    }
+    .resume-meta {
+      font-size: 12px;
+      color: var(--muted);
+    }
+    .resume-tags {
+      display: flex;
+      gap: 6px;
+      margin-top: 8px;
+      flex-wrap: wrap;
+    }
+    .resume-tag {
+      font-size: 10px;
+      padding: 2px 6px;
+      border-radius: var(--radius-xs);
+      background: var(--panel);
+      color: var(--fg-2);
+      border: 1px solid var(--border);
+    }
+
+    /* ─── Pipeline Kanban ─── */
+    .pipeline-section {
+      margin-bottom: 32px;
+    }
+    .kanban-board {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      align-items: start;
+    }
+    .kanban-col {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 16px;
+      min-height: 360px;
+    }
+    .kanban-col-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--border-soft);
+    }
+    .kanban-col-title {
+      font-size: 12px;
+      font-family: var(--font-mono);
+      font-weight: 600;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .kanban-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .kanban-count {
+      font-size: 11px;
+      font-family: var(--font-mono);
+      background: var(--panel);
+      color: var(--muted);
+      padding: 2px 6px;
+      border-radius: var(--radius-xs);
+    }
+    .job-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xs);
+      padding: 14px;
+      margin-bottom: 10px;
+      cursor: pointer;
+      transition: border-color var(--motion-fast), background var(--motion-fast);
+    }
+    .job-card:hover {
+      border-color: var(--accent);
+      background: var(--surface-hover);
+    }
+    .job-card-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+    .job-slug {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      color: var(--muted);
+      text-transform: uppercase;
+    }
+    .job-score {
+      font-size: 10px;
+      font-family: var(--font-mono);
+      padding: 2px 6px;
+      border-radius: var(--radius-xs);
+    }
+    .job-score.high { background: rgba(43, 95, 69, 0.08); color: var(--success); }
+    .job-score.mid { background: rgba(212, 163, 22, 0.08); color: var(--warn); }
+    .job-card-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--fg);
+      margin-bottom: 2px;
+    }
+    .job-card-comp {
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 10px;
+    }
+    .job-card-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-top: 1px solid var(--border-soft);
+      padding-top: 8px;
+      font-size: 11px;
+      color: var(--meta);
+    }
+    .job-tag {
+      font-size: 10px;
+      padding: 2px 6px;
+      border-radius: var(--radius-xs);
+      border: 1px solid var(--border);
+      color: var(--muted);
+    }
+
+    /* ─── Drawer (Resume Preview + ATS) ─── */
+    .drawer-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.3);
+      z-index: 200;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity var(--motion-base);
+    }
+    .drawer-overlay.open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .drawer {
+      position: fixed;
+      top: 0;
+      right: -800px;
+      width: 800px;
+      max-width: 100vw;
+      height: 100vh;
+      background: var(--surface);
+      border-left: 1px solid var(--border);
+      z-index: 201;
+      display: flex;
+      flex-direction: column;
+      transition: right var(--motion-base) var(--ease-standard);
+    }
+    .drawer.open {
+      right: 0;
+    }
+    .drawer-header {
+      padding: 20px 28px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-shrink: 0;
+    }
+    .drawer-title-group {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .drawer-title {
+      font-size: 16px;
+      font-weight: 600;
+    }
+    .drawer-subtitle {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--muted);
+    }
+    .drawer-close {
+      padding: 6px;
+      border-radius: 50%;
+      color: var(--muted);
+      transition: all var(--motion-fast);
+    }
+    .drawer-close:hover {
+      color: var(--fg);
+      background: var(--panel);
+    }
+    .drawer-body {
+      flex-grow: 1;
+      overflow-y: auto;
+      padding: 28px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 28px;
+    }
+    /* Left: Resume preview */
+    .drawer-resume {
+      background: #FDFDFB;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xs);
+      padding: 32px 28px;
+      font-family: Georgia, serif;
+      color: #2D2D2A;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+    .drawer-resume-header {
+      text-align: center;
+      margin-bottom: 24px;
+    }
+    .drawer-resume-name {
+      font-size: 24px;
+      font-weight: 500;
+      color: #1A1A18;
+      margin-bottom: 4px;
+    }
+    .drawer-resume-contact {
+      font-family: var(--font-body);
+      font-size: 11px;
+      color: #6B7280;
+    }
+    .drawer-resume-section {
+      margin-bottom: 20px;
+    }
+    .drawer-resume-section-title {
+      font-family: var(--font-body);
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--accent);
+      border-bottom: 1px solid #EBEBE9;
+      padding-bottom: 6px;
+      margin-bottom: 12px;
+    }
+    .drawer-resume-item {
+      margin-bottom: 16px;
+    }
+    .drawer-resume-item-header {
+      display: flex;
+      justify-content: space-between;
+      font-weight: 600;
+      font-size: 13px;
+      margin-bottom: 2px;
+    }
+    .drawer-resume-item-role {
+      font-family: var(--font-body);
+      font-size: 12px;
+      color: #6B7280;
+    }
+    .drawer-resume-item-date {
+      font-family: var(--font-body);
+      font-size: 11px;
+      color: #9CA3AF;
+    }
+    .drawer-resume ul {
+      margin: 6px 0 0 0;
+      padding-left: 18px;
+    }
+    .drawer-resume li {
+      margin-bottom: 4px;
+    }
+    .drawer-resume-skills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    .drawer-resume-skill {
+      background: #F3F4F6;
+      padding: 3px 8px;
+      border-radius: var(--radius-xs);
+      font-family: var(--font-body);
+      font-size: 11px;
+    }
+
+    /* Right: ATS Panel */
+    .drawer-ats {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+    .ats-score-card {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 24px;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+    .ats-score-ring {
+      position: relative;
+      width: 72px;
+      height: 72px;
+      flex-shrink: 0;
+    }
+    .ats-score-ring svg {
+      transform: rotate(-90deg);
+      width: 72px;
+      height: 72px;
+    }
+    .ats-ring-bg {
+      fill: none;
+      stroke: var(--border);
+      stroke-width: 5;
+    }
+    .ats-ring-fill {
+      fill: none;
+      stroke: var(--success);
+      stroke-width: 5;
+      stroke-linecap: round;
+      stroke-dasharray: 200;
+      stroke-dashoffset: calc(200 - (91 / 100 * 200));
+      transition: stroke-dashoffset 1s var(--ease-standard), stroke var(--motion-base);
+    }
+    .ats-score-num {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-family: var(--font-mono);
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--fg);
+    }
+    .ats-score-info h3 {
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+    .ats-score-info p {
+      font-size: 12px;
+      color: var(--fg-2);
+    }
+    .ats-keywords {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .ats-kw-header {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      border-bottom: 1px solid var(--border-soft);
+      padding-bottom: 6px;
+      display: flex;
+      justify-content: space-between;
+    }
+    .ats-kw-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    .ats-kw {
+      font-size: 11px;
+      font-family: var(--font-mono);
+      padding: 4px 10px;
+      border-radius: var(--radius-xs);
+    }
+    .ats-kw.matched {
+      background: rgba(43, 95, 69, 0.08);
+      color: var(--success);
+      border: 1px solid rgba(43, 95, 69, 0.15);
+    }
+    .ats-kw.missing {
+      background: rgba(220, 38, 38, 0.06);
+      color: var(--danger);
+      border: 1px solid rgba(220, 38, 38, 0.12);
+    }
+    .ats-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    /* ─── Footer ─── */
+    .app-footer {
+      flex-shrink: 0;
+      padding: 12px 24px;
+      border-top: 1px solid var(--border-soft);
+      color: var(--meta);
+      font-size: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--surface);
+    }
+
+    /* ─── Dark Mode ─── */
     body.dark-mode {
-      --bg:           #0B0D0E;              /* dark page background */
-      --surface:      #141618;              /* elevated surfaces */
-      --surface-card: #1C1E20;
-      --panel:        #141618;              /* sidebar panel background */
-      --console-bg:   #0B0D0E;              /* chat area background */
+      --bg:           #0B0D0E;
+      --surface:      #141618;
+      --surface-hover:#1A1C1E;
+      --panel:        #141618;
       --border:       rgba(255, 255, 255, 0.06);
       --border-soft:  rgba(255, 255, 255, 0.04);
       --fg:           #EDEEF0;
       --fg-2:         #9BA0A8;
       --muted:        #656A72;
       --meta:         #656A72;
-      --accent:       #E87053;              /* terracotta in dark mode */
-      --accent-on:    #120703;
-      --accent-hover: #FF8C72;
-      --accent-active:#D96245;
-      --success:      #22C55E;
-      --warn:         #EAB308;
+      --accent:       #7B8AD8;   /* lighter steel-blue for dark mode contrast */
+      --accent-hover: #8B9AE8;
+      --accent-active:#5B6ABF;
+      --accent-soft:  rgba(123, 138, 216, 0.12);
+      --success:      #4ADE80;
+    }
+    body.dark-mode .coach-message.assistant {
+      background: rgba(255,255,255,0.02);
+    }
+    body.dark-mode .drawer-resume {
+      background: #111214;
+      color: #C5C6C8;
+    }
+    body.dark-mode .drawer-resume-name {
+      color: #EDEEF0;
+    }
+    body.dark-mode .drawer-resume-section-title {
+      border-bottom-color: rgba(255,255,255,0.06);
+    }
+    body.dark-mode .drawer-resume-header {
+      border-bottom-color: rgba(255,255,255,0.06);
+    }
+    body.dark-mode .drawer-resume-skill {
+      background: #1C1E20;
+      color: #EDEEF0;
+    }
+
+    /* ─── Responsive ─── */
+    @media (max-width: 1200px) {
+      .resume-gallery { grid-template-columns: repeat(2, 1fr); }
+      .kanban-board { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 1024px) {
+      .coach-sidebar {
+        position: fixed;
+        right: 0;
+        top: var(--topnav-h);
+        bottom: 0;
+        z-index: 50;
+        box-shadow: -4px 0 16px rgba(0,0,0,0.08);
+      }
+      .coach-sidebar.collapsed {
+        width: 0;
+        border-left: none;
+        overflow: hidden;
+      }
+    }
+    @media (max-width: 768px) {
+      .main-content { padding: 24px 16px 0 16px; }
+      .stats-bar { grid-template-columns: repeat(2, 1fr); }
+      .resume-gallery { grid-template-columns: 1fr; }
+      .kanban-board { grid-template-columns: 1fr; }
+      .drawer { width: 100vw; }
+      .drawer-body { grid-template-columns: 1fr; }
     }
   </style>
 </head>
 <body>
-  <div class="workspace-wrapper">
-    <!-- Topnav -->
+  <div class="app-viewport">
+
+    <!-- ═══════════ Topnav ═══════════ -->
     <header class="topnav">
-      <div class="container topnav-inner">
+      <div class="topnav-inner">
         <a href="index.html" class="logo-container">
           <div class="logo-mark"></div>
           <span class="logo-text">JOB FOR SURE</span>
         </a>
         <nav>
           <a href="landing.html">Product</a>
+          <a href="index.html" class="active">Dashboard</a>
           <a href="agency.html">Workspace</a>
-          <a href="resumes.html">Resumes</a>
           <a href="ats.html">ATS Optimizer</a>
-          <a href="app.html">Job Pipeline</a>
         </nav>
         <div class="nav-actions">
-          <button id="themeToggle" class="btn btn-ghost nav-icon-btn" title="Toggle Light/Dark Theme">
+          <button id="themeToggle" class="nav-icon-btn" title="Toggle Light/Dark Theme">
             <svg id="themeMoon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
             <svg id="themeSun" style="display:none;" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
           </button>
@@ -490,225 +982,564 @@
       </div>
     </header>
 
-    <main>
-      <div class="container">
-        <div class="hero-section">
-          <div class="eyebrow">Interactive Prototype</div>
-          <h1>Job For Sure Career Suite</h1>
-          <p class="subtitle">An AI-powered suite for modern job hunts — optimize resumes, manage personas, track applications, and import from LinkedIn.</p>
-        </div>
+    <!-- ═══════════ Dashboard ═══════════ -->
+    <div class="dashboard">
 
-        <div class="screens-grid">
-          <!-- 1. Landing -->
-          <a href="landing.html" class="screen-card">
-            <div class="card-top">
-              <div class="card-num">01 / PUBLIC MARKETING</div>
-              <h2>Landing Page</h2>
-              <p class="card-desc">Sleek product landing presenting features, statistics, Chrome extension, and pricing.</p>
-              <ul class="card-features">
-                <li>Value Props</li>
-                <li>Chrome Ext Demo</li>
-                <li>Pricing Matrix</li>
-              </ul>
-            </div>
-            <div class="card-bottom">
-              <span class="launch-btn">Launch screen <span class="arrow-icon">→</span></span>
-              <span class="badge-interactive">Responsive</span>
-            </div>
-          </a>
+      <!-- Main Content Area -->
+      <main class="main-content">
 
-          <!-- 2. Persona Hub -->
-          <a href="agency.html" class="screen-card">
-            <div class="card-top">
-              <div class="card-num">02 / AUTHENTICATED HUB</div>
-              <h2>Workspace (Persona Hub)</h2>
-              <p class="card-desc">Manage your own multiple target resume personas (Frontend, Full-Stack, Designer) in one place with a Postgres JSONB view.</p>
-              <ul class="card-features">
-                <li>Persona Switcher</li>
-                <li>JSONB Document</li>
-                <li>Guided Onboarding Tour</li>
-                <li>AI Coach console</li>
-              </ul>
-            </div>
-            <div class="card-bottom">
-              <span class="launch-btn">Launch screen <span class="arrow-icon">→</span></span>
-              <span class="badge-interactive" style="background: rgba(217, 98, 69, 0.08); color: var(--accent); border-color: rgba(217, 98, 69, 0.15);">Entry Point</span>
-            </div>
-          </a>
-
-          <!-- 3. ATS Analyzer -->
-          <a href="ats.html" class="screen-card">
-            <div class="card-top">
-              <div class="card-num">03 / DEEP SIMULATION</div>
-              <h2>ATS Score Matcher &amp; Editor</h2>
-              <p class="card-desc">Deep interactive split-screen experience matching a resume to a JD with keyword highlights.</p>
-              <ul class="card-features">
-                <li>ATS Score Indicator</li>
-                <li>JD Matcher</li>
-                <li>Split Editor</li>
-                <li>Key Optimizer</li>
-              </ul>
-            </div>
-            <div class="card-bottom">
-              <span class="launch-btn">Launch screen <span class="arrow-icon">→</span></span>
-              <span class="badge-interactive" style="background: rgba(39, 166, 68, 0.1); color: var(--fg); border-color: rgba(39, 166, 68, 0.2);">Fully Interactive</span>
-            </div>
-          </a>
-
-          <!-- 4. Dashboard -->
-          <a href="app.html" class="screen-card">
-            <div class="card-top">
-              <div class="card-num">04 / APPLICATION CONTEXT</div>
-              <h2>Job Pipeline</h2>
-              <p class="card-desc">Track and organize your active job applications in a Kanban pipeline board with docked AI Career Coach.</p>
-              <ul class="card-features">
-                <li>Job Pipeline</li>
-                <li>Stats Overview</li>
-                <li>Floating AI Chat</li>
-              </ul>
-            </div>
-            <div class="card-bottom">
-              <span class="launch-btn">Launch screen <span class="arrow-icon">→</span></span>
-              <span class="badge-interactive">Interactive Chat</span>
-            </div>
-          </a>
-
-          <!-- 5. Resumes Collection -->
-          <a href="resumes.html" class="screen-card">
-            <div class="card-top">
-              <div class="card-num">05 / PERSISTENT PERSONAS</div>
-              <h2>Resume Collection</h2>
-              <p class="card-desc">Inspect your active resume files, upload new variations, and preview your Read.cv-styled documents in visual calm.</p>
-              <ul class="card-features">
-                <li>Upload Zone</li>
-                <li>Persona Preview</li>
-                <li>Match Indexes</li>
-                <li>Undo Deletion</li>
-              </ul>
-            </div>
-            <div class="card-bottom">
-              <span class="launch-btn">Launch screen <span class="arrow-icon">→</span></span>
-              <span class="badge-interactive">Interactive Upload</span>
-            </div>
-          </a>
-        </div>
-      </div>
-    </main>
-
-    <footer>
-      <div class="container footer-inner">
-        <span>© 2026 Job For Sure. Built for the modern job seeker.</span>
-        <span>Inter Variable · Warm Light Theme</span>
-      </div>
-    </footer>
-  </div>
-
-  <!-- Floating AI Chat Widget -->
-  <div class="chat-widget" id="chatWidget">
-    <button class="chat-trigger" id="chatTrigger" aria-label="Open AI Career Coach">
-      <svg class="chat-trigger-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
-      </svg>
-      <span class="chat-badge"></span>
-    </button>
-    <div class="chat-window" id="chatWindow">
-      <div class="chat-header">
-        <div class="chat-coach-info">
-          <div class="chat-avatar">AI</div>
-          <div>
-            <div class="chat-coach-name">Job For Sure Coach</div>
-            <div class="chat-coach-status">Online</div>
+        <!-- Stats Bar -->
+        <div class="stats-bar">
+          <div class="stat-card">
+            <div class="stat-val">12</div>
+            <div class="stat-lbl">Active Applications</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-val">3</div>
+            <div class="stat-lbl">Interviews</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-val">91%</div>
+            <div class="stat-lbl">Avg Match Score</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-val">6</div>
+            <div class="stat-lbl">Resume Versions</div>
           </div>
         </div>
-        <button class="chat-close" id="chatClose" aria-label="Close Chat">&times;</button>
-      </div>
-      <div class="chat-body" id="chatBody">
-        <div class="chat-message coach">
-          Hey! I'm your AI Career Coach. Drop a job description, paste your resume, or ask me for tips on optimization.
+
+        <!-- Resume Gallery Section -->
+        <section class="gallery-section">
+          <div class="section-header">
+            <span class="section-title">Resume Gallery</span>
+            <span class="section-action" onclick="alert('Upload new resume — drag & drop PDF or DOCX')">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+              Add Resume
+            </span>
+          </div>
+          <div class="resume-gallery" id="resumeGallery">
+            <!-- Rendered via JS -->
+          </div>
+        </section>
+
+        <!-- Pipeline Kanban Section -->
+        <section class="pipeline-section">
+          <div class="section-header">
+            <span class="section-title">Job Pipeline</span>
+            <span class="section-action" onclick="alert('Import job from URL or LinkedIn')">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+              Add Job
+            </span>
+          </div>
+          <div class="kanban-board" id="kanbanBoard">
+            <!-- Rendered via JS -->
+          </div>
+        </section>
+
+      </main>
+
+      <!-- AI Coach Sidebar (always visible) -->
+      <aside class="coach-sidebar" id="coachSidebar">
+        <div class="coach-header">
+          <div class="coach-header-left">
+            <div class="coach-avatar">AI</div>
+            <div>
+              <div class="coach-name">Career Coach</div>
+              <div class="coach-status">Online · Ready to help</div>
+            </div>
+          </div>
+          <button class="nav-icon-btn" onclick="toggleCoach()" title="Toggle Coach Panel">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
         </div>
+
+        <div class="coach-body" id="coachBody">
+          <!-- Welcome message -->
+          <div class="coach-message assistant">
+            Hey! I'm your AI Career Coach. I track your resumes and applications. Try one of these:
+            <div class="coach-pills">
+              <button class="coach-pill" onclick="coachAction('score')">📊 Score Resume</button>
+              <button class="coach-pill" onclick="coachAction('summary')">✍️ Write Summary</button>
+              <button class="coach-pill" onclick="coachAction('optimize')">🎯 Optimize for JD</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="coach-footer">
+          <div class="coach-input-row">
+            <input type="text" class="coach-input" id="coachInput" placeholder="Ask your coach..." />
+            <button class="coach-send" onclick="sendCoachMessage()" title="Send">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="22" y1="2" x2="11" y2="13"></line>
+                <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </aside>
+
+    </div>
+
+    <!-- ═══════════ Footer ═══════════ -->
+    <footer class="app-footer">
+      <span>© 2026 Job For Sure. Built for the modern job seeker.</span>
+      <span>Inter Variable · Enterprise Steel Theme</span>
+    </footer>
+
+  </div>
+
+  <!-- ═══════════ Drawer (Resume Preview + ATS) ═══════════ -->
+  <div class="drawer-overlay" id="drawerOverlay" onclick="closeDrawerOutside(event)"></div>
+  <div class="drawer" id="drawer">
+    <div class="drawer-header">
+      <div class="drawer-title-group">
+        <span class="drawer-title" id="drawerTitle">Resume Preview</span>
+        <span class="drawer-subtitle" id="drawerSubtitle">Loading...</span>
       </div>
-      <div class="chat-footer">
-        <input type="text" class="chat-input" id="chatInput" placeholder="Ask about resume optimization..." />
-        <button class="chat-send" id="chatSend">Send</button>
+      <button class="drawer-close" onclick="closeDrawer()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+    </div>
+    <div class="drawer-body">
+      <!-- Left: Resume Paper Preview -->
+      <div class="drawer-resume" id="drawerResume">
+        <!-- Populated by JS -->
+      </div>
+      <!-- Right: ATS Analysis -->
+      <div class="drawer-ats">
+        <div class="ats-score-card">
+          <div class="ats-score-ring">
+            <svg viewBox="0 0 36 36">
+              <circle class="ats-ring-bg" cx="18" cy="18" r="15.9"/>
+              <circle class="ats-ring-fill" id="atsRingFill" cx="18" cy="18" r="15.9"/>
+            </svg>
+            <div class="ats-score-num" id="atsScoreNum">91%</div>
+          </div>
+          <div class="ats-score-info">
+            <h3 id="atsMatchLabel">Strong Match</h3>
+            <p id="atsMatchDesc">Your resume aligns well with target roles. Minor optimizations recommended.</p>
+          </div>
+        </div>
+
+        <div class="ats-keywords">
+          <div>
+            <div class="ats-kw-header">
+              <span>Matched Keywords</span>
+              <span id="matchedCount">8</span>
+            </div>
+            <div class="ats-kw-grid" id="matchedKeywords">
+              <!-- Rendered by JS -->
+            </div>
+          </div>
+          <div>
+            <div class="ats-kw-header">
+              <span>Missing Keywords</span>
+              <span id="missingCount">3</span>
+            </div>
+            <div class="ats-kw-grid" id="missingKeywords">
+              <!-- Rendered by JS -->
+            </div>
+          </div>
+        </div>
+
+        <div class="ats-actions">
+          <button class="btn btn-primary" onclick="alert('Opening ATS Optimizer for detailed editing...')">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m12 3-1.912 5.886L4.202 9l5.886 1.912L12 16.798l1.912-5.886 5.886-1.912-5.886-1.912zM5 3v4M3 5h4M19 17v4M17 19h4"/></svg>
+            Open ATS Optimizer
+          </button>
+          <button class="btn btn-secondary" onclick="openDrawerPipeline()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg>
+            View in Pipeline
+          </button>
+        </div>
       </div>
     </div>
   </div>
 
   <script>
-    // Chat Widget Interaction
-    const chatTrigger = document.getElementById('chatTrigger');
-    const chatWindow = document.getElementById('chatWindow');
-    const chatClose = document.getElementById('chatClose');
-    const chatBody = document.getElementById('chatBody');
-    const chatInput = document.getElementById('chatInput');
-    const chatSend = document.getElementById('chatSend');
+    // ═══════════════════════════════════════════════════════════════════════
+    // Data
+    // ═══════════════════════════════════════════════════════════════════════
 
-    chatTrigger.addEventListener('click', () => {
-      chatWindow.classList.toggle('open');
-      const badge = document.querySelector('.chat-badge');
-      if (badge) badge.style.display = 'none';
-    });
+    const resumeData = [
+      {
+        id: 1,
+        role: 'Lead Frontend Developer',
+        persona: 'React / TypeScript',
+        score: '94%',
+        updated: '2h ago',
+        tags: ['React', 'TypeScript', 'Next.js'],
+        fileName: 'John_Doe_Frontend_React_Linear.pdf',
+        contact: 'john.doe@email.com · SF, CA',
+        summary: 'Lead Frontend Engineer with 6+ years constructing visual interfaces, styling tokens, and reactive dashboard architectures.',
+        experience: [
+          {
+            role: 'Lead Frontend Architect',
+            company: 'Velo Technologies',
+            date: '2023 - Present',
+            bullets: [
+              'Designed visual styling systems using container-queries, CSS clamping, and custom variables.',
+              'Built client-side JSONB resume pipeline parser reducing backend latency by 300ms.',
+              'Implemented custom compiler rules for visual assets across internal platforms.'
+            ]
+          },
+          {
+            role: 'Senior UI Developer',
+            company: 'Stripe',
+            date: '2020 - 2023',
+            bullets: [
+              'Owned checkout components loading in under 120ms for global merchants.',
+              'Maintained CSS layout guidelines and refactored responsive grids.'
+            ]
+          }
+        ],
+        skills: ['JavaScript', 'HTML5', 'CSS Grid', 'Tailwind', 'React', 'Figma', 'JSONB', 'Neon Postgres'],
+        matchedKw: ['React', 'TypeScript', 'CSS', 'HTML5', 'JavaScript', 'Frontend', 'UI', 'Responsive'],
+        missingKw: ['PostgreSQL', 'Cloudflare Workers', 'WebSockets']
+      },
+      {
+        id: 2,
+        role: 'Full-Stack Architect',
+        persona: 'Go / Postgres',
+        score: '92%',
+        updated: '4h ago',
+        tags: ['Go', 'PostgreSQL', 'Node.js'],
+        fileName: 'John_Doe_FullStack_Go_Postgres.pdf',
+        contact: 'john.doe@email.com · SF, CA',
+        summary: 'Systems architect specializing in distributed databases, Neon Postgres schemas, and server-side TypeScript rendering.',
+        experience: [
+          {
+            role: 'Full-Stack Tech Lead',
+            company: 'Velo Tech',
+            date: '2022 - 2024',
+            bullets: [
+              'Migrated application databases to Neon Postgres with real-time JSONB indexing.',
+              'Established automated client pipelines with Node.js and SQLite.',
+              'Architected split-layout preview components for custom file parsers.'
+            ]
+          }
+        ],
+        skills: ['Node.js', 'TypeScript', 'PostgreSQL', 'JSONB', 'SQLite', 'Docker', 'React'],
+        matchedKw: ['Go', 'PostgreSQL', 'Node.js', 'TypeScript', 'SQL', 'Docker', 'API', 'Backend'],
+        missingKw: ['Kubernetes', 'GraphQL', 'Redis']
+      },
+      {
+        id: 3,
+        role: 'Product Designer',
+        persona: 'Figma / Design Systems',
+        score: '88%',
+        updated: '1d ago',
+        tags: ['Figma', 'Design Systems', 'UX'],
+        fileName: 'John_Doe_Product_Design_Figma.pdf',
+        contact: 'john.doe@email.com · SF, CA',
+        summary: 'Product designer with engineering background. Creating beautiful tools, high-fidelity prototypes, and visual systems.',
+        experience: [
+          {
+            role: 'Lead Interaction Designer',
+            company: 'Figma',
+            date: '2021 - 2023',
+            bullets: [
+              'Reshaped design-system documentation, facilitating 10x faster developer handoffs.',
+              'Co-created typography templates ensuring consistent visual aesthetics across products.'
+            ]
+          }
+        ],
+        skills: ['Figma', 'UI Design', 'Visual Systems', 'Typography', 'Prototyping', 'CSS', 'Motion Design'],
+        matchedKw: ['Figma', 'UI Design', 'Typography', 'Prototyping', 'CSS', 'Design Systems'],
+        missingKw: ['User Research', 'HTML', 'Analytics']
+      }
+    ];
 
-    chatClose.addEventListener('click', () => {
-      chatWindow.classList.remove('open');
-    });
+    const pipelineData = [
+      {
+        col: 'Sandbox',
+        dot: '#9CA3AF',
+        jobs: [
+          { slug: 'LN', title: 'Lead Frontend Engineer', comp: 'Linear · Remote', score: '94%', level: 'high', tag: 'LinkedIn Import', time: '1h ago' },
+          { slug: 'ST', title: 'UI Engineer', comp: 'Stripe · South SF', score: '86%', level: 'high', tag: 'LinkedIn Import', time: '4h ago' }
+        ]
+      },
+      {
+        col: 'Applied',
+        dot: '#5B6ABF',
+        jobs: [
+          { slug: 'VC', title: 'Frontend Architect', comp: 'Vercel · Remote', score: '90%', level: 'high', tag: 'Direct Portal', time: '2d ago' },
+          { slug: 'SB', title: 'Database Engineer', comp: 'Supabase · Remote', score: '82%', level: 'mid', tag: 'Direct Portal', time: '4d ago' }
+        ]
+      },
+      {
+        col: 'Interviewing',
+        dot: '#D4A316',
+        jobs: [
+          { slug: 'CF', title: 'Developer Advocate', comp: 'Cloudflare · Austin', score: '92%', level: 'high', tag: 'Tech Prep', time: 'Tomorrow' }
+        ]
+      },
+      {
+        col: 'Offers',
+        dot: '#2B5F45',
+        jobs: [
+          { slug: 'FL', title: 'Platform UI Designer', comp: 'Fly.io · Remote', score: '89%', level: 'high', tag: 'Offer', time: 'Received' }
+        ]
+      }
+    ];
 
-    function appendMessage(text, sender) {
+    // ═══════════════════════════════════════════════════════════════════════
+    // Render Resume Gallery
+    // ═══════════════════════════════════════════════════════════════════════
+
+    function renderGallery() {
+      const container = document.getElementById('resumeGallery');
+      container.innerHTML = resumeData.map(r => `
+        <div class="resume-card" onclick="openDrawer(${r.id})">
+          <div class="resume-preview">
+            <div class="resume-preview-line accent"></div>
+            <div class="resume-preview-line"></div>
+            <div class="resume-preview-line"></div>
+            <div class="resume-preview-line"></div>
+            <div class="resume-preview-line"></div>
+            <div class="resume-preview-line"></div>
+            <div class="resume-preview-line"></div>
+            <span class="resume-preview-label">${r.fileName.replace(/_/g, ' ').replace(/\.pdf/g, '')}</span>
+          </div>
+          <div class="resume-card-body">
+            <div class="resume-card-top">
+              <span class="resume-role">${r.role}</span>
+              <span class="resume-score-badge">${r.score}</span>
+            </div>
+            <div class="resume-meta">${r.persona} · Updated ${r.updated}</div>
+            <div class="resume-tags">
+              ${r.tags.map(t => `<span class="resume-tag">${t}</span>`).join('')}
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // ═══════════════════════════════════════════════════════════════════════
+    // Render Pipeline Kanban
+    // ═══════════════════════════════════════════════════════════════════════
+
+    function renderPipeline() {
+      const board = document.getElementById('kanbanBoard');
+      board.innerHTML = pipelineData.map(col => `
+        <div class="kanban-col">
+          <div class="kanban-col-header">
+            <span class="kanban-col-title">
+              <span class="kanban-dot" style="background:${col.dot}"></span>
+              ${col.col}
+            </span>
+            <span class="kanban-count">${col.jobs.length}</span>
+          </div>
+          ${col.jobs.map(job => `
+            <div class="job-card" onclick="alert('Open: ${job.title} at ${job.comp}')">
+              <div class="job-card-top">
+                <span class="job-slug">${job.slug}</span>
+                <span class="job-score ${job.level}">${job.score}</span>
+              </div>
+              <div class="job-card-title">${job.title}</div>
+              <div class="job-card-comp">${job.comp}</div>
+              <div class="job-card-footer">
+                <span class="job-tag">${job.tag}</span>
+                <span>${job.time}</span>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      `).join('');
+    }
+
+    // ═══════════════════════════════════════════════════════════════════════
+    // Drawer (Resume Preview + ATS)
+    // ═══════════════════════════════════════════════════════════════════════
+
+    function openDrawer(id) {
+      const r = resumeData.find(d => d.id === id);
+      if (!r) return;
+
+      document.getElementById('drawerTitle').textContent = r.role;
+      document.getElementById('drawerSubtitle').textContent = r.fileName.replace(/_/g, ' ');
+      document.getElementById('atsScoreNum').textContent = r.score;
+
+      // Resume preview (left)
+      let docHTML = `
+        <div class="drawer-resume-header">
+          <div class="drawer-resume-name">${r.role}</div>
+          <div class="drawer-resume-contact">${r.contact}</div>
+        </div>
+        <div class="drawer-resume-section">
+          <div class="drawer-resume-section-title">Summary</div>
+          <p>${r.summary}</p>
+        </div>
+        <div class="drawer-resume-section">
+          <div class="drawer-resume-section-title">Experience</div>
+      `;
+      r.experience.forEach(exp => {
+        docHTML += `
+          <div class="drawer-resume-item">
+            <div class="drawer-resume-item-header">
+              <span>${exp.company}</span>
+              <span class="drawer-resume-item-date">${exp.date}</span>
+            </div>
+            <div class="drawer-resume-item-role">${exp.role}</div>
+            <ul>
+              ${exp.bullets.map(b => `<li>${b}</li>`).join('')}
+            </ul>
+          </div>
+        `;
+      });
+      docHTML += `
+        </div>
+        <div class="drawer-resume-section">
+          <div class="drawer-resume-section-title">Skills</div>
+          <div class="drawer-resume-skills">
+            ${r.skills.map(s => `<span class="drawer-resume-skill">${s}</span>`).join('')}
+          </div>
+        </div>
+      `;
+      document.getElementById('drawerResume').innerHTML = docHTML;
+
+      // ATS panel (right)
+      document.getElementById('matchedKeywords').innerHTML = r.matchedKw.map(k =>
+        `<span class="ats-kw matched">${k}</span>`
+      ).join('');
+      document.getElementById('missingKeywords').innerHTML = r.missingKw.map(k =>
+        `<span class="ats-kw missing">${k}</span>`
+      ).join('');
+      document.getElementById('matchedCount').textContent = r.matchedKw.length;
+      document.getElementById('missingCount').textContent = r.missingKw.length;
+
+      // Update score ring
+      const scoreVal = parseInt(r.score);
+      const ring = document.getElementById('atsRingFill');
+      const circumference = 200;
+      const offset = circumference - (scoreVal / 100 * circumference);
+      ring.style.strokeDashoffset = offset;
+      if (scoreVal >= 90) {
+        ring.style.stroke = 'var(--success)';
+        document.getElementById('atsMatchLabel').textContent = 'Excellent Match';
+        document.getElementById('atsMatchDesc').textContent = 'Your resume is highly aligned. Ready to apply!';
+      } else if (scoreVal >= 80) {
+        ring.style.stroke = 'var(--warn)';
+        document.getElementById('atsMatchLabel').textContent = 'Good Match';
+        document.getElementById('atsMatchDesc').textContent = 'Minor optimizations recommended for best results.';
+      } else {
+        ring.style.stroke = 'var(--danger)';
+        document.getElementById('atsMatchLabel').textContent = 'Needs Work';
+        document.getElementById('atsMatchDesc').textContent = 'Significant keyword gaps detected. Open ATS Optimizer.';
+      }
+
+      document.getElementById('drawerOverlay').classList.add('open');
+      document.getElementById('drawer').classList.add('open');
+    }
+
+    function closeDrawer() {
+      document.getElementById('drawerOverlay').classList.remove('open');
+      document.getElementById('drawer').classList.remove('open');
+    }
+
+    function closeDrawerOutside(e) {
+      if (e.target === document.getElementById('drawerOverlay')) {
+        closeDrawer();
+      }
+    }
+
+    function openDrawerPipeline() {
+      closeDrawer();
+      document.querySelector('.pipeline-section').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    // ═══════════════════════════════════════════════════════════════════════
+    // AI Coach
+    // ═══════════════════════════════════════════════════════════════════════
+
+    let coachInitialized = false;
+
+    function addCoachMessage(text, sender) {
+      const body = document.getElementById('coachBody');
       const msg = document.createElement('div');
-      msg.className = `chat-message ${sender}`;
+      msg.className = `coach-message ${sender}`;
       msg.textContent = text;
-      chatBody.appendChild(msg);
-      chatBody.scrollTop = chatBody.scrollHeight;
+      body.appendChild(msg);
+      body.scrollTop = body.scrollHeight;
     }
 
-    function showTypingIndicator() {
+    function showCoachTyping() {
+      const body = document.getElementById('coachBody');
       const indicator = document.createElement('div');
-      indicator.className = 'chat-typing-indicator';
-      indicator.id = 'typingIndicator';
-      indicator.innerHTML = '<div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div>';
-      chatBody.appendChild(indicator);
-      chatBody.scrollTop = chatBody.scrollHeight;
+      indicator.className = 'coach-typing';
+      indicator.id = 'coachTyping';
+      indicator.innerHTML = '<div class="coach-typing-dot"></div><div class="coach-typing-dot"></div><div class="coach-typing-dot"></div>';
+      body.appendChild(indicator);
+      body.scrollTop = body.scrollHeight;
     }
 
-    function removeTypingIndicator() {
-      const indicator = document.getElementById('typingIndicator');
-      if (indicator) indicator.remove();
+    function hideCoachTyping() {
+      const el = document.getElementById('coachTyping');
+      if (el) el.remove();
     }
 
-    function handleSend() {
-      const text = chatInput.value.trim();
-      if (!text) return;
-
-      appendMessage(text, 'user');
-      chatInput.value = '';
-      showTypingIndicator();
-
+    function coachReply(text) {
+      showCoachTyping();
       setTimeout(() => {
-        removeTypingIndicator();
-        let reply = "I can help with that. Head to the ATS Optimizer to match your resume against any job description.";
-        const normalizedText = text.toLowerCase();
-        if (normalizedText.includes('resume') || normalizedText.includes('optimize') || normalizedText.includes('ats')) {
-          reply = "Upload your resume in the ATS Optimizer. It will scan for keywords and give you a detailed match score.";
-        } else if (normalizedText.includes('pipeline') || normalizedText.includes('dashboard') || normalizedText.includes('kanban')) {
-          reply = "Your job pipeline is in the Job Pipeline section. Track applications from initial contact to offer.";
-        } else if (normalizedText.includes('hello') || normalizedText.includes('hi')) {
-          reply = "Hello! Ready to improve your job search? Start with the ATS Optimizer or browse your Resumes.";
-        }
-        appendMessage(reply, 'coach');
-      }, 1000);
+        hideCoachTyping();
+        addCoachMessage(text, 'assistant');
+      }, 800);
     }
 
-    chatSend.addEventListener('click', handleSend);
-    chatInput.addEventListener('keypress', (e) => {
-      if (e.key === 'Enter') handleSend();
+    function sendCoachMessage() {
+      const input = document.getElementById('coachInput');
+      const text = input.value.trim();
+      if (!text) return;
+      addCoachMessage(text, 'user');
+      input.value = '';
+
+      const lower = text.toLowerCase();
+      let reply = "I'm here to help with your job search. Try asking about resume optimization, interview prep, or application strategy.";
+      if (lower.includes('score') || lower.includes('resume')) {
+        reply = "Your Lead Frontend Developer resume scores 94% against target roles. The ATS panel highlights strong keyword coverage. Want me to suggest improvements?";
+      } else if (lower.includes('interview') || lower.includes('prepare') || lower.includes('question')) {
+        reply = "For frontend roles, expect questions on React patterns, CSS architecture, and system design. I recommend reviewing: component composition, state management strategies, and Core Web Vitals.";
+      } else if (lower.includes('optimize') || lower.includes('ats')) {
+        reply = "Your main gaps are PostgreSQL, Cloudflare Workers, and WebSockets. Open the ATS Optimizer to inject these keywords naturally into your experience bullets.";
+      } else if (lower.includes('hello') || lower.includes('hi')) {
+        reply = "Hi! Ready to optimize your job search. Click a resume card to see the ATS breakdown, or ask me anything.";
+      }
+      coachReply(reply);
+    }
+
+    function coachAction(type) {
+      const messages = {
+        score: "📊 Analyzing your active resume personas... Your Lead Frontend resume scores 94% — strong match. The Product Designer variant could use some work at 88%. Want me to drill into specifics?",
+        summary: "✍️ Here's a suggested professional summary for your target role:\n\n\"Frontend Engineer with 6+ years building high-performance web applications. Specialized in React, TypeScript, and responsive design systems. Proven track record of optimizing UI performance and shipping developer tooling.\"",
+        optimize: "🎯 To optimize for the Linear role: inject PostgreSQL experience, Cloudflare Workers familiarity, and WebSocket architecture knowledge. Your current 94% is strong — we can push to 98% with targeted edits."
+      };
+      addCoachMessage(messages[type] || 'How can I help?', 'assistant');
+    }
+
+    // Coach input: Enter key
+    document.getElementById('coachInput').addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') sendCoachMessage();
     });
 
-    // Theme Switcher Logic (Warm Light default, dark mode as override)
+    function toggleCoach() {
+      const sidebar = document.getElementById('coachSidebar');
+      sidebar.classList.toggle('collapsed');
+    }
+
+    // ═══════════════════════════════════════════════════════════════════════
+    // Theme Switcher
+    // ═══════════════════════════════════════════════════════════════════════
+
     const themeToggle = document.getElementById('themeToggle');
     const themeMoon = document.getElementById('themeMoon');
     const themeSun = document.getElementById('themeSun');
 
-    // Apply stored theme on load (default to light)
     const currentTheme = localStorage.getItem('theme') || 'light';
     if (currentTheme === 'dark') {
       document.body.classList.add('dark-mode');
@@ -725,8 +1556,6 @@
         document.body.classList.toggle('dark-mode');
         const theme = document.body.classList.contains('dark-mode') ? 'dark' : 'light';
         localStorage.setItem('theme', theme);
-        
-        // Sync icon
         if (theme === 'dark') {
           if (themeMoon) themeMoon.style.display = 'none';
           if (themeSun) themeSun.style.display = 'block';
@@ -736,6 +1565,13 @@
         }
       });
     }
+
+    // ═══════════════════════════════════════════════════════════════════════
+    // Init
+    // ═══════════════════════════════════════════════════════════════════════
+
+    renderGallery();
+    renderPipeline();
   </script>
 </body>
 </html>
