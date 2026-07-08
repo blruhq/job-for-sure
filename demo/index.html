@@ -3,14 +3,12 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Job For Sure · Workspace</title>
+  <title>Job For Sure · Find Your Match</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
-    /* ═══════════════════════════════════════════════════════════════════
-       TOKENS
-       ════════════════════════════════════════════════════════════════════ */
+    /* ══ TOKENS ══ */
     :root {
       --bg:           #F7F6F2;
       --surface:      #FFFFFF;
@@ -24,13 +22,13 @@
       --border-soft:  #F0EFEA;
       --accent:       #5B6ABF;
       --accent-hover: #6B7AD0;
-      --accent-soft:  rgba(91, 106, 191, 0.08);
+      --accent-soft:  rgba(91,106,191,0.08);
       --success:      #2B5F45;
-      --success-soft: rgba(43, 95, 69, 0.08);
+      --success-soft: rgba(43,95,69,0.08);
       --warn:         #D4A316;
-      --warn-soft:    rgba(212, 163, 22, 0.08);
+      --warn-soft:    rgba(212,163,22,0.08);
       --danger:       #DC2626;
-      --font-body:    "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      --font-body:    "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
       --font-mono:    "JetBrains Mono", ui-monospace, monospace;
       --text-xs:      11px;
       --text-sm:      12px;
@@ -39,693 +37,516 @@
       --text-lg:      16px;
       --text-xl:      18px;
       --text-2xl:     22px;
+      --text-3xl:     28px;
       --radius-xs:    4px;
       --radius-sm:    6px;
       --radius-md:    8px;
       --motion-fast:  120ms;
       --motion-base:  200ms;
-      --ease:         cubic-bezier(0.2, 0, 0, 1);
-      --sidebar-w:    200px;
+      --ease:         cubic-bezier(0.2,0,0,1);
+      --sidebar-w:    220px;
       --topbar-h:     48px;
     }
 
-    *, *::before, *::after { box-sizing: border-box; margin: 0; }
+    *,*::before,*::after { box-sizing:border-box; margin:0; }
     body {
-      font-family: var(--font-body);
-      font-size: var(--text-base);
-      line-height: 1.5;
-      color: var(--fg);
-      background: var(--bg);
-      -webkit-font-smoothing: antialiased;
-      height: 100vh;
-      overflow: hidden;
+      font-family:var(--font-body);
+      font-size:var(--text-base);
+      line-height:1.5;
+      color:var(--fg);
+      background:var(--bg);
+      -webkit-font-smoothing:antialiased;
+      height:100vh;
+      overflow:hidden;
     }
-    a { color: inherit; text-decoration: none; }
-    button { font: inherit; cursor: pointer; border: none; background: none; padding: 0; color: inherit; }
-    svg { display: block; }
-    h1,h2,h3,h4 { font-weight: 600; letter-spacing: -0.01em; }
+    a{color:inherit;text-decoration:none}
+    button{font:inherit;cursor:pointer;border:none;background:none;padding:0;color:inherit}
+    svg{display:block}
+    h1,h2,h3,h4{font-weight:600;letter-spacing:-0.01em}
 
-    /* ════════════════════════════════════════════════════════════════════
-       APP SHELL
-       ════════════════════════════════════════════════════════════════════ */
-    .app {
-      display: flex;
-      flex-direction: column;
-      height: 100vh;
-    }
+    /* ══ APP SHELL ══ */
+    .app{display:flex;flex-direction:column;height:100vh}
 
-    /* ─── Topbar ─── */
-    .topbar {
-      height: var(--topbar-h);
-      background: var(--surface);
-      border-bottom: 1px solid var(--border);
-      display: flex;
-      align-items: center;
-      padding: 0 16px;
-      gap: 12px;
-      flex-shrink: 0;
-      z-index: 100;
+    /* ── Topbar ── */
+    .topbar{
+      height:var(--topbar-h);
+      background:var(--surface);
+      border-bottom:1px solid var(--border);
+      display:flex;align-items:center;
+      padding:0 12px;gap:8px;flex-shrink:0;z-index:100;
     }
-    .topbar-brand {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      width: calc(var(--sidebar-w) - 16px);
-      flex-shrink: 0;
+    .toggle-sidebar{
+      width:30px;height:30px;
+      display:flex;align-items:center;justify-content:center;
+      border-radius:var(--radius-sm);
+      color:var(--fg-2);
+      transition:all var(--motion-fast);
     }
-    .brand-mark {
-      width: 14px; height: 14px;
-      background: var(--accent);
-      border-radius: 3px;
-      flex-shrink: 0;
+    .toggle-sidebar:hover{background:var(--bg);color:var(--fg)}
+    .brand{display:flex;align-items:center;gap:8px}
+    .brand-mark{width:14px;height:14px;background:var(--accent);border-radius:3px;flex-shrink:0}
+    .brand-name{font-size:var(--text-md);font-weight:600;letter-spacing:-0.02em}
+    .topbar-spacer{flex-grow:1}
+    .icon-btn{
+      width:30px;height:30px;
+      display:flex;align-items:center;justify-content:center;
+      border-radius:var(--radius-sm);color:var(--fg-2);
+      transition:all var(--motion-fast);
     }
-    .brand-name {
-      font-size: var(--text-md);
-      font-weight: 600;
-      letter-spacing: -0.02em;
-    }
-    .topbar-search {
-      flex-grow: 1;
-      max-width: 320px;
-      position: relative;
-    }
-    .topbar-search input {
-      width: 100%;
-      height: 30px;
-      padding: 0 10px 0 30px;
-      background: var(--bg);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-sm);
-      font-family: var(--font-body);
-      font-size: var(--text-sm);
-      color: var(--fg);
-      outline: none;
-      transition: border-color var(--motion-fast);
-    }
-    .topbar-search input:focus { border-color: var(--accent); }
-    .topbar-search input::placeholder { color: var(--muted); }
-    .topbar-search svg {
-      position: absolute;
-      left: 8px; top: 50%;
-      transform: translateY(-50%);
-      color: var(--muted);
-    }
-    .topbar-actions {
-      display: flex;
-      align-items: center;
-      gap: 4px;
-      margin-left: auto;
-    }
-    .icon-btn {
-      width: 30px; height: 30px;
-      display: flex; align-items: center; justify-content: center;
-      border-radius: var(--radius-sm);
-      color: var(--fg-2);
-      transition: all var(--motion-fast);
-    }
-    .icon-btn:hover { background: var(--bg); color: var(--fg); }
-    .avatar {
-      width: 26px; height: 26px;
-      border-radius: 50%;
-      background: var(--accent);
-      color: white;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 10px; font-weight: 600;
-      flex-shrink: 0;
-      margin-left: 4px;
+    .icon-btn:hover{background:var(--bg);color:var(--fg)}
+    .avatar{
+      width:26px;height:26px;border-radius:50%;
+      background:var(--accent);color:white;
+      display:flex;align-items:center;justify-content:center;
+      font-size:10px;font-weight:600;flex-shrink:0;
     }
 
-    /* ─── App Body ─── */
-    .app-body {
-      display: flex;
-      flex-grow: 1;
-      overflow: hidden;
+    /* ── App Body ── */
+    .app-body{display:flex;flex-grow:1;overflow:hidden}
+
+    /* ── Sidebar ── */
+    .sidebar{
+      width:var(--sidebar-w);
+      background:var(--sidebar-bg);
+      border-right:1px solid var(--border);
+      display:flex;flex-direction:column;
+      flex-shrink:0;
+      transition:width var(--motion-base) var(--ease),margin-left var(--motion-base) var(--ease);
+      overflow:hidden;
+    }
+    .sidebar.collapsed{margin-left:calc(var(--sidebar-w) * -1)}
+
+    .nav-label{
+      font-size:10px;font-family:var(--font-mono);
+      text-transform:uppercase;letter-spacing:0.06em;
+      color:var(--muted);padding:12px 10px 4px 10px;
+    }
+    .nav-item{
+      display:flex;align-items:center;gap:8px;
+      padding:6px 10px;margin:0 4px;
+      border-radius:var(--radius-sm);
+      font-size:var(--text-sm);font-weight:500;
+      color:var(--fg-2);transition:all var(--motion-fast);
+      cursor:pointer;
+    }
+    .nav-item:hover{background:var(--sidebar-hover);color:var(--fg)}
+    .nav-item.active{background:var(--sidebar-active);color:var(--fg);font-weight:600}
+    .nav-item svg{flex-shrink:0;opacity:0.7}
+    .nav-item.active svg{opacity:1;color:var(--accent)}
+    .nav-badge{
+      margin-left:auto;font-size:10px;font-family:var(--font-mono);
+      background:var(--accent-soft);color:var(--accent);
+      padding:1px 6px;border-radius:var(--radius-xs);font-weight:600;
     }
 
-    /* ─── Sidebar ─── */
-    .sidebar {
-      width: var(--sidebar-w);
-      background: var(--sidebar-bg);
-      border-right: 1px solid var(--border);
-      display: flex;
-      flex-direction: column;
-      flex-shrink: 0;
-      padding: 8px;
+    /* Resume switcher in sidebar */
+    .resume-switcher{padding:4px;margin-bottom:4px}
+    .resume-switch-item{
+      display:flex;align-items:center;gap:8px;
+      padding:6px 8px;margin:0 4px;
+      border-radius:var(--radius-sm);
+      cursor:pointer;transition:all var(--motion-fast);
     }
-    .nav-group-label {
-      font-size: 10px;
-      font-family: var(--font-mono);
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-      color: var(--muted);
-      padding: 12px 8px 4px 8px;
+    .resume-switch-item:hover{background:var(--sidebar-hover)}
+    .resume-switch-item.active{background:var(--sidebar-active)}
+    .resume-switch-dot{
+      width:8px;height:8px;border-radius:50%;
+      border:2px solid var(--muted);flex-shrink:0;
+      transition:all var(--motion-fast);
     }
-    .nav-item {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 6px 8px;
-      border-radius: var(--radius-sm);
-      font-size: var(--text-sm);
-      font-weight: 500;
-      color: var(--fg-2);
-      transition: all var(--motion-fast);
-      margin-bottom: 1px;
-      cursor: pointer;
+    .resume-switch-item.active .resume-switch-dot{
+      border-color:var(--accent);
+      background:var(--accent);
     }
-    .nav-item:hover { background: var(--sidebar-hover); color: var(--fg); }
-    .nav-item.active { background: var(--sidebar-active); color: var(--fg); font-weight: 600; }
-    .nav-item svg { flex-shrink: 0; opacity: 0.7; }
-    .nav-item.active svg { opacity: 1; color: var(--accent); }
-    .nav-badge {
-      margin-left: auto;
-      font-size: 10px;
-      font-family: var(--font-mono);
-      background: var(--accent-soft);
-      color: var(--accent);
-      padding: 1px 6px;
-      border-radius: var(--radius-xs);
-      font-weight: 600;
+    .resume-switch-info{flex-grow:1;min-width:0}
+    .resume-switch-name{font-size:var(--text-sm);font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .resume-switch-score{font-size:10px;font-family:var(--font-mono);color:var(--success);font-weight:600}
+    .resume-add-btn{
+      display:flex;align-items:center;gap:6px;
+      padding:6px 8px;margin:0 4px;
+      border-radius:var(--radius-sm);
+      font-size:var(--text-sm);color:var(--accent);
+      cursor:pointer;transition:all var(--motion-fast);
     }
-    .sidebar-footer {
-      margin-top: auto;
-      padding: 8px;
-      border-top: 1px solid var(--border);
-    }
-    .sidebar-user {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 4px;
-      border-radius: var(--radius-sm);
-    }
-    .sidebar-user-info {
-      display: flex;
-      flex-direction: column;
-      min-width: 0;
-    }
-    .sidebar-user-name { font-size: var(--text-sm); font-weight: 600; }
-    .sidebar-user-plan { font-size: 10px; color: var(--muted); font-family: var(--font-mono); }
+    .resume-add-btn:hover{background:var(--accent-soft)}
 
-    /* ─── Main Content ─── */
-    .main {
-      flex-grow: 1;
-      overflow-y: auto;
-      padding: 24px 32px;
-      min-width: 0;
+    .sidebar-footer{
+      margin-top:auto;padding:8px;
+      border-top:1px solid var(--border);
     }
+    .sidebar-user{display:flex;align-items:center;gap:8px;padding:4px}
+    .sidebar-user-name{font-size:var(--text-sm);font-weight:600}
+    .sidebar-user-plan{font-size:10px;color:var(--muted);font-family:var(--font-mono)}
 
-    /* ─── Views ─── */
-    .view { display: none; }
-    .view.active { display: block; }
+    /* ── Main Content ── */
+    .main{flex-grow:1;overflow-y:auto;padding:24px 32px;min-width:0}
 
-    /* ─── Page Header ─── */
-    .page-head {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 24px;
-    }
-    .page-head h1 {
-      font-size: var(--text-xl);
-      font-weight: 600;
-    }
-    .page-head .subtitle {
-      font-size: var(--text-sm);
-      color: var(--muted);
-      margin-top: 2px;
-    }
+    /* ── Views ── */
+    .view{display:none}
+    .view.active{display:block}
 
-    /* ─── Buttons ─── */
-    .btn {
-      display: inline-flex; align-items: center; gap: 5px;
-      padding: 6px 12px;
-      border-radius: var(--radius-sm);
-      font-size: var(--text-sm);
-      font-weight: 500;
-      transition: all var(--motion-fast);
-      white-space: nowrap;
-      border: 1px solid transparent;
-      font-family: var(--font-body);
-      line-height: 1.3;
-    }
-    .btn:active { transform: translateY(1px); }
-    .btn-primary { background: var(--accent); color: white; }
-    .btn-primary:hover { background: var(--accent-hover); }
-    .btn-secondary { background: var(--surface); color: var(--fg-2); border-color: var(--border); }
-    .btn-secondary:hover { background: var(--bg); color: var(--fg); }
-    .btn-ghost { color: var(--fg-2); }
-    .btn-ghost:hover { background: var(--bg); color: var(--fg); }
+    /* ── Page Header ── */
+    .page-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
+    .page-head h1{font-size:var(--text-xl);font-weight:600}
+    .page-head .subtitle{font-size:var(--text-sm);color:var(--muted);margin-top:2px}
 
-    /* ─── Stats Row ─── */
-    .stats {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 12px;
-      margin-bottom: 24px;
+    /* ── Buttons ── */
+    .btn{
+      display:inline-flex;align-items:center;gap:5px;
+      padding:6px 12px;border-radius:var(--radius-sm);
+      font-size:var(--text-sm);font-weight:500;
+      transition:all var(--motion-fast);white-space:nowrap;
+      border:1px solid transparent;font-family:var(--font-body);line-height:1.3;
     }
-    .stat {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-sm);
-      padding: 14px 16px;
-    }
-    .stat-val {
-      font-family: var(--font-mono);
-      font-size: var(--text-2xl);
-      font-weight: 500;
-      line-height: 1.1;
-    }
-    .stat-lbl {
-      font-size: var(--text-xs);
-      color: var(--muted);
-      font-family: var(--font-mono);
-      margin-top: 2px;
-    }
+    .btn:active{transform:translateY(1px)}
+    .btn-primary{background:var(--accent);color:white}
+    .btn-primary:hover{background:var(--accent-hover)}
+    .btn-secondary{background:var(--surface);color:var(--fg-2);border-color:var(--border)}
+    .btn-secondary:hover{background:var(--bg);color:var(--fg)}
+    .btn-ghost{color:var(--fg-2)}
+    .btn-ghost:hover{background:var(--bg);color:var(--fg)}
 
-    /* ─── Section ─── */
-    .section { margin-bottom: 28px; }
-    .section-head {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 12px;
+    /* ══ UPLOAD ZONE (Hero when no resume) ══ */
+    .upload-hero{
+      display:flex;flex-direction:column;align-items:center;justify-content:center;
+      min-height:calc(100vh - var(--topbar-h) - 48px);
+      padding:40px;
     }
-    .section-title {
-      font-size: var(--text-md);
-      font-weight: 600;
+    .upload-zone{
+      width:100%;max-width:480px;
+      border:2px dashed var(--border);
+      border-radius:var(--radius-md);
+      padding:48px 32px;
+      text-align:center;
+      background:var(--surface);
+      transition:all var(--motion-base) var(--ease);
+      cursor:pointer;
+      position:relative;
+      overflow:hidden;
     }
-    .section-link {
-      font-size: var(--text-sm);
-      color: var(--accent);
-      font-weight: 500;
-      cursor: pointer;
+    .upload-zone::before{
+      content:'';
+      position:absolute;inset:0;
+      background-image:radial-gradient(circle,var(--border) 0.6px,transparent 0.6px);
+      background-size:20px 20px;
+      opacity:0.3;
+      pointer-events:none;
     }
-    .section-link:hover { color: var(--accent-hover); }
-
-    /* ─── Resume Cards ─── */
-    .resume-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 12px;
+    .upload-zone:hover,.upload-zone.dragover{
+      border-color:var(--accent);
+      background:var(--accent-soft);
     }
-    .resume-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-sm);
-      overflow: hidden;
-      cursor: pointer;
-      transition: border-color var(--motion-fast), transform var(--motion-fast);
+    .upload-zone:hover::before,.upload-zone.dragover::before{opacity:0.5}
+    .upload-icon{
+      width:48px;height:48px;
+      margin:0 auto 16px;
+      display:flex;align-items:center;justify-content:center;
+      background:var(--accent-soft);color:var(--accent);
+      border-radius:var(--radius-md);
+      position:relative;z-index:1;
     }
-    .resume-card:hover { border-color: var(--accent); transform: translateY(-1px); }
-    .resume-preview {
-      height: 110px;
-      background: var(--sidebar-bg);
-      border-bottom: 1px solid var(--border);
-      padding: 10px 14px;
-      position: relative;
-      overflow: hidden;
-      font-family: var(--font-mono);
-      font-size: 9px;
-      color: var(--muted);
+    .upload-title{
+      font-size:var(--text-lg);font-weight:600;
+      margin-bottom:4px;position:relative;z-index:1;
     }
-    .resume-preview::after {
-      content: '';
-      position: absolute; inset: 0;
-      background-image: radial-gradient(circle, var(--border) 0.5px, transparent 0.5px);
-      background-size: 14px 14px;
-      opacity: 0.4;
-      pointer-events: none;
+    .upload-sub{
+      font-size:var(--text-sm);color:var(--muted);
+      margin-bottom:20px;position:relative;z-index:1;
     }
-    .rp-name { font-family: var(--font-body); font-size: 10px; font-weight: 600; color: var(--fg); position: relative; z-index: 1; }
-    .rp-role { font-family: var(--font-body); font-size: 9px; color: var(--fg-2); margin-bottom: 6px; position: relative; z-index: 1; }
-    .rp-bullet { display: flex; gap: 4px; line-height: 1.4; margin-bottom: 1px; position: relative; z-index: 1; }
-    .rp-bullet::before { content: '·'; flex-shrink: 0; }
-    .rp-skills { display: flex; gap: 3px; margin-top: 4px; position: relative; z-index: 1; }
-    .rp-skill { background: var(--surface); border: 1px solid var(--border); padding: 0 4px; border-radius: 2px; font-size: 7px; text-transform: uppercase; letter-spacing: 0.02em; }
-    .resume-info { padding: 12px 14px; }
-    .resume-info-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2px; }
-    .resume-info-title { font-size: var(--text-md); font-weight: 600; }
-    .resume-score {
-      font-family: var(--font-mono);
-      font-size: var(--text-xs);
-      font-weight: 600;
-      padding: 1px 6px;
-      border-radius: var(--radius-xs);
+    .upload-btn{
+      position:relative;z-index:1;
+      display:inline-flex;align-items:center;gap:6px;
+      padding:8px 20px;border-radius:var(--radius-sm);
+      background:var(--accent);color:white;
+      font-size:var(--text-sm);font-weight:600;
+      transition:background var(--motion-fast);
     }
-    .resume-score.high { background: var(--success-soft); color: var(--success); }
-    .resume-score.mid { background: var(--warn-soft); color: var(--warn); }
-    .resume-meta { font-size: var(--text-xs); color: var(--muted); }
-
-    /* ─── Pipeline Kanban ─── */
-    .kanban {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 12px;
-      align-items: start;
+    .upload-btn:hover{background:var(--accent-hover)}
+    .upload-formats{
+      font-size:var(--text-xs);font-family:var(--font-mono);
+      color:var(--muted);margin-top:12px;position:relative;z-index:1;
     }
-    .kanban-col {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-sm);
-      padding: 10px;
-      min-height: 300px;
+    .upload-divider{
+      display:flex;align-items:center;gap:12px;
+      width:100%;max-width:480px;margin:20px 0;
     }
-    .kanban-col-head {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding-bottom: 8px;
-      border-bottom: 1px solid var(--border-soft);
-      margin-bottom: 8px;
+    .upload-divider::before,.upload-divider::after{
+      content:'';flex-grow:1;height:1px;background:var(--border);
     }
-    .kanban-col-name {
-      font-size: var(--text-xs);
-      font-family: var(--font-mono);
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      color: var(--muted);
-      font-weight: 600;
-      display: flex;
-      align-items: center;
-      gap: 6px;
+    .upload-divider span{font-size:var(--text-xs);color:var(--muted);font-family:var(--font-mono)}
+    .paste-zone{
+      width:100%;max-width:480px;
+      background:var(--surface);border:1px solid var(--border);
+      border-radius:var(--radius-sm);
+      padding:12px;
     }
-    .kanban-dot { width: 6px; height: 6px; border-radius: 50%; }
-    .kanban-count {
-      font-size: 10px;
-      font-family: var(--font-mono);
-      color: var(--muted);
-      background: var(--bg);
-      padding: 1px 5px;
-      border-radius: var(--radius-xs);
+    .paste-zone textarea{
+      width:100%;height:80px;
+      border:none;outline:none;resize:none;
+      font-family:var(--font-body);font-size:var(--text-sm);
+      color:var(--fg);background:transparent;
+    }
+    .paste-zone textarea::placeholder{color:var(--muted)}
+    .paste-btn{
+      display:flex;justify-content:flex-end;margin-top:8px;
     }
 
-    /* ─── Job Card ─── */
-    .job {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-xs);
-      padding: 10px;
-      margin-bottom: 6px;
-      transition: border-color var(--motion-fast);
-      cursor: pointer;
+    /* ══ ACTIVE RESUME BAR (after upload) ══ */
+    .active-resume-bar{
+      display:flex;align-items:center;gap:12px;
+      background:var(--surface);border:1px solid var(--border);
+      border-radius:var(--radius-sm);
+      padding:10px 14px;margin-bottom:20px;
     }
-    .job:hover { border-color: var(--accent); }
-    .job-top { display: flex; align-items: center; gap: 6px; margin-bottom: 6px; }
-    .job-logo {
-      width: 20px; height: 20px;
-      border-radius: var(--radius-xs);
-      display: flex; align-items: center; justify-content: center;
-      font-family: var(--font-mono);
-      font-size: 8px;
-      font-weight: 700;
-      color: white;
-      flex-shrink: 0;
+    .arb-preview{
+      width:32px;height:40px;
+      background:var(--sidebar-bg);border:1px solid var(--border);
+      border-radius:var(--radius-xs);
+      display:flex;align-items:center;justify-content:center;
+      flex-shrink:0;font-size:8px;font-family:var(--font-mono);color:var(--muted);
     }
-    .job-company { font-size: var(--text-xs); font-weight: 600; color: var(--fg); }
-    .job-score {
-      margin-left: auto;
-      font-family: var(--font-mono);
-      font-size: 10px;
-      font-weight: 600;
-      padding: 1px 5px;
-      border-radius: var(--radius-xs);
-    }
-    .job-score.high { background: var(--success-soft); color: var(--success); }
-    .job-score.mid { background: var(--warn-soft); color: var(--warn); }
-    .job-title { font-size: var(--text-sm); font-weight: 500; margin-bottom: 4px; }
-    .job-loc { font-size: var(--text-xs); color: var(--muted); margin-bottom: 8px; }
-    .job-foot {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding-top: 6px;
-      border-top: 1px solid var(--border-soft);
-    }
-    .job-time { font-size: 10px; color: var(--muted); font-family: var(--font-mono); }
-    .job-apply {
-      font-size: var(--text-xs);
-      color: var(--accent);
-      font-weight: 500;
-      display: flex;
-      align-items: center;
-      gap: 2px;
-    }
-    .job-apply:hover { color: var(--accent-hover); }
-
-    /* ─── Coach View ─── */
-    .coach-view {
-      max-width: 640px;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-    .coach-msg {
-      max-width: 80%;
-      padding: 10px 14px;
-      border-radius: var(--radius-sm);
-      font-size: var(--text-sm);
-      line-height: 1.5;
-    }
-    .coach-msg.assistant {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      align-self: flex-start;
-    }
-    .coach-msg.user {
-      background: var(--accent);
-      color: white;
-      align-self: flex-end;
-    }
-    .coach-pills { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
-    .coach-pill {
-      font-size: var(--text-xs);
-      padding: 4px 10px;
-      border-radius: var(--radius-sm);
-      background: var(--surface);
-      border: 1px solid var(--border);
-      color: var(--fg-2);
-      cursor: pointer;
-      transition: all var(--motion-fast);
-    }
-    .coach-pill:hover { border-color: var(--accent); color: var(--accent); }
-    .coach-input-bar {
-      position: sticky;
-      bottom: 0;
-      background: var(--bg);
-      padding: 12px 0;
-      border-top: 1px solid var(--border);
-    }
-    .coach-input-row {
-      display: flex;
-      gap: 8px;
-      align-items: center;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-sm);
-      padding: 4px 4px 4px 12px;
-    }
-    .coach-input-row:focus-within { border-color: var(--accent); }
-    .coach-input {
-      flex-grow: 1;
-      border: none;
-      outline: none;
-      background: transparent;
-      font-family: var(--font-body);
-      font-size: var(--text-sm);
-      color: var(--fg);
-    }
-    .coach-input::placeholder { color: var(--muted); }
-
-    /* ─── Settings View ─── */
-    .settings-group {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-sm);
-      margin-bottom: 16px;
-    }
-    .setting-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 14px 16px;
-      border-bottom: 1px solid var(--border-soft);
-    }
-    .setting-row:last-child { border-bottom: none; }
-    .setting-label { font-size: var(--text-sm); font-weight: 500; }
-    .setting-desc { font-size: var(--text-xs); color: var(--muted); margin-top: 1px; }
-
-    /* ─── Drawer (Resume Preview + ATS) ─── */
-    .drawer-overlay {
-      position: fixed; inset: 0;
-      background: rgba(0,0,0,0.25);
-      z-index: 200;
-      opacity: 0; pointer-events: none;
-      transition: opacity var(--motion-base);
-    }
-    .drawer-overlay.open { opacity: 1; pointer-events: auto; }
-    .drawer {
-      position: fixed; top: 0; right: -680px;
-      width: 680px; max-width: 100vw;
-      height: 100vh;
-      background: var(--surface);
-      border-left: 1px solid var(--border);
-      z-index: 201;
-      display: flex; flex-direction: column;
-      transition: right var(--motion-base) var(--ease);
-    }
-    .drawer.open { right: 0; }
-    .drawer-head {
-      padding: 12px 20px;
-      border-bottom: 1px solid var(--border);
-      display: flex; align-items: center; justify-content: space-between;
-      flex-shrink: 0;
-    }
-    .drawer-head-title { font-size: var(--text-md); font-weight: 600; }
-    .drawer-head-sub { font-size: var(--text-xs); color: var(--muted); font-family: var(--font-mono); }
-    .drawer-body {
-      flex-grow: 1;
-      overflow-y: auto;
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-    }
-    .drawer-resume {
-      padding: 24px;
-      font-family: Georgia, serif;
-      font-size: 12px;
-      color: var(--fg);
-      border-right: 1px solid var(--border);
-    }
-    .dr-header { text-align: center; margin-bottom: 20px; }
-    .dr-name { font-size: 20px; font-weight: 500; margin-bottom: 2px; }
-    .dr-contact { font-family: var(--font-body); font-size: 10px; color: var(--fg-2); }
-    .dr-section { margin-bottom: 16px; }
-    .dr-section-title {
-      font-family: var(--font-body);
-      font-size: 10px; font-weight: 600;
-      text-transform: uppercase; letter-spacing: 0.06em;
-      color: var(--accent);
-      border-bottom: 1px solid var(--border-soft);
-      padding-bottom: 4px; margin-bottom: 8px;
-    }
-    .dr-item { margin-bottom: 10px; }
-    .dr-item-head { display: flex; justify-content: space-between; font-weight: 600; font-size: 12px; }
-    .dr-item-role { font-family: var(--font-body); font-size: 11px; color: var(--fg-2); }
-    .dr-item-date { font-family: var(--font-body); font-size: 10px; color: var(--muted); }
-    .dr-bullets { margin: 4px 0 0 0; padding-left: 16px; font-size: 11px; }
-    .dr-bullets li { margin-bottom: 2px; }
-    .dr-skills { display: flex; flex-wrap: wrap; gap: 4px; }
-    .dr-skill { background: var(--sidebar-bg); border: 1px solid var(--border); padding: 2px 6px; border-radius: 3px; font-family: var(--font-body); font-size: 10px; }
-    .drawer-ats { padding: 24px; display: flex; flex-direction: column; gap: 20px; }
-    .ats-score-box {
-      display: flex; align-items: center; gap: 16px;
-      background: var(--bg); border: 1px solid var(--border);
-      border-radius: var(--radius-sm); padding: 16px;
-    }
-    .ats-ring { position: relative; width: 56px; height: 56px; flex-shrink: 0; }
-    .ats-ring svg { transform: rotate(-90deg); }
-    .ats-ring-bg-c { fill: none; stroke: var(--border); stroke-width: 4; }
-    .ats-ring-fill-c { fill: none; stroke: var(--success); stroke-width: 4; stroke-linecap: round; transition: stroke-dashoffset 0.8s var(--ease); }
-    .ats-ring-num { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); font-family: var(--font-mono); font-size: 13px; font-weight: 600; }
-    .ats-score-info h3 { font-size: var(--text-sm); }
-    .ats-score-info p { font-size: var(--text-xs); color: var(--fg-2); }
-    .ats-kw-head { font-family: var(--font-mono); font-size: 10px; text-transform: uppercase; color: var(--muted); border-bottom: 1px solid var(--border-soft); padding-bottom: 4px; display: flex; justify-content: space-between; margin-bottom: 8px; }
-    .ats-kw-grid { display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 12px; }
-    .ats-kw { font-size: 10px; font-family: var(--font-mono); padding: 2px 8px; border-radius: var(--radius-xs); }
-    .ats-kw.matched { background: var(--success-soft); color: var(--success); }
-    .ats-kw.missing { background: rgba(220,38,38,0.06); color: var(--danger); }
-
-    /* ════════════════════════════════════════════════════════════════════
-       DARK MODE
-       ════════════════════════════════════════════════════════════════════ */
-    body.dark {
-      --bg:           #131312;
-      --surface:      #1A1A18;
-      --sidebar-bg:   #161614;
-      --sidebar-hover:#1F1F1D;
-      --sidebar-active:#252522;
-      --fg:           #EFEEE9;
-      --fg-2:         #A5A49D;
-      --muted:        #7D7C76;
-      --border:       rgba(255,255,255,0.07);
-      --border-soft:  rgba(255,255,255,0.04);
-      --accent:       #7B8AD8;
-      --accent-hover: #8B9AE8;
-      --accent-soft:  rgba(123,138,216,0.12);
-      --success:      #4ADE80;
-      --success-soft: rgba(74,222,128,0.10);
+    .arb-info{flex-grow:1;min-width:0}
+    .arb-name{font-size:var(--text-md);font-weight:600}
+    .arb-meta{font-size:var(--text-xs);color:var(--muted);font-family:var(--font-mono)}
+    .arb-score{
+      font-family:var(--font-mono);font-size:var(--text-lg);font-weight:600;
+      color:var(--success);
     }
 
-    /* ════════════════════════════════════════════════════════════════════
-       RESPONSIVE
-       ════════════════════════════════════════════════════════════════════ */
-    @media (max-width: 1024px) {
-      .resume-grid { grid-template-columns: repeat(2, 1fr); }
-      .kanban { grid-template-columns: repeat(2, 1fr); }
-      .drawer-body { grid-template-columns: 1fr; }
+    /* ══ MATCH LIST ══ */
+    .match-list{display:flex;flex-direction:column;gap:8px}
+    .match-card{
+      display:flex;align-items:center;gap:12px;
+      background:var(--surface);border:1px solid var(--border);
+      border-radius:var(--radius-sm);
+      padding:12px 14px;
+      transition:border-color var(--motion-fast);
+      cursor:pointer;
     }
-    @media (max-width: 768px) {
-      .sidebar { display: none; }
-      .topbar-brand { width: auto; }
-      .stats { grid-template-columns: repeat(2, 1fr); }
-      .resume-grid { grid-template-columns: 1fr; }
-      .kanban { grid-template-columns: 1fr; }
-      .main { padding: 16px; }
-      .drawer { width: 100vw; }
+    .match-card:hover{border-color:var(--accent)}
+    .match-logo{
+      width:36px;height:36px;border-radius:var(--radius-sm);
+      display:flex;align-items:center;justify-content:center;
+      font-family:var(--font-mono);font-size:11px;font-weight:700;
+      color:white;flex-shrink:0;
+    }
+    .match-info{flex-grow:1;min-width:0}
+    .match-top-row{display:flex;align-items:center;gap:8px;margin-bottom:2px}
+    .match-company{font-size:var(--text-md);font-weight:600}
+    .match-score{
+      font-family:var(--font-mono);font-size:var(--text-sm);font-weight:600;
+      padding:1px 6px;border-radius:var(--radius-xs);
+    }
+    .match-score.high{background:var(--success-soft);color:var(--success)}
+    .match-score.mid{background:var(--warn-soft);color:var(--warn)}
+    .match-role{font-size:var(--text-sm);color:var(--fg);font-weight:500}
+    .match-details{
+      font-size:var(--text-xs);color:var(--muted);
+      display:flex;gap:8px;margin-top:2px;
+    }
+    .match-details span:not(:last-child)::after{content:'·';margin-left:8px}
+    .match-actions{display:flex;align-items:center;gap:6px;flex-shrink:0}
+    .match-apply{
+      display:flex;align-items:center;gap:4px;
+      padding:5px 10px;border-radius:var(--radius-sm);
+      background:var(--accent);color:white;
+      font-size:var(--text-xs);font-weight:600;
+      transition:background var(--motion-fast);
+    }
+    .match-apply:hover{background:var(--accent-hover)}
+
+    /* ══ STATS INLINE ══ */
+    .match-summary{
+      display:flex;gap:16px;margin-bottom:16px;
+      font-size:var(--text-sm);color:var(--fg-2);
+    }
+    .match-summary strong{color:var(--fg);font-family:var(--font-mono)}
+
+    /* ══ PIPELINE VIEW ══ */
+    .kanban{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;align-items:start}
+    .kanban-col{
+      background:var(--surface);border:1px solid var(--border);
+      border-radius:var(--radius-sm);padding:10px;min-height:300px;
+    }
+    .kanban-col-head{
+      display:flex;align-items:center;justify-content:space-between;
+      padding-bottom:8px;border-bottom:1px solid var(--border-soft);margin-bottom:8px;
+    }
+    .kanban-col-name{
+      font-size:var(--text-xs);font-family:var(--font-mono);
+      text-transform:uppercase;letter-spacing:0.05em;
+      color:var(--muted);font-weight:600;
+      display:flex;align-items:center;gap:6px;
+    }
+    .kanban-dot{width:6px;height:6px;border-radius:50%}
+    .kanban-count{font-size:10px;font-family:var(--font-mono);color:var(--muted);background:var(--bg);padding:1px 5px;border-radius:var(--radius-xs)}
+    .pipe-card{
+      background:var(--surface);border:1px solid var(--border);
+      border-radius:var(--radius-xs);padding:10px;margin-bottom:6px;
+      transition:border-color var(--motion-fast);cursor:pointer;
+    }
+    .pipe-card:hover{border-color:var(--accent)}
+    .pipe-top{display:flex;align-items:center;gap:6px;margin-bottom:6px}
+    .pipe-logo{
+      width:20px;height:20px;border-radius:var(--radius-xs);
+      display:flex;align-items:center;justify-content:center;
+      font-family:var(--font-mono);font-size:8px;font-weight:700;color:white;flex-shrink:0;
+    }
+    .pipe-company{font-size:var(--text-xs);font-weight:600}
+    .pipe-score{margin-left:auto;font-family:var(--font-mono);font-size:10px;font-weight:600;padding:1px 5px;border-radius:var(--radius-xs)}
+    .pipe-score.high{background:var(--success-soft);color:var(--success)}
+    .pipe-score.mid{background:var(--warn-soft);color:var(--warn)}
+    .pipe-title{font-size:var(--text-sm);font-weight:500;margin-bottom:4px}
+    .pipe-loc{font-size:var(--text-xs);color:var(--muted);margin-bottom:8px}
+    .pipe-foot{display:flex;align-items:center;justify-content:space-between;padding-top:6px;border-top:1px solid var(--border-soft)}
+    .pipe-time{font-size:10px;color:var(--muted);font-family:var(--font-mono)}
+    .pipe-apply{font-size:var(--text-xs);color:var(--accent);font-weight:500}
+
+    /* ══ COACH VIEW ══ */
+    .coach-area{max-width:640px;display:flex;flex-direction:column;gap:10px}
+    .coach-msg{
+      max-width:80%;padding:10px 14px;
+      border-radius:var(--radius-sm);
+      font-size:var(--text-sm);line-height:1.5;
+    }
+    .coach-msg.assistant{background:var(--surface);border:1px solid var(--border);align-self:flex-start}
+    .coach-msg.user{background:var(--accent);color:white;align-self:flex-end}
+    .coach-pills{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+    .coach-pill{
+      font-size:var(--text-xs);padding:4px 10px;
+      border-radius:var(--radius-sm);
+      background:var(--surface);border:1px solid var(--border);
+      color:var(--fg-2);cursor:pointer;transition:all var(--motion-fast);
+    }
+    .coach-pill:hover{border-color:var(--accent);color:var(--accent)}
+    .coach-bar{
+      position:sticky;bottom:0;background:var(--bg);
+      padding:12px 0;border-top:1px solid var(--border);
+      max-width:640px;
+    }
+    .coach-input-row{
+      display:flex;gap:8px;align-items:center;
+      background:var(--surface);border:1px solid var(--border);
+      border-radius:var(--radius-sm);padding:4px 4px 4px 12px;
+    }
+    .coach-input-row:focus-within{border-color:var(--accent)}
+    .coach-input{flex-grow:1;border:none;outline:none;background:transparent;font-family:var(--font-body);font-size:var(--text-sm);color:var(--fg)}
+    .coach-input::placeholder{color:var(--muted)}
+
+    /* ══ SETTINGS VIEW ══ */
+    .settings-group{
+      background:var(--surface);border:1px solid var(--border);
+      border-radius:var(--radius-sm);margin-bottom:12px;
+    }
+    .setting-row{
+      display:flex;align-items:center;justify-content:space-between;
+      padding:12px 16px;border-bottom:1px solid var(--border-soft);
+    }
+    .setting-row:last-child{border-bottom:none}
+    .setting-label{font-size:var(--text-sm);font-weight:500}
+    .setting-desc{font-size:var(--text-xs);color:var(--muted);margin-top:1px}
+
+    /* ══ RESUMES VIEW ══ */
+    .resumes-list{display:flex;flex-direction:column;gap:8px;max-width:640px}
+    .res-row{
+      display:flex;align-items:center;gap:12px;
+      background:var(--surface);border:1px solid var(--border);
+      border-radius:var(--radius-sm);padding:12px 14px;
+      transition:border-color var(--motion-fast);cursor:pointer;
+    }
+    .res-row:hover{border-color:var(--accent)}
+    .res-row.active{border-color:var(--accent);background:var(--accent-soft)}
+    .res-icon{
+      width:36px;height:36px;border-radius:var(--radius-sm);
+      background:var(--sidebar-bg);border:1px solid var(--border);
+      display:flex;align-items:center;justify-content:center;
+      color:var(--accent);flex-shrink:0;
+    }
+    .res-info{flex-grow:1;min-width:0}
+    .res-name{font-size:var(--text-md);font-weight:600}
+    .res-meta{font-size:var(--text-xs);color:var(--muted)}
+    .res-score{font-family:var(--font-mono);font-size:var(--text-sm);font-weight:600;color:var(--success)}
+
+    /* ══ DARK MODE ══ */
+    body.dark{
+      --bg:#131312;--surface:#1A1A18;--sidebar-bg:#161614;
+      --sidebar-hover:#1F1F1D;--sidebar-active:#252522;
+      --fg:#EFEEE9;--fg-2:#A5A49D;--muted:#7D7C76;
+      --border:rgba(255,255,255,0.07);--border-soft:rgba(255,255,255,0.04);
+      --accent:#7B8AD8;--accent-hover:#8B9AE8;
+      --accent-soft:rgba(123,138,216,0.12);
+      --success:#4ADE80;--success-soft:rgba(74,222,128,0.10);
+      --warn:#EAB308;--warn-soft:rgba(234,179,8,0.10);
+    }
+
+    /* ══ RESPONSIVE ══ */
+    @media(max-width:1024px){
+      .kanban{grid-template-columns:repeat(2,1fr)}
+    }
+    @media(max-width:768px){
+      .sidebar{position:fixed;left:0;top:var(--topbar-h);bottom:0;z-index:90}
+      .sidebar.collapsed{margin-left:calc(var(--sidebar-w) * -1)}
+      .kanban{grid-template-columns:1fr}
+      .main{padding:16px}
     }
   </style>
 </head>
 <body>
 <div class="app">
 
-  <!-- ════ TOPBAR ════ -->
+  <!-- ══ TOPBAR ══ -->
   <header class="topbar">
-    <div class="topbar-brand">
+    <button class="toggle-sidebar" id="toggleSidebar" title="Toggle sidebar">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
+    <div class="brand">
       <div class="brand-mark"></div>
       <span class="brand-name">JOB FOR SURE</span>
     </div>
-    <div class="topbar-search">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-      <input type="text" placeholder="Search resumes, jobs, companies..." />
-    </div>
-    <div class="topbar-actions">
-      <button class="icon-btn" id="themeToggle" title="Toggle theme">
-        <svg id="iconMoon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
-        <svg id="iconSun" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
-      </button>
-      <a href="landing.html" class="icon-btn" title="Marketing site">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
-      </a>
-      <div class="avatar">JD</div>
-    </div>
+    <div class="topbar-spacer"></div>
+    <button class="icon-btn" id="themeToggle" title="Toggle theme">
+      <svg id="iconMoon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      <svg id="iconSun" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+    </button>
+    <a href="landing.html" class="icon-btn" title="Marketing site">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+    </a>
+    <div class="avatar">JD</div>
   </header>
 
-  <!-- ════ APP BODY ════ -->
+  <!-- ══ APP BODY ══ -->
   <div class="app-body">
 
-    <!-- ════ SIDEBAR ════ -->
-    <aside class="sidebar">
-      <div class="nav-group-label">Workspace</div>
-      <div class="nav-item active" data-view="dashboard">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
-        Dashboard
+    <!-- ══ SIDEBAR ══ -->
+    <aside class="sidebar" id="sidebar">
+      <div class="nav-label">Navigate</div>
+      <div class="nav-item active" data-view="matches">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        Matches
       </div>
       <div class="nav-item" data-view="resumes">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-        Resumes
-        <span class="nav-badge">3</span>
+        My Resumes
+        <span class="nav-badge" id="resumeCount">3</span>
       </div>
       <div class="nav-item" data-view="pipeline">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="1"/><line x1="9" y1="3" x2="9" y2="21"/><line x1="15" y1="3" x2="15" y2="21"/></svg>
         Pipeline
-        <span class="nav-badge">6</span>
+        <span class="nav-badge" id="pipelineCount">6</span>
       </div>
       <div class="nav-item" data-view="coach">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
         Coach
       </div>
 
-      <div class="nav-group-label">Account</div>
+      <div class="nav-label">Resumes</div>
+      <div class="resume-switcher" id="resumeSwitcher"></div>
+      <div class="resume-add-btn" onclick="switchView('resumes')">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+        Add Resume
+      </div>
+
+      <div class="nav-label">Account</div>
       <div class="nav-item" data-view="settings">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
         Settings
@@ -734,87 +555,73 @@
       <div class="sidebar-footer">
         <div class="sidebar-user">
           <div class="avatar">JD</div>
-          <div class="sidebar-user-info">
-            <span class="sidebar-user-name">John Doe</span>
-            <span class="sidebar-user-plan">FREE PLAN</span>
+          <div>
+            <div class="sidebar-user-name">John Doe</div>
+            <div class="sidebar-user-plan">FREE PLAN</div>
           </div>
         </div>
       </div>
     </aside>
 
-    <!-- ════ MAIN CONTENT ════ -->
-    <main class="main">
+    <!-- ══ MAIN ══ -->
+    <main class="main" id="main">
 
-      <!-- ─── DASHBOARD VIEW ─── -->
-      <section class="view active" id="view-dashboard">
-        <div class="page-head">
-          <div>
-            <h1>Dashboard</h1>
-            <div class="subtitle">Welcome back, John · Here's your job search at a glance</div>
-          </div>
-          <button class="btn btn-primary" onclick="switchView('resumes')">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
-            Create Resume
-          </button>
-        </div>
-
-        <div class="stats">
-          <div class="stat">
-            <div class="stat-val">12</div>
-            <div class="stat-lbl">Active Apps</div>
-          </div>
-          <div class="stat">
-            <div class="stat-val">3</div>
-            <div class="stat-lbl">Interviews</div>
-          </div>
-          <div class="stat">
-            <div class="stat-val">91%</div>
-            <div class="stat-lbl">Avg Match</div>
-          </div>
-          <div class="stat">
-            <div class="stat-val">3</div>
-            <div class="stat-lbl">Resumes</div>
+      <!-- ── MATCHES VIEW (default) ── -->
+      <section class="view active" id="view-matches">
+        <!-- Upload hero shown when no active resume -->
+        <div id="uploadSection" style="display:none">
+          <div class="upload-hero">
+            <div class="upload-zone" id="uploadZone">
+              <input type="file" id="fileInput" style="display:none" accept=".pdf,.docx,.txt,.md" />
+              <div class="upload-icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+              </div>
+              <div class="upload-title">Drop your resume</div>
+              <div class="upload-sub">We'll match you with companies that fit your skills</div>
+              <button class="upload-btn" onclick="document.getElementById('fileInput').click()">
+                Choose File
+              </button>
+              <div class="upload-formats">PDF · DOCX · TXT · MD</div>
+            </div>
+            <div class="upload-divider"><span>OR PASTE TEXT</span></div>
+            <div class="paste-zone">
+              <textarea id="pasteInput" placeholder="Paste your resume text here..."></textarea>
+              <div class="paste-btn">
+                <button class="btn btn-primary" id="pasteBtn" onclick="handlePaste()">Find Matches</button>
+              </div>
+            </div>
           </div>
         </div>
 
-        <div class="section">
-          <div class="section-head">
-            <span class="section-title">Resume Gallery</span>
-            <span class="section-link" onclick="switchView('resumes')">View all →</span>
-          </div>
-          <div class="resume-grid" id="dashGallery"></div>
-        </div>
-
-        <div class="section">
-          <div class="section-head">
-            <span class="section-title">Pipeline Overview</span>
-            <span class="section-link" onclick="switchView('pipeline')">View board →</span>
-          </div>
-          <div class="kanban" id="dashKanban"></div>
+        <!-- Active resume bar + match list (shown after upload/select) -->
+        <div id="matchSection">
+          <div class="active-resume-bar" id="activeResumeBar"></div>
+          <div class="match-summary" id="matchSummary"></div>
+          <div class="match-list" id="matchList"></div>
         </div>
       </section>
 
-      <!-- ─── RESUMES VIEW ─── -->
+      <!-- ── RESUMES VIEW ── -->
       <section class="view" id="view-resumes">
         <div class="page-head">
           <div>
-            <h1>Resumes</h1>
-            <div class="subtitle">Manage your tailored resume versions for different roles</div>
+            <h1>My Resumes</h1>
+            <div class="subtitle">Each resume gets its own company matches</div>
           </div>
-          <button class="btn btn-primary" onclick="alert('Resume builder — upload PDF or start from template')">
+          <button class="btn btn-primary" onclick="switchView('matches');showUpload()">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
-            Create Resume
+            Upload Resume
           </button>
         </div>
-        <div class="resume-grid" id="resumesGallery"></div>
+        <div class="resumes-list" id="resumesList"></div>
       </section>
 
-      <!-- ─── PIPELINE VIEW ─── -->
+      <!-- ── PIPELINE VIEW ── -->
       <section class="view" id="view-pipeline">
         <div class="page-head">
           <div>
             <h1>Pipeline</h1>
-            <div class="subtitle">Track applications across companies · click any card for details</div>
+            <div class="subtitle">Track applications across companies</div>
           </div>
           <button class="btn btn-secondary" onclick="alert('Paste a job URL to import')">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
@@ -824,17 +631,17 @@
         <div class="kanban" id="pipelineBoard"></div>
       </section>
 
-      <!-- ─── COACH VIEW ─── -->
+      <!-- ── COACH VIEW ── -->
       <section class="view" id="view-coach">
         <div class="page-head">
           <div>
             <h1>AI Career Coach</h1>
-            <div class="subtitle">Ask about resumes, interviews, salary negotiation, or job strategy</div>
+            <div class="subtitle">Resume advice, interview prep, salary negotiation</div>
           </div>
         </div>
-        <div class="coach-view" id="coachMessages">
+        <div class="coach-area" id="coachMessages">
           <div class="coach-msg assistant">
-            Hey John! I'm tracking 3 resumes and 6 active applications. Your strongest match is <strong>Lead Frontend Engineer at Linear (94%)</strong>. How can I help?
+            Hi John! I can see your active resume is <strong>Lead Frontend Developer</strong> with a 94% average match score. What should we work on?
             <div class="coach-pills">
               <button class="coach-pill" onclick="coachAct('score')">Score my resume</button>
               <button class="coach-pill" onclick="coachAct('interview')">Prep for interview</button>
@@ -843,15 +650,15 @@
             </div>
           </div>
         </div>
-        <div class="coach-input-bar">
+        <div class="coach-bar">
           <div class="coach-input-row">
-            <input type="text" class="coach-input" id="coachInput" placeholder="Ask your coach anything..." />
+            <input type="text" class="coach-input" id="coachInput" placeholder="Ask your coach..." />
             <button class="btn btn-primary" onclick="sendCoach()">Send</button>
           </div>
         </div>
       </section>
 
-      <!-- ─── SETTINGS VIEW ─── -->
+      <!-- ── SETTINGS VIEW ── -->
       <section class="view" id="view-settings">
         <div class="page-head">
           <div>
@@ -865,7 +672,7 @@
               <div class="setting-label">Theme</div>
               <div class="setting-desc">Switch between light and dark mode</div>
             </div>
-            <button class="btn btn-secondary" id="themeToggle2" onclick="toggleTheme()">Toggle</button>
+            <button class="btn btn-secondary" onclick="toggleTheme()">Toggle</button>
           </div>
           <div class="setting-row">
             <div>
@@ -897,119 +704,81 @@
   </div>
 </div>
 
-<!-- ════ DRAWER ════ -->
-<div class="drawer-overlay" id="drawerOverlay" onclick="closeDrawer()"></div>
-<div class="drawer" id="drawer">
-  <div class="drawer-head">
-    <div>
-      <div class="drawer-head-title" id="drawerTitle">Resume</div>
-      <div class="drawer-head-sub" id="drawerSub">Loading...</div>
-    </div>
-    <button class="icon-btn" onclick="closeDrawer()">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-    </button>
-  </div>
-  <div class="drawer-body">
-    <div class="drawer-resume" id="drawerResume"></div>
-    <div class="drawer-ats">
-      <div class="ats-score-box">
-        <div class="ats-ring">
-          <svg width="56" height="56" viewBox="0 0 36 36">
-            <circle class="ats-ring-bg-c" cx="18" cy="18" r="15.9"/>
-            <circle class="ats-ring-fill-c" id="atsRing" cx="18" cy="18" r="15.9"/>
-          </svg>
-          <div class="ats-ring-num" id="atsNum">--</div>
-        </div>
-        <div class="ats-score-info">
-          <h3 id="atsLabel">Analyzing...</h3>
-          <p id="atsDesc">Running keyword analysis</p>
-        </div>
-      </div>
-      <div>
-        <div class="ats-kw-head"><span>Matched</span><span id="matchedN">0</span></div>
-        <div class="ats-kw-grid" id="matchedKW"></div>
-      </div>
-      <div>
-        <div class="ats-kw-head"><span>Missing</span><span id="missingN">0</span></div>
-        <div class="ats-kw-grid" id="missingKW"></div>
-      </div>
-      <div style="display:flex;flex-direction:column;gap:6px">
-        <a href="ats.html" class="btn btn-primary" style="justify-content:center">Open ATS Optimizer</a>
-      </div>
-    </div>
-  </div>
-</div>
-
 <script>
-// ═══════════════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════════
 // DATA
-// ═══════════════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════════
 const RESUMES = [
   {
-    id:1, role:'Lead Frontend Developer', persona:'React / TypeScript', score:94, level:'high',
-    updated:'2h ago', tags:['React','TypeScript','Next.js'],
-    name:'John Doe', contact:'john.doe@email.com · SF, CA',
-    summary:'Lead Frontend Engineer with 6+ years building visual interfaces, styling tokens, and reactive dashboard architectures.',
-    experience:[
-      {role:'Lead Frontend Architect', company:'Velo Technologies', date:'2023 - Present', bullets:['Designed visual styling systems using container-queries and CSS clamping.','Built client-side JSONB resume pipeline parser reducing latency by 300ms.','Implemented compiler rules for visual assets across internal platforms.']},
-      {role:'Senior UI Developer', company:'Stripe', date:'2020 - 2023', bullets:['Owned checkout components loading in under 120ms.','Maintained CSS layout guidelines and refactored responsive grids.']}
-    ],
-    skills:['JavaScript','HTML5','CSS Grid','Tailwind','React','Figma','JSONB'],
-    matchedKw:['React','TypeScript','CSS','HTML5','JavaScript','Frontend','UI','Responsive'],
-    missingKw:['PostgreSQL','Cloudflare Workers','WebSockets']
+    id:1, name:'Lead Frontend Developer', persona:'React / TypeScript',
+    score:94, level:'high', updated:'2h ago',
+    skills:['React','TypeScript','Next.js','Tailwind','CSS Grid','JavaScript'],
+    summary:'6+ years building visual interfaces and reactive dashboard architectures.',
+    companies:[
+      {logo:'LN',color:'#5E6AD2',name:'Linear',role:'Lead Frontend Engineer',loc:'Remote',salary:'$180-240k',score:94,level:'high',url:'https://linear.app/careers'},
+      {logo:'CF',color:'#F38020',name:'Cloudflare',role:'Developer Advocate',loc:'Austin, TX',salary:'$160-220k',score:92,level:'high',url:'https://cloudflare.com/careers'},
+      {logo:'VC',color:'#000000',name:'Vercel',role:'Frontend Architect',loc:'Remote',salary:'$190-240k',score:90,level:'high',url:'https://vercel.com/careers'},
+      {logo:'ST',color:'#635BFF',name:'Stripe',role:'UI Engineer',loc:'South San Francisco',salary:'$185-245k',score:86,level:'high',url:'https://stripe.com/jobs'},
+      {logo:'SB',color:'#3ECF8E',name:'Supabase',role:'Frontend Engineer',loc:'Remote',salary:'$140-190k',score:83,level:'mid',url:'https://supabase.com/careers'},
+    ]
   },
   {
-    id:2, role:'Full-Stack Architect', persona:'Go / Postgres', score:92, level:'high',
-    updated:'4h ago', tags:['Go','PostgreSQL','Node.js'],
-    name:'John Doe', contact:'john.doe@email.com · SF, CA',
-    summary:'Systems architect specializing in distributed databases, Postgres schemas, and server-side TypeScript rendering.',
-    experience:[
-      {role:'Full-Stack Tech Lead', company:'Velo Tech', date:'2022 - 2024', bullets:['Migrated databases to Neon Postgres with real-time JSONB indexing.','Established automated client pipelines with Node.js and SQLite.','Architected split-layout preview components for file parsers.']}
-    ],
-    skills:['Node.js','TypeScript','PostgreSQL','JSONB','SQLite','Docker','React'],
-    matchedKw:['Go','PostgreSQL','Node.js','TypeScript','SQL','Docker','API','Backend'],
-    missingKw:['Kubernetes','GraphQL','Redis']
+    id:2, name:'Full-Stack Architect', persona:'Go / Postgres',
+    score:92, level:'high', updated:'4h ago',
+    skills:['Go','PostgreSQL','Node.js','TypeScript','Docker','Redis'],
+    summary:'Systems architect specializing in distributed databases and server-side TypeScript.',
+    companies:[
+      {logo:'ST',color:'#635BFF',name:'Stripe',role:'Backend Engineer',loc:'South San Francisco',salary:'$190-260k',score:95,level:'high',url:'https://stripe.com/jobs'},
+      {logo:'LN',color:'#5E6AD2',name:'Linear',role:'Full-Stack Engineer',loc:'Remote',salary:'$180-240k',score:92,level:'high',url:'https://linear.app/careers'},
+      {logo:'SB',color:'#3ECF8E',name:'Supabase',role:'Database Engineer',loc:'Remote',salary:'$150-210k',score:89,level:'high',url:'https://supabase.com/careers'},
+      {logo:'FL',color:'#7B3FF2',name:'Fly.io',role:'Platform Engineer',loc:'Remote',salary:'$160-220k',score:85,level:'mid',url:'https://fly.io/about'},
+    ]
   },
   {
-    id:3, role:'Product Designer', persona:'Figma / Design Systems', score:88, level:'mid',
-    updated:'1d ago', tags:['Figma','UX','Prototyping'],
-    name:'John Doe', contact:'john.doe@email.com · SF, CA',
-    summary:'Product designer with engineering background. Creating tools, high-fidelity prototypes, and visual systems.',
-    experience:[
-      {role:'Lead Interaction Designer', company:'Figma', date:'2021 - 2023', bullets:['Reshaped design-system docs for 10x faster developer handoffs.','Co-created typography templates ensuring visual consistency.']}
-    ],
-    skills:['Figma','UI Design','Visual Systems','Typography','Prototyping','CSS'],
-    matchedKw:['Figma','UI Design','Typography','Prototyping','CSS','Design Systems'],
-    missingKw:['User Research','HTML','Analytics']
+    id:3, name:'Product Designer', persona:'Figma / Design Systems',
+    score:88, level:'mid', updated:'1d ago',
+    skills:['Figma','Prototyping','Typography','Design Systems','CSS','Motion'],
+    summary:'Product designer with engineering background. Tools, prototypes, and visual systems.',
+    companies:[
+      {logo:'VC',color:'#000000',name:'Vercel',role:'Product Designer',loc:'Remote',salary:'$160-220k',score:90,level:'high',url:'https://vercel.com/careers'},
+      {logo:'FL',color:'#7B3FF2',name:'Fly.io',role:'Platform UI Designer',loc:'Remote',salary:'$140-190k',score:89,level:'high',url:'https://fly.io/about'},
+      {logo:'LN',color:'#5E6AD2',name:'Linear',role:'Product Designer',loc:'Remote',salary:'$170-230k',score:84,level:'mid',url:'https://linear.app/careers'},
+    ]
   }
 ];
 
 const PIPELINE = [
-  { col:'Sandbox', dot:'#9F9E98', jobs:[
-    {logo:'LN', color:'#5E6AD2', company:'Linear', title:'Lead Frontend Engineer', loc:'Remote', score:94, level:'high', time:'1h ago', url:'https://linear.app/careers'},
-    {logo:'ST', color:'#635BFF', company:'Stripe', title:'UI Engineer', loc:'South San Francisco', score:86, level:'high', time:'4h ago', url:'https://stripe.com/jobs'}
+  {col:'Sandbox',dot:'#9F9E98',jobs:[
+    {logo:'LN',color:'#5E6AD2',company:'Linear',title:'Lead Frontend Engineer',loc:'Remote',score:94,level:'high',time:'1h ago',url:'https://linear.app/careers'},
+    {logo:'ST',color:'#635BFF',company:'Stripe',title:'UI Engineer',loc:'South SF',score:86,level:'high',time:'4h ago',url:'https://stripe.com/jobs'}
   ]},
-  { col:'Applied', dot:'#5B6ABF', jobs:[
-    {logo:'VC', color:'#000000', company:'Vercel', title:'Frontend Architect', loc:'Remote', score:90, level:'high', time:'2d ago', url:'https://vercel.com/careers'},
-    {logo:'SB', color:'#3ECF8E', company:'Supabase', title:'Database Engineer', loc:'Remote', score:82, level:'mid', time:'4d ago', url:'https://supabase.com/careers'}
+  {col:'Applied',dot:'#5B6ABF',jobs:[
+    {logo:'VC',color:'#000000',company:'Vercel',title:'Frontend Architect',loc:'Remote',score:90,level:'high',time:'2d ago',url:'https://vercel.com/careers'},
+    {logo:'SB',color:'#3ECF8E',company:'Supabase',title:'Database Engineer',loc:'Remote',score:82,level:'mid',time:'4d ago',url:'https://supabase.com/careers'}
   ]},
-  { col:'Interviewing', dot:'#D4A316', jobs:[
-    {logo:'CF', color:'#F38020', company:'Cloudflare', title:'Developer Advocate', loc:'Austin, TX', score:92, level:'high', time:'Tomorrow', url:'https://cloudflare.com/careers'}
+  {col:'Interviewing',dot:'#D4A316',jobs:[
+    {logo:'CF',color:'#F38020',company:'Cloudflare',title:'Developer Advocate',loc:'Austin, TX',score:92,level:'high',time:'Tomorrow',url:'https://cloudflare.com/careers'}
   ]},
-  { col:'Offers', dot:'#2B5F45', jobs:[
-    {logo:'FL', color:'#7B3FF2', company:'Fly.io', title:'Platform UI Designer', loc:'Remote', score:89, level:'high', time:'Received', url:'https://fly.io/about'}
+  {col:'Offers',dot:'#2B5F45',jobs:[
+    {logo:'FL',color:'#7B3FF2',company:'Fly.io',title:'Platform UI Designer',loc:'Remote',score:89,level:'high',time:'Received',url:'https://fly.io/about'}
   ]}
 ];
 
-// Company colors for job logos
-const COMPANY_COLORS = {
-  'Linear':'#5E6AD2','Stripe':'#635BFF','Vercel':'#000000','Supabase':'#3ECF8E',
-  'Cloudflare':'#F38020','Fly.io':'#7B3FF2'
-};
+// ═══════════════════════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════════════════════
+let activeResumeId = 1; // default to first resume
 
-// ═══════════════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════════
+// SIDEBAR TOGGLE
+// ═══════════════════════════════════════════════════════════════════
+document.getElementById('toggleSidebar').addEventListener('click', () => {
+  document.getElementById('sidebar').classList.toggle('collapsed');
+});
+
+// ═══════════════════════════════════════════════════════════════════
 // VIEW SWITCHING
-// ═══════════════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════════
 function switchView(name) {
   document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
@@ -1017,47 +786,183 @@ function switchView(name) {
   if (view) view.classList.add('active');
   const nav = document.querySelector(`.nav-item[data-view="${name}"]`);
   if (nav) nav.classList.add('active');
-  document.querySelector('.main').scrollTop = 0;
+  document.getElementById('main').scrollTop = 0;
 }
 
 document.querySelectorAll('.nav-item').forEach(item => {
   item.addEventListener('click', () => switchView(item.dataset.view));
 });
 
-// ═══════════════════════════════════════════════════════════════════════
-// RENDER RESUMES
-// ═══════════════════════════════════════════════════════════════════════
-function renderResumes(containerId) {
-  const el = document.getElementById(containerId);
-  if (!el) return;
+// ═══════════════════════════════════════════════════════════════════
+// RESUME SWITCHER (sidebar)
+// ═══════════════════════════════════════════════════════════════════
+function renderSwitcher() {
+  const el = document.getElementById('resumeSwitcher');
   el.innerHTML = RESUMES.map(r => `
-    <div class="resume-card" onclick="openDrawer(${r.id})">
-      <div class="resume-preview">
-        <div class="rp-name">${r.name}</div>
-        <div class="rp-role">${r.role}</div>
-        <div class="rp-bullet">${r.experience[0].company} — ${r.experience[0].role}</div>
-        <div class="rp-bullet">${r.experience[1] ? r.experience[1].company + ' — ' + r.experience[1].role : r.summary.substring(0,45)+'...'}</div>
-        <div class="rp-skills">
-          ${r.skills.slice(0,4).map(s => `<span class="rp-skill">${s}</span>`).join('')}
+    <div class="resume-switch-item ${r.id === activeResumeId ? 'active' : ''}" onclick="switchResume(${r.id})">
+      <div class="resume-switch-dot"></div>
+      <div class="resume-switch-info">
+        <div class="resume-switch-name">${r.name}</div>
+      </div>
+      <div class="resume-switch-score">${r.score}%</div>
+    </div>
+  `).join('');
+}
+
+function switchResume(id) {
+  activeResumeId = id;
+  renderSwitcher();
+  renderMatches();
+  renderActiveBar();
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// MATCHES VIEW
+// ═══════════════════════════════════════════════════════════════════
+function getActiveResume() {
+  return RESUMES.find(r => r.id === activeResumeId);
+}
+
+function renderActiveBar() {
+  const r = getActiveResume();
+  if (!r) return;
+  const bar = document.getElementById('activeResumeBar');
+  bar.innerHTML = `
+    <div class="arb-preview">PDF</div>
+    <div class="arb-info">
+      <div class="arb-name">${r.name}</div>
+      <div class="arb-meta">${r.persona} · ${r.updated} · ${r.skills.length} skills indexed</div>
+    </div>
+    <div class="arb-score">${r.score}%</div>
+  `;
+}
+
+function renderMatches() {
+  const r = getActiveResume();
+  if (!r) return;
+
+  // Summary
+  const summary = document.getElementById('matchSummary');
+  summary.innerHTML = `
+    <div><strong>${r.companies.length}</strong> matching companies</div>
+    <div>Top match: <strong>${r.companies[0].score}%</strong> at ${r.companies[0].name}</div>
+    <div>Avg score: <strong>${Math.round(r.companies.reduce((s,c) => s+c.score, 0) / r.companies.length)}%</strong></div>
+  `;
+
+  // Match list
+  const list = document.getElementById('matchList');
+  list.innerHTML = r.companies.map(c => `
+    <div class="match-card" onclick="window.open('${c.url}', '_blank')">
+      <div class="match-logo" style="background:${c.color}">${c.logo}</div>
+      <div class="match-info">
+        <div class="match-top-row">
+          <span class="match-company">${c.name}</span>
+          <span class="match-score ${c.level}">${c.score}% match</span>
+        </div>
+        <div class="match-role">${c.role}</div>
+        <div class="match-details">
+          <span>${c.loc}</span>
+          <span>${c.salary}</span>
         </div>
       </div>
-      <div class="resume-info">
-        <div class="resume-info-top">
-          <span class="resume-info-title">${r.role}</span>
-          <span class="resume-score ${r.level}">${r.score}%</span>
-        </div>
-        <div class="resume-meta">${r.persona} · ${r.updated}</div>
+      <div class="match-actions">
+        <span class="match-apply">
+          Apply
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>
+        </span>
       </div>
     </div>
   `).join('');
 }
 
-// ═══════════════════════════════════════════════════════════════════════
-// RENDER PIPELINE
-// ═══════════════════════════════════════════════════════════════════════
-function renderPipeline(containerId) {
-  const el = document.getElementById(containerId);
-  if (!el) return;
+// ═══════════════════════════════════════════════════════════════════
+// UPLOAD FLOW
+// ═══════════════════════════════════════════════════════════════════
+function showUpload() {
+  document.getElementById('uploadSection').style.display = 'block';
+  document.getElementById('matchSection').style.display = 'none';
+}
+
+function showMatches() {
+  document.getElementById('uploadSection').style.display = 'none';
+  document.getElementById('matchSection').style.display = 'block';
+}
+
+// File input
+document.getElementById('fileInput').addEventListener('change', (e) => {
+  if (e.target.files.length > 0) handleUpload(e.target.files[0].name);
+});
+
+// Drag & drop
+const zone = document.getElementById('uploadZone');
+zone.addEventListener('click', (e) => {
+  if (e.target.tagName !== 'BUTTON') document.getElementById('fileInput').click();
+});
+zone.addEventListener('dragover', (e) => { e.preventDefault(); zone.classList.add('dragover'); });
+zone.addEventListener('dragleave', () => zone.classList.remove('dragover'));
+zone.addEventListener('drop', (e) => {
+  e.preventDefault();
+  zone.classList.remove('dragover');
+  if (e.dataTransfer.files.length > 0) handleUpload(e.dataTransfer.files[0].name);
+});
+
+function handleUpload(filename) {
+  // Simulate: add new resume from upload
+  const newId = Date.now();
+  const newResume = {
+    id: newId,
+    name: filename.replace(/\.(pdf|docx|txt|md)$/i, '').replace(/_/g, ' ').substring(0, 40),
+    persona: 'New Upload',
+    score: 85,
+    level: 'mid',
+    updated: 'just now',
+    skills: ['JavaScript', 'React', 'CSS', 'HTML5'],
+    summary: 'Resume parsed from uploaded file.',
+    companies: [
+      {logo:'VC',color:'#000000',name:'Vercel',role:'Frontend Engineer',loc:'Remote',salary:'$150-200k',score:87,level:'high',url:'https://vercel.com/careers'},
+      {logo:'SB',color:'#3ECF8E',name:'Supabase',role:'Full-Stack Engineer',loc:'Remote',salary:'$140-190k',score:82,level:'mid',url:'https://supabase.com/careers'},
+    ]
+  };
+  RESUMES.push(newResume);
+  activeResumeId = newId;
+  document.getElementById('resumeCount').textContent = RESUMES.length;
+  renderSwitcher();
+  renderActiveBar();
+  renderMatches();
+  renderResumesList();
+  showMatches();
+}
+
+function handlePaste() {
+  const text = document.getElementById('pasteInput').value.trim();
+  if (!text || text.length < 20) return;
+  handleUpload('Pasted_Resume.txt');
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// RESUMES LIST VIEW
+// ═══════════════════════════════════════════════════════════════════
+function renderResumesList() {
+  const el = document.getElementById('resumesList');
+  el.innerHTML = RESUMES.map(r => `
+    <div class="res-row ${r.id === activeResumeId ? 'active' : ''}" onclick="switchResume(${r.id});switchView('matches')">
+      <div class="res-icon">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+      </div>
+      <div class="res-info">
+        <div class="res-name">${r.name}</div>
+        <div class="res-meta">${r.persona} · ${r.updated} · ${r.companies.length} matches</div>
+      </div>
+      <div class="res-score">${r.score}%</div>
+    </div>
+  `).join('');
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// PIPELINE VIEW
+// ═══════════════════════════════════════════════════════════════════
+function renderPipeline() {
+  const el = document.getElementById('pipelineBoard');
   el.innerHTML = PIPELINE.map(col => `
     <div class="kanban-col">
       <div class="kanban-col-head">
@@ -1068,17 +973,17 @@ function renderPipeline(containerId) {
         <span class="kanban-count">${col.jobs.length}</span>
       </div>
       ${col.jobs.map(job => `
-        <div class="job" onclick="window.open('${job.url}', '_blank')">
-          <div class="job-top">
-            <div class="job-logo" style="background:${COMPANY_COLORS[job.company]||'#666'}">${job.logo}</div>
-            <span class="job-company">${job.company}</span>
-            <span class="job-score ${job.level}">${job.score}%</span>
+        <div class="pipe-card" onclick="window.open('${job.url}', '_blank')">
+          <div class="pipe-top">
+            <div class="pipe-logo" style="background:${job.color}">${job.logo}</div>
+            <span class="pipe-company">${job.company}</span>
+            <span class="pipe-score ${job.level}">${job.score}%</span>
           </div>
-          <div class="job-title">${job.title}</div>
-          <div class="job-loc">${job.loc}</div>
-          <div class="job-foot">
-            <span class="job-time">${job.time}</span>
-            <span class="job-apply">Apply <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg></span>
+          <div class="pipe-title">${job.title}</div>
+          <div class="pipe-loc">${job.loc}</div>
+          <div class="pipe-foot">
+            <span class="pipe-time">${job.time}</span>
+            <span class="pipe-apply">Apply →</span>
           </div>
         </div>
       `).join('')}
@@ -1086,72 +991,16 @@ function renderPipeline(containerId) {
   `).join('');
 }
 
-// ═══════════════════════════════════════════════════════════════════════
-// DRAWER (Resume Preview + ATS)
-// ═══════════════════════════════════════════════════════════════════════
-function openDrawer(id) {
-  const r = RESUMES.find(d => d.id === id);
-  if (!r) return;
-
-  document.getElementById('drawerTitle').textContent = r.role;
-  document.getElementById('drawerSub').textContent = r.persona;
-  document.getElementById('atsNum').textContent = r.score + '%';
-
-  // Resume preview
-  let html = `
-    <div class="dr-header">
-      <div class="dr-name">${r.name}</div>
-      <div class="dr-contact">${r.contact}</div>
-    </div>
-    <div class="dr-section"><div class="dr-section-title">Summary</div><p>${r.summary}</p></div>
-    <div class="dr-section"><div class="dr-section-title">Experience</div>
-  `;
-  r.experience.forEach(e => {
-    html += `<div class="dr-item">
-      <div class="dr-item-head"><span>${e.company}</span><span class="dr-item-date">${e.date}</span></div>
-      <div class="dr-item-role">${e.role}</div>
-      <ul class="dr-bullets">${e.bullets.map(b => `<li>${b}</li>`).join('')}</ul>
-    </div>`;
-  });
-  html += `</div><div class="dr-section"><div class="dr-section-title">Skills</div>
-    <div class="dr-skills">${r.skills.map(s => `<span class="dr-skill">${s}</span>`).join('')}</div></div>`;
-  document.getElementById('drawerResume').innerHTML = html;
-
-  // ATS
-  document.getElementById('matchedKW').innerHTML = r.matchedKw.map(k => `<span class="ats-kw matched">${k}</span>`).join('');
-  document.getElementById('missingKW').innerHTML = r.missingKw.map(k => `<span class="ats-kw missing">${k}</span>`).join('');
-  document.getElementById('matchedN').textContent = r.matchedKw.length;
-  document.getElementById('missingN').textContent = r.missingKw.length;
-
-  // Ring
-  const ring = document.getElementById('atsRing');
-  const circ = 99.9; // 2*PI*15.9 ≈ 99.9
-  ring.style.strokeDasharray = circ;
-  ring.style.strokeDashoffset = circ - (r.score / 100 * circ);
-  ring.style.stroke = r.score >= 90 ? 'var(--success)' : r.score >= 80 ? 'var(--warn)' : 'var(--danger)';
-
-  document.getElementById('atsLabel').textContent = r.score >= 90 ? 'Excellent Match' : r.score >= 80 ? 'Good Match' : 'Needs Work';
-  document.getElementById('atsDesc').textContent = r.score >= 90 ? 'Highly aligned. Ready to apply.' : r.score >= 80 ? 'Minor keyword gaps. A few tweaks recommended.' : 'Significant gaps. Open ATS Optimizer.';
-
-  document.getElementById('drawerOverlay').classList.add('open');
-  document.getElementById('drawer').classList.add('open');
-}
-
-function closeDrawer() {
-  document.getElementById('drawerOverlay').classList.remove('open');
-  document.getElementById('drawer').classList.remove('open');
-}
-
-// ═══════════════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════════
 // COACH
-// ═══════════════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════════
 function addCoachMsg(text, sender) {
-  const container = document.getElementById('coachMessages');
-  const msg = document.createElement('div');
-  msg.className = `coach-msg ${sender}`;
-  msg.innerHTML = text;
-  container.appendChild(msg);
-  container.scrollTop = container.scrollHeight;
+  const c = document.getElementById('coachMessages');
+  const m = document.createElement('div');
+  m.className = `coach-msg ${sender}`;
+  m.innerHTML = text;
+  c.appendChild(m);
+  c.scrollTop = c.scrollHeight;
 }
 
 function sendCoach() {
@@ -1160,30 +1009,30 @@ function sendCoach() {
   if (!text) return;
   addCoachMsg(text, 'user');
   input.value = '';
-
+  const r = getActiveResume();
   const lower = text.toLowerCase();
-  let reply = 'I can help with resume optimization, interview prep, salary negotiation, or job strategy. What do you need?';
+  let reply = 'I can help with resume optimization, interview prep, salary negotiation, or job strategy.';
   if (lower.includes('score') || lower.includes('resume')) {
-    reply = 'Your <strong>Lead Frontend</strong> resume scores <strong>94%</strong>. Strong keyword coverage. Main gaps: PostgreSQL, Cloudflare Workers, WebSockets. Want me to suggest where to add them?';
+    reply = `Your <strong>${r.name}</strong> resume scores <strong>${r.score}%</strong>. Top match: ${r.companies[0].name} at ${r.companies[0].score}%. Focus on adding keywords from the JD to push past 95%.`;
   } else if (lower.includes('interview') || lower.includes('prep')) {
-    reply = 'For the <strong>Cloudflare Developer Advocate</strong> interview (tomorrow): expect questions on edge computing, Workers architecture, and developer community building. Key prep: review Durable Objects docs and prepare a demo.';
+    reply = `Top interview: <strong>${r.companies[0].name}</strong> for ${r.companies[0].role}. Expect questions on ${r.skills.slice(0,3).join(', ')}. Prep a demo and review their engineering blog.`;
   } else if (lower.includes('outreach') || lower.includes('draft') || lower.includes('email')) {
-    reply = 'Here\'s a draft for Linear:\n\n<em>"Hi Karri, I applied for the Lead Frontend Engineer role. With 6+ years building React/TypeScript systems at scale — including performance work at Stripe — I\'d love to discuss how I can contribute to Linear\'s speed-focused culture."</em>';
-  } else if (lower.includes('salary') || lower.includes('offer') || lower.includes('pay')) {
-    reply = 'For Lead Frontend roles at top-tier companies (Linear, Vercel, Stripe): expect \$180-240k base + equity. The Fly.io offer — what\'s the package? I can help negotiate.';
-  } else if (lower.includes('hello') || lower.includes('hi')) {
-    reply = 'Hi John! You have 6 active applications, 1 interview tomorrow at Cloudflare, and 1 offer from Fly.io. What should we tackle?';
+    reply = `Draft for ${r.companies[0].name}:\n\n<em>"Hi, I'm applying for the ${r.companies[0].role} role. My background in ${r.skills.slice(0,3).join(', ')} aligns well. Would love to chat."</em>`;
+  } else if (lower.includes('salary') || lower.includes('pay') || lower.includes('offer')) {
+    reply = `For ${r.companies[0].role} at ${r.companies[0].name}: expected range <strong>${r.companies[0].salary}</strong>. Negotiate equity and signing bonus. Don't accept the first offer.`;
+  } else if (lower.includes('hi') || lower.includes('hello')) {
+    reply = `Hi! You have ${r.companies.length} matches for your ${r.name} resume. What should we work on?`;
   }
-
   setTimeout(() => addCoachMsg(reply, 'assistant'), 600);
 }
 
 function coachAct(type) {
+  const r = getActiveResume();
   const msgs = {
-    score: 'Analyzing your resumes... Your <strong>Frontend</strong> variant is strongest at 94%. The <strong>Designer</strong> variant could use work at 88%. Want specifics?',
-    interview: 'Next interview: <strong>Cloudflare Developer Advocate</strong> (tomorrow). Expect: edge computing architecture, community building, live coding. I recommend prepping a Workers demo.',
-    outreach: 'Draft for Linear hiring manager:\n\n<em>"Hi Karri, I noticed the Lead Frontend Engineer opening. My experience at Stripe optimizing checkout performance (sub-120ms load) aligns directly with Linear\'s speed-first approach. Would love to chat."</em>',
-    salary: 'Market rates for your target roles: Linear $200-250k, Vercel $190-240k, Stripe $180-230k (base + equity). The Fly.io offer — what number did they give?'
+    score: `Scoring <strong>${r.name}</strong>: <strong>${r.score}%</strong>. Skills indexed: ${r.skills.join(', ')}. Main gap: add more backend/cloud keywords to widen your match surface.`,
+    interview: `Next priority: <strong>${r.companies[0].name}</strong> (${r.companies[0].role}). Prep focus: ${r.skills.slice(0,3).join(', ')}. Salary band: ${r.companies[0].salary}.`,
+    outreach: `For ${r.companies[0].name}:\n\n<em>"Hi, I noticed the ${r.companies[0].role} opening. With my experience in ${r.skills.slice(0,2).join(' and ')}, I'd love to contribute. Open to a quick chat?"</em>`,
+    salary: `Market data for ${r.companies[0].role}: <strong>${r.companies[0].salary}</strong> at ${r.companies[0].name}. For remote roles at top-tier companies, push for the upper end + equity.`
   };
   addCoachMsg(msgs[type] || 'How can I help?', 'assistant');
 }
@@ -1192,9 +1041,9 @@ document.getElementById('coachInput').addEventListener('keypress', e => {
   if (e.key === 'Enter') sendCoach();
 });
 
-// ═══════════════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════════
 // THEME
-// ═══════════════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════════
 function toggleTheme() {
   document.body.classList.toggle('dark');
   const dark = document.body.classList.contains('dark');
@@ -1203,16 +1052,22 @@ function toggleTheme() {
   document.getElementById('iconSun').style.display = dark ? 'block' : 'none';
 }
 
-if (localStorage.getItem('theme') === 'dark') toggleTheme();
+if (localStorage.getItem('theme') === 'dark') {
+  document.body.classList.add('dark');
+  document.getElementById('iconMoon').style.display = 'none';
+  document.getElementById('iconSun').style.display = 'block';
+}
 document.getElementById('themeToggle').addEventListener('click', toggleTheme);
 
-// ═══════════════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════════
 // INIT
-// ═══════════════════════════════════════════════════════════════════════
-renderResumes('dashGallery');
-renderResumes('resumesGallery');
-renderPipeline('dashKanban');
-renderPipeline('pipelineBoard');
+// ═══════════════════════════════════════════════════════════════════
+renderSwitcher();
+renderActiveBar();
+renderMatches();
+renderResumesList();
+renderPipeline();
+showMatches(); // start with matches visible since we have resumes
 </script>
 </body>
 </html>
