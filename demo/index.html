@@ -311,6 +311,33 @@
     .arb-link{font-size:var(--text-xs);color:var(--accent);font-weight:500;cursor:pointer;margin-left:auto}
     .arb-link:hover{color:var(--accent-hover)}
 
+    /* ══ FILTER BAR ══ */
+    .filter-bar{display:flex;align-items:center;gap:8px;margin-bottom:16px;flex-wrap:wrap}
+    .filter-search{
+      flex-grow:1;min-width:160px;max-width:240px;
+      position:relative;
+    }
+    .filter-search input{
+      width:100%;height:30px;padding:0 10px 0 28px;
+      background:var(--surface);border:1px solid var(--border);
+      border-radius:var(--radius-sm);font-family:var(--font-body);
+      font-size:var(--text-sm);color:var(--fg);outline:none;
+      transition:border-color var(--motion-fast);
+    }
+    .filter-search input:focus{border-color:var(--accent)}
+    .filter-search input::placeholder{color:var(--muted)}
+    .filter-search svg{position:absolute;left:8px;top:50%;transform:translateY(-50%);color:var(--muted)}
+    .filter-btn{
+      padding:5px 12px;border-radius:var(--radius-sm);
+      font-size:var(--text-sm);font-weight:500;
+      background:var(--surface);border:1px solid var(--border);
+      color:var(--fg-2);cursor:pointer;transition:all var(--motion-fast);
+      white-space:nowrap;
+    }
+    .filter-btn:hover{border-color:var(--accent);color:var(--fg)}
+    .filter-btn.active{background:var(--accent);color:white;border-color:var(--accent)}
+    .filter-divider{width:1px;height:20px;background:var(--border);margin:0 2px}
+
     /* ══ PIPELINE ══ */
     .kanban{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;align-items:start}
     .kanban-col{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px;min-height:300px}
@@ -529,6 +556,19 @@
           <!-- Active resume bar + matches -->
           <div class="active-resume-bar" id="activeResumeBar" style="margin-top:28px"></div>
           <div class="match-summary" id="matchSummary"></div>
+          <div class="filter-bar" id="filterBar">
+            <div class="filter-search">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+              <input type="text" id="matchSearch" placeholder="Search company or role..." oninput="applyFilters()" />
+            </div>
+            <button class="filter-btn active" data-filter="all" onclick="setFilter('all')">All</button>
+            <div class="filter-divider"></div>
+            <button class="filter-btn" data-filter="remote" onclick="setFilter('remote')">Remote</button>
+            <button class="filter-btn" data-filter="hybrid" onclick="setFilter('hybrid')">Hybrid</button>
+            <button class="filter-btn" data-filter="onsite" onclick="setFilter('onsite')">On-site</button>
+            <div class="filter-divider"></div>
+            <button class="filter-btn" data-filter="visa" onclick="setFilter('visa')">Visa Sponsor</button>
+          </div>
           <div class="match-list" id="matchList"></div>
           <div class="stretch-section" id="stretchSection"></div>
         </div>
@@ -638,51 +678,51 @@
 const COMPANY_DB = {
   frontend:{
     direct:[
-      {logo:'LN',color:'#5E6AD2',name:'Linear',role:'Lead Frontend Engineer',loc:'Remote',salary:'$180-240k',score:94,level:'high',url:'https://linear.app/careers'},
-      {logo:'CF',color:'#F38020',name:'Cloudflare',role:'Developer Advocate',loc:'Austin, TX',salary:'$160-220k',score:92,level:'high',url:'https://cloudflare.com/careers'},
-      {logo:'VC',color:'#000000',name:'Vercel',role:'Frontend Architect',loc:'Remote',salary:'$190-240k',score:90,level:'high',url:'https://vercel.com/careers'},
-      {logo:'ST',color:'#635BFF',name:'Stripe',role:'UI Engineer',loc:'South San Francisco',salary:'$185-245k',score:86,level:'high',url:'https://stripe.com/jobs'},
-      {logo:'SB',color:'#3ECF8E',name:'Supabase',role:'Frontend Engineer',loc:'Remote',salary:'$140-190k',score:83,level:'mid',url:'https://supabase.com/careers'},
+      {logo:'LN',color:'#5E6AD2',name:'Linear',role:'Lead Frontend Engineer',loc:'Remote',work:'remote',visa:true,salary:'$180-240k',score:94,level:'high',url:'https://linear.app/careers'},
+      {logo:'CF',color:'#F38020',name:'Cloudflare',role:'Developer Advocate',loc:'Austin, TX',work:'hybrid',visa:true,salary:'$160-220k',score:92,level:'high',url:'https://cloudflare.com/careers'},
+      {logo:'VC',color:'#000000',name:'Vercel',role:'Frontend Architect',loc:'Remote',work:'remote',visa:true,salary:'$190-240k',score:90,level:'high',url:'https://vercel.com/careers'},
+      {logo:'ST',color:'#635BFF',name:'Stripe',role:'UI Engineer',loc:'South San Francisco',work:'onsite',visa:false,salary:'$185-245k',score:86,level:'high',url:'https://stripe.com/jobs'},
+      {logo:'SB',color:'#3ECF8E',name:'Supabase',role:'Frontend Engineer',loc:'Remote',work:'remote',visa:true,salary:'$140-190k',score:83,level:'mid',url:'https://supabase.com/careers'},
     ],
     stretch:[
-      {logo:'ST',color:'#635BFF',name:'Stripe',role:'QA Automation Engineer',loc:'South San Francisco',salary:'$150-200k',score:78,level:'mid',url:'https://stripe.com/jobs',missing:['Cypress','Selenium','Test Automation Frameworks'],transferable:['JavaScript','TypeScript','CI/CD','Cross-browser Testing']},
-      {logo:'CF',color:'#F38020',name:'Cloudflare',role:'Infrastructure Engineer',loc:'Austin, TX',salary:'$170-230k',score:72,level:'mid',url:'https://cloudflare.com/careers',missing:['Rust','Kubernetes','Terraform'],transferable:['JavaScript','Performance Optimization','Networking Basics']},
-      {logo:'SB',color:'#3ECF8E',name:'Supabase',role:'Python Backend Engineer',loc:'Remote',salary:'$140-190k',score:68,level:'mid',url:'https://supabase.com/careers',missing:['Python','Django','PostgreSQL Advanced'],transferable:['API Design','Git','TypeScript','Database Concepts']},
+      {logo:'ST',color:'#635BFF',name:'Stripe',role:'QA Automation Engineer',loc:'South San Francisco',work:'hybrid',visa:false,salary:'$150-200k',score:78,level:'mid',url:'https://stripe.com/jobs',missing:['Cypress','Selenium','Test Automation Frameworks'],transferable:['JavaScript','TypeScript','CI/CD','Cross-browser Testing']},
+      {logo:'CF',color:'#F38020',name:'Cloudflare',role:'Infrastructure Engineer',loc:'Austin, TX',work:'onsite',visa:true,salary:'$170-230k',score:72,level:'mid',url:'https://cloudflare.com/careers',missing:['Rust','Kubernetes','Terraform'],transferable:['JavaScript','Performance Optimization','Networking Basics']},
+      {logo:'SB',color:'#3ECF8E',name:'Supabase',role:'Python Backend Engineer',loc:'Remote',work:'remote',visa:true,salary:'$140-190k',score:68,level:'mid',url:'https://supabase.com/careers',missing:['Python','Django','PostgreSQL Advanced'],transferable:['API Design','Git','TypeScript','Database Concepts']},
     ]
   },
   backend:{
     direct:[
-      {logo:'ST',color:'#635BFF',name:'Stripe',role:'Backend Engineer',loc:'South San Francisco',salary:'$190-260k',score:95,level:'high',url:'https://stripe.com/jobs'},
-      {logo:'LN',color:'#5E6AD2',name:'Linear',role:'Full-Stack Engineer',loc:'Remote',salary:'$180-240k',score:92,level:'high',url:'https://linear.app/careers'},
-      {logo:'SB',color:'#3ECF8E',name:'Supabase',role:'Database Engineer',loc:'Remote',salary:'$150-210k',score:89,level:'high',url:'https://supabase.com/careers'},
-      {logo:'FL',color:'#7B3FF2',name:'Fly.io',role:'Platform Engineer',loc:'Remote',salary:'$160-220k',score:85,level:'mid',url:'https://fly.io/about'},
+      {logo:'ST',color:'#635BFF',name:'Stripe',role:'Backend Engineer',loc:'South San Francisco',work:'hybrid',visa:false,salary:'$190-260k',score:95,level:'high',url:'https://stripe.com/jobs'},
+      {logo:'LN',color:'#5E6AD2',name:'Linear',role:'Full-Stack Engineer',loc:'Remote',work:'remote',visa:true,salary:'$180-240k',score:92,level:'high',url:'https://linear.app/careers'},
+      {logo:'SB',color:'#3ECF8E',name:'Supabase',role:'Database Engineer',loc:'Remote',work:'remote',visa:true,salary:'$150-210k',score:89,level:'high',url:'https://supabase.com/careers'},
+      {logo:'FL',color:'#7B3FF2',name:'Fly.io',role:'Platform Engineer',loc:'Remote',work:'remote',visa:true,salary:'$160-220k',score:85,level:'mid',url:'https://fly.io/about'},
     ],
     stretch:[
-      {logo:'CF',color:'#F38020',name:'Cloudflare',role:'Frontend Engineer',loc:'Austin, TX',salary:'$160-220k',score:76,level:'mid',url:'https://cloudflare.com/careers',missing:['React','CSS Advanced','Accessibility'],transferable:['TypeScript','API Design','Performance Optimization']},
-      {logo:'VC',color:'#000000',name:'Vercel',role:'QA Engineer',loc:'Remote',salary:'$150-200k',score:72,level:'mid',url:'https://vercel.com/careers',missing:['Cypress','Playwright','Visual Regression'],transferable:['Node.js','CI/CD','Automated Testing']},
-      {logo:'FL',color:'#7B3FF2',name:'Fly.io',role:'Python Developer Advocate',loc:'Remote',salary:'$140-190k',score:68,level:'mid',url:'https://fly.io/about',missing:['Python','Content Creation','Community Management'],transferable:['Docker','PostgreSQL','Technical Writing']},
+      {logo:'CF',color:'#F38020',name:'Cloudflare',role:'Frontend Engineer',loc:'Austin, TX',work:'hybrid',visa:true,salary:'$160-220k',score:76,level:'mid',url:'https://cloudflare.com/careers',missing:['React','CSS Advanced','Accessibility'],transferable:['TypeScript','API Design','Performance Optimization']},
+      {logo:'VC',color:'#000000',name:'Vercel',role:'QA Engineer',loc:'Remote',work:'remote',visa:false,salary:'$150-200k',score:72,level:'mid',url:'https://vercel.com/careers',missing:['Cypress','Playwright','Visual Regression'],transferable:['Node.js','CI/CD','Automated Testing']},
+      {logo:'FL',color:'#7B3FF2',name:'Fly.io',role:'Python Developer Advocate',loc:'Remote',work:'remote',visa:true,salary:'$140-190k',score:68,level:'mid',url:'https://fly.io/about',missing:['Python','Content Creation','Community Management'],transferable:['Docker','PostgreSQL','Technical Writing']},
     ]
   },
   design:{
     direct:[
-      {logo:'VC',color:'#000000',name:'Vercel',role:'Product Designer',loc:'Remote',salary:'$160-220k',score:90,level:'high',url:'https://vercel.com/careers'},
-      {logo:'FL',color:'#7B3FF2',name:'Fly.io',role:'Platform UI Designer',loc:'Remote',salary:'$140-190k',score:89,level:'high',url:'https://fly.io/about'},
-      {logo:'LN',color:'#5E6AD2',name:'Linear',role:'Product Designer',loc:'Remote',salary:'$170-230k',score:84,level:'mid',url:'https://linear.app/careers'},
+      {logo:'VC',color:'#000000',name:'Vercel',role:'Product Designer',loc:'Remote',work:'remote',visa:true,salary:'$160-220k',score:90,level:'high',url:'https://vercel.com/careers'},
+      {logo:'FL',color:'#7B3FF2',name:'Fly.io',role:'Platform UI Designer',loc:'Remote',work:'remote',visa:true,salary:'$140-190k',score:89,level:'high',url:'https://fly.io/about'},
+      {logo:'LN',color:'#5E6AD2',name:'Linear',role:'Product Designer',loc:'Remote',work:'remote',visa:true,salary:'$170-230k',score:84,level:'mid',url:'https://linear.app/careers'},
     ],
     stretch:[
-      {logo:'ST',color:'#635BFF',name:'Stripe',role:'Frontend Engineer',loc:'South San Francisco',salary:'$185-245k',score:75,level:'mid',url:'https://stripe.com/jobs',missing:['React','JavaScript Advanced','State Management'],transferable:['CSS','Design Systems','Prototyping','User Research']},
-      {logo:'CF',color:'#F38020',name:'Cloudflare',role:'Technical Writer',loc:'Austin, TX',salary:'$130-180k',score:70,level:'mid',url:'https://cloudflare.com/careers',missing:['Technical Documentation','API Docs','Markdown'],transferable:['UI Design','Typography','Design Systems','Communication']},
+      {logo:'ST',color:'#635BFF',name:'Stripe',role:'Frontend Engineer',loc:'South San Francisco',work:'onsite',visa:false,salary:'$185-245k',score:75,level:'mid',url:'https://stripe.com/jobs',missing:['React','JavaScript Advanced','State Management'],transferable:['CSS','Design Systems','Prototyping','User Research']},
+      {logo:'CF',color:'#F38020',name:'Cloudflare',role:'Technical Writer',loc:'Austin, TX',work:'hybrid',visa:true,salary:'$130-180k',score:70,level:'mid',url:'https://cloudflare.com/careers',missing:['Technical Documentation','API Docs','Markdown'],transferable:['UI Design','Typography','Design Systems','Communication']},
     ]
   },
   generic:{
     direct:[
-      {logo:'VC',color:'#000000',name:'Vercel',role:'Software Engineer',loc:'Remote',salary:'$160-220k',score:85,level:'mid',url:'https://vercel.com/careers'},
-      {logo:'SB',color:'#3ECF8E',name:'Supabase',role:'Engineer',loc:'Remote',salary:'$140-190k',score:80,level:'mid',url:'https://supabase.com/careers'},
-      {logo:'FL',color:'#7B3FF2',name:'Fly.io',role:'Engineer',loc:'Remote',salary:'$150-200k',score:78,level:'mid',url:'https://fly.io/about'},
+      {logo:'VC',color:'#000000',name:'Vercel',role:'Software Engineer',loc:'Remote',work:'remote',visa:true,salary:'$160-220k',score:85,level:'mid',url:'https://vercel.com/careers'},
+      {logo:'SB',color:'#3ECF8E',name:'Supabase',role:'Engineer',loc:'Remote',work:'remote',visa:true,salary:'$140-190k',score:80,level:'mid',url:'https://supabase.com/careers'},
+      {logo:'FL',color:'#7B3FF2',name:'Fly.io',role:'Engineer',loc:'Remote',work:'remote',visa:true,salary:'$150-200k',score:78,level:'mid',url:'https://fly.io/about'},
     ],
     stretch:[
-      {logo:'ST',color:'#635BFF',name:'Stripe',role:'QA Engineer',loc:'South San Francisco',salary:'$150-200k',score:72,level:'mid',url:'https://stripe.com/jobs',missing:['Test Frameworks','Automation'],transferable:['JavaScript','Git','CI/CD']},
-      {logo:'CF',color:'#F38020',name:'Cloudflare',role:'Support Engineer',loc:'Remote',salary:'$120-170k',score:68,level:'mid',url:'https://cloudflare.com/careers',missing:['Networking Deep Dive','DNS','HTTP Internals'],transferable:['Problem Solving','Communication','Debugging']},
+      {logo:'ST',color:'#635BFF',name:'Stripe',role:'QA Engineer',loc:'South San Francisco',work:'hybrid',visa:false,salary:'$150-200k',score:72,level:'mid',url:'https://stripe.com/jobs',missing:['Test Frameworks','Automation'],transferable:['JavaScript','Git','CI/CD']},
+      {logo:'CF',color:'#F38020',name:'Cloudflare',role:'Support Engineer',loc:'Remote',work:'remote',visa:true,salary:'$120-170k',score:68,level:'mid',url:'https://cloudflare.com/careers',missing:['Networking Deep Dive','DNS','HTTP Internals'],transferable:['Problem Solving','Communication','Debugging']},
     ]
   }
 };
@@ -710,6 +750,8 @@ let activeResumeId = null;
 let wizardStep = 0;
 let wizardSkills = [];
 let wizardExp = [];
+let activeFilter = 'all';
+let searchQuery = '';
 
 // ══ SIDEBAR TOGGLE ══
 document.getElementById('toggleSidebar').addEventListener('click',()=>document.getElementById('sidebar').classList.toggle('collapsed'));
@@ -994,35 +1036,73 @@ function renderActiveBar(){
   `;
 }
 
+// ══ FILTERS ══
+function setFilter(f){
+  activeFilter=f;
+  document.querySelectorAll('.filter-btn').forEach(b=>{
+    b.classList.toggle('active',b.dataset.filter===f);
+  });
+  renderMatches();
+}
+function applyFilters(){
+  searchQuery=document.getElementById('matchSearch').value.toLowerCase().trim();
+  renderMatches();
+}
+function matchesFilter(c){
+  // Work policy filter
+  if(activeFilter==='remote'&&c.work!=='remote')return false;
+  if(activeFilter==='hybrid'&&c.work!=='hybrid')return false;
+  if(activeFilter==='onsite'&&c.work!=='onsite')return false;
+  if(activeFilter==='visa'&&!c.visa)return false;
+  // Search filter
+  if(searchQuery){
+    const text=(c.name+' '+c.role+' '+c.loc).toLowerCase();
+    if(!text.includes(searchQuery))return false;
+  }
+  return true;
+}
+
 function renderMatches(){
   const r=getActiveResume();
   if(!r)return;
-  const direct=r.companies||[];
-  const stretch=r.stretch||[];
+  const allDirect=r.companies||[];
+  const allStretch=r.stretch||[];
+
+  // Apply filters
+  const direct=allDirect.filter(matchesFilter);
+  const stretch=allStretch.filter(matchesFilter);
 
   // Summary
-  const totalMatches=direct.length+stretch.length;
   document.getElementById('matchSummary').innerHTML=`
     <div><strong>${direct.length}</strong> direct matches</div>
     <div><strong>${stretch.length}</strong> stretch roles</div>
-    <div>Top: <strong>${direct[0]?direct[0].score+'%':''}</strong> ${direct[0]?'at '+direct[0].name:''}</div>
+    ${direct[0]?`<div>Top: <strong>${direct[0].score}%</strong> at ${direct[0].name}</div>`:''}
   `;
 
   // Direct matches
-  document.getElementById('matchList').innerHTML=direct.map(c=>`
-    <div class="match-card" onclick="window.open('${c.url}','_blank')">
-      <div class="match-logo" style="background:${c.color}">${c.logo}</div>
-      <div class="match-info">
-        <div class="match-top-row">
-          <span class="match-company">${c.name}</span>
-          <span class="match-score ${c.level}">${c.score}% match</span>
+  if(direct.length>0){
+    document.getElementById('matchList').innerHTML=direct.map(c=>`
+      <div class="match-card" onclick="window.open('${c.url}','_blank')">
+        <div class="match-logo" style="background:${c.color}">${c.logo}</div>
+        <div class="match-info">
+          <div class="match-top-row">
+            <span class="match-company">${c.name}</span>
+            <span class="match-score ${c.level}">${c.score}%</span>
+          </div>
+          <div class="match-role">${c.role}</div>
+          <div class="match-details">
+            <span>${c.loc}</span>
+            <span>${c.work}</span>
+            ${c.visa?'<span>visa</span>':''}
+            <span>${c.salary}</span>
+          </div>
         </div>
-        <div class="match-role">${c.role}</div>
-        <div class="match-details"><span>${c.loc}</span><span>${c.salary}</span></div>
+        <span class="match-apply">Apply <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg></span>
       </div>
-      <span class="match-apply">Apply <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg></span>
-    </div>
-  `).join('');
+    `).join('');
+  }else{
+    document.getElementById('matchList').innerHTML='<div style="padding:24px;text-align:center;color:var(--muted);font-size:var(--text-sm)">No direct matches for these filters. Try widening your search.</div>';
+  }
 
   // Stretch roles
   if(stretch.length>0){
@@ -1030,7 +1110,7 @@ function renderMatches(){
       <div class="stretch-head">
         <span class="stretch-title">Stretch Roles</span>
         <span class="stretch-badge">Explore</span>
-        <span class="stretch-info">Related positions you could grow into — honest gaps shown</span>
+        <span class="stretch-info">${stretch.length} roles you could grow into</span>
       </div>
       ${stretch.map(c=>`
         <div class="stretch-card">
