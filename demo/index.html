@@ -408,13 +408,12 @@
     <!-- ══ SIDEBAR ══ -->
     <aside class="sidebar" id="sidebar">
       <div class="nav-label">Navigate</div>
-      <div class="nav-item active" data-view="home"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2h-4a2 2 0 0 1-2-2v-4a2 2 0 0 0-2-2H10a2 2 0 0 0-2 2v4a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2z" transform="translate(2 0)"/></svg>Home</div>
-      <div class="nav-item" data-view="resumes"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>My Resumes<span class="nav-badge" id="resumeCount">0</span></div>
+      <div class="nav-item active" data-view="resumes"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>My Resumes<span class="nav-badge" id="resumeCount">0</span></div>
       <div class="nav-item" data-view="pipeline"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="1"/><line x1="9" y1="3" x2="9" y2="21"/><line x1="15" y1="3" x2="15" y2="21"/></svg>Pipeline<span class="nav-badge" id="pipelineCount">6</span></div>
       <div class="nav-item" data-view="coach"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Coach</div>
       <div class="nav-label">Resumes</div>
       <div class="resume-switcher" id="resumeSwitcher"></div>
-      <div class="resume-add-btn" onclick="showOnboarding()"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>Add Resume</div>
+      <div class="resume-add-btn" onclick="openUploadModal()"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>Add Resume</div>
       <div class="nav-label">Account</div>
       <div class="nav-item" data-view="settings"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>Settings</div>
       <div class="sidebar-footer"><div class="sidebar-user"><div class="avatar">JD</div><div><div class="sidebar-user-name">John Doe</div><div class="sidebar-user-plan">FREE PLAN</div></div></div></div>
@@ -423,10 +422,10 @@
     <!-- ══ MAIN ══ -->
     <main class="main" id="main">
 
-      <!-- ── MATCHES VIEW ── -->
-      <section class="view active" id="view-home">
-        <!-- Onboarding (shown when no resumes) -->
-        <div id="onboardingSection">
+      <!-- ── MY RESUMES VIEW (landing page) ── -->
+      <section class="view active" id="view-resumes">
+        <!-- Empty state: upload hero -->
+        <div id="emptyState">
           <div class="onboarding">
             <div class="onboarding-title">Find companies that match your skills</div>
             <div class="onboarding-sub">Upload your resume or build one — we'll match you instantly</div>
@@ -448,7 +447,7 @@
           </div>
         </div>
 
-        <!-- Wizard (hidden by default) -->
+        <!-- Wizard (hidden by default, replaces empty state) -->
         <div id="wizardSection" style="display:none">
           <div class="wizard">
             <div class="wizard-card">
@@ -458,7 +457,6 @@
                 <div class="wizard-step-dot" id="dot-2"></div>
                 <div class="wizard-step-dot" id="dot-3"></div>
               </div>
-
               <!-- Step 0: Role -->
               <div class="wizard-step active" id="step-0">
                 <div class="wizard-step-label">STEP 1 OF 4</div>
@@ -473,45 +471,22 @@
                     <span class="field-suggestion" onclick="setField('wb-role','Backend Engineer')">Backend Engineer</span>
                   </div>
                 </div>
-                <div class="wizard-nav">
-                  <span></span>
-                  <button class="btn btn-primary" onclick="nextStep(0)">Next <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></button>
-                </div>
+                <div class="wizard-nav"><span></span><button class="btn btn-primary" onclick="nextStep(0)">Next <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></button></div>
               </div>
-
               <!-- Step 1: Personal -->
               <div class="wizard-step" id="step-1">
                 <div class="wizard-step-label">STEP 2 OF 4</div>
                 <div class="wizard-question">Tell us about yourself</div>
                 <div class="wizard-hint">Basic info for your resume header</div>
-                <div class="field">
-                  <label class="field-label">Full Name</label>
-                  <input type="text" class="field-input" id="wb-name" placeholder="John Doe" />
-                </div>
+                <div class="field"><label class="field-label">Full Name</label><input type="text" class="field-input" id="wb-name" placeholder="John Doe" /></div>
                 <div class="field-row">
-                  <div class="field">
-                    <label class="field-label">Email</label>
-                    <input type="text" class="field-input" id="wb-email" placeholder="john@email.com" />
-                  </div>
-                  <div class="field">
-                    <label class="field-label">Location</label>
-                    <input type="text" class="field-input" id="wb-location" placeholder="San Francisco, CA" />
-                  </div>
+                  <div class="field"><label class="field-label">Email</label><input type="text" class="field-input" id="wb-email" placeholder="john@email.com" /></div>
+                  <div class="field"><label class="field-label">Location</label><input type="text" class="field-input" id="wb-location" placeholder="San Francisco, CA" /></div>
                 </div>
-                <div class="field">
-                  <label class="field-label">Years of Experience</label>
-                  <input type="text" class="field-input" id="wb-years" placeholder="6" />
-                </div>
-                <div class="field">
-                  <label class="field-label">Professional Summary</label>
-                  <textarea class="field-textarea" id="wb-summary" placeholder="Brief description of your experience and strengths..."></textarea>
-                </div>
-                <div class="wizard-nav">
-                  <span class="wizard-back" onclick="prevStep(1)">← Back</span>
-                  <button class="btn btn-primary" onclick="nextStep(1)">Next <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></button>
-                </div>
+                <div class="field"><label class="field-label">Years of Experience</label><input type="text" class="field-input" id="wb-years" placeholder="6" /></div>
+                <div class="field"><label class="field-label">Professional Summary</label><textarea class="field-textarea" id="wb-summary" placeholder="Brief description of your experience and strengths..."></textarea></div>
+                <div class="wizard-nav"><span class="wizard-back" onclick="prevStep(1)">← Back</span><button class="btn btn-primary" onclick="nextStep(1)">Next <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></button></div>
               </div>
-
               <!-- Step 2: Experience -->
               <div class="wizard-step" id="step-2">
                 <div class="wizard-step-label">STEP 3 OF 4</div>
@@ -519,21 +494,15 @@
                 <div class="wizard-hint">Add at least one job — you can edit later</div>
                 <div id="expEntries"></div>
                 <button class="btn btn-secondary" onclick="addExpEntry()" style="margin-top:4px"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg> Add another job</button>
-                <div class="wizard-nav">
-                  <span class="wizard-back" onclick="prevStep(2)">← Back</span>
-                  <button class="btn btn-primary" onclick="nextStep(2)">Next <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></button>
-                </div>
+                <div class="wizard-nav"><span class="wizard-back" onclick="prevStep(2)">← Back</span><button class="btn btn-primary" onclick="nextStep(2)">Next <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></button></div>
               </div>
-
               <!-- Step 3: Skills -->
               <div class="wizard-step" id="step-3">
                 <div class="wizard-step-label">STEP 4 OF 4</div>
                 <div class="wizard-question">What are your key skills?</div>
-                <div class="wizard-hint">Type a skill and press Enter — add as many as you want</div>
+                <div class="wizard-hint">Type a skill and press Enter</div>
                 <div class="field">
-                  <div class="skill-tags" id="skillTags">
-                    <input type="text" class="skill-tag-input" id="skillInput" placeholder="Type a skill and press Enter..." />
-                  </div>
+                  <div class="skill-tags" id="skillTags"><input type="text" class="skill-tag-input" id="skillInput" placeholder="Type a skill and press Enter..." /></div>
                   <div class="field-suggestions" id="skillSuggestions">
                     <span class="field-suggestion" onclick="addSkill('React')">React</span>
                     <span class="field-suggestion" onclick="addSkill('TypeScript')">TypeScript</span>
@@ -543,31 +512,26 @@
                     <span class="field-suggestion" onclick="addSkill('PostgreSQL')">PostgreSQL</span>
                   </div>
                 </div>
-                <div class="wizard-nav">
-                  <span class="wizard-back" onclick="prevStep(3)">← Back</span>
-                  <button class="btn btn-primary" onclick="generateResume()">Generate Resume <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg></button>
-                </div>
+                <div class="wizard-nav"><span class="wizard-back" onclick="prevStep(3)">← Back</span><button class="btn btn-primary" onclick="generateResume()">Generate Resume <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg></button></div>
               </div>
             </div>
           </div>
         </div>
 
-        <!-- Active resume + matches (shown after upload/generate) -->
-        <div id="matchSection" style="display:none">
-          <div class="active-resume-bar" id="activeResumeBar"></div>
+        <!-- Populated state: resume list + active resume matches -->
+        <div id="populatedState" style="display:none">
+          <div class="page-head">
+            <div><h1>My Resumes</h1><div class="subtitle">Each resume gets its own company matches</div></div>
+            <button class="btn btn-primary" onclick="openUploadModal()"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>Upload Resume</button>
+          </div>
+          <div class="resumes-list" id="resumesList"></div>
+
+          <!-- Active resume bar + matches -->
+          <div class="active-resume-bar" id="activeResumeBar" style="margin-top:28px"></div>
           <div class="match-summary" id="matchSummary"></div>
           <div class="match-list" id="matchList"></div>
           <div class="stretch-section" id="stretchSection"></div>
         </div>
-      </section>
-
-      <!-- ── RESUMES VIEW ── -->
-      <section class="view" id="view-resumes">
-        <div class="page-head">
-          <div><h1>My Resumes</h1><div class="subtitle">Each resume gets its own company matches</div></div>
-          <button class="btn btn-primary" onclick="showOnboarding()"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>Add Resume</button>
-        </div>
-        <div class="resumes-list" id="resumesList"></div>
       </section>
 
       <!-- ── PIPELINE VIEW ── -->
@@ -609,6 +573,40 @@
       </section>
 
     </main>
+  </div>
+</div>
+
+<!-- ══ UPLOAD MODAL (for adding resumes when populated) ══ -->
+<div class="rp-overlay" id="uploadOverlay" onclick="closeUploadModal()"></div>
+<div class="rp-modal" id="uploadModal" style="z-index:199">
+  <div class="rp-topbar">
+    <div class="rp-topbar-left">
+      <div class="rp-topbar-title">Add Resume</div>
+    </div>
+    <div class="rp-topbar-actions">
+      <button class="icon-btn" onclick="closeUploadModal()" title="Close">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+  </div>
+  <div class="rp-scroll" style="background:var(--bg)">
+    <div style="max-width:480px;margin:0 auto;padding:32px 16px">
+      <div class="upload-zone" id="uploadZoneModal" style="max-width:none">
+        <input type="file" id="fileInputModal" style="display:none" accept=".pdf,.docx,.txt,.md" />
+        <div class="upload-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></div>
+        <div class="upload-zone-title">Drop your resume</div>
+        <div class="upload-zone-sub">PDF or DOCX — we'll parse it instantly</div>
+        <button class="upload-btn" onclick="document.getElementById('fileInputModal').click()">Choose File</button>
+        <div class="upload-formats">PDF · DOCX</div>
+      </div>
+      <div class="onboarding-divider" style="max-width:none"><span>OR</span></div>
+      <div style="text-align:center">
+        <span class="template-link" onclick="closeUploadModal();showWizard()">
+          Build one from template
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </span>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -728,23 +726,57 @@ function switchView(name){
 }
 document.querySelectorAll('.nav-item').forEach(item=>item.addEventListener('click',()=>switchView(item.dataset.view)));
 
-// ══ ONBOARDING / WIZARD ══
-function showOnboarding(){
-  document.getElementById('onboardingSection').style.display='block';
+// ══ VIEW STATE: empty / wizard / populated ══
+function showEmptyState(){
+  document.getElementById('emptyState').style.display='block';
   document.getElementById('wizardSection').style.display='none';
-  document.getElementById('matchSection').style.display='none';
-  switchView('home');
+  document.getElementById('populatedState').style.display='none';
+}
+function showWizardState(){
+  document.getElementById('emptyState').style.display='none';
+  document.getElementById('wizardSection').style.display='block';
+  document.getElementById('populatedState').style.display='none';
+}
+function showPopulatedState(){
+  document.getElementById('emptyState').style.display='none';
+  document.getElementById('wizardSection').style.display='none';
+  document.getElementById('populatedState').style.display='block';
 }
 
+// Legacy compat
+function showOnboarding(){showEmptyState();switchView('resumes')}
+
 function showWizard(){
-  document.getElementById('onboardingSection').style.display='none';
-  document.getElementById('wizardSection').style.display='block';
-  document.getElementById('matchSection').style.display='none';
+  showWizardState();
   wizardStep=0;wizardSkills=[];wizardExp=[];
   showStep(0);
-  // Add first exp entry
   if(wizardExp.length===0)addExpEntry();
 }
+
+// ══ UPLOAD MODAL ══
+function openUploadModal(){
+  document.getElementById('uploadOverlay').classList.add('open');
+  document.getElementById('uploadModal').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+function closeUploadModal(){
+  document.getElementById('uploadOverlay').classList.remove('open');
+  document.getElementById('uploadModal').classList.remove('open');
+  document.body.style.overflow='';
+}
+
+// Modal file upload
+document.getElementById('fileInputModal').addEventListener('change',e=>{
+  if(e.target.files.length>0){closeUploadModal();handleUpload(e.target.files[0].name)}
+});
+const uzModal=document.getElementById('uploadZoneModal');
+uzModal.addEventListener('click',e=>{if(e.target.tagName!=='BUTTON')document.getElementById('fileInputModal').click()});
+uzModal.addEventListener('dragover',e=>{e.preventDefault();uzModal.classList.add('dragover')});
+uzModal.addEventListener('dragleave',()=>uzModal.classList.remove('dragover'));
+uzModal.addEventListener('drop',e=>{
+  e.preventDefault();uzModal.classList.remove('dragover');
+  if(e.dataTransfer.files.length>0){closeUploadModal();handleUpload(e.dataTransfer.files[0].name)}
+});
 
 function showStep(n){
   wizardStep=n;
@@ -919,10 +951,9 @@ function createResume(data){
   renderResumesList();
   renderActiveBar();
   renderMatches();
-  // Hide onboarding/wizard, show matches
-  document.getElementById('onboardingSection').style.display='none';
-  document.getElementById('wizardSection').style.display='none';
-  document.getElementById('matchSection').style.display='block';
+  // Show populated state
+  showPopulatedState();
+  closeUploadModal();
 }
 
 // ══ RESUME SWITCHER ══
@@ -942,9 +973,9 @@ function switchResume(id){
   renderSwitcher();
   renderActiveBar();
   renderMatches();
-  document.getElementById('matchSection').style.display='block';
-  document.getElementById('onboardingSection').style.display='none';
-  document.getElementById('wizardSection').style.display='none';
+  renderResumesList();
+  showPopulatedState();
+  switchView('resumes');
 }
 
 function getActiveResume(){return RESUMES.find(r=>r.id===activeResumeId)}
@@ -1050,13 +1081,13 @@ function renderResumesList(){
     const stretchCount=(r.stretch||[]).length;
     return `
     <div class="res-row ${r.id===activeResumeId?'active':''}" style="flex-wrap:wrap">
-      <div class="res-icon" onclick="switchResume(${r.id});switchView('home')" style="cursor:pointer"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
-      <div class="res-info" onclick="switchResume(${r.id});switchView('home')" style="cursor:pointer;flex-grow:1"><div class="res-name">${r.name}</div><div class="res-meta">${r.persona} · ${r.updated} · ${directCount} direct + ${stretchCount} stretch</div></div>
+      <div class="res-icon" onclick="switchResume(${r.id});switchView('resumes')" style="cursor:pointer"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
+      <div class="res-info" onclick="switchResume(${r.id});switchView('resumes')" style="cursor:pointer;flex-grow:1"><div class="res-name">${r.name}</div><div class="res-meta">${r.persona} · ${r.updated} · ${directCount} direct + ${stretchCount} stretch</div></div>
       <div class="res-score">${r.score}%</div>
       <div style="display:flex;gap:6px;width:100%;padding-top:8px;border-top:1px solid var(--border-soft);margin-top:4px">
         <button class="btn btn-secondary" onclick="viewResume(${r.id})"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>View</button>
         <button class="btn btn-secondary" onclick="downloadResume(${r.id})"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Download</button>
-        <button class="btn btn-ghost" onclick="switchResume(${r.id});switchView('home')">View Matches</button>
+        <button class="btn btn-ghost" onclick="switchResume(${r.id});switchView('resumes')">View Matches</button>
       </div>
     </div>
   `}).join('');
@@ -1255,8 +1286,7 @@ document.getElementById('themeToggle').addEventListener('click',toggleTheme);
 renderSwitcher();
 renderResumesList();
 renderPipeline();
-// Start with onboarding (empty state)
-showOnboarding();
+showEmptyState(); // start with upload zone (empty state)
 </script>
 </body>
 </html>
