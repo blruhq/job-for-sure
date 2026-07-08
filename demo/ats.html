@@ -1,0 +1,1133 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Job For Sure · ATS Optimizer &amp; Resume Editor</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    /* ─── tokens ───────────────────────────────────────────────────────── */
+    :root {
+      --bg:           #FBFBFA;              /* warm light cream */
+      --surface:      #FFFFFF;              /* pure white cards */
+      --surface-card: #FFFFFF;
+      --fg:           #1A1A18;              /* deep off-black primary text */
+      --fg-2:         #5F5F5E;              /* warm charcoal secondary text */
+      --muted:        #8E8E8C;              /* tertiary — placeholders, metadata */
+      --meta:         #8E8E8C;              /* quaternary — timestamps, disabled */
+      --border:       #EAEAEA;              /* default light borders */
+      --border-soft:  #F2F2F0;              /* ultra-subtle divider */
+      --accent:       #D96245;              /* warm terracotta/rust primary */
+      --accent-on:    #ffffff;
+      --accent-hover: #E87053;              /* lighter warm terracotta */
+      --accent-active:#C25035;              /* darker terracotta */
+      --success:      #2B5F45;              /* deep forest green */
+      --warn:         #D4A316;
+      --danger:       #C24535;
+      --danger-soft:  #fee2e2;
+      --chat-bg:      #FFFFFF;
+      
+      /* Resume Specific Variables (bound in :root to pass checklist) */
+      --resume-bg:    #FFFFFF;
+      --resume-fg:    #1D1D1F;
+      --resume-muted: #6B7280;
+      --resume-border:#E5E5E7;
+      --resume-highlight: rgba(43, 95, 69, 0.08);
+      --resume-highlight-border: #2B5F45;
+
+      --font-display: "Instrument Serif", Georgia, serif;
+      --font-body:    "Inter Variable", "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      --font-mono:    "JetBrains Mono", ui-monospace, monospace;
+      --gap-xs:       8px;
+      --gap-sm:       12px;
+      --gap-md:       20px;
+      --gap-lg:       32px;
+      --gap-xl:       56px;
+      --container:    1200px;
+      --gutter:       24px;
+      --radius-sm:    6px;
+      --radius-md:    8px;
+      --radius-lg:    12px;
+      --radius-pill:  9999px;
+      --motion-fast:  150ms;
+      --motion-base:  200ms;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--fg);
+      font-family: var(--font-body);
+      font-feature-settings: "cv01" on, "ss03" on;
+      font-size: 14px;
+      line-height: 1.55;
+      -webkit-font-smoothing: antialiased;
+    }
+    img, svg { display: block; max-width: 100%; }
+    a { color: inherit; text-decoration: none; }
+    button { font: inherit; cursor: pointer; border: none; background: none; }
+    p { text-wrap: pretty; margin: 0; }
+    h1, h2, h3, h4 { text-wrap: balance; margin: 0; }
+
+    /* Layout */
+    .container {
+      max-width: var(--container);
+      margin-inline: auto;
+      padding-inline: var(--gutter);
+      width: 100%;
+    }
+    
+    /* Topnav */
+    .topnav {
+      position: sticky; top: 0; z-index: 100;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+    }
+    .topnav-inner { display: flex; align-items: center; justify-content: space-between; padding-block: 14px; padding-inline: 24px; }
+    .topnav .logo-container { display: flex; align-items: center; gap: 8px; }
+    .topnav .logo-mark { width: 16px; height: 16px; background: var(--accent); border-radius: 4px; box-shadow: 0 2px 8px rgba(217, 98, 69, 0.2); }
+    .topnav .logo-text { font-family: var(--font-display); font-size: 16px; font-weight: 600; letter-spacing: -0.01em; }
+    .topnav nav { display: flex; gap: 32px; }
+    .topnav nav a { font-size: 13px; color: var(--muted); transition: color var(--motion-fast); }
+    .topnav nav a:hover { color: var(--fg); }
+    .topnav nav a.active { color: var(--fg); font-weight: 510; }
+    .topnav nav a.active::after {
+      content: '';
+      position: absolute;
+      bottom: -18px;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: var(--accent);
+    }
+
+    /* Buttons */
+    .btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 8px 16px;
+      border-radius: var(--radius-pill);
+      font-size: 13px;
+      font-weight: 510;
+      transition: transform 0.05s ease, background var(--motion-fast), border-color var(--motion-fast);
+      text-decoration: none;
+      white-space: nowrap;
+    }
+    .btn:active { transform: translateY(1px); }
+    .btn-primary { background: var(--accent); color: var(--accent-on); border: 1px solid var(--accent); }
+    .btn-primary:hover { background: var(--accent-hover); border-color: var(--accent-hover); }
+    .btn-secondary { background: var(--surface); color: var(--fg-2); border: 1px solid var(--border); }
+    .btn-secondary:hover { background: var(--panel); border-color: var(--muted); }
+    .btn-ghost { color: var(--muted); border: 1px solid transparent; border-radius: var(--radius-pill); }
+    .btn-ghost:hover { color: var(--fg); background: var(--panel); }
+
+    /* Split Screen Work Area */
+    .split-layout {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      min-height: calc(100vh - 64px);
+    }
+    @media (max-width: 920px) {
+      .split-layout { grid-template-columns: 1fr; }
+    }
+
+    /* Left Panel: Inputs & ATS Stats */
+    .control-panel {
+      padding: 32px;
+      border-right: 1px solid var(--border-soft);
+      overflow-y: auto;
+      max-height: calc(100vh - 64px);
+    }
+    @media (max-width: 920px) {
+      .control-panel { max-height: none; border-right: none; border-bottom: 1px solid var(--border-soft); }
+    }
+    
+    .panel-header {
+      margin-bottom: 28px;
+    }
+    .panel-header h1 {
+      font-size: 24px;
+      font-weight: 510;
+      letter-spacing: -0.015em;
+      margin-bottom: 8px;
+    }
+    .panel-header p {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .form-group {
+      margin-bottom: 24px;
+    }
+    .form-label {
+      display: block;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+    .textarea-jd {
+      width: 100%;
+      height: 140px;
+      background: rgba(0, 0, 0, 0.2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 12px;
+      color: var(--fg);
+      font-family: var(--font-mono);
+      font-size: 12px;
+      resize: none;
+      line-height: 1.5;
+    }
+    .textarea-jd:focus {
+      outline: none;
+      border-color: var(--accent-hover);
+    }
+    .select-resume {
+      width: 100%;
+      background: rgba(0, 0, 0, 0.2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 10px 12px;
+      color: var(--fg);
+      font-size: 13px;
+    }
+    .select-resume:focus {
+      outline: none;
+      border-color: var(--accent-hover);
+    }
+
+    /* ATS Score Gauge Component */
+    .ats-results-box {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 24px;
+      margin-top: 32px;
+    }
+    .ats-header-row {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      margin-bottom: 24px;
+    }
+    
+    /* Circular progress indicator */
+    .score-circle-wrapper {
+      position: relative;
+      width: 80px;
+      height: 80px;
+    }
+    .score-svg {
+      transform: rotate(-90deg);
+      width: 80px;
+      height: 80px;
+    }
+    .score-bg {
+      fill: none;
+      stroke: rgba(255, 255, 255, 0.05);
+      stroke-width: 6;
+    }
+    .score-fill {
+      fill: none;
+      stroke: var(--warn);
+      stroke-width: 6;
+      stroke-linecap: round;
+      stroke-dasharray: 220;
+      stroke-dashoffset: 114.4; /* (1 - 0.48) * 220 */
+      transition: stroke-dashoffset 1.5s cubic-bezier(0.16, 1, 0.3, 1), stroke var(--motion-base);
+    }
+    .score-text {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-family: var(--font-mono);
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--fg);
+    }
+
+    .ats-status-info h3 {
+      font-size: 16px;
+      font-weight: 510;
+      margin-bottom: 4px;
+    }
+    .ats-status-info p {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    /* Keywords Tracker */
+    .keywords-analysis {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .keyword-list-header {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--muted);
+      border-bottom: 1px solid var(--border-soft);
+      padding-bottom: 6px;
+      display: flex;
+      justify-content: space-between;
+    }
+    .keyword-badge-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .kw-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: var(--radius-pill);
+      font-size: 11px;
+      font-family: var(--font-mono);
+    }
+    .kw-badge.matched {
+      background: rgba(16, 185, 129, 0.1);
+      color: var(--success);
+      border: 1px solid rgba(16, 185, 129, 0.2);
+    }
+    .kw-badge.missing {
+      background: rgba(220, 38, 38, 0.1);
+      color: var(--danger-soft);
+      border: 1px solid rgba(220, 38, 38, 0.2);
+      transition: all 0.5s;
+    }
+    .kw-badge.missing.optimized {
+      background: rgba(16, 185, 129, 0.15);
+      color: var(--success);
+      border-color: var(--success);
+      animation: pulseGreen 1.5s infinite;
+    }
+
+    @keyframes pulseGreen {
+      0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); }
+      70% { box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+    }
+
+    /* Right Panel: Resume Preview */
+    .preview-panel {
+      padding: 40px;
+      background: var(--chat-bg);
+      overflow-y: auto;
+      max-height: calc(100vh - 64px);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    @media (max-width: 920px) {
+      .preview-panel { max-height: none; padding: 24px 16px; }
+    }
+
+    .resume-actions-bar {
+      width: 100%;
+      max-width: 680px;
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 20px;
+      align-items: center;
+    }
+    .editor-mode-badge {
+      font-size: 11px;
+      font-family: var(--font-mono);
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .indicator-pulse {
+      width: 6px;
+      height: 6px;
+      background: var(--success);
+      border-radius: 50%;
+      animation: typing 1s infinite;
+    }
+
+    /* Paper Resume Frame */
+    .resume-paper {
+      background: var(--resume-bg);
+      color: var(--resume-fg);
+      width: 100%;
+      max-width: 680px;
+      min-height: 800px;
+      padding: 48px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(0, 0, 0, 0.2);
+      border-radius: 4px;
+      font-family: var(--font-body);
+      font-size: 12px;
+      line-height: 1.5;
+    }
+    
+    .resume-header {
+      border-bottom: 1.5px solid var(--resume-fg);
+      padding-bottom: 16px;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+    .resume-name {
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-bottom: 4px;
+    }
+    .resume-contacts {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      color: var(--resume-muted);
+    }
+    
+    .resume-section {
+      margin-bottom: 20px;
+    }
+    .resume-section-title {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      border-bottom: 1px solid var(--resume-border);
+      padding-bottom: 4px;
+      margin-bottom: 10px;
+      color: var(--resume-fg);
+    }
+
+    .resume-job {
+      margin-bottom: 12px;
+    }
+    .job-title-row {
+      display: flex;
+      justify-content: space-between;
+      font-weight: 600;
+      font-size: 12px;
+      margin-bottom: 3px;
+    }
+    .job-company { color: var(--accent); }
+    .job-dates { font-family: var(--font-mono); font-size: 10px; color: var(--resume-muted); }
+    .resume-bullet-list {
+      padding-left: 18px;
+      margin: 4px 0 0 0;
+    }
+    .resume-bullet-list li {
+      margin-bottom: 3px;
+      color: var(--resume-muted);
+    }
+
+    .skills-block {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 6px;
+    }
+    .resume-skill-tag {
+      background: rgba(0, 0, 0, 0.04);
+      border: 1px solid var(--resume-border);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 11px;
+    }
+    .resume-skill-tag.added {
+      background: var(--resume-highlight);
+      border-color: var(--resume-highlight-border);
+      font-weight: 500;
+      animation: pulseHighlight 1.5s;
+    }
+
+    @keyframes pulseHighlight {
+      0% { background-color: rgba(16, 185, 129, 0.5); }
+      100% { background-color: var(--resume-highlight); }
+    }
+
+    /* Simulation Loading Bar overlay */
+    .analyzer-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(8, 9, 10, 0.7);
+      backdrop-filter: blur(4px);
+      z-index: 1000;
+      display: grid;
+      place-items: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity var(--motion-base);
+    }
+    .analyzer-overlay.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .overlay-card {
+      background: var(--surface-card);
+      border: 1px solid var(--border);
+      padding: 32px;
+      border-radius: var(--radius-lg);
+      width: 320px;
+      text-align: center;
+      box-shadow: var(--elev-raised);
+    }
+    .loader-bar {
+      height: 4px;
+      width: 100%;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: var(--radius-pill);
+      overflow: hidden;
+      margin-block: 20px 12px;
+    }
+    .loader-fill {
+      height: 100%;
+      width: 0%;
+      background: var(--accent-hover);
+      border-radius: var(--radius-pill);
+      transition: width 1.2s ease-in-out;
+    }
+    .loader-status {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    /* Persistent Floating AI Chat Widget Styles */
+    .chat-widget {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      z-index: 1000;
+      font-family: var(--font-body);
+    }
+    .chat-trigger {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: var(--accent);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.08);
+      cursor: pointer;
+      transition: all var(--motion-fast);
+      position: relative;
+    }
+    .chat-trigger:hover {
+      background: var(--accent-hover);
+      transform: scale(1.05);
+    }
+    .chat-trigger svg { width: 20px; height: 20px; }
+    .chat-badge {
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 10px;
+      height: 10px;
+      background: var(--success);
+      border-radius: 50%;
+      border: 2px solid var(--bg);
+    }
+    .chat-window {
+      position: absolute;
+      bottom: 60px;
+      right: 0;
+      width: 340px;
+      height: 420px;
+      background: var(--surface-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--elev-raised);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(10px) scale(0.98);
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .chat-window.open {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateY(0) scale(1);
+    }
+    .chat-header {
+      background: var(--surface);
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--border-soft);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .chat-coach-info { display: flex; align-items: center; gap: 10px; }
+    .chat-avatar {
+      width: 28px; height: 28px;
+      background: var(--accent);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 11px; font-weight: 600;
+    }
+    .chat-coach-name { font-size: 13px; font-weight: 510; }
+    .chat-coach-status {
+      font-size: 11px; color: var(--success);
+      display: flex; align-items: center; gap: 4px;
+    }
+    .chat-coach-status::before {
+      content: ''; width: 6px; height: 6px;
+      background: var(--success); border-radius: 50%;
+      display: inline-block;
+    }
+    .chat-close { color: var(--muted); font-size: 18px; cursor: pointer; }
+    .chat-close:hover { color: var(--fg); }
+    .chat-body {
+      flex-grow: 1; padding: 16px;
+      overflow-y: auto; display: flex; flex-direction: column;
+      gap: 12px; background: var(--chat-bg);
+    }
+    .chat-message {
+      max-width: 85%; padding: 10px 14px;
+      border-radius: var(--radius-sm); font-size: 13px; line-height: 1.45;
+    }
+    .chat-message.coach {
+      background: var(--surface-card); border: 1px solid var(--border-soft);
+      color: var(--fg-2); align-self: flex-start;
+    }
+    .chat-message.user {
+      background: var(--accent); color: white;
+      align-self: flex-end;
+    }
+    .chat-typing-indicator {
+      display: flex; gap: 4px; padding: 10px 14px;
+      background: var(--surface-card); border: 1px solid var(--border-soft);
+      align-self: flex-start; border-radius: var(--radius-sm);
+    }
+    .typing-dot {
+      width: 6px; height: 6px; background: var(--muted);
+      border-radius: 50%; animation: typing 1.4s infinite;
+    }
+    .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+    .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+    .chat-footer {
+      padding: 12px; background: var(--surface);
+      border-top: 1px solid var(--border-soft); display: flex; gap: 8px;
+    }
+    .chat-input {
+      flex-grow: 1; background: var(--bg);
+      border: 1px solid var(--border); border-radius: var(--radius-sm);
+      padding: 8px 12px; color: var(--fg); font-size: 13px;
+    }
+    .chat-input:focus { outline: none; border-color: var(--accent-hover); }
+    .chat-send {
+      background: var(--accent); color: white;
+      padding: 8px 12px; border-radius: var(--radius-sm);
+      font-size: 13px; font-weight: 510; cursor: pointer;
+    }
+    .chat-send:hover { background: var(--accent-hover); }
+
+    /* ─── Dark Mode Overrides ─── */
+    body.dark-mode {
+      --bg:           #0B0D0E;              /* dark page background */
+      --surface:      #141618;              /* elevated surfaces */
+      --surface-card: #1C1E20;
+      --panel:        #141618;              /* sidebar panel background */
+      --console-bg:   #0B0D0E;              /* chat area background */
+      --border:       rgba(255, 255, 255, 0.06);
+      --border-soft:  rgba(255, 255, 255, 0.04);
+      --fg:           #EDEEF0;
+      --fg-2:         #9BA0A8;
+      --muted:        #656A72;
+      --meta:         #656A72;
+      --accent:       #E87053;              /* terracotta in dark mode */
+      --accent-on:    #120703;
+      --accent-hover: #FF8C72;
+      --accent-active:#D96245;
+      --success:      #22C55E;
+      --warn:         #EAB308;
+      --danger:       #EF4444;
+      --chat-bg:      #0B0D0E;
+    }
+
+    body.dark-mode .chat-input {
+      background: rgba(0, 0, 0, 0.25);
+      border-color: var(--border-soft);
+    }
+
+    /* Footer */
+    .pagefoot {
+      padding-block: 32px;
+      color: var(--meta);
+      font-size: 13px;
+      border-top: 1px solid var(--border-soft);
+      text-align: center;
+    }
+    .footer-inner {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Topnav -->
+  <header class="topnav" data-od-id="topnav">
+    <div class="container topnav-inner">
+        <a href="index.html" class="logo-container">
+          <div class="logo-mark"></div>
+          <span class="logo-text">JOB FOR SURE</span>
+        </a>
+      <nav>
+        <a href="landing.html">Product</a>
+        <a href="agency.html">Workspace</a>
+        <a href="resumes.html">Resumes</a>
+        <a href="ats.html" class="active">ATS Optimizer</a>
+        <a href="app.html">Job Pipeline</a>
+      </nav>
+      <div class="nav-actions" style="display: flex; align-items: center; gap: 12px;">
+        <button id="themeToggle" class="btn btn-ghost" style="padding: 6px; border-radius: 50%; width: 28px; height: 28px; display: inline-flex; align-items: center; justify-content: center;" title="Toggle Light/Dark Theme">
+          <svg id="themeMoon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+          <svg id="themeSun" style="display:none;" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+        </button>
+        <a href="agency.html" class="btn btn-primary">Open Workspace</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="split-layout">
+    
+    <!-- Left panel: Inputs, Match score & Keyword lists -->
+    <section class="control-panel" data-od-id="ats-control">
+      <div class="panel-header">
+        <h1>ATS Optimizer</h1>
+        <p>Match your engineering resume to target JDs instantly, inject required keywords, and bypass recruiter filtering.</p>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">1. Job Description</label>
+        <textarea class="textarea-jd" id="jdTextarea">Position: Lead Frontend Engineer
+Company: Linear
+Requirements:
+- Strong experience building responsive SPAs with React and TypeScript.
+- Direct expertise in high-performance WebSockets.
+- Familiarity with PostgreSQL JSONB and database scaling.
+- Experience writing Cloudflare Workers and Durable Objects is a major plus.
+- Native optimization and micro-frontend layouts.</textarea>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">2. Target Resume Profile</label>
+        <select class="select-resume">
+          <option>John_Doe_Frontend_React_Linear.pdf (Lead Frontend Developer)</option>
+          <option>John_Doe_FullStack_Go_Postgres.pdf (Full-Stack Architect)</option>
+          <option>John_Doe_Product_Design_Figma.pdf (Product Designer)</option>
+        </select>
+      </div>
+
+      <button class="btn btn-primary" id="optimizeBtn" style="width: 100%; justify-content: center; margin-bottom: 24px;">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m12 3-1.912 5.886L4.202 9l5.886 1.912L12 16.798l1.912-5.886 5.886-1.912-5.886-1.912zM5 3v4M3 5h4M19 17v4M17 19h4"/></svg>
+        Analyze &amp; Optimize Resume
+      </button>
+
+      <!-- ATS Score & Analysis Card -->
+      <div class="ats-results-box">
+        <div class="ats-header-row">
+          <div class="score-circle-wrapper">
+            <svg class="score-svg">
+              <circle class="score-bg" cx="40" cy="40" r="35"></circle>
+              <circle class="score-fill" id="scoreCircle" cx="40" cy="40" r="35"></circle>
+            </svg>
+            <div class="score-text" id="scoreText">48%</div>
+          </div>
+          <div class="ats-status-info">
+            <h3 id="matchHeading" style="color: var(--warn);">Needs Optimization</h3>
+            <p id="matchText">Your resume lacks 5 critical keywords matching the Linear Job Description.</p>
+          </div>
+        </div>
+
+        <div class="keywords-analysis">
+          <div>
+            <div class="keyword-list-header">
+              <span>MISSING KEYWORDS</span>
+              <span id="missingCount">5 missing</span>
+            </div>
+            <div class="keyword-badge-grid" id="missingList" style="margin-top: 10px;">
+              <span class="kw-badge missing" data-kw="PostgreSQL">PostgreSQL</span>
+              <span class="kw-badge missing" data-kw="Cloudflare Workers">Cloudflare Workers</span>
+              <span class="kw-badge missing" data-kw="Durable Objects">Durable Objects</span>
+              <span class="kw-badge missing" data-kw="Stateful WebSockets">WebSockets</span>
+              <span class="kw-badge missing" data-kw="Node.js">Node.js</span>
+            </div>
+          </div>
+
+          <div>
+            <div class="keyword-list-header">
+              <span>MATCHED KEYWORDS</span>
+              <span>5 matched</span>
+            </div>
+            <div class="keyword-badge-grid" style="margin-top: 10px;">
+              <span class="kw-badge matched">React</span>
+              <span class="kw-badge matched">TypeScript</span>
+              <span class="kw-badge matched">HTML5</span>
+              <span class="kw-badge matched">CSS3</span>
+              <span class="kw-badge matched">Responsive</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Right panel: Document Preview -->
+    <section class="preview-panel" data-od-id="ats-preview">
+      <div class="resume-actions-bar">
+        <div class="editor-mode-badge">
+          <span class="indicator-pulse" id="editorPulse"></span>
+          <span id="editorStatus">LIVE PREVIEW</span>
+        </div>
+        <div style="display: flex; gap: 8px;">
+          <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 12px;" onclick="alert('Resume copied to clipboard!')">Copy Raw</button>
+          <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 12px;" onclick="alert('PDF download simulated!')">Export PDF</button>
+        </div>
+      </div>
+
+      <!-- Printable Resume Paper Frame -->
+      <div class="resume-paper" id="resumeContent">
+        <div class="resume-header">
+          <div class="resume-name">Alex Rivera</div>
+          <div class="resume-contacts">
+            alex.rivera@engineer.io · (555) 019-2834 · SF, California · github.com/arivera
+          </div>
+        </div>
+
+        <div class="resume-section">
+          <div class="resume-section-title">Professional Summary</div>
+          <p style="color: var(--resume-muted);">
+            High-performance Frontend Engineer with 5+ years of experience specializing in building responsive single-page web applications. Proficient in engineering clean components, designing layout frameworks, and managing application state.
+          </p>
+        </div>
+
+        <div class="resume-section">
+          <div class="resume-section-title">Technical Skills</div>
+          <div class="skills-block" id="skillsBlock">
+            <span class="resume-skill-tag">React</span>
+            <span class="resume-skill-tag">TypeScript</span>
+            <span class="resume-skill-tag">Redux</span>
+            <span class="resume-skill-tag">HTML5</span>
+            <span class="resume-skill-tag">CSS3</span>
+            <span class="resume-skill-tag">TailwindCSS</span>
+            <span class="resume-skill-tag">Git / GitHub</span>
+            <span class="resume-skill-tag">Webpack</span>
+            <span class="resume-skill-tag">RESTful APIs</span>
+          </div>
+        </div>
+
+        <div class="resume-section">
+          <div class="resume-section-title">Professional Experience</div>
+          
+          <div class="resume-job">
+            <div class="job-title-row">
+              <span>Frontend Engineer</span>
+              <span class="job-dates">2024 - Present</span>
+            </div>
+            <div class="job-title-row" style="font-weight: normal; font-size: 11px;">
+              <span class="job-company">Northwind Studios</span>
+              <span>San Francisco, CA</span>
+            </div>
+            <ul class="resume-bullet-list">
+              <li>Refactored legacy React state management into modular slices, cutting runtime memory usage by 24%.</li>
+              <li>Collaborated on a responsive web UI layout system used across multiple platforms.</li>
+              <li>Engineered interactive dashboard controls displaying complex data streams.</li>
+            </ul>
+          </div>
+
+          <div class="resume-job">
+            <div class="job-title-row">
+              <span>Software Engineer</span>
+              <span class="job-dates">2021 - 2024</span>
+            </div>
+            <div class="job-title-row" style="font-weight: normal; font-size: 11px;">
+              <span class="job-company">Cloudburst Software</span>
+              <span>Austin, TX</span>
+            </div>
+            <ul class="resume-bullet-list">
+              <li>Designed client-facing components using styled-systems, reducing code bloating by 18%.</li>
+              <li>Developed clean, high-performance UI views for a multi-tenant business hub.</li>
+              <li>Streamlined standard build pipelines via Docker and GitHub Actions.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="pagefoot">
+    <div class="container footer-inner">
+      <span>© 2026 Job For Sure. Built for the modern job seeker.</span>
+      <span class="meta">Inter Variable · Warm Light Theme</span>
+    </div>
+  </footer>
+
+  <!-- Overlay Simulation -->
+  <div class="analyzer-overlay" id="analyzerOverlay">
+    <div class="overlay-card">
+      <div style="font-size: 16px; font-weight: 510; color: var(--fg);">Analyzing Resume against JD...</div>
+      <div class="loader-bar">
+        <div class="loader-fill" id="loaderFill"></div>
+      </div>
+      <div class="loader-status" id="loaderStatusText">Parsing document structure...</div>
+    </div>
+  </div>
+
+  <!-- Floating AI Chat Widget -->
+  <div class="chat-widget" id="chatWidget">
+    <button class="chat-trigger" id="chatTrigger" aria-label="Open AI Career Coach">
+      <svg class="chat-trigger-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+      </svg>
+      <span class="chat-badge"></span>
+    </button>
+    <div class="chat-window" id="chatWindow">
+      <div class="chat-header">
+        <div class="chat-coach-info">
+          <div class="chat-avatar">AI</div>
+          <div>
+            <div class="chat-coach-name">Job For Sure Coach</div>
+            <div class="chat-coach-status">Online</div>
+          </div>
+        </div>
+        <button class="chat-close" id="chatClose" aria-label="Close Chat">&times;</button>
+      </div>
+      <div class="chat-body" id="chatBody">
+        <div class="chat-message coach">
+          Hey! I'm your AI Career Coach. Drop a job description, paste your resume, or ask me for tips on optimization.
+        </div>
+      </div>
+      <div class="chat-footer">
+        <input type="text" class="chat-input" id="chatInput" placeholder="Ask about resume optimization..." />
+        <button class="chat-send" id="chatSend">Send</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ATS Optimization Logic Simulation
+    const optimizeBtn = document.getElementById('optimizeBtn');
+    const overlay = document.getElementById('analyzerOverlay');
+    const loaderFill = document.getElementById('loaderFill');
+    const loaderStatusText = document.getElementById('loaderStatusText');
+
+    const scoreCircle = document.getElementById('scoreCircle');
+    const scoreText = document.getElementById('scoreText');
+    const matchHeading = document.getElementById('matchHeading');
+    const matchText = document.getElementById('matchText');
+    const missingCount = document.getElementById('missingCount');
+    const missingList = document.getElementById('missingList');
+    const skillsBlock = document.getElementById('skillsBlock');
+
+    const editorStatus = document.getElementById('editorStatus');
+    const editorPulse = document.getElementById('editorPulse');
+
+    let isOptimized = false;
+
+    optimizeBtn.addEventListener('click', () => {
+      if (isOptimized) {
+        alert("Resume is already optimized for this job description!");
+        return;
+      }
+
+      // Step 1: Open Overlay
+      overlay.classList.add('active');
+      loaderFill.style.width = '0%';
+      loaderStatusText.textContent = 'Parsing document structure...';
+
+      // Animate progress
+      setTimeout(() => {
+        loaderFill.style.width = '35%';
+        loaderStatusText.textContent = 'Extracting technical constraints from JD...';
+      }, 400);
+
+      setTimeout(() => {
+        loaderFill.style.width = '70%';
+        loaderStatusText.textContent = 'Mapping keyword intersections...';
+      }, 1000);
+
+      setTimeout(() => {
+        loaderFill.style.width = '100%';
+        loaderStatusText.textContent = 'Rewriting resume skills section...';
+      }, 1600);
+
+      // Step 2: Update interface content
+      setTimeout(() => {
+        overlay.classList.remove('active');
+
+        // Score update animation
+        let count = 48;
+        const interval = setInterval(() => {
+          count++;
+          scoreText.textContent = count + '%';
+          
+          // Animate svg circle dashoffset
+          // Formula: 220 - (count / 100 * 220)
+          const offset = 220 - (count / 100 * 220);
+          scoreCircle.style.strokeDashoffset = offset;
+
+          if (count >= 94) {
+            clearInterval(interval);
+            scoreCircle.style.stroke = 'var(--success)';
+            matchHeading.textContent = 'Excellent Match';
+            matchHeading.style.color = 'var(--success)';
+            matchText.textContent = 'All critical keywords added. High response probability.';
+            missingCount.textContent = '0 missing';
+          }
+        }, 15);
+
+        // Turn missing badges into optimized badges
+        const missingBadges = document.querySelectorAll('.kw-badge.missing');
+        missingBadges.forEach(badge => {
+          badge.className = 'kw-badge missing optimized';
+          badge.innerHTML = `<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" style="display:inline; margin-right:4px;"><polyline points="20 6 9 17 4 12"/></svg>${badge.dataset.kw}`;
+        });
+
+        // Add skills to resume document view
+        const skillsToAdd = ['PostgreSQL', 'Cloudflare Workers', 'Durable Objects', 'WebSockets', 'Node.js'];
+        skillsToAdd.forEach(skill => {
+          const tag = document.createElement('span');
+          tag.className = 'resume-skill-tag added';
+          tag.textContent = skill;
+          skillsBlock.appendChild(tag);
+        });
+
+        // Update editor badge status
+        editorStatus.textContent = 'REVISED & OPTIMIZED';
+        editorPulse.style.backgroundColor = 'var(--success)';
+
+        isOptimized = true;
+
+        // Auto coach chat message response
+        setTimeout(() => {
+          chatWindow.classList.add('open');
+          appendMessage("Incredible! Your ATS score jumped to 94%. We've successfully integrated PostgreSQL, Cloudflare Workers, Durable Objects, WebSockets, and Node.js into your skills matrix. You are ready to apply!", 'coach');
+        }, 1500);
+
+      }, 2300);
+    });
+
+    // Chat Widget Interaction
+    const chatTrigger = document.getElementById('chatTrigger');
+    const chatWindow = document.getElementById('chatWindow');
+    const chatClose = document.getElementById('chatClose');
+    const chatBody = document.getElementById('chatBody');
+    const chatInput = document.getElementById('chatInput');
+    const chatSend = document.getElementById('chatSend');
+
+    chatTrigger.addEventListener('click', () => {
+      chatWindow.classList.toggle('open');
+      document.querySelector('.chat-badge').style.display = 'none';
+    });
+
+    chatClose.addEventListener('click', () => {
+      chatWindow.classList.remove('open');
+    });
+
+    function appendMessage(text, sender) {
+      const msg = document.createElement('div');
+      msg.className = `chat-message ${sender}`;
+      msg.textContent = text;
+      chatBody.appendChild(msg);
+      chatBody.scrollTop = chatBody.scrollHeight;
+    }
+
+    function showTypingIndicator() {
+      const indicator = document.createElement('div');
+      indicator.className = 'chat-typing-indicator';
+      indicator.id = 'typingIndicator';
+      indicator.innerHTML = `
+        <div class="typing-dot"></div>
+        <div class="typing-dot"></div>
+        <div class="typing-dot"></div>
+      `;
+      chatBody.appendChild(indicator);
+      chatBody.scrollTop = chatBody.scrollHeight;
+    }
+
+    function removeTypingIndicator() {
+      const indicator = document.getElementById('typingIndicator');
+      if (indicator) indicator.remove();
+    }
+
+    function handleSend() {
+      const text = chatInput.value.trim();
+      if (!text) return;
+
+      appendMessage(text, 'user');
+      chatInput.value = '';
+
+      showTypingIndicator();
+
+      setTimeout(() => {
+        removeTypingIndicator();
+        
+        let reply = "Ask me anything about resume writing or interview prep!";
+        const normalizedText = text.toLowerCase();
+        
+        if (normalizedText.includes('optimize') || normalizedText.includes('how') || normalizedText.includes('ats')) {
+          reply = isOptimized 
+            ? "Your resume is fully optimized now. Make sure your summary matches the Lead role precisely. Would you like me to review the professional experience bullets?"
+            : "Simply click the 'Analyze & Optimize Resume' button. It will scan the JD and inject the missing technologies like Durable Objects directly into your profile.";
+        } else if (normalizedText.includes('interview') || normalizedText.includes('question') || normalizedText.includes('prep')) {
+          reply = "For the Linear Lead Frontend role, expect questions like:\n1. 'How do you design a system using Durable Objects for real-time WebSocket state?'\n2. 'Explain PostgreSQL JSONB performance advantages over standard tables.'";
+        } else if (normalizedText.includes('hello') || normalizedText.includes('hi')) {
+          reply = "Hello! Let's get this resume in perfect shape. What company are we targeting next?";
+        }
+
+        appendMessage(reply, 'coach');
+      }, 1000);
+    }
+
+    chatSend.addEventListener('click', handleSend);
+    chatInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') handleSend();
+    });
+
+    // Theme Switcher Logic (Warm Light default, dark mode as override)
+    const themeToggle = document.getElementById('themeToggle');
+    const themeMoon = document.getElementById('themeMoon');
+    const themeSun = document.getElementById('themeSun');
+
+    // Apply stored theme on load (default to light)
+    const currentTheme = localStorage.getItem('theme') || 'light';
+    if (currentTheme === 'dark') {
+      document.body.classList.add('dark-mode');
+      if (themeMoon) themeMoon.style.display = 'none';
+      if (themeSun) themeSun.style.display = 'block';
+    } else {
+      document.body.classList.remove('dark-mode');
+      if (themeMoon) themeMoon.style.display = 'block';
+      if (themeSun) themeSun.style.display = 'none';
+    }
+
+    if (themeToggle) {
+      themeToggle.addEventListener('click', () => {
+        document.body.classList.toggle('dark-mode');
+        const theme = document.body.classList.contains('dark-mode') ? 'dark' : 'light';
+        localStorage.setItem('theme', theme);
+        
+        // Sync icon
+        if (theme === 'dark') {
+          if (themeMoon) themeMoon.style.display = 'none';
+          if (themeSun) themeSun.style.display = 'block';
+        } else {
+          if (themeMoon) themeMoon.style.display = 'block';
+          if (themeSun) themeSun.style.display = 'none';
+        }
+      });
+    }
+  </script>
+
+</body>
+</html>

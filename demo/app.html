@@ -1,0 +1,946 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Job For Sure · Career Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    /* ─── tokens ───────────────────────────────────────────────────────── */
+    :root {
+      --bg:           #FBFBFA;              /* warm light cream */
+      --surface:      #FFFFFF;              /* pure white cards */
+      --surface-card: #FFFFFF;
+      --fg:           #1A1A18;              /* deep off-black primary text */
+      --fg-2:         #5F5F5E;              /* warm charcoal secondary text */
+      --muted:        #8E8E8C;              /* tertiary — placeholders, metadata */
+      --meta:         #8E8E8C;              /* quaternary — timestamps, disabled */
+      --border:       #EAEAEA;              /* default light borders */
+      --border-soft:  #F2F2F0;              /* ultra-subtle divider */
+      --accent:       #D96245;              /* warm terracotta/rust primary */
+      --accent-on:    #ffffff;
+      --accent-hover: #E87053;              /* lighter warm terracotta */
+      --accent-active:#C25035;              /* darker terracotta */
+      --success:      #2B5F45;              /* deep forest green */
+      --warn:         #D4A316;
+      --danger:       #C24535;
+      --chat-bg:      #FFFFFF;
+      
+      --font-display: "Instrument Serif", Georgia, serif;
+      --font-body:    "Inter Variable", "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      --font-mono:    "JetBrains Mono", ui-monospace, monospace;
+      --gap-xs:       8px;
+      --gap-sm:       12px;
+      --gap-md:       20px;
+      --gap-lg:       32px;
+      --gap-xl:       56px;
+      --container:    1200px;
+      --gutter:       24px;
+      --radius-sm:    6px;
+      --radius-md:    8px;
+      --radius-lg:    12px;
+      --radius-pill:  9999px;
+      --motion-fast:  150ms;
+      --motion-base:  200ms;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--fg);
+      font-family: var(--font-body);
+      font-feature-settings: "cv01" on, "ss03" on;
+      font-size: 14px;
+      line-height: 1.55;
+      -webkit-font-smoothing: antialiased;
+    }
+    img, svg { display: block; max-width: 100%; }
+    a { color: inherit; text-decoration: none; }
+    button { font: inherit; cursor: pointer; border: none; background: none; }
+    p { text-wrap: pretty; margin: 0; }
+    h1, h2, h3, h4 { text-wrap: balance; margin: 0; }
+
+    /* Layout */
+    .container {
+      max-width: var(--container);
+      margin-inline: auto;
+      padding-inline: var(--gutter);
+      width: 100%;
+    }
+    
+    /* Topnav */
+    .topnav {
+      position: sticky; top: 0; z-index: 100;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+    }
+    .topnav-inner { display: flex; align-items: center; justify-content: space-between; padding-block: 14px; padding-inline: 24px; }
+    .topnav .logo-container { display: flex; align-items: center; gap: 8px; }
+    .topnav .logo-mark { width: 16px; height: 16px; background: var(--accent); border-radius: 4px; box-shadow: 0 2px 8px rgba(217, 98, 69, 0.2); }
+    .topnav .logo-text { font-family: var(--font-display); font-size: 16px; font-weight: 600; letter-spacing: -0.01em; }
+    .topnav nav { display: flex; gap: 32px; }
+    .topnav nav a { font-size: 13px; color: var(--muted); transition: color var(--motion-fast); }
+    .topnav nav a:hover { color: var(--fg); }
+    .topnav nav a.active { color: var(--fg); font-weight: 510; }
+    .topnav nav a.active::after {
+      content: '';
+      position: absolute;
+      bottom: -18px;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: var(--accent);
+    }
+
+    /* Dashboard Header Grid */
+    .dash-header {
+      padding-top: 40px;
+      margin-bottom: 40px;
+    }
+    .dash-title-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 32px;
+    }
+    .dash-title-row h1 {
+      font-family: var(--font-display);
+      font-size: 32px;
+      font-weight: 500;
+      letter-spacing: -0.01em;
+    }
+    
+    /* Stats Bar */
+    .stats-bar {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 32px;
+    }
+    @media (max-width: 768px) {
+      .stats-bar { grid-template-columns: repeat(2, 1fr); }
+    }
+    .stat-card {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 20px;
+      text-align: left;
+    }
+    .stat-card .val {
+      font-size: 26px;
+      font-weight: 600;
+      font-family: var(--font-mono);
+      color: var(--fg);
+      margin-bottom: 4px;
+    }
+    .stat-card .lbl {
+      color: var(--muted);
+      font-size: 12px;
+      font-family: var(--font-mono);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    /* Pipeline / Kanban Board */
+    .kanban-board {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px;
+      align-items: start;
+    }
+    @media (max-width: 1024px) {
+      .kanban-board { grid-template-columns: repeat(2, 1fr); gap: 24px; }
+    }
+    @media (max-width: 640px) {
+      .kanban-board { grid-template-columns: 1fr; }
+    }
+
+    .kanban-column {
+      background: rgba(255, 255, 255, 0.01);
+      border: 1px solid var(--border-soft);
+      border-radius: var(--radius-lg);
+      padding: 16px;
+      min-height: 500px;
+    }
+    .column-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      border-bottom: 1px solid var(--border-soft);
+      padding-bottom: 10px;
+    }
+    .column-title {
+      font-size: 12px;
+      font-family: var(--font-mono);
+      font-weight: 510;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .column-count {
+      font-size: 11px;
+      font-family: var(--font-mono);
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--muted);
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+
+    .job-card {
+      background: var(--surface-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 16px;
+      margin-bottom: 12px;
+      cursor: pointer;
+      transition: border-color var(--motion-fast), background var(--motion-fast), transform var(--motion-fast);
+    }
+    .job-card:hover {
+      border-color: rgba(255, 255, 255, 0.15);
+      background: rgba(255, 255, 255, 0.04);
+      transform: translateY(-1px);
+    }
+    .card-meta-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    .job-logo-slug {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--muted);
+      text-transform: uppercase;
+    }
+    .score-badge {
+      font-size: 10px;
+      font-family: var(--font-mono);
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+    .score-badge.high { background: rgba(16, 185, 129, 0.15); color: var(--success); }
+    .score-badge.mid { background: rgba(234, 179, 8, 0.15); color: var(--warn); }
+    
+    .job-title {
+      font-size: 14px;
+      font-weight: 510;
+      color: var(--fg);
+      margin-bottom: 4px;
+    }
+    .job-comp {
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 12px;
+    }
+    .job-footer-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-top: 1px solid var(--border-soft);
+      padding-top: 10px;
+      font-size: 11px;
+      color: var(--meta);
+    }
+    .act-tag {
+      font-size: 10px;
+      background: rgba(255, 255, 255, 0.03);
+      padding: 2px 6px;
+      border-radius: var(--radius-pill);
+      border: 1px solid var(--border);
+    }
+
+    /* Modal / Details Drawer Dialog */
+    .drawer-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(8, 9, 10, 0.75);
+      backdrop-filter: blur(6px);
+      z-index: 500;
+      display: flex;
+      justify-content: flex-end;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity var(--motion-base);
+    }
+    .drawer-overlay.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .drawer-content {
+      width: 100%;
+      max-width: 500px;
+      background: var(--surface-card);
+      border-left: 1px solid var(--border);
+      height: 100%;
+      padding: 40px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      overflow-y: auto;
+      transform: translateX(100%);
+      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .drawer-overlay.active .drawer-content {
+      transform: translateX(0);
+    }
+    .drawer-header {
+      border-bottom: 1px solid var(--border-soft);
+      padding-bottom: 24px;
+      margin-bottom: 24px;
+    }
+    .drawer-header h2 {
+      font-size: 22px;
+      font-weight: 510;
+      margin-bottom: 4px;
+    }
+    .drawer-header .comp {
+      color: var(--accent-hover);
+      font-size: 14px;
+      font-weight: 500;
+    }
+    .drawer-body {
+      flex-grow: 1;
+      margin-bottom: 32px;
+    }
+    .drawer-section {
+      margin-bottom: 24px;
+    }
+    .drawer-section-title {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 10px;
+      letter-spacing: 0.05em;
+    }
+    .checklist-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 8px;
+      font-size: 13px;
+      color: var(--fg-2);
+    }
+    .checklist-item input {
+      accent-color: var(--accent);
+    }
+
+    /* Buttons inside modal */
+    .btn-row {
+      display: flex;
+      gap: 12px;
+    }
+
+    /* Persistent Floating AI Chat Widget Styles */
+    .chat-widget {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      z-index: 1000;
+      font-family: var(--font-body);
+    }
+    .chat-trigger {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: var(--accent);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.08);
+      cursor: pointer;
+      transition: all var(--motion-fast);
+      position: relative;
+    }
+    .chat-trigger:hover {
+      background: var(--accent-hover);
+      transform: scale(1.05);
+    }
+    .chat-trigger svg { width: 20px; height: 20px; }
+    .chat-badge {
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 10px;
+      height: 10px;
+      background: var(--success);
+      border-radius: 50%;
+      border: 2px solid var(--bg);
+    }
+    .chat-window {
+      position: absolute;
+      bottom: 60px;
+      right: 0;
+      width: 340px;
+      height: 420px;
+      background: var(--surface-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--elev-raised);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(10px) scale(0.98);
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .chat-window.open {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateY(0) scale(1);
+    }
+    .chat-header {
+      background: var(--surface);
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--border-soft);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .chat-coach-info { display: flex; align-items: center; gap: 10px; }
+    .chat-avatar {
+      width: 28px; height: 28px;
+      background: var(--accent);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 11px; font-weight: 600;
+    }
+    .chat-coach-name { font-size: 13px; font-weight: 510; }
+    .chat-coach-status {
+      font-size: 11px; color: var(--success);
+      display: flex; align-items: center; gap: 4px;
+    }
+    .chat-coach-status::before {
+      content: ''; width: 6px; height: 6px;
+      background: var(--success); border-radius: 50%;
+      display: inline-block;
+    }
+    .chat-close { color: var(--muted); font-size: 18px; cursor: pointer; }
+    .chat-close:hover { color: var(--fg); }
+    .chat-body {
+      flex-grow: 1; padding: 16px;
+      overflow-y: auto; display: flex; flex-direction: column;
+      gap: 12px; background: var(--chat-bg);
+    }
+    .chat-message {
+      max-width: 85%; padding: 10px 14px;
+      border-radius: var(--radius-sm); font-size: 13px; line-height: 1.45;
+    }
+    .chat-message.coach {
+      background: var(--surface-card); border: 1px solid var(--border-soft);
+      color: var(--fg-2); align-self: flex-start;
+    }
+    .chat-message.user {
+      background: var(--accent); color: white;
+      align-self: flex-end;
+    }
+    .chat-typing-indicator {
+      display: flex; gap: 4px; padding: 10px 14px;
+      background: var(--surface-card); border: 1px solid var(--border-soft);
+      align-self: flex-start; border-radius: var(--radius-sm);
+    }
+    .typing-dot {
+      width: 6px; height: 6px; background: var(--muted);
+      border-radius: 50%; animation: typing 1.4s infinite;
+    }
+    .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+    .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+    .chat-footer {
+      padding: 12px; background: var(--surface);
+      border-top: 1px solid var(--border-soft); display: flex; gap: 8px;
+    }
+    .chat-input {
+      flex-grow: 1; background: var(--bg);
+      border: 1px solid var(--border); border-radius: var(--radius-sm);
+      padding: 8px 12px; color: var(--fg); font-size: 13px;
+    }
+    .chat-input:focus { outline: none; border-color: var(--accent-hover); }
+    .chat-send {
+      background: var(--accent); color: white;
+      padding: 8px 12px; border-radius: var(--radius-sm);
+      font-size: 13px; font-weight: 510; cursor: pointer;
+    }
+    .chat-send:hover { background: var(--accent-hover); }
+
+    /* ─── Dark Mode Overrides ─── */
+    body.dark-mode {
+      --bg:           #0B0D0E;              /* dark page background */
+      --surface:      #141618;              /* elevated surfaces */
+      --surface-card: #1C1E20;
+      --panel:        #141618;              /* sidebar panel background */
+      --console-bg:   #0B0D0E;              /* chat area background */
+      --border:       rgba(255, 255, 255, 0.06);
+      --border-soft:  rgba(255, 255, 255, 0.04);
+      --fg:           #EDEEF0;
+      --fg-2:         #9BA0A8;
+      --muted:        #656A72;
+      --meta:         #656A72;
+      --accent:       #E87053;              /* terracotta in dark mode */
+      --accent-on:    #120703;
+      --accent-hover: #FF8C72;
+      --accent-active:#D96245;
+      --success:      #22C55E;
+      --warn:         #EAB308;
+      --chat-bg:      #0B0D0E;
+    }
+
+    body.dark-mode .chat-input {
+      background: rgba(0, 0, 0, 0.25);
+      border-color: var(--border-soft);
+    }
+
+    /* Footer */
+    .pagefoot {
+      padding-block: 32px;
+      color: var(--meta);
+      font-size: 13px;
+      border-top: 1px solid var(--border-soft);
+      margin-top: 40px;
+    }
+    .footer-inner {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Topnav -->
+  <header class="topnav" data-od-id="topnav">
+    <div class="container topnav-inner">
+        <a href="index.html" class="logo-container">
+          <div class="logo-mark"></div>
+          <span class="logo-text">JOB FOR SURE</span>
+        </a>
+      <nav>
+        <a href="landing.html">Product</a>
+        <a href="agency.html">Workspace</a>
+        <a href="resumes.html">Resumes</a>
+        <a href="ats.html">ATS Optimizer</a>
+        <a href="app.html" class="active">Job Pipeline</a>
+      </nav>
+      <div class="nav-actions" style="display: flex; align-items: center; gap: 12px;">
+        <button id="themeToggle" class="btn btn-ghost" style="padding: 6px; border-radius: 50%; width: 28px; height: 28px; display: inline-flex; align-items: center; justify-content: center;" title="Toggle Light/Dark Theme">
+          <svg id="themeMoon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+          <svg id="themeSun" style="display:none;" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+        </button>
+        <a href="agency.html" class="btn btn-primary">Open Workspace</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <div class="dash-header">
+      <div class="dash-title-row">
+        <h1>Applications Board</h1>
+        <button class="btn btn-primary" onclick="alert('Import job from URL mock')">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+          Add Job Link
+        </button>
+      </div>
+
+      <!-- Stats Bar -->
+      <div class="stats-bar">
+        <div class="stat-card">
+          <div class="val">12</div>
+          <div class="lbl">Total Active</div>
+        </div>
+        <div class="stat-card">
+          <div class="val">3</div>
+          <div class="lbl">Interviews</div>
+        </div>
+        <div class="stat-card">
+          <div class="val">91%</div>
+          <div class="lbl">Avg Match Score</div>
+        </div>
+        <div class="stat-card">
+          <div class="val">4</div>
+          <div class="lbl">Extension Imports</div>
+        </div>
+      </div>
+
+      <!-- Kanban Pipeline Board -->
+      <div class="kanban-board">
+        
+        <!-- Column 1: Imported / Sandbox -->
+        <div class="kanban-column">
+          <div class="column-header">
+            <span class="column-title"><span style="width:6px; height:6px; background:var(--muted); border-radius:50%;"></span>Sandbox</span>
+            <span class="column-count">2</span>
+          </div>
+          
+          <div class="job-card" onclick="openDrawer('Lead Frontend Engineer', 'Linear', '94%', 'High Match', 'Linear-JD-optimized.pdf')">
+            <div class="card-meta-row">
+              <span class="job-logo-slug">LN</span>
+              <span class="score-badge high">94%</span>
+            </div>
+            <div class="job-title">Lead Frontend Engineer</div>
+            <div class="job-comp">Linear · Remote</div>
+            <div class="job-footer-row">
+              <span class="act-tag">LinkedIn Import</span>
+              <span>1h ago</span>
+            </div>
+          </div>
+
+          <div class="job-card" onclick="openDrawer('UI Engineer', 'Stripe', '86%', 'Mid Match', 'Stripe-JD-matched.pdf')">
+            <div class="card-meta-row">
+              <span class="job-logo-slug">ST</span>
+              <span class="score-badge high">86%</span>
+            </div>
+            <div class="job-title">UI Engineer</div>
+            <div class="job-comp">Stripe · South SF</div>
+            <div class="job-footer-row">
+              <span class="act-tag">LinkedIn Import</span>
+              <span>4h ago</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Column 2: Applied -->
+        <div class="kanban-column">
+          <div class="column-header">
+            <span class="column-title"><span style="width:6px; height:6px; background:var(--accent); border-radius:50%;"></span>Applied</span>
+            <span class="column-count">2</span>
+          </div>
+
+          <div class="job-card" onclick="openDrawer('Frontend Architect', 'Vercel', '90%', 'Optimized', 'Vercel-Architect-Resume.pdf')">
+            <div class="card-meta-row">
+              <span class="job-logo-slug">VC</span>
+              <span class="score-badge high">90%</span>
+            </div>
+            <div class="job-title">Frontend Architect</div>
+            <div class="job-comp">Vercel · Remote</div>
+            <div class="job-footer-row">
+              <span class="act-tag">Direct Portal</span>
+              <span>2d ago</span>
+            </div>
+          </div>
+
+          <div class="job-card" onclick="openDrawer('Database Engineer', 'Supabase', '82%', 'Needs Review', 'Supabase-Resume.pdf')">
+            <div class="card-meta-row">
+              <span class="job-logo-slug">SB</span>
+              <span class="score-badge mid">82%</span>
+            </div>
+            <div class="job-title">Database Engineer</div>
+            <div class="job-comp">Supabase · Remote</div>
+            <div class="job-footer-row">
+              <span class="act-tag">Direct Portal</span>
+              <span>4d ago</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Column 3: Interviewing -->
+        <div class="kanban-column">
+          <div class="column-header">
+            <span class="column-title"><span style="width:6px; height:6px; background:var(--warn); border-radius:50%;"></span>Interviewing</span>
+            <span class="column-count">1</span>
+          </div>
+
+          <div class="job-card" onclick="openDrawer('Developer Advocate', 'Cloudflare', '92%', 'Technical Round 2', 'Cloudflare-DevRel.pdf')">
+            <div class="card-meta-row">
+              <span class="job-logo-slug">CF</span>
+              <span class="score-badge high">92%</span>
+            </div>
+            <div class="job-title">Developer Advocate</div>
+            <div class="job-comp">Cloudflare · Austin</div>
+            <div class="job-footer-row">
+              <span class="act-tag" style="border-color:var(--warn); color:var(--warn);">Tech Prep</span>
+              <span>Tomorrow</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Column 4: Offers -->
+        <div class="kanban-column">
+          <div class="column-header">
+            <span class="column-title"><span style="width:6px; height:6px; background:var(--success); border-radius:50%;"></span>Offers</span>
+            <span class="column-count">1</span>
+          </div>
+
+          <div class="job-card" onclick="openDrawer('Platform UI Designer', 'Fly.io', '89%', 'Offer Extended', 'FlyIO-Design.pdf')">
+            <div class="card-meta-row">
+              <span class="job-logo-slug">FL</span>
+              <span class="score-badge high">89%</span>
+            </div>
+            <div class="job-title">Platform UI Designer</div>
+            <div class="job-comp">Fly.io · Remote</div>
+            <div class="job-footer-row">
+              <span class="act-tag" style="border-color:var(--success); color:var(--success);">Offer</span>
+              <span>Received</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="pagefoot">
+    <div class="container footer-inner">
+      <span>© 2026 Job For Sure. Built for the modern job seeker.</span>
+      <span class="meta">Inter Variable · Warm Light Theme</span>
+    </div>
+  </footer>
+
+  <!-- Details Drawer Dialog Modal -->
+  <div class="drawer-overlay" id="drawerOverlay" onclick="closeDrawerOutside(event)">
+    <div class="drawer-content" id="drawerContent">
+      <div>
+        <div class="drawer-header">
+          <h2 id="drawerJobTitle">Lead Frontend Engineer</h2>
+          <div class="comp" id="drawerCompany">Linear · Remote</div>
+        </div>
+
+        <div class="drawer-body">
+          <div class="drawer-section">
+            <div class="drawer-section-title">ACTIVE RESUME FILE</div>
+            <div style="background:rgba(255,255,255,0.03); border:1px solid var(--border); padding:10px 14px; border-radius:var(--radius-sm); display:flex; justify-content:space-between; align-items:center; font-size:13px;">
+              <span id="drawerResumeName">Linear-JD-optimized.pdf</span>
+              <span id="drawerScore" class="score-badge high">94% Match</span>
+            </div>
+          </div>
+
+          <div class="drawer-section">
+            <div class="drawer-section-title">INTERVIEW CHECKLIST</div>
+            <div class="checklist-item">
+              <input type="checkbox" checked />
+              <span>Analyze Job Description requirements</span>
+            </div>
+            <div class="checklist-item">
+              <input type="checkbox" checked />
+              <span>Optimize skills section with keyword matches</span>
+            </div>
+            <div class="checklist-item">
+              <input type="checkbox" id="checkOutreach" />
+              <span>Draft LinkedIn outreach to hiring manager</span>
+            </div>
+            <div class="checklist-item">
+              <input type="checkbox" id="checkQPredict" />
+              <span>Predict technical questions with AI Coach</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-secondary" onclick="closeDrawer()" style="flex: 1; justify-content: center;">Close</button>
+        <button class="btn btn-primary" id="btnCoachPrep" style="flex: 1.5; justify-content: center;">Prep with AI Coach</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Floating AI Chat Widget -->
+  <div class="chat-widget" id="chatWidget">
+    <button class="chat-trigger" id="chatTrigger" aria-label="Open AI Career Coach">
+      <svg class="chat-trigger-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+      </svg>
+      <span class="chat-badge"></span>
+    </button>
+    <div class="chat-window" id="chatWindow">
+      <div class="chat-header">
+        <div class="chat-coach-info">
+          <div class="chat-avatar">AI</div>
+          <div>
+            <div class="chat-coach-name">Job For Sure Coach</div>
+            <div class="chat-coach-status">Online</div>
+          </div>
+        </div>
+        <button class="chat-close" id="chatClose" aria-label="Close Chat">&times;</button>
+      </div>
+      <div class="chat-body" id="chatBody">
+        <div class="chat-message coach">
+          Hey! I'm your AI Career Coach. Drop a job description, paste your resume, or ask me for tips on optimization.
+        </div>
+      </div>
+      <div class="chat-footer">
+        <input type="text" class="chat-input" id="chatInput" placeholder="Ask about resume optimization..." />
+        <button class="chat-send" id="chatSend">Send</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Kanban Drawer Control
+    const drawerOverlay = document.getElementById('drawerOverlay');
+    const drawerJobTitle = document.getElementById('drawerJobTitle');
+    const drawerCompany = document.getElementById('drawerCompany');
+    const drawerResumeName = document.getElementById('drawerResumeName');
+    const drawerScore = document.getElementById('drawerScore');
+
+    const checkOutreach = document.getElementById('checkOutreach');
+    const checkQPredict = document.getElementById('checkQPredict');
+    const btnCoachPrep = document.getElementById('btnCoachPrep');
+
+    function openDrawer(title, company, score, status, resume) {
+      drawerJobTitle.textContent = title;
+      drawerCompany.textContent = company;
+      drawerResumeName.textContent = resume;
+      drawerScore.textContent = score + ' Match';
+
+      // Reset checklist mock values based on job title
+      if (title.includes('Lead')) {
+        checkOutreach.checked = false;
+        checkQPredict.checked = false;
+      } else {
+        checkOutreach.checked = true;
+        checkQPredict.checked = false;
+      }
+
+      drawerOverlay.classList.add('active');
+    }
+
+    function closeDrawer() {
+      drawerOverlay.classList.remove('active');
+    }
+
+    function closeDrawerOutside(e) {
+      if (e.target === drawerOverlay) {
+        closeDrawer();
+      }
+    }
+
+    // Direct Prep with Coach Button triggers Chat Panel opening with context
+    btnCoachPrep.addEventListener('click', () => {
+      closeDrawer();
+      chatWindow.classList.add('open');
+      document.querySelector('.chat-badge').style.display = 'none';
+
+      showTypingIndicator();
+
+      setTimeout(() => {
+        removeTypingIndicator();
+        appendMessage(`Let's prep for your upcoming discussions at ${drawerCompany.textContent.split(' · ')[0]} for the ${drawerJobTitle.textContent} role! They'll likely look for candidates strong in state scaling and modern layouts. I recommend asking me: 'Predict questions' or 'Draft outreach'.`, 'coach');
+      }, 1000);
+    });
+
+    // Chat Widget Interaction
+    const chatTrigger = document.getElementById('chatTrigger');
+    const chatWindow = document.getElementById('chatWindow');
+    const chatClose = document.getElementById('chatClose');
+    const chatBody = document.getElementById('chatBody');
+    const chatInput = document.getElementById('chatInput');
+    const chatSend = document.getElementById('chatSend');
+
+    chatTrigger.addEventListener('click', () => {
+      chatWindow.classList.toggle('open');
+      document.querySelector('.chat-badge').style.display = 'none';
+    });
+
+    chatClose.addEventListener('click', () => {
+      chatWindow.classList.remove('open');
+    });
+
+    function appendMessage(text, sender) {
+      const msg = document.createElement('div');
+      msg.className = `chat-message ${sender}`;
+      msg.textContent = text;
+      chatBody.appendChild(msg);
+      chatBody.scrollTop = chatBody.scrollHeight;
+    }
+
+    function showTypingIndicator() {
+      const indicator = document.createElement('div');
+      indicator.className = 'chat-typing-indicator';
+      indicator.id = 'typingIndicator';
+      indicator.innerHTML = `
+        <div class="typing-dot"></div>
+        <div class="typing-dot"></div>
+        <div class="typing-dot"></div>
+      `;
+      chatBody.appendChild(indicator);
+      chatBody.scrollTop = chatBody.scrollHeight;
+    }
+
+    function removeTypingIndicator() {
+      const indicator = document.getElementById('typingIndicator');
+      if (indicator) indicator.remove();
+    }
+
+    function handleSend() {
+      const text = chatInput.value.trim();
+      if (!text) return;
+
+      appendMessage(text, 'user');
+      chatInput.value = '';
+
+      showTypingIndicator();
+
+      setTimeout(() => {
+        removeTypingIndicator();
+        
+        let reply = "I can help with that. To deeply analyze your resume against a job description, head over to the ATS Optimizer page from the top navigation.";
+        const normalizedText = text.toLowerCase();
+        
+        if (normalizedText.includes('prep') || normalizedText.includes('question') || normalizedText.includes('predict')) {
+          reply = `Here are predicted interview questions for the Lead/Advocate roles:
+1. 'How do you coordinate distributed state across instances using Durable Objects and WebSockets?'
+2. 'Discuss how PostgreSQL index types differ when optimizing JSONB structures.'`;
+        } else if (normalizedText.includes('outreach') || normalizedText.includes('draft') || normalizedText.includes('linkedin')) {
+          reply = `Here is a custom outreach draft:
+"Hi [Hiring Manager], I recently applied to the Developer Advocate role. With my background optimizing edge caching at Northwind and writing responsive TypeScript libraries, I'd love to chat about how I can contribute to the team."`;
+        } else if (normalizedText.includes('hello') || normalizedText.includes('hi')) {
+          reply = "Hello! Let's get you ready for your interviews. Which job card are we reviewing?";
+        }
+
+        appendMessage(reply, 'coach');
+      }, 1000);
+    }
+
+    chatSend.addEventListener('click', handleSend);
+    chatInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') handleSend();
+    });
+
+    // Theme Switcher Logic (Warm Light default, dark mode as override)
+    const themeToggle = document.getElementById('themeToggle');
+    const themeMoon = document.getElementById('themeMoon');
+    const themeSun = document.getElementById('themeSun');
+
+    // Apply stored theme on load (default to light)
+    const currentTheme = localStorage.getItem('theme') || 'light';
+    if (currentTheme === 'dark') {
+      document.body.classList.add('dark-mode');
+      if (themeMoon) themeMoon.style.display = 'none';
+      if (themeSun) themeSun.style.display = 'block';
+    } else {
+      document.body.classList.remove('dark-mode');
+      if (themeMoon) themeMoon.style.display = 'block';
+      if (themeSun) themeSun.style.display = 'none';
+    }
+
+    if (themeToggle) {
+      themeToggle.addEventListener('click', () => {
+        document.body.classList.toggle('dark-mode');
+        const theme = document.body.classList.contains('dark-mode') ? 'dark' : 'light';
+        localStorage.setItem('theme', theme);
+        
+        // Sync icon
+        if (theme === 'dark') {
+          if (themeMoon) themeMoon.style.display = 'none';
+          if (themeSun) themeSun.style.display = 'block';
+        } else {
+          if (themeMoon) themeMoon.style.display = 'block';
+          if (themeSun) themeSun.style.display = 'none';
+        }
+      });
+    }
+  </script>
+
+</body>
+</html>
