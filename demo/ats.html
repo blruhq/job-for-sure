@@ -80,28 +80,51 @@
       width: 100%;
     }
     
-    /* Topnav */
+    /* ─── Topnav ─── */
     .topnav {
-      position: sticky; top: 0; z-index: 100;
+      position: sticky;
+      top: 0;
+      z-index: 100;
       background: var(--surface);
       border-bottom: 1px solid var(--border);
+      height: 64px;
     }
-    .topnav-inner { display: flex; align-items: center; justify-content: space-between; padding-block: 14px; padding-inline: 24px; }
-    .topnav .logo-container { display: flex; align-items: center; gap: 8px; }
+    .topnav-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 100%;
+      padding-inline: 24px;
+    }
+    .topnav .logo-container { display: flex; align-items: center; gap: 10px; text-decoration: none; color: inherit; }
     .topnav .logo-mark { width: 16px; height: 16px; background: var(--accent); border-radius: 4px; box-shadow: 0 2px 8px rgba(217, 98, 69, 0.2); }
     .topnav .logo-text { font-family: var(--font-display); font-size: 16px; font-weight: 600; letter-spacing: -0.01em; }
     .topnav nav { display: flex; gap: 32px; }
-    .topnav nav a { font-size: 13px; color: var(--muted); transition: color var(--motion-fast); }
+    .topnav nav a { font-size: 13px; color: var(--muted); text-decoration: none; transition: color var(--motion-fast); position: relative; }
     .topnav nav a:hover { color: var(--fg); }
     .topnav nav a.active { color: var(--fg); font-weight: 510; }
     .topnav nav a.active::after {
       content: '';
       position: absolute;
-      bottom: -18px;
+      bottom: -22px;
       left: 0;
       right: 0;
       height: 2px;
       background: var(--accent);
+    }
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .nav-icon-btn {
+      padding: 6px;
+      border-radius: 50%;
+      width: 28px;
+      height: 28px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
     }
 
     /* Buttons */
@@ -675,12 +698,12 @@
 <body>
 
   <!-- Topnav -->
-  <header class="topnav" data-od-id="topnav">
+  <header class="topnav">
     <div class="container topnav-inner">
-        <a href="index.html" class="logo-container">
-          <div class="logo-mark"></div>
-          <span class="logo-text">JOB FOR SURE</span>
-        </a>
+      <a href="index.html" class="logo-container">
+        <div class="logo-mark"></div>
+        <span class="logo-text">JOB FOR SURE</span>
+      </a>
       <nav>
         <a href="landing.html">Product</a>
         <a href="agency.html">Workspace</a>
@@ -688,8 +711,8 @@
         <a href="ats.html" class="active">ATS Optimizer</a>
         <a href="app.html">Job Pipeline</a>
       </nav>
-      <div class="nav-actions" style="display: flex; align-items: center; gap: 12px;">
-        <button id="themeToggle" class="btn btn-ghost" style="padding: 6px; border-radius: 50%; width: 28px; height: 28px; display: inline-flex; align-items: center; justify-content: center;" title="Toggle Light/Dark Theme">
+      <div class="nav-actions">
+        <button id="themeToggle" class="btn btn-ghost nav-icon-btn" title="Toggle Light/Dark Theme">
           <svg id="themeMoon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
           <svg id="themeSun" style="display:none;" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
         </button>
