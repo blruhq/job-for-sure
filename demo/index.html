@@ -235,6 +235,28 @@
     .stretch-tag.transferable{background:var(--success-soft);color:var(--success)}
     .stretch-actions{display:flex;gap:8px;padding-top:4px}
 
+    /* ══ RESUME PREVIEW DRAWER ══ */
+    .rp-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.25);z-index:200;opacity:0;pointer-events:none;transition:opacity var(--motion-base)}
+    .rp-overlay.open{opacity:1;pointer-events:auto}
+    .rp-drawer{position:fixed;top:0;right:-560px;width:560px;max-width:100vw;height:100vh;background:var(--surface);border-left:1px solid var(--border);z-index:201;display:flex;flex-direction:column;transition:right var(--motion-base) var(--ease)}
+    .rp-drawer.open{right:0}
+    .rp-head{padding:12px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+    .rp-head-title{font-size:var(--text-md);font-weight:600}
+    .rp-head-sub{font-size:var(--text-xs);color:var(--muted);font-family:var(--font-mono);margin-top:1px}
+    .rp-body{flex-grow:1;overflow-y:auto;padding:24px}
+    .rp-doc{font-family:Georgia,serif;color:var(--fg);font-size:13px;line-height:1.6}
+    .rp-doc-header{text-align:center;margin-bottom:20px}
+    .rp-doc-name{font-size:20px;font-weight:500;margin-bottom:2px}
+    .rp-doc-contact{font-family:var(--font-body);font-size:10px;color:var(--fg-2)}
+    .rp-doc-section{margin-bottom:16px}
+    .rp-doc-section-title{font-family:var(--font-body);font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--accent);border-bottom:1px solid var(--border-soft);padding-bottom:4px;margin-bottom:8px}
+    .rp-doc-skills{display:flex;flex-wrap:wrap;gap:4px}
+    .rp-doc-skill{background:var(--sidebar-bg);border:1px solid var(--border);padding:2px 6px;border-radius:3px;font-family:var(--font-body);font-size:10px}
+    .rp-tailored-banner{background:var(--accent-soft);border:1px solid rgba(91,106,191,0.15);border-radius:var(--radius-sm);padding:10px 14px;margin-bottom:16px;font-size:var(--text-sm);color:var(--accent)}
+    .rp-foot{padding:12px 20px;border-top:1px solid var(--border);display:flex;gap:8px;flex-shrink:0}
+    .arb-link{font-size:var(--text-xs);color:var(--accent);font-weight:500;cursor:pointer;margin-left:auto}
+    .arb-link:hover{color:var(--accent-hover)}
+
     /* ══ PIPELINE ══ */
     .kanban{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;align-items:start}
     .kanban-col{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px;min-height:300px}
@@ -533,6 +555,28 @@
       </section>
 
     </main>
+  </div>
+</div>
+
+<!-- ══ RESUME PREVIEW DRAWER ══ -->
+<div class="rp-overlay" id="rpOverlay" onclick="closeResumePreview()"></div>
+<div class="rp-drawer" id="rpDrawer">
+  <div class="rp-head">
+    <div>
+      <div class="rp-head-title" id="rpTitle">Resume</div>
+      <div class="rp-head-sub" id="rpSub">Loading...</div>
+    </div>
+    <button class="icon-btn" onclick="closeResumePreview()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+  </div>
+  <div class="rp-body" id="rpBody"></div>
+  <div class="rp-foot" id="rpFoot">
+    <button class="btn btn-primary" onclick="alert('Downloading resume as PDF...')">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      Download PDF
+    </button>
+    <button class="btn btn-secondary" onclick="closeResumePreview()">Close</button>
   </div>
 </div>
 
@@ -859,6 +903,7 @@ function renderActiveBar(){
       <div class="arb-name">${r.name}</div>
       <div class="arb-meta">${r.persona} · ${r.updated} · ${r.skills.length} skills indexed</div>
     </div>
+    <span class="arb-link" onclick="viewResume(${r.id})">View resume →</span>
     <div class="arb-score">${r.score}%</div>
   `;
 }
@@ -927,7 +972,7 @@ function renderMatches(){
           </div>
           <div class="stretch-actions">
             <button class="btn btn-secondary" onclick="window.open('${c.url}','_blank')">View Posting</button>
-            <button class="btn btn-secondary" onclick="alert('Tailoring resume with your transferable skills...\\n\\nWe will NOT add skills you dont have. We will reorganize your existing experience to highlight: ${(c.transferable||[]).join(', ')}')">Tailor &amp; Apply</button>
+            <button class="btn btn-primary" onclick="tailorResume(${r.id},${JSON.stringify(c).replace(/"/g,'&quot;')})">Tailor &amp; Apply</button>
             <button class="btn btn-ghost" onclick="alert('Skill gap resources:\\n\\n${(c.missing||[]).map(s=>'• Learn '+s).join('\\n')}')">Learn First</button>
           </div>
         </div>
@@ -945,13 +990,116 @@ function renderResumesList(){
     el.innerHTML='<div style="text-align:center;padding:40px;color:var(--muted);font-size:var(--text-sm)">No resumes yet. Click "Add Resume" to get started.</div>';
     return;
   }
-  el.innerHTML=RESUMES.map(r=>`
-    <div class="res-row ${r.id===activeResumeId?'active':''}" onclick="switchResume(${r.id});switchView('matches')">
-      <div class="res-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
-      <div class="res-info"><div class="res-name">${r.name}</div><div class="res-meta">${r.persona} · ${r.updated} · ${r.companies.length} matches</div></div>
+  el.innerHTML=RESUMES.map(r=>{
+    const directCount=(r.companies||[]).length;
+    const stretchCount=(r.stretch||[]).length;
+    return `
+    <div class="res-row ${r.id===activeResumeId?'active':''}" style="flex-wrap:wrap">
+      <div class="res-icon" onclick="switchResume(${r.id});switchView('matches')" style="cursor:pointer"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
+      <div class="res-info" onclick="switchResume(${r.id});switchView('matches')" style="cursor:pointer;flex-grow:1"><div class="res-name">${r.name}</div><div class="res-meta">${r.persona} · ${r.updated} · ${directCount} direct + ${stretchCount} stretch</div></div>
       <div class="res-score">${r.score}%</div>
+      <div style="display:flex;gap:6px;width:100%;padding-top:8px;border-top:1px solid var(--border-soft);margin-top:4px">
+        <button class="btn btn-secondary" onclick="viewResume(${r.id})"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>View</button>
+        <button class="btn btn-secondary" onclick="downloadResume(${r.id})"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Download</button>
+        <button class="btn btn-ghost" onclick="switchResume(${r.id});switchView('matches')">Matches →</button>
+      </div>
     </div>
-  `).join('');
+  `}).join('');
+}
+
+// ══ RESUME PREVIEW DRAWER ══
+function viewResume(id,opts={}){
+  const r=RESUMES.find(x=>x.id===id);
+  if(!r)return;
+
+  document.getElementById('rpTitle').textContent=r.name;
+  document.getElementById('rpSub').textContent=`${r.persona} · ${r.score}% match · ${r.updated}`;
+
+  const tailoredNote = opts.tailoredFor ? `
+    <div class="rp-tailored-banner">
+      Tailored for <strong>${opts.tailoredFor.company} — ${opts.tailoredFor.role}</strong> (${opts.tailoredFor.score}% match)<br>
+      <span style="font-size:var(--text-xs)">Reorganized to highlight: ${(opts.tailoredFor.transferable||[]).join(', ')}. We did NOT add skills you don't have.</span>
+    </div>
+  ` : '';
+
+  const skillsToShow = opts.tailoredFor
+    ? [...(opts.tailoredFor.transferable||[]), ...r.skills.filter(s=>!(opts.tailoredFor.transferable||[]).includes(s))]
+    : r.skills;
+
+  const skillsNote = opts.tailoredFor ? `
+    <div style="font-size:var(--text-xs);color:var(--muted);margin-top:6px;font-family:var(--font-body)">
+      Missing (not included): ${(opts.tailoredFor.missing||[]).map(s=>`<span style="color:var(--danger)">${s}</span>`).join(', ')}
+    </div>` : '';
+
+  let html=`
+    <div class="rp-doc">
+      ${tailoredNote}
+      <div class="rp-doc-header">
+        <div class="rp-doc-name">${opts.name||r.persona||'Your Name'}</div>
+        <div class="rp-doc-contact">john.doe@email.com · San Francisco, CA</div>
+      </div>
+      <div class="rp-doc-section">
+        <div class="rp-doc-section-title">Summary</div>
+        <p>${opts.summary||r.summary||'Professional with experience in '+r.skills.slice(0,3).join(', ')+'.'}</p>
+      </div>
+      <div class="rp-doc-section">
+        <div class="rp-doc-section-title">Skills</div>
+        <div class="rp-doc-skills">
+          ${skillsToShow.map(s=>`<span class="rp-doc-skill">${s}</span>`).join('')}
+        </div>
+        ${skillsNote}
+      </div>
+      <div class="rp-doc-section">
+        <div class="rp-doc-section-title">Experience</div>
+        ${(opts.experience||r.experience||[{company:'Your Company',role:r.name,dates:'2020 - Present',bullets:['Describe your achievements here.']}]).map(e=>`
+          <div style="margin-bottom:12px">
+            <div style="display:flex;justify-content:space-between;font-weight:600;font-size:13px"><span>${e.company||''}</span><span style="font-size:10px;color:var(--muted)">${e.dates||''}</span></div>
+            <div style="font-size:11px;color:var(--fg-2);margin-bottom:2px">${e.role||''}</div>
+            ${e.bullets?'<ul style="margin:4px 0 0 0;padding-left:16px;font-size:11px">'+(Array.isArray(e.bullets)?e.bullets:e.bullets.split('\\n').filter(Boolean)).map(b=>'<li>'+b+'</li>').join('')+'</ul>':''}
+          </div>
+        `).join('')}
+      </div>
+    </div>
+  `;
+
+  document.getElementById('rpBody').innerHTML=html;
+
+  // Update footer
+  const foot=document.getElementById('rpFoot');
+  if(opts.tailoredFor){
+    foot.innerHTML=`
+      <button class="btn btn-primary" onclick="alert('Downloading tailored resume for ${opts.tailoredFor.company}...')"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Download Tailored PDF</button>
+      <button class="btn btn-secondary" onclick="window.open('${opts.tailoredFor.url}','_blank')">Apply at ${opts.tailoredFor.company} →</button>
+      <button class="btn btn-ghost" onclick="closeResumePreview()">Close</button>
+    `;
+  }else{
+    foot.innerHTML=`
+      <button class="btn btn-primary" onclick="alert('Downloading resume as PDF...')"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Download PDF</button>
+      <button class="btn btn-ghost" onclick="closeResumePreview()">Close</button>
+    `;
+  }
+
+  document.getElementById('rpOverlay').classList.add('open');
+  document.getElementById('rpDrawer').classList.add('open');
+}
+
+function closeResumePreview(){
+  document.getElementById('rpOverlay').classList.remove('open');
+  document.getElementById('rpDrawer').classList.remove('open');
+}
+
+function downloadResume(id){
+  const r=RESUMES.find(x=>x.id===id);
+  if(!r)return;
+  alert('Downloading "'+r.name+'" as PDF...');
+}
+
+function tailorResume(resumeId,company){
+  // Find the resume
+  const r=RESUMES.find(x=>x.id===resumeId);
+  if(!r)return;
+  // Open resume preview in tailored mode
+  viewResume(resumeId,{tailoredFor:company});
 }
 
 // ══ PIPELINE ══
