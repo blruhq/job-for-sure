@@ -208,6 +208,33 @@
     .match-apply{display:flex;align-items:center;gap:4px;padding:5px 10px;border-radius:var(--radius-sm);background:var(--accent);color:white;font-size:var(--text-xs);font-weight:600;transition:background var(--motion-fast);flex-shrink:0}
     .match-apply:hover{background:var(--accent-hover)}
 
+    /* ══ STRETCH ROLES ══ */
+    .stretch-section{margin-top:28px}
+    .stretch-head{display:flex;align-items:center;gap:8px;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--border-soft)}
+    .stretch-title{font-size:var(--text-md);font-weight:600}
+    .stretch-badge{font-size:10px;font-family:var(--font-mono);padding:2px 8px;border-radius:var(--radius-xs);background:var(--warn-soft);color:var(--warn);font-weight:600;text-transform:uppercase;letter-spacing:0.04em}
+    .stretch-info{font-size:var(--text-xs);color:var(--muted);margin-left:auto}
+    .stretch-card{
+      display:flex;flex-direction:column;gap:10px;
+      background:var(--surface);border:1px solid var(--border);
+      border-radius:var(--radius-sm);padding:14px;margin-bottom:8px;
+      transition:border-color var(--motion-fast);
+    }
+    .stretch-card:hover{border-color:var(--warn)}
+    .stretch-top{display:flex;align-items:center;gap:12px}
+    .stretch-top .match-logo{width:32px;height:32px;font-size:10px}
+    .stretch-company{font-size:var(--text-md);font-weight:600}
+    .stretch-role{font-size:var(--text-sm);color:var(--fg-2)}
+    .stretch-score{margin-left:auto;font-family:var(--font-mono);font-size:var(--text-sm);font-weight:600;padding:2px 8px;border-radius:var(--radius-xs);background:var(--warn-soft);color:var(--warn);flex-shrink:0}
+    .stretch-gaps{display:flex;gap:16px;flex-wrap:wrap}
+    .stretch-gap-group{flex:1;min-width:140px}
+    .stretch-gap-label{font-size:10px;font-family:var(--font-mono);text-transform:uppercase;letter-spacing:0.04em;color:var(--muted);margin-bottom:4px}
+    .stretch-gap-tags{display:flex;flex-wrap:wrap;gap:4px}
+    .stretch-tag{font-size:var(--text-xs);padding:2px 8px;border-radius:var(--radius-xs);font-weight:500}
+    .stretch-tag.missing{background:rgba(220,38,38,0.06);color:var(--danger)}
+    .stretch-tag.transferable{background:var(--success-soft);color:var(--success)}
+    .stretch-actions{display:flex;gap:8px;padding-top:4px}
+
     /* ══ PIPELINE ══ */
     .kanban{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;align-items:start}
     .kanban-col{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px;min-height:300px}
@@ -454,6 +481,7 @@
           <div class="active-resume-bar" id="activeResumeBar"></div>
           <div class="match-summary" id="matchSummary"></div>
           <div class="match-list" id="matchList"></div>
+          <div class="stretch-section" id="stretchSection"></div>
         </div>
       </section>
 
@@ -511,29 +539,55 @@
 <script>
 // ══ DATA ══
 const COMPANY_DB = {
-  frontend:[
-    {logo:'LN',color:'#5E6AD2',name:'Linear',role:'Lead Frontend Engineer',loc:'Remote',salary:'$180-240k',score:94,level:'high',url:'https://linear.app/careers'},
-    {logo:'CF',color:'#F38020',name:'Cloudflare',role:'Developer Advocate',loc:'Austin, TX',salary:'$160-220k',score:92,level:'high',url:'https://cloudflare.com/careers'},
-    {logo:'VC',color:'#000000',name:'Vercel',role:'Frontend Architect',loc:'Remote',salary:'$190-240k',score:90,level:'high',url:'https://vercel.com/careers'},
-    {logo:'ST',color:'#635BFF',name:'Stripe',role:'UI Engineer',loc:'South San Francisco',salary:'$185-245k',score:86,level:'high',url:'https://stripe.com/jobs'},
-    {logo:'SB',color:'#3ECF8E',name:'Supabase',role:'Frontend Engineer',loc:'Remote',salary:'$140-190k',score:83,level:'mid',url:'https://supabase.com/careers'},
-  ],
-  backend:[
-    {logo:'ST',color:'#635BFF',name:'Stripe',role:'Backend Engineer',loc:'South San Francisco',salary:'$190-260k',score:95,level:'high',url:'https://stripe.com/jobs'},
-    {logo:'LN',color:'#5E6AD2',name:'Linear',role:'Full-Stack Engineer',loc:'Remote',salary:'$180-240k',score:92,level:'high',url:'https://linear.app/careers'},
-    {logo:'SB',color:'#3ECF8E',name:'Supabase',role:'Database Engineer',loc:'Remote',salary:'$150-210k',score:89,level:'high',url:'https://supabase.com/careers'},
-    {logo:'FL',color:'#7B3FF2',name:'Fly.io',role:'Platform Engineer',loc:'Remote',salary:'$160-220k',score:85,level:'mid',url:'https://fly.io/about'},
-  ],
-  design:[
-    {logo:'VC',color:'#000000',name:'Vercel',role:'Product Designer',loc:'Remote',salary:'$160-220k',score:90,level:'high',url:'https://vercel.com/careers'},
-    {logo:'FL',color:'#7B3FF2',name:'Fly.io',role:'Platform UI Designer',loc:'Remote',salary:'$140-190k',score:89,level:'high',url:'https://fly.io/about'},
-    {logo:'LN',color:'#5E6AD2',name:'Linear',role:'Product Designer',loc:'Remote',salary:'$170-230k',score:84,level:'mid',url:'https://linear.app/careers'},
-  ],
-  generic:[
-    {logo:'VC',color:'#000000',name:'Vercel',role:'Software Engineer',loc:'Remote',salary:'$160-220k',score:85,level:'mid',url:'https://vercel.com/careers'},
-    {logo:'SB',color:'#3ECF8E',name:'Supabase',role:'Engineer',loc:'Remote',salary:'$140-190k',score:80,level:'mid',url:'https://supabase.com/careers'},
-    {logo:'FL',color:'#7B3FF2',name:'Fly.io',role:'Engineer',loc:'Remote',salary:'$150-200k',score:78,level:'mid',url:'https://fly.io/about'},
-  ]
+  frontend:{
+    direct:[
+      {logo:'LN',color:'#5E6AD2',name:'Linear',role:'Lead Frontend Engineer',loc:'Remote',salary:'$180-240k',score:94,level:'high',url:'https://linear.app/careers'},
+      {logo:'CF',color:'#F38020',name:'Cloudflare',role:'Developer Advocate',loc:'Austin, TX',salary:'$160-220k',score:92,level:'high',url:'https://cloudflare.com/careers'},
+      {logo:'VC',color:'#000000',name:'Vercel',role:'Frontend Architect',loc:'Remote',salary:'$190-240k',score:90,level:'high',url:'https://vercel.com/careers'},
+      {logo:'ST',color:'#635BFF',name:'Stripe',role:'UI Engineer',loc:'South San Francisco',salary:'$185-245k',score:86,level:'high',url:'https://stripe.com/jobs'},
+      {logo:'SB',color:'#3ECF8E',name:'Supabase',role:'Frontend Engineer',loc:'Remote',salary:'$140-190k',score:83,level:'mid',url:'https://supabase.com/careers'},
+    ],
+    stretch:[
+      {logo:'ST',color:'#635BFF',name:'Stripe',role:'QA Automation Engineer',loc:'South San Francisco',salary:'$150-200k',score:78,level:'mid',url:'https://stripe.com/jobs',missing:['Cypress','Selenium','Test Automation Frameworks'],transferable:['JavaScript','TypeScript','CI/CD','Cross-browser Testing']},
+      {logo:'CF',color:'#F38020',name:'Cloudflare',role:'Infrastructure Engineer',loc:'Austin, TX',salary:'$170-230k',score:72,level:'mid',url:'https://cloudflare.com/careers',missing:['Rust','Kubernetes','Terraform'],transferable:['JavaScript','Performance Optimization','Networking Basics']},
+      {logo:'SB',color:'#3ECF8E',name:'Supabase',role:'Python Backend Engineer',loc:'Remote',salary:'$140-190k',score:68,level:'mid',url:'https://supabase.com/careers',missing:['Python','Django','PostgreSQL Advanced'],transferable:['API Design','Git','TypeScript','Database Concepts']},
+    ]
+  },
+  backend:{
+    direct:[
+      {logo:'ST',color:'#635BFF',name:'Stripe',role:'Backend Engineer',loc:'South San Francisco',salary:'$190-260k',score:95,level:'high',url:'https://stripe.com/jobs'},
+      {logo:'LN',color:'#5E6AD2',name:'Linear',role:'Full-Stack Engineer',loc:'Remote',salary:'$180-240k',score:92,level:'high',url:'https://linear.app/careers'},
+      {logo:'SB',color:'#3ECF8E',name:'Supabase',role:'Database Engineer',loc:'Remote',salary:'$150-210k',score:89,level:'high',url:'https://supabase.com/careers'},
+      {logo:'FL',color:'#7B3FF2',name:'Fly.io',role:'Platform Engineer',loc:'Remote',salary:'$160-220k',score:85,level:'mid',url:'https://fly.io/about'},
+    ],
+    stretch:[
+      {logo:'CF',color:'#F38020',name:'Cloudflare',role:'Frontend Engineer',loc:'Austin, TX',salary:'$160-220k',score:76,level:'mid',url:'https://cloudflare.com/careers',missing:['React','CSS Advanced','Accessibility'],transferable:['TypeScript','API Design','Performance Optimization']},
+      {logo:'VC',color:'#000000',name:'Vercel',role:'QA Engineer',loc:'Remote',salary:'$150-200k',score:72,level:'mid',url:'https://vercel.com/careers',missing:['Cypress','Playwright','Visual Regression'],transferable:['Node.js','CI/CD','Automated Testing']},
+      {logo:'FL',color:'#7B3FF2',name:'Fly.io',role:'Python Developer Advocate',loc:'Remote',salary:'$140-190k',score:68,level:'mid',url:'https://fly.io/about',missing:['Python','Content Creation','Community Management'],transferable:['Docker','PostgreSQL','Technical Writing']},
+    ]
+  },
+  design:{
+    direct:[
+      {logo:'VC',color:'#000000',name:'Vercel',role:'Product Designer',loc:'Remote',salary:'$160-220k',score:90,level:'high',url:'https://vercel.com/careers'},
+      {logo:'FL',color:'#7B3FF2',name:'Fly.io',role:'Platform UI Designer',loc:'Remote',salary:'$140-190k',score:89,level:'high',url:'https://fly.io/about'},
+      {logo:'LN',color:'#5E6AD2',name:'Linear',role:'Product Designer',loc:'Remote',salary:'$170-230k',score:84,level:'mid',url:'https://linear.app/careers'},
+    ],
+    stretch:[
+      {logo:'ST',color:'#635BFF',name:'Stripe',role:'Frontend Engineer',loc:'South San Francisco',salary:'$185-245k',score:75,level:'mid',url:'https://stripe.com/jobs',missing:['React','JavaScript Advanced','State Management'],transferable:['CSS','Design Systems','Prototyping','User Research']},
+      {logo:'CF',color:'#F38020',name:'Cloudflare',role:'Technical Writer',loc:'Austin, TX',salary:'$130-180k',score:70,level:'mid',url:'https://cloudflare.com/careers',missing:['Technical Documentation','API Docs','Markdown'],transferable:['UI Design','Typography','Design Systems','Communication']},
+    ]
+  },
+  generic:{
+    direct:[
+      {logo:'VC',color:'#000000',name:'Vercel',role:'Software Engineer',loc:'Remote',salary:'$160-220k',score:85,level:'mid',url:'https://vercel.com/careers'},
+      {logo:'SB',color:'#3ECF8E',name:'Supabase',role:'Engineer',loc:'Remote',salary:'$140-190k',score:80,level:'mid',url:'https://supabase.com/careers'},
+      {logo:'FL',color:'#7B3FF2',name:'Fly.io',role:'Engineer',loc:'Remote',salary:'$150-200k',score:78,level:'mid',url:'https://fly.io/about'},
+    ],
+    stretch:[
+      {logo:'ST',color:'#635BFF',name:'Stripe',role:'QA Engineer',loc:'South San Francisco',salary:'$150-200k',score:72,level:'mid',url:'https://stripe.com/jobs',missing:['Test Frameworks','Automation'],transferable:['JavaScript','Git','CI/CD']},
+      {logo:'CF',color:'#F38020',name:'Cloudflare',role:'Support Engineer',loc:'Remote',salary:'$120-170k',score:68,level:'mid',url:'https://cloudflare.com/careers',missing:['Networking Deep Dive','DNS','HTTP Internals'],transferable:['Problem Solving','Communication','Debugging']},
+    ]
+  }
 };
 
 const PIPELINE = [
@@ -708,13 +762,15 @@ function handleUpload(filename){
   const cleanName=filename.replace(/\.(pdf|docx|txt|md)$/i,'').replace(/_/g,' ').replace(/-/g,' ');
   const role=cleanName.length>5?cleanName.substring(0,40):'Software Engineer';
   const category=getMatchCategory(role);
+  const db=COMPANY_DB[category]||COMPANY_DB.generic;
   createResume({
     name:role,
     persona:'Uploaded File',
     source:'upload',
     skills:deriveSkills(role),
-    companies:COMPANY_DB[category]||COMPANY_DB.generic,
-    score:COMPANY_DB[category]?COMPANY_DB[category][0].score:80
+    companies:db.direct,
+    stretch:db.stretch,
+    score:db.direct[0].score
   });
 }
 
@@ -731,14 +787,16 @@ function generateResume(){
   const role=document.getElementById('wb-role').value||'Software Engineer';
   const name=document.getElementById('wb-name').value||'Your Name';
   const category=getMatchCategory(role);
+  const db=COMPANY_DB[category]||COMPANY_DB.generic;
 
   createResume({
     name:role,
     persona:name,
     source:'template',
     skills:wizardSkills.length>0?wizardSkills:deriveSkills(role),
-    companies:COMPANY_DB[category]||COMPANY_DB.generic,
-    score:COMPANY_DB[category]?COMPANY_DB[category][0].score:80
+    companies:db.direct,
+    stretch:db.stretch,
+    score:db.direct[0].score
   });
 }
 
@@ -752,7 +810,8 @@ function createResume(data){
     score:data.score,
     updated:'just now',
     skills:data.skills,
-    companies:data.companies
+    companies:data.companies,
+    stretch:data.stretch||[]
   };
   RESUMES.push(resume);
   activeResumeId=id;
@@ -807,12 +866,19 @@ function renderActiveBar(){
 function renderMatches(){
   const r=getActiveResume();
   if(!r)return;
+  const direct=r.companies||[];
+  const stretch=r.stretch||[];
+
+  // Summary
+  const totalMatches=direct.length+stretch.length;
   document.getElementById('matchSummary').innerHTML=`
-    <div><strong>${r.companies.length}</strong> matching companies</div>
-    <div>Top match: <strong>${r.companies[0].score}%</strong> at ${r.companies[0].name}</div>
-    <div>Avg: <strong>${Math.round(r.companies.reduce((s,c)=>s+c.score,0)/r.companies.length)}%</strong></div>
+    <div><strong>${direct.length}</strong> direct matches</div>
+    <div><strong>${stretch.length}</strong> stretch roles</div>
+    <div>Top: <strong>${direct[0]?direct[0].score+'%':''}</strong> ${direct[0]?'at '+direct[0].name:''}</div>
   `;
-  document.getElementById('matchList').innerHTML=r.companies.map(c=>`
+
+  // Direct matches
+  document.getElementById('matchList').innerHTML=direct.map(c=>`
     <div class="match-card" onclick="window.open('${c.url}','_blank')">
       <div class="match-logo" style="background:${c.color}">${c.logo}</div>
       <div class="match-info">
@@ -826,6 +892,50 @@ function renderMatches(){
       <span class="match-apply">Apply <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg></span>
     </div>
   `).join('');
+
+  // Stretch roles
+  if(stretch.length>0){
+    document.getElementById('stretchSection').innerHTML=`
+      <div class="stretch-head">
+        <span class="stretch-title">Stretch Roles</span>
+        <span class="stretch-badge">Explore</span>
+        <span class="stretch-info">Related positions you could grow into — honest gaps shown</span>
+      </div>
+      ${stretch.map(c=>`
+        <div class="stretch-card">
+          <div class="stretch-top">
+            <div class="match-logo" style="background:${c.color}">${c.logo}</div>
+            <div class="match-info">
+              <div class="stretch-company">${c.name}</div>
+              <div class="stretch-role">${c.role}</div>
+            </div>
+            <span class="stretch-score">${c.score}%</span>
+          </div>
+          <div class="stretch-gaps">
+            <div class="stretch-gap-group">
+              <div class="stretch-gap-label">Missing Skills</div>
+              <div class="stretch-gap-tags">
+                ${(c.missing||[]).map(s=>`<span class="stretch-tag missing">${s}</span>`).join('')}
+              </div>
+            </div>
+            <div class="stretch-gap-group">
+              <div class="stretch-gap-label">Transferable From Your Resume</div>
+              <div class="stretch-gap-tags">
+                ${(c.transferable||[]).map(s=>`<span class="stretch-tag transferable">${s}</span>`).join('')}
+              </div>
+            </div>
+          </div>
+          <div class="stretch-actions">
+            <button class="btn btn-secondary" onclick="window.open('${c.url}','_blank')">View Posting</button>
+            <button class="btn btn-secondary" onclick="alert('Tailoring resume with your transferable skills...\\n\\nWe will NOT add skills you dont have. We will reorganize your existing experience to highlight: ${(c.transferable||[]).join(', ')}')">Tailor &amp; Apply</button>
+            <button class="btn btn-ghost" onclick="alert('Skill gap resources:\\n\\n${(c.missing||[]).map(s=>'• Learn '+s).join('\\n')}')">Learn First</button>
+          </div>
+        </div>
+      `).join('')}
+    `;
+  }else{
+    document.getElementById('stretchSection').innerHTML='';
+  }
 }
 
 // ══ RESUMES LIST VIEW ══
