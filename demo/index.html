@@ -12,16 +12,16 @@
        Tokens
        ═══════════════════════════════════════════════════════════════════════ */
     :root {
-      --bg:           #F8F9FB;              /* cool off-white page bg */
+      --bg:           #F7F6F2;              /* warm paper off-white */
       --surface:      #FFFFFF;              /* pure white cards */
-      --surface-hover:#F9FAFB;              /* subtle hover tint */
-      --panel:        #F3F4F6;              /* sidebar/panel bg */
-      --fg:           #111827;              /* deep gray primary text */
-      --fg-2:         #6B7280;              /* secondary text */
-      --muted:        #9CA3AF;              /* tertiary — placeholders */
-      --meta:         #9CA3AF;              /* timestamps, disabled */
-      --border:       #E5E7EB;              /* default border */
-      --border-soft:  #F0F1F3;              /* ultra-subtle divider */
+      --surface-hover:#F5F4EF;              /* subtle warm hover tint */
+      --panel:        #F0EFEA;              /* warm panel bg */
+      --fg:           #1C1B16;              /* warm off-black primary */
+      --fg-2:         #71706A;              /* warm secondary */
+      --muted:        #9F9E98;              /* warm tertiary */
+      --meta:         #9F9E98;              /* timestamps */
+      --border:       #E6E5DF;              /* warm border */
+      --border-soft:  #F0EFEA;              /* subtle warm divider */
       --accent:       #5B6ABF;              /* steel-blue primary */
       --accent-hover: #6B7AD0;              /* lighter steel-blue */
       --accent-active:#4A59A8;              /* darker steel-blue */
@@ -38,6 +38,12 @@
       --motion-base:  200ms;
       --ease-standard: cubic-bezier(0.2, 0, 0, 1);
       --topnav-h:     64px;
+    }
+
+    /* ─── Subtle dot-grid signature pattern ─── */
+    .dot-grid-bg {
+      background-image: radial-gradient(circle, var(--border) 0.8px, transparent 0.8px);
+      background-size: 16px 16px;
     }
 
     *, *::before, *::after { box-sizing: border-box; }
@@ -186,7 +192,7 @@
 
     /* ─── AI Coach Sidebar (right) ─── */
     .coach-sidebar {
-      width: 360px;
+      width: 320px;
       background: var(--surface);
       border-left: 1px solid var(--border);
       display: flex;
@@ -418,53 +424,85 @@
       border-radius: var(--radius-sm);
       padding: 0;
       cursor: pointer;
-      transition: border-color var(--motion-fast);
+      transition: border-color var(--motion-fast), transform var(--motion-fast), box-shadow var(--motion-fast);
       overflow: hidden;
     }
     .resume-card:hover {
       border-color: var(--accent);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
     }
     .resume-preview {
       height: 140px;
       background: var(--panel);
       border-bottom: 1px solid var(--border);
-      padding: 16px 20px;
+      padding: 14px 18px;
       display: flex;
       flex-direction: column;
-      gap: 6px;
-      font-family: var(--font-mono);
-      font-size: 10px;
-      color: var(--muted);
       position: relative;
       overflow: hidden;
     }
-    .resume-preview-line {
-      height: 6px;
-      background: var(--border);
-      border-radius: 2px;
-      width: 100%;
-    }
-    .resume-preview-line:nth-child(2) { width: 85%; }
-    .resume-preview-line:nth-child(3) { width: 70%; }
-    .resume-preview-line:nth-child(4) { width: 90%; }
-    .resume-preview-line:nth-child(5) { width: 60%; }
-    .resume-preview-line:nth-child(6) { width: 75%; }
-    .resume-preview-line:nth-child(7) { width: 45%; }
-    .resume-preview-line.accent {
-      background: var(--accent-soft);
-      height: 8px;
-    }
-    .resume-preview-label {
+    .resume-preview::after {
+      content: '';
       position: absolute;
-      bottom: 12px;
-      right: 16px;
+      inset: 0;
+      background-image: radial-gradient(circle, var(--border) 0.6px, transparent 0.6px);
+      background-size: 18px 18px;
+      opacity: 0.5;
+      pointer-events: none;
+    }
+    .resume-preview-name {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--fg);
+      margin-bottom: 1px;
+      position: relative;
+      z-index: 1;
+    }
+    .resume-preview-role {
+      font-size: 10px;
+      color: var(--fg-2);
+      margin-bottom: 8px;
+      position: relative;
+      z-index: 1;
+    }
+    .resume-preview-bullets {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      flex-grow: 1;
+      position: relative;
+      z-index: 1;
+    }
+    .resume-preview-bullet {
+      display: flex;
+      gap: 5px;
       font-size: 9px;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
+      color: var(--muted);
+      line-height: 1.3;
+    }
+    .resume-preview-bullet::before {
+      content: '—';
+      color: var(--muted);
+      flex-shrink: 0;
+    }
+    .resume-preview-skills {
+      display: flex;
+      gap: 4px;
+      flex-wrap: wrap;
+      margin-top: auto;
+      position: relative;
+      z-index: 1;
+    }
+    .resume-preview-skill {
+      font-size: 7px;
+      padding: 1px 5px;
+      border-radius: 2px;
       background: var(--surface);
-      padding: 2px 8px;
-      border-radius: var(--radius-xs);
       border: 1px solid var(--border);
+      color: var(--fg-2);
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
     }
     .resume-card-body {
       padding: 16px 20px;
@@ -567,11 +605,12 @@
       padding: 14px;
       margin-bottom: 10px;
       cursor: pointer;
-      transition: border-color var(--motion-fast), background var(--motion-fast);
+      transition: border-color var(--motion-fast), background var(--motion-fast), transform var(--motion-fast);
     }
     .job-card:hover {
       border-color: var(--accent);
       background: var(--surface-hover);
+      transform: translateY(-1px);
     }
     .job-card-top {
       display: flex;
@@ -638,8 +677,8 @@
     .drawer {
       position: fixed;
       top: 0;
-      right: -800px;
-      width: 800px;
+      right: -720px;
+      width: 720px;
       max-width: 100vw;
       height: 100vh;
       background: var(--surface);
@@ -694,12 +733,12 @@
     }
     /* Left: Resume preview */
     .drawer-resume {
-      background: #FDFDFB;
+      background: #FDFCF9;
       border: 1px solid var(--border);
       border-radius: var(--radius-xs);
       padding: 32px 28px;
       font-family: Georgia, serif;
-      color: #2D2D2A;
+      color: var(--fg);
       font-size: 13px;
       line-height: 1.5;
     }
@@ -710,13 +749,13 @@
     .drawer-resume-name {
       font-size: 24px;
       font-weight: 500;
-      color: #1A1A18;
+      color: var(--fg);
       margin-bottom: 4px;
     }
     .drawer-resume-contact {
       font-family: var(--font-body);
       font-size: 11px;
-      color: #6B7280;
+      color: var(--fg-2);
     }
     .drawer-resume-section {
       margin-bottom: 20px;
@@ -728,7 +767,7 @@
       text-transform: uppercase;
       letter-spacing: 0.08em;
       color: var(--accent);
-      border-bottom: 1px solid #EBEBE9;
+      border-bottom: 1px solid var(--border-soft);
       padding-bottom: 6px;
       margin-bottom: 12px;
     }
@@ -745,12 +784,12 @@
     .drawer-resume-item-role {
       font-family: var(--font-body);
       font-size: 12px;
-      color: #6B7280;
+      color: var(--fg-2);
     }
     .drawer-resume-item-date {
       font-family: var(--font-body);
       font-size: 11px;
-      color: #9CA3AF;
+      color: var(--muted);
     }
     .drawer-resume ul {
       margin: 6px 0 0 0;
@@ -765,7 +804,7 @@
       gap: 6px;
     }
     .drawer-resume-skill {
-      background: #F3F4F6;
+      background: var(--panel);
       padding: 3px 8px;
       border-radius: var(--radius-xs);
       font-family: var(--font-body);
@@ -889,17 +928,17 @@
 
     /* ─── Dark Mode ─── */
     body.dark-mode {
-      --bg:           #0B0D0E;
-      --surface:      #141618;
-      --surface-hover:#1A1C1E;
-      --panel:        #141618;
-      --border:       rgba(255, 255, 255, 0.06);
+      --bg:           #131312;              /* warm dark */
+      --surface:      #1A1A18;              /* warm surface */
+      --surface-hover:#21211E;              /* warm hover */
+      --panel:        #1A1A18;              /* warm panel */
+      --border:       rgba(255, 255, 255, 0.07);
       --border-soft:  rgba(255, 255, 255, 0.04);
-      --fg:           #EDEEF0;
-      --fg-2:         #9BA0A8;
-      --muted:        #656A72;
-      --meta:         #656A72;
-      --accent:       #7B8AD8;   /* lighter steel-blue for dark mode contrast */
+      --fg:           #EFEEE9;
+      --fg-2:         #A5A49D;
+      --muted:        #7D7C76;
+      --meta:         #7D7C76;
+      --accent:       #7B8AD8;              /* lighter steel-blue for dark contrast */
       --accent-hover: #8B9AE8;
       --accent-active:#5B6ABF;
       --accent-soft:  rgba(123, 138, 216, 0.12);
@@ -909,21 +948,15 @@
       background: rgba(255,255,255,0.02);
     }
     body.dark-mode .drawer-resume {
-      background: #111214;
-      color: #C5C6C8;
-    }
-    body.dark-mode .drawer-resume-name {
-      color: #EDEEF0;
+      background: var(--surface);
+      color: var(--fg);
     }
     body.dark-mode .drawer-resume-section-title {
-      border-bottom-color: rgba(255,255,255,0.06);
-    }
-    body.dark-mode .drawer-resume-header {
-      border-bottom-color: rgba(255,255,255,0.06);
+      border-bottom-color: var(--border);
     }
     body.dark-mode .drawer-resume-skill {
-      background: #1C1E20;
-      color: #EDEEF0;
+      background: var(--panel);
+      color: var(--fg);
     }
 
     /* ─── Responsive ─── */
@@ -1298,14 +1331,15 @@
       container.innerHTML = resumeData.map(r => `
         <div class="resume-card" onclick="openDrawer(${r.id})">
           <div class="resume-preview">
-            <div class="resume-preview-line accent"></div>
-            <div class="resume-preview-line"></div>
-            <div class="resume-preview-line"></div>
-            <div class="resume-preview-line"></div>
-            <div class="resume-preview-line"></div>
-            <div class="resume-preview-line"></div>
-            <div class="resume-preview-line"></div>
-            <span class="resume-preview-label">${r.fileName.replace(/_/g, ' ').replace(/\.pdf/g, '')}</span>
+            <div class="resume-preview-name">John Doe</div>
+            <div class="resume-preview-role">${r.role}</div>
+            <div class="resume-preview-bullets">
+              <div class="resume-preview-bullet">${r.experience[0].company} — ${r.experience[0].role}</div>
+              <div class="resume-preview-bullet">${r.experience[1] ? r.experience[1].company + ' — ' + r.experience[1].role : r.experience[0].bullets[0].substring(0, 40) + '...'}</div>
+            </div>
+            <div class="resume-preview-skills">
+              ${r.skills.slice(0, 4).map(s => `<span class="resume-preview-skill">${s}</span>`).join('')}
+            </div>
           </div>
           <div class="resume-card-body">
             <div class="resume-card-top">
