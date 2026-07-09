@@ -2,7 +2,6 @@
 
 import { useState, useMemo, useCallback } from 'react'
 import type { ResumeData } from '~/types/resume'
-import { analyzeAtsMatch } from '~/lib/ai'
 
 // ─── default keyword list (fallback when AI is unavailable) ───
 const FALLBACK_KEYWORDS = [
@@ -76,17 +75,23 @@ export function AtsPanel({
 
   const result = aiResult || localResult
 
-  // AI-powered deep analysis
+  // AI-powered deep analysis via API
   const runAiAnalysis = useCallback(async () => {
     if (!resume || !jdText.trim()) return
     setAiLoading(true)
     setAiError('')
     try {
-      const analysis = await analyzeAtsMatch(resume, jdText)
+      const res = await fetch('/api/ai/ats-match', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ resume, jdText }),
+      })
+      if (!res.ok) throw new Error('AI analysis failed')
+      const analysis = await res.json()
       setAiResult({
-        missing: analysis.missingKeywords,
-        matched: analysis.matchedKeywords,
-        score: analysis.score,
+        missing: analysis.missingKeywords || analysis.missing || [],
+        matched: analysis.matchedKeywords || analysis.matched || [],
+        score: analysis.score || 0,
       })
     } catch (err) {
       setAiError(err instanceof Error ? err.message : 'AI analysis failed')

@@ -121,6 +121,32 @@ body {
   color: var(--color-text-primary);
 }
 
+/* ── Dark Mode Overrides ── */
+.dark {
+  --color-page: #131312;
+  --color-surface: #1A1A18;
+  --color-elevated: #1A1A18;
+  --color-hover: #222420;
+  --color-active: #2A2C28;
+  --color-sidebar-bg: #1A1A18;
+  --color-sidebar-hover: #222420;
+  --color-sidebar-active: #2A2C28;
+  --color-border: #2A2C28;
+  --color-border-hover: #363830;
+  --color-text-primary: #EDEEE9;
+  --color-text-secondary: #A5A49D;
+  --color-text-tertiary: #7D7C76;
+  --color-accent: #3B82F6;
+  --color-accent-hover: #60A5FA;
+  --color-accent-active: #2563EB;
+  --color-accent-muted: rgba(59, 130, 246, 0.15);
+  --color-accent-subtle: rgba(59, 130, 246, 0.08);
+  --color-success: #22C55E;
+  --color-warning: #EAB308;
+  --color-danger: #EF4444;
+  --color-neutral: #6B7280;
+}
+
 /* ── Animations ── */
 @keyframes fade-up {
   from { opacity: 0; transform: translateY(8px); }
