@@ -205,6 +205,31 @@
     }
     .active-resume-indicator strong{color:var(--fg);font-weight:600}
 
+    /* Chat Status Bar */
+    .chat-status-bar{
+      display:flex;align-items:center;justify-content:space-between;
+      padding:10px 32px;border-bottom:1px solid var(--border-soft);
+      background:var(--surface);font-size:var(--text-xs);color:var(--fg-2);
+      flex-shrink:0;gap:12px;
+    }
+    .chat-status-item{
+      display:flex;align-items:center;gap:6px;
+    }
+    .chat-status-label{
+      color:var(--muted);font-family:var(--font-mono);text-transform:uppercase;
+      letter-spacing:0.04em;font-size:10px;
+    }
+    .chat-status-value{
+      font-weight:600;color:var(--fg);background:var(--bg);
+      padding:3px 8px;border-radius:var(--radius-xs);border:1px solid var(--border);
+    }
+    .chat-status-select{
+      background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-xs);
+      font-size:var(--text-xs);padding:2px 6px;color:var(--fg);outline:none;cursor:pointer;
+      font-family:var(--font-body);
+    }
+    .chat-status-select:focus{border-color:var(--accent)}
+
     /* Typing indicator */
     .typing{display:flex;gap:3px;padding:10px 14px}
     .typing-dot{width:5px;height:5px;background:var(--muted);border-radius:50%;animation:typingDot 1.4s infinite}
@@ -469,6 +494,18 @@
 
       <!-- ── CHAT VIEW (main interface) ── -->
       <section class="view active chat-view" id="view-chat">
+        <div class="chat-status-bar">
+          <div class="chat-status-item">
+            <span class="chat-status-label">Active Profile:</span>
+            <span class="chat-status-value" id="chatActiveResumeName" style="cursor:pointer" onclick="switchResume(activeResumeId)">None (Upload first)</span>
+          </div>
+          <div class="chat-status-item">
+            <span class="chat-status-label">Target Company:</span>
+            <select class="chat-status-select" id="chatTargetCompanySelect" onchange="onTargetCompanyChange(this.value)">
+              <option value="none">General Career Coach</option>
+            </select>
+          </div>
+        </div>
         <div class="chat-scroll" id="chatScroll">
           <div class="chat-container" id="chatContainer">
             <!-- Messages rendered by JS -->
@@ -634,6 +671,7 @@ function switchView(name){
   if(view)view.classList.add('active');
   const nav=document.querySelector(`.nav-item[data-view="${name}"]`);
   if(nav)nav.classList.add('active');
+  if(name==='chat')updateChatStatusBar();
 }
 document.querySelectorAll('.nav-item').forEach(item=>item.addEventListener('click',()=>switchView(item.dataset.view)));
 
@@ -1042,8 +1080,61 @@ function handleUpload(filename){
 // ═══════════════════════════════════════════════════════════════
 function getActiveResume(){return RESUMES.find(r=>r.id===activeResumeId)}
 
+// ═══════════════════════════════════════════════════════════════
+// CHAT STATUS BAR (ACTIVE RESUME & TARGET COMPANY)
+// ═══════════════════════════════════════════════════════════════
+let targetCompanyKey = 'none';
+
+function updateChatStatusBar(){
+  const r = getActiveResume();
+  const nameEl = document.getElementById('chatActiveResumeName');
+  const selectEl = document.getElementById('chatTargetCompanySelect');
+  if(!nameEl || !selectEl) return;
+  
+  if(!r){
+    nameEl.textContent = 'None (Upload first)';
+    selectEl.innerHTML = `<option value="none">General Career Coach</option>`;
+    selectEl.disabled = true;
+    return;
+  }
+  
+  nameEl.textContent = r.name;
+  selectEl.disabled = false;
+  
+  const directList = r.companies || [];
+  const stretchList = r.stretch || [];
+  const allCompanies = [...directList, ...stretchList];
+  
+  let optionsHtml = `<option value="none" ${targetCompanyKey==='none'?'selected':''}>General Career Coach</option>`;
+  allCompanies.forEach(c => {
+    const key = (c.name+c.role).replace(/\s+/g,'-').toLowerCase();
+    optionsHtml += `<option value="${key}" data-name="${c.name}" data-role="${c.role}" ${targetCompanyKey===key?'selected':''}>${c.name} (${c.role})</option>`;
+  });
+  
+  selectEl.innerHTML = optionsHtml;
+}
+
+function onTargetCompanyChange(val){
+  targetCompanyKey = val;
+  const selectEl = document.getElementById('chatTargetCompanySelect');
+  if(val === 'none'){
+    addUserMsg(`Switch to General Coaching`);
+    coachReply(`Coaching mode set to **General Career Advice**. You can ask me questions about resume optimization, general interview prep, or salary negotiation strategies!`);
+    return;
+  }
+  
+  const opt = selectEl.querySelector(`option[value="${val}"]`);
+  if(opt){
+    const name = opt.getAttribute('data-name');
+    const role = opt.getAttribute('data-role');
+    addUserMsg(`Target ${name} (${role})`);
+    coachReply(`🎯 **Company Targeting Active: ${name}**!<br><br>I've loaded the specifications for the **${role}** position. I'll now tailor my interview questions, salary advice, and resume optimization tips specifically to bypass ${name}'s ATS and recruiters. Ask me anything!`);
+  }
+}
+
 function renderSwitcher(){
   const el=document.getElementById('resumeSwitcher');
+  updateChatStatusBar();
   if(RESUMES.length===0){el.innerHTML='';return}
   el.innerHTML=RESUMES.map(r=>`
     <div class="resume-switch-item ${r.id===activeResumeId?'active':''}" onclick="switchResume(${r.id})">
