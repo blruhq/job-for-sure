@@ -1,4 +1,4 @@
-import { streamText } from 'ai'
+import { streamText, convertToModelMessages } from 'ai'
 import { openai } from '@ai-sdk/openai'
 
 export const maxDuration = 30
@@ -38,9 +38,9 @@ Rules:
 - Keep responses under 200 words unless the user asks for detail.`
 
   const result = streamText({
-    model: openai('gpt-4o-mini'),
+    model: openai.chat('glm-4.5-air'),
     system: systemPrompt,
-    messages,
+    messages: await convertToModelMessages(messages),
     temperature: 0.7,
     maxOutputTokens: 1024,
   })

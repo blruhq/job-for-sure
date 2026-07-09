@@ -6,6 +6,7 @@ import { ArrowLeft, Bookmark, MessageSquare, Wand2, ExternalLink, Download } fro
 import { cn } from '~/lib/utils'
 import { useAppStore } from '~/lib/store'
 import { notify } from '~/lib/toast'
+import { ResumeCopilot } from '~/components/resume/resume-copilot'
 import type { Company } from '~/types/resume'
 
 function companyKey(c: Company) {
@@ -297,7 +298,7 @@ export function ResumeDetail({ resumeId }: { resumeId: number }) {
             <div className="flex w-full lg:w-[65%] flex-col gap-3 overflow-y-auto border-r border-border p-4 md:p-6">
               <div className="flex items-center justify-between rounded-sm border border-border bg-card p-2 px-3">
                 <div className="flex gap-2">
-                  <button onClick={saveChanges} className="flex items-center gap-1 rounded-sm bg-primary px-2.5 py-1 text-[11px] font-medium text-white hover:bg-primary/80">
+                  <button onClick={saveChanges} className="flex items-center gap-1 rounded-sm bg-primary px-2.5 py-1 text-[11px] font-medium text-primary-foreground transition-opacity hover:opacity-90">
                     <Download size={11} /> Save Changes
                   </button>
                   <button onClick={() => notify({ message: 'Save as new coming soon', type: 'info' })} className="flex items-center gap-1 rounded-sm border border-border bg-card px-2.5 py-1 text-[11px] hover:bg-background">
@@ -368,51 +369,7 @@ export function ResumeDetail({ resumeId }: { resumeId: number }) {
             </div>
 
             {/* AI Co-Pilot sidebar */}
-            <div className="flex w-full lg:w-[35%] lg:min-w-[280px] lg:max-w-[360px] flex-col border-t lg:border-t-0 lg:border-l border-border bg-card">
-              <div className="flex items-center gap-2 border-b border-border/50 bg-card px-4 py-2.5">
-                <span className="text-xs font-semibold">AI Co-Pilot</span>
-                <span className="rounded-xs bg-success-soft px-1.5 py-px font-mono text-[9px] font-semibold text-success">Active</span>
-              </div>
-              <div className="flex-1 overflow-y-auto bg-background p-4">
-                <div className="flex items-start gap-2.5">
-                  <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-sm bg-primary text-[11px] font-bold text-white">AI</div>
-                  <div className="flex-1 pt-0.5">
-                    <div className="mb-0.5 text-xs font-semibold">Co-Pilot</div>
-                    <div className="inline-block rounded-md border border-border bg-card px-3.5 py-2.5 text-xs leading-relaxed">
-                      Hey! I'm your AI Resume Co-pilot. Ask me to rewrite sections of your resume, add new keywords, or generate experience bullet points matching your target job!
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div className="flex items-center gap-1.5 border-t border-border/50 bg-card p-2.5">
-                <input
-                  id="co-pilot-input"
-                  placeholder="Ask co-pilot to rewrite..."
-                  className="flex-1 rounded-xs border border-border bg-background px-2.5 py-1.5 text-[11px] outline-none focus:border-primary"
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') {
-                      const input = document.getElementById('co-pilot-input') as HTMLInputElement
-                      if (input?.value?.trim()) {
-                        notify({ message: `AI Co-Pilot: "${input.value}" — coming soon!`, type: 'info' })
-                        input.value = ''
-                      }
-                    }
-                  }}
-                />
-                <button
-                  onClick={() => {
-                    const input = document.getElementById('co-pilot-input') as HTMLInputElement
-                    if (input?.value?.trim()) {
-                      notify({ message: `AI Co-Pilot: "${input.value}" — coming soon!`, type: 'info' })
-                      input.value = ''
-                    }
-                  }}
-                  className="rounded-xs bg-primary px-2.5 py-1.5 text-[11px] font-medium text-white hover:bg-primary/80"
-                >
-                  Send
-                </button>
-              </div>
-            </div>
+            <ResumeCopilot resume={resume} />
           </div>
         )}
       </div>

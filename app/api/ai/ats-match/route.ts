@@ -7,7 +7,7 @@ export async function POST(req: NextRequest) {
     const { resume, jdText } = await req.json()
 
     const { text } = await generateText({
-      model: openai('gpt-4o-mini'),
+      model: openai.chat('glm-4.5-air'),
       messages: [
         {
           role: 'system',
