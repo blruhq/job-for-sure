@@ -57,9 +57,9 @@ export function AtsView() {
   }
 
   return (
-    <div className="flex h-full w-full">
+    <div className="flex h-full w-full flex-col md:flex-row">
       {/* Left panel — inputs + analysis */}
-      <div className="flex w-[45%] flex-col gap-5 overflow-y-auto border-r border-border bg-card p-6">
+      <div className="flex w-full md:w-[45%] flex-col gap-5 overflow-y-auto border-b md:border-b-0 md:border-r border-border bg-card p-4 md:p-6">
         <div>
           <h1 className="text-lg font-semibold">ATS Optimizer</h1>
           <div className="text-xs text-muted-foreground">Evaluate and score your resume matches</div>
@@ -151,7 +151,7 @@ export function AtsView() {
       </div>
 
       {/* Right panel — live resume preview */}
-      <div className="flex w-[55%] flex-col items-center overflow-y-auto bg-background p-6">
+      <div className="flex w-full md:w-[55%] flex-col items-center overflow-y-auto bg-background p-4 md:p-6">
         <div className="mb-4 flex w-full max-w-[550px] items-center justify-between rounded-sm border border-border bg-card p-2 px-3">
           <span className="text-[11px] font-semibold text-muted-foreground">ATS Real-Time Sheet</span>
           <button className="rounded-sm border border-border bg-card px-2 py-1 text-[11px] hover:bg-background">Edit Resume Based on ATS</button>

@@ -104,8 +104,8 @@ export function ResumeDetail({ resumeId }: { resumeId: number }) {
         {/* ── Tab 1: Recommended Jobs ── */}
         {tab === 'jobs' && (
           <div className="flex w-full">
-            {/* Filter sidebar */}
-            <div className="w-[220px] shrink-0 overflow-y-auto border-r border-border bg-card p-5">
+            {/* Filter sidebar — hidden on mobile */}
+            <div className="hidden lg:block w-[220px] shrink-0 overflow-y-auto border-r border-border bg-card p-5">
               <div className="mb-4">
                 <div className="label-mono mb-2">Search Skills</div>
                 <input
@@ -290,9 +290,9 @@ export function ResumeDetail({ resumeId }: { resumeId: number }) {
 
         {/* ── Tab 3: Resume Editor ── */}
         {tab === 'editor' && (
-          <div className="flex w-full">
+          <div className="flex w-full flex-col lg:flex-row">
             {/* Form editor */}
-            <div className="flex w-[65%] flex-col gap-3 overflow-y-auto border-r border-border p-6">
+            <div className="flex w-full lg:w-[65%] flex-col gap-3 overflow-y-auto border-r border-border p-4 md:p-6">
               <div className="flex items-center justify-between rounded-sm border border-border bg-card p-2 px-3">
                 <div className="flex gap-2">
                   <button onClick={saveChanges} className="flex items-center gap-1 rounded-sm bg-primary px-2.5 py-1 text-[11px] font-medium text-white hover:bg-primary/80">
@@ -366,7 +366,7 @@ export function ResumeDetail({ resumeId }: { resumeId: number }) {
             </div>
 
             {/* AI Co-Pilot sidebar */}
-            <div className="flex w-[35%] min-w-[280px] max-w-[360px] flex-col border-l border-border bg-card">
+            <div className="flex w-full lg:w-[35%] lg:min-w-[280px] lg:max-w-[360px] flex-col border-t lg:border-t-0 lg:border-l border-border bg-card">
               <div className="flex items-center gap-2 border-b border-border/50 bg-card px-4 py-2.5">
                 <span className="text-xs font-semibold">AI Co-Pilot</span>
                 <span className="rounded-xs bg-success-soft px-1.5 py-px font-mono text-[9px] font-semibold text-success">Active</span>

@@ -41,7 +41,7 @@ Rules:
       },
     ],
     temperature: 0.3,
-    maxTokens: 4096,
+    maxOutputTokens: 4096,
   })
 
   // Parse the JSON response
@@ -94,7 +94,7 @@ Return a JSON object with:
       { role: 'user', content: prompt },
     ],
     temperature: 0.2,
-    maxTokens: 2048,
+    maxOutputTokens: 2048,
   })
 
   return JSON.parse(cleanJSON(text))
@@ -171,7 +171,7 @@ Generate 5 likely interview questions as a JSON array of strings.`,
       },
     ],
     temperature: 0.5,
-    maxTokens: 1024,
+    maxOutputTokens: 1024,
   })
 
   try {
