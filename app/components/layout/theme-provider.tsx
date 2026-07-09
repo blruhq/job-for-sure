@@ -9,26 +9,28 @@ interface ThemeContext {
   toggle: () => void
 }
 
-const ThemeCtx = createContext<ThemeContext>({ theme: 'dark', toggle: () => {} })
+const ThemeCtx = createContext<ThemeContext>({ theme: 'light', toggle: () => {} })
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
-  const [theme, setTheme] = useState<Theme>('dark')
+  const [theme, setTheme] = useState<Theme>('light')
+  const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
+    setMounted(true)
     const stored = localStorage.getItem('theme') as Theme | null
     if (stored) {
       setTheme(stored)
-      document.documentElement.dataset.theme = stored
-      document.documentElement.classList.toggle('light', stored === 'light')
     }
   }, [])
 
+  useEffect(() => {
+    if (!mounted) return
+    document.documentElement.classList.toggle('dark', theme === 'dark')
+    localStorage.setItem('theme', theme)
+  }, [theme, mounted])
+
   const toggle = () => {
-    const next = theme === 'dark' ? 'light' : 'dark'
-    setTheme(next)
-    localStorage.setItem('theme', next)
-    document.documentElement.dataset.theme = next
-    document.documentElement.classList.toggle('light', next === 'light')
+    setTheme((prev) => (prev === 'dark' ? 'light' : 'dark'))
   }
 
   return (

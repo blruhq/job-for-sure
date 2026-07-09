@@ -10,6 +10,11 @@
   --color-hover: #F0F0F2;
   --color-active: #E8E8EC;
 
+  /* ── Sidebar ── */
+  --color-sidebar-bg: #EFEEE9;
+  --color-sidebar-hover: #E8E7E1;
+  --color-sidebar-active: #E2E1DA;
+
   /* ── Borders ── */
   --color-border: #E5E5E7;
   --color-border-hover: #D4D4D8;
@@ -70,7 +75,7 @@
   --text-display-xl--line-height: 1.0;
   --text-display-xl--font-weight: 650;
 
-  /* ── Spacing (8px base — Path.cv generous) ── */
+  /* ── Spacing (8px base) ── */
   --spacing-0-5: 4px;
   --spacing-1: 8px;
   --spacing-2: 12px;
@@ -95,9 +100,9 @@
   --radius-full: 9999px;
 
   /* ── Layout ── */
-  --sidebar-width: 240px;
-  --sidebar-collapsed: 60px;
-  --header-height: 56px;
+  --sidebar-width: 220px;
+  --sidebar-collapsed: 56px;
+  --header-height: 48px;
 }
 
 /* ── Global defaults ── */
