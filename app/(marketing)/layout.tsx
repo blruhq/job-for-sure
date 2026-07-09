@@ -20,12 +20,6 @@ export default function MarketingLayout({ children }: { children: React.ReactNod
             >
               Features
             </a>
-            <a
-              href="#how-it-works"
-              className="cursor-pointer text-[13px] text-muted-foreground transition-colors hover:text-foreground"
-            >
-              How it Works
-            </a>
           </nav>
 
           {/* Auth buttons */}
