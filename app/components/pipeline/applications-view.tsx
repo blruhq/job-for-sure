@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { Trash2, Plus, Link2 } from 'lucide-react'
 import { cn } from '~/lib/utils'
 import { useAppStore } from '~/lib/store'
+import { notify } from '~/lib/toast'
 import type { Pipeline, PipelineColumnId, PipelineJob } from '~/types/resume'
 
 const COLUMNS: { id: PipelineColumnId; label: string; dot: string; next: PipelineColumnId | null }[] = [
@@ -69,6 +70,12 @@ export function ApplicationsView() {
             <Trash2 size={13} /> Clear All
           </button>
           <button
+            onClick={() => {
+              const url = window.prompt('Paste a job URL to import:')
+              if (url && url.trim()) {
+                notify({ message: `Job import from "${url.slice(0, 40)}..." coming soon!`, type: 'info' })
+              }
+            }}
             className="flex items-center gap-1.5 rounded-sm bg-primary px-3 py-1.5 text-xs font-medium text-white hover:bg-primary/80"
           >
             <Link2 size={13} /> Import Job

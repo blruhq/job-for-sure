@@ -6,6 +6,7 @@ import { usePathname } from 'next/navigation'
 import { MessageSquare, KanbanSquare, CheckSquare, Settings, Plus } from 'lucide-react'
 import { cn } from '~/lib/utils'
 import { useAppStore } from '~/lib/store'
+import { notify } from '~/lib/toast'
 
 const NAV_ITEMS = [
   { href: '/chat', label: 'Chat', icon: MessageSquare },
@@ -94,6 +95,7 @@ export function Sidebar() {
         ))}
         {/* Add resume — always rendered, icon stays when collapsed */}
         <button
+          onClick={() => { router.push('/chat'); notify({ message: 'Upload a resume in chat to add one!', type: 'info' }); }}
           title={c ? 'Add Resume' : undefined}
           className={cn(
             'flex items-center gap-1.5 rounded-sm px-2 py-1.5 text-xs text-primary transition-colors hover:bg-accent-soft',

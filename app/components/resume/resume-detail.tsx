@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { ArrowLeft, Bookmark, MessageSquare, Wand2, ExternalLink, Download } from 'lucide-react'
 import { cn } from '~/lib/utils'
 import { useAppStore } from '~/lib/store'
+import { notify } from '~/lib/toast'
 import type { Company } from '~/types/resume'
 
 function companyKey(c: Company) {
@@ -206,10 +207,10 @@ export function ResumeDetail({ resumeId }: { resumeId: number }) {
                               >
                                 <Bookmark size={11} fill={bm ? 'currentColor' : 'none'} /> {bm ? 'Bookmarked' : 'Bookmark'}
                               </button>
-                              <button className="cursor-pointer rounded-xs border border-border bg-card px-2 py-1 text-[11px] transition-colors hover:border-primary hover:text-primary">
+                              <button onClick={(e) => { e.stopPropagation(); notify({ message: 'AI coaching coming soon — ask the chat for advice!', type: 'info' }); }} className="cursor-pointer rounded-xs border border-border bg-card px-2 py-1 text-[11px] transition-colors hover:border-primary hover:text-primary">
                                 Coach for Job
                               </button>
-                              <button className="cursor-pointer rounded-xs border border-border bg-card px-2 py-1 text-[11px] transition-colors hover:border-primary hover:text-primary">
+                              <button onClick={(e) => { e.stopPropagation(); notify({ message: 'Resume tailoring coming soon', type: 'info' }); }} className="cursor-pointer rounded-xs border border-border bg-card px-2 py-1 text-[11px] transition-colors hover:border-primary hover:text-primary">
                                 Tailor Resume
                               </button>
                               <a
@@ -249,8 +250,8 @@ export function ResumeDetail({ resumeId }: { resumeId: number }) {
                 </select>
               </div>
               <div className="flex gap-1.5">
-                <button className="rounded-sm px-2 py-1 text-[11px] text-muted-foreground hover:bg-background hover:text-foreground">Export PDF</button>
-                <button className="rounded-sm px-2 py-1 text-[11px] text-muted-foreground hover:bg-background hover:text-foreground">Export DOCX</button>
+                <button onClick={() => notify({ message: 'PDF export coming soon', type: 'info' })} className="rounded-sm px-2 py-1 text-[11px] text-muted-foreground hover:bg-background hover:text-foreground">Export PDF</button>
+                <button onClick={() => notify({ message: 'DOCX export coming soon', type: 'info' })} className="rounded-sm px-2 py-1 text-[11px] text-muted-foreground hover:bg-background hover:text-foreground">Export DOCX</button>
               </div>
             </div>
             <div className="resume-paper w-full max-w-[600px] min-h-[750px] rounded-xs p-8" style={{ boxShadow: 'var(--shadow-paper)' }}>
@@ -299,10 +300,10 @@ export function ResumeDetail({ resumeId }: { resumeId: number }) {
                   <button onClick={saveChanges} className="flex items-center gap-1 rounded-sm bg-primary px-2.5 py-1 text-[11px] font-medium text-white hover:bg-primary/80">
                     <Download size={11} /> Save Changes
                   </button>
-                  <button className="flex items-center gap-1 rounded-sm border border-border bg-card px-2.5 py-1 text-[11px] hover:bg-background">
+                  <button onClick={() => notify({ message: 'Save as new coming soon', type: 'info' })} className="flex items-center gap-1 rounded-sm border border-border bg-card px-2.5 py-1 text-[11px] hover:bg-background">
                     Save as New
                   </button>
-                  <button className="flex items-center gap-1 rounded-sm border border-border bg-card px-2.5 py-1 text-[11px] hover:bg-background">
+                  <button onClick={() => notify({ message: 'AI Optimize coming soon', type: 'info' })} className="flex items-center gap-1 rounded-sm border border-border bg-card px-2.5 py-1 text-[11px] hover:bg-background">
                     <Wand2 size={11} /> AI Optimize
                   </button>
                 </div>
@@ -385,10 +386,31 @@ export function ResumeDetail({ resumeId }: { resumeId: number }) {
               </div>
               <div className="flex items-center gap-1.5 border-t border-border/50 bg-card p-2.5">
                 <input
+                  id="co-pilot-input"
                   placeholder="Ask co-pilot to rewrite..."
                   className="flex-1 rounded-xs border border-border bg-background px-2.5 py-1.5 text-[11px] outline-none focus:border-primary"
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      const input = document.getElementById('co-pilot-input') as HTMLInputElement
+                      if (input?.value?.trim()) {
+                        notify({ message: `AI Co-Pilot: "${input.value}" — coming soon!`, type: 'info' })
+                        input.value = ''
+                      }
+                    }
+                  }}
                 />
-                <button className="rounded-xs bg-primary px-2.5 py-1.5 text-[11px] font-medium text-white hover:bg-primary/80">Send</button>
+                <button
+                  onClick={() => {
+                    const input = document.getElementById('co-pilot-input') as HTMLInputElement
+                    if (input?.value?.trim()) {
+                      notify({ message: `AI Co-Pilot: "${input.value}" — coming soon!`, type: 'info' })
+                      input.value = ''
+                    }
+                  }}
+                  className="rounded-xs bg-primary px-2.5 py-1.5 text-[11px] font-medium text-white hover:bg-primary/80"
+                >
+                  Send
+                </button>
               </div>
             </div>
           </div>

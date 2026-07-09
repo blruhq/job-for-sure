@@ -2,12 +2,15 @@
 
 import { useState, useMemo } from 'react'
 import { Wand2 } from 'lucide-react'
+import { useRouter } from 'next/navigation'
 import { cn } from '~/lib/utils'
 import { useAppStore } from '~/lib/store'
+import { notify } from '~/lib/toast'
 
 const ALL_KEYWORDS = ['React', 'TypeScript', 'Node.js', 'PostgreSQL', 'Cloudflare Workers', 'Durable Objects', 'WebSockets', 'Figma', 'Git', 'HTML5', 'CSS3']
 
 export function AtsView() {
+  const router = useRouter()
   const { resumes, activeResumeId, setActiveResumeId, updateResume } = useAppStore()
   const [jdText, setJdText] = useState('')
 
@@ -154,7 +157,19 @@ export function AtsView() {
       <div className="flex w-full md:w-[55%] flex-col items-center overflow-y-auto bg-background p-4 md:p-6">
         <div className="mb-4 flex w-full max-w-[550px] items-center justify-between rounded-sm border border-border bg-card p-2 px-3">
           <span className="text-[11px] font-semibold text-muted-foreground">ATS Real-Time Sheet</span>
-          <button className="rounded-sm border border-border bg-card px-2 py-1 text-[11px] hover:bg-background">Edit Resume Based on ATS</button>
+          <button
+            onClick={() => {
+              if (activeResumeId) {
+                router.push(`/resume/${activeResumeId}`)
+                notify({ message: 'Switch to Editor tab to make changes', type: 'info' })
+              } else {
+                notify({ message: 'Select a resume first', type: 'warning' })
+              }
+            }}
+            className="rounded-sm border border-border bg-card px-2 py-1 text-[11px] hover:bg-background"
+          >
+            Edit Resume Based on ATS
+          </button>
         </div>
         {resume ? (
           <div className="resume-paper w-full max-w-[550px] min-h-[650px] rounded-xs p-6" style={{ boxShadow: 'var(--shadow-paper)' }}>
