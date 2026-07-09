@@ -46,7 +46,7 @@ export async function PUT(request: Request) {
   const body = await request.json()
   const { emailNotifications, weeklyDigest, marketingEmails } = body
 
-  const update: Record<string, boolean> = {}
+  const update: Record<string, boolean | Date> = {}
   if (typeof emailNotifications === 'boolean') update.emailNotifications = emailNotifications
   if (typeof weeklyDigest === 'boolean') update.weeklyDigest = weeklyDigest
   if (typeof marketingEmails === 'boolean') update.marketingEmails = marketingEmails
