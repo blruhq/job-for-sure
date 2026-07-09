@@ -281,6 +281,122 @@
     .setting-label{font-size:var(--text-sm);font-weight:500}
     .setting-desc{font-size:var(--text-xs);color:var(--muted);margin-top:1px}
 
+    /* ══ RESUME VIEW ══ */
+    .resume-view{display:none;flex-direction:column;height:100%;flex-grow:1}
+    .resume-view.active{display:flex}
+    .resume-view-header{
+      display:flex;align-items:center;justify-content:space-between;
+      padding:12px 24px;border-bottom:1px solid var(--border);
+      background:var(--surface);flex-shrink:0;gap:12px;
+    }
+    .resume-view-header-title{
+      display:flex;align-items:center;gap:12px;
+    }
+    .resume-view-header-title h1{
+      font-size:var(--text-md);font-weight:600;
+    }
+    .resume-view-header-title .score{
+      font-family:var(--font-mono);font-size:var(--text-xs);font-weight:600;
+      padding:2px 6px;border-radius:var(--radius-xs);
+      background:var(--success-soft);color:var(--success);
+    }
+    .resume-view-body{
+      display:flex;flex-grow:1;overflow:hidden;
+    }
+    .resume-view-doc{
+      width:40%;min-width:350px;max-width:480px;
+      border-right:1px solid var(--border);background:var(--surface);
+      overflow-y:auto;padding:24px;display:flex;flex-direction:column;align-items:center;
+    }
+    .resume-view-doc-paper{
+      background:#FFFFFF;color:#2D2D2A;padding:24px;
+      box-shadow:0 4px 16px rgba(0,0,0,0.06), 0 0 0 1px var(--border);
+      border-radius:var(--radius-xs);font-family:Georgia, serif;font-size:11px;line-height:1.5;
+      width:100%;min-height:550px;
+    }
+    body.dark .resume-view-doc-paper{
+      background:#1C1B18;color:#D5D4D0;
+    }
+    .resume-paper-name{font-size:16px;text-align:center;font-weight:600;margin-bottom:2px}
+    .resume-paper-contact{text-align:center;font-size:9px;color:var(--muted);margin-bottom:12px;font-family:var(--font-mono)}
+    .resume-paper-section{margin-bottom:14px}
+    .resume-paper-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;border-bottom:0.5px solid var(--border);padding-bottom:2px;margin-bottom:6px;color:var(--fg)}
+    .resume-paper-skills{display:flex;flex-wrap:wrap;gap:4px}
+    .resume-paper-skill{background:var(--bg);border:0.5px solid var(--border);padding:2px 6px;font-size:9px;border-radius:var(--radius-xs);color:var(--fg-2)}
+    .resume-paper-job{margin-bottom:8px}
+    .resume-paper-job-header{display:flex;justify-content:space-between;font-weight:600}
+    .resume-paper-job-desc{color:var(--fg-2);margin-top:2px}
+    
+    /* Matches panel on the right */
+    .resume-view-matches{
+      flex-grow:1;display:flex;overflow:hidden;
+    }
+    /* Filter sidebar */
+    .matches-filter-sidebar{
+      width:220px;background:var(--surface);border-right:1px solid var(--border);
+      padding:20px;flex-shrink:0;overflow-y:auto;display:flex;flex-direction:column;gap:18px;
+    }
+    .filter-group-title{
+      font-size:10px;font-family:var(--font-mono);text-transform:uppercase;
+      letter-spacing:0.05em;color:var(--muted);margin-bottom:8px;font-weight:600;
+    }
+    .filter-chips{display:flex;flex-direction:column;gap:6px}
+    .filter-chip{
+      font-size:var(--text-xs);padding:6px 10px;border-radius:var(--radius-xs);
+      background:var(--bg);border:1px solid var(--border);color:var(--fg-2);cursor:pointer;
+      transition:all var(--motion-fast);text-align:left;display:flex;justify-content:space-between;align-items:center;
+    }
+    .filter-chip:hover{border-color:var(--accent);color:var(--accent)}
+    .filter-chip.active{background:var(--accent-soft);color:var(--accent);border-color:var(--accent);font-weight:600}
+    
+    .filter-search-input{
+      width:100%;padding:6px 10px;background:var(--bg);
+      border:1px solid var(--border);border-radius:var(--radius-sm);
+      font-size:var(--text-xs);color:var(--fg);
+    }
+    .filter-search-input:focus{border-color:var(--accent)}
+
+    /* Matching cards list */
+    .matches-cards-pane{
+      flex-grow:1;overflow-y:auto;padding:24px;
+      display:flex;flex-direction:column;gap:12px;
+    }
+    .matches-pane-title{
+      font-size:var(--text-md);font-weight:600;margin-bottom:4px;
+    }
+    
+    .match-item-card{
+      background:var(--surface);border:1px solid var(--border);
+      border-radius:var(--radius-sm);padding:16px;
+      display:flex;gap:16px;align-items:flex-start;
+      transition:border-color var(--motion-fast);
+    }
+    .match-item-card:hover{border-color:var(--accent)}
+    .match-item-logo{
+      width:36px;height:36px;border-radius:var(--radius-sm);
+      display:flex;align-items:center;justify-content:center;
+      font-family:var(--font-mono);font-size:12px;font-weight:700;color:white;flex-shrink:0;
+    }
+    .match-item-content{flex-grow:1;min-width:0}
+    .match-item-role-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:2px}
+    .match-item-role{font-size:var(--text-base);font-weight:600}
+    .match-item-company{font-size:var(--text-sm);color:var(--fg-2)}
+    .match-item-meta-row{display:flex;gap:8px;font-size:var(--text-xs);color:var(--muted);margin-block:6px}
+    .match-item-meta-tag{
+      background:var(--bg);border:1px solid var(--border);
+      padding:2px 6px;border-radius:var(--radius-xs);
+    }
+    .match-item-actions-row{
+      display:flex;align-items:center;justify-content:space-between;margin-top:12px;
+      padding-top:12px;border-top:1px solid var(--border-soft);
+    }
+    .match-item-score-badge{
+      font-family:var(--font-mono);font-size:var(--text-sm);font-weight:600;
+      padding:3px 8px;border-radius:var(--radius-xs);
+    }
+    .match-item-score-badge.high{background:var(--success-soft);color:var(--success)}
+    .match-item-score-badge.mid{background:var(--warn-soft);color:var(--warn)}
+
     /* ══ DARK MODE ══ */
     body.dark{
       --bg:#131312;--surface:#1A1A18;--sidebar-bg:#161614;--sidebar-hover:#1F1F1D;--sidebar-active:#252522;
@@ -394,6 +510,61 @@
           </div>
           <div class="settings-group">
             <div class="setting-row"><div><div class="setting-label">Plan</div><div class="setting-desc">Free tier · upgrade for unlimited</div></div><button class="btn btn-primary" onclick="alert('Upgrade')">Upgrade to Pro</button></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── RESUME DETAIL VIEW ── -->
+      <section class="view" id="view-resume">
+        <div class="resume-view">
+          <div class="resume-view-header">
+            <button class="btn btn-secondary btn-xs" onclick="switchView('chat')">← Back to Chat</button>
+            <div class="resume-view-header-title">
+              <h1 id="resHeaderName">resume thai (3)</h1>
+              <span class="score" id="resHeaderScore">85% Match</span>
+            </div>
+          </div>
+          <div class="resume-view-body">
+            <!-- Left Panel: Resume Document Preview -->
+            <div class="resume-view-doc">
+              <div class="resume-view-doc-paper" id="resumePaperDoc">
+                <!-- Populated by JS -->
+              </div>
+            </div>
+            <!-- Right Panel: Matching Companies with Filters -->
+            <div class="resume-view-matches">
+              <!-- Filter Sidebar -->
+              <div class="matches-filter-sidebar">
+                <div>
+                  <div class="filter-group-title">Search Skills</div>
+                  <input type="text" class="filter-search-input" id="filterSearch" placeholder="Type a skill..." oninput="onFilterChange()" />
+                </div>
+                <div>
+                  <div class="filter-group-title">Work Policy</div>
+                  <div class="filter-chips">
+                    <button class="filter-chip active" id="chip-policy-all" onclick="togglePolicyFilter('all')">All Policies</button>
+                    <button class="filter-chip" id="chip-policy-remote" onclick="togglePolicyFilter('remote')">Remote Only</button>
+                    <button class="filter-chip" id="chip-policy-hybrid" onclick="togglePolicyFilter('hybrid')">Hybrid Only</button>
+                    <button class="filter-chip" id="chip-policy-onsite" onclick="togglePolicyFilter('onsite')">On-site Only</button>
+                  </div>
+                </div>
+                <div>
+                  <div class="filter-group-title">Min Match Score</div>
+                  <div class="filter-chips">
+                    <button class="filter-chip active" id="chip-score-all" onclick="toggleScoreFilter(0)">All Scores</button>
+                    <button class="filter-chip" id="chip-score-80" onclick="toggleScoreFilter(80)">80%+ Match</button>
+                    <button class="filter-chip" id="chip-score-90" onclick="toggleScoreFilter(90)">90%+ Match</button>
+                  </div>
+                </div>
+              </div>
+              <!-- Matches List -->
+              <div class="matches-cards-pane">
+                <h2 class="matches-pane-title" id="matchesCountTitle">Recommended Roles (0)</h2>
+                <div id="matchesListContainer" style="display:flex; flex-direction:column; gap:12px;">
+                  <!-- Populated by JS -->
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -884,13 +1055,235 @@ function renderSwitcher(){
   `).join('');
 }
 
+// ═══════════════════════════════════════════════════════════════
+// RESUME DETAIL VIEW STATE & RENDER
+// ═══════════════════════════════════════════════════════════════
+let currentPolicyFilter = 'all';
+let currentScoreFilter = 0;
+let currentSearchFilter = '';
+
+function togglePolicyFilter(policy){
+  currentPolicyFilter = policy;
+  ['all', 'remote', 'hybrid', 'onsite'].forEach(p => {
+    const el = document.getElementById('chip-policy-' + p);
+    if(el) {
+      if(p === policy) el.classList.add('active');
+      else el.classList.remove('active');
+    }
+  });
+  applyFilters();
+}
+
+function toggleScoreFilter(score){
+  currentScoreFilter = score;
+  [0, 80, 90].forEach(s => {
+    const el = document.getElementById('chip-score-' + (s === 0 ? 'all' : s));
+    if(el) {
+      if(s === score) el.classList.add('active');
+      else el.classList.remove('active');
+    }
+  });
+  applyFilters();
+}
+
+function onFilterChange(){
+  currentSearchFilter = document.getElementById('filterSearch').value.toLowerCase().trim();
+  applyFilters();
+}
+
+function applyFilters(){
+  const r = getActiveResume();
+  if(!r) return;
+  
+  const directList = r.companies.map(c => ({...c, type: 'Direct Match'}));
+  const stretchList = (r.stretch || []).map(c => ({...c, type: 'Stretch Match'}));
+  const allMatches = [...directList, ...stretchList];
+  
+  const filtered = allMatches.filter(c => {
+    if(currentPolicyFilter !== 'all'){
+      if(c.work !== currentPolicyFilter) return false;
+    }
+    if(c.score < currentScoreFilter) return false;
+    if(currentSearchFilter !== ''){
+      const roleMatch = c.role.toLowerCase().includes(currentSearchFilter);
+      const nameMatch = c.name.toLowerCase().includes(currentSearchFilter);
+      const missingMatch = (c.missing || []).some(s => s.toLowerCase().includes(currentSearchFilter));
+      const transMatch = (c.transferable || []).some(s => s.toLowerCase().includes(currentSearchFilter));
+      if(!roleMatch && !nameMatch && !missingMatch && !transMatch) return false;
+    }
+    return true;
+  });
+  
+  renderMatchesList(filtered);
+}
+
+function renderMatchesList(list){
+  const container = document.getElementById('matchesListContainer');
+  const countTitle = document.getElementById('matchesCountTitle');
+  if(!container) return;
+  
+  countTitle.textContent = `Recommended Roles (${list.length})`;
+  
+  if(list.length === 0){
+    container.innerHTML = `<div style="text-align:center; padding:48px; color:var(--muted); font-size:var(--text-sm)">No companies match your filters. Try adjusting them.</div>`;
+    return;
+  }
+  
+  container.innerHTML = list.map(c => {
+    const cKey = (c.name+c.role).replace(/\s+/g,'-').toLowerCase();
+    const bm = isBookmarked(cKey);
+    return `
+    <div class="match-item-card">
+      <div class="match-item-logo" style="background:${c.color}">${c.logo}</div>
+      <div class="match-item-content">
+        <div class="match-item-role-row">
+          <span class="match-item-role">${c.role}</span>
+          <span class="match-item-score-badge ${c.score >= 85 ? 'high' : 'mid'}">${c.score}% Match</span>
+        </div>
+        <div class="match-item-company">${c.name}</div>
+        
+        <div class="match-item-meta-row">
+          <span class="match-item-meta-tag">${c.loc}</span>
+          <span class="match-item-meta-tag">${c.work.toUpperCase()}</span>
+          <span class="match-item-meta-tag">${c.salary}</span>
+        </div>
+        
+        ${c.missing && c.missing.length > 0 ? `
+        <div style="font-size:var(--text-xs); margin-top:8px; color:var(--fg-2)">
+          <strong style="color:var(--danger)">Missing skills:</strong> ${c.missing.join(', ')}
+        </div>
+        ` : ''}
+        
+        <div class="match-item-actions-row">
+          <span class="pipe-time">${c.type}</span>
+          <div style="display:flex; gap:8px">
+            <button id="bm-detail-${cKey}" class="btn btn-secondary btn-xs" onclick="event.stopPropagation(); toggleDetailBookmark('${cKey}', '${c.logo}', '${c.color}', '${c.name.replace(/'/g,"\\'")}', '${c.role.replace(/'/g,"\\'")}', '${c.loc}', '${c.work}', ${c.score}, '${c.level}', '${c.url}')">
+              ${bm ? '✓ Bookmarked' : '☆ Bookmark'}
+            </button>
+            <button class="btn btn-primary btn-xs" onclick="window.open('${c.url}','_blank')">Apply Now</button>
+          </div>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function toggleDetailBookmark(key, logo, color, name, role, loc, work, score, level, url){
+  const pipe = getPipeline();
+  const idx = pipe.bookmark.findIndex(j => j.key === key);
+  
+  if (idx !== -1) {
+    pipe.bookmark.splice(idx, 1);
+    savePipeline(pipe);
+    const btn = document.getElementById('bm-detail-' + key);
+    if(btn) btn.textContent = '☆ Bookmark';
+    const chatBtn = document.getElementById('bm-' + key);
+    if(chatBtn) {
+      chatBtn.classList.remove('bookmarked');
+      chatBtn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg> Bookmark`;
+      chatBtn.style.pointerEvents = 'auto';
+    }
+  } else {
+    pipe.bookmark.push({
+      key, logo, color, company: name, title: role, loc, score, level, time: 'just now', url,
+      resume: getActiveResume()?.name || ''
+    });
+    savePipeline(pipe);
+    const btn = document.getElementById('bm-detail-' + key);
+    if(btn) btn.textContent = '✓ Bookmarked';
+    const chatBtn = document.getElementById('bm-' + key);
+    if(chatBtn) {
+      chatBtn.classList.add('bookmarked');
+      chatBtn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg> Bookmarked`;
+      chatBtn.style.pointerEvents = 'none';
+    }
+  }
+}
+
+function renderResumePaper(r){
+  const container = document.getElementById('resumePaperDoc');
+  if(!container) return;
+  
+  const persona = r.persona || 'Your Name';
+  const summary = r.summary || `Experienced developer specializing in frontend components, layouts, and web application state.`;
+  const skills = r.skills || ['JavaScript', 'HTML5', 'CSS3'];
+  
+  let expHtml = '';
+  if(r.experience && r.experience.length > 0){
+    expHtml = r.experience.map(exp => `
+      <div class="resume-paper-job">
+        <div class="resume-paper-job-header">
+          <span>${exp.role}</span>
+          <span style="font-family:var(--font-mono); font-size:9px; color:var(--muted)">${exp.dates || '2020 - Present'}</span>
+        </div>
+        <div style="font-style:italic; font-size:10px; margin-bottom:4px">${exp.company}</div>
+        <ul style="padding-left:14px; margin:0; color:var(--fg-2)">
+          ${(exp.bullets || []).map(b => `<li>${b}</li>`).join('')}
+        </ul>
+      </div>
+    `).join('');
+  } else {
+    expHtml = `
+      <div class="resume-paper-job">
+        <div class="resume-paper-job-header">
+          <span>Software Engineer</span>
+          <span style="font-family:var(--font-mono); font-size:9px; color:var(--muted)">2022 - Present</span>
+        </div>
+        <div style="font-style:italic; font-size:10px; margin-bottom:4px">Cloudburst Software</div>
+        <ul style="padding-left:14px; margin:0; color:var(--fg-2)">
+          <li>Engineered modular codebases using clean design patterns.</li>
+          <li>Optimized critical user flows, boosting performance by 25%.</li>
+          <li>Collaborated with design and product teams on design system features.</li>
+        </ul>
+      </div>
+    `;
+  }
+  
+  container.innerHTML = `
+    <div class="resume-paper-name">${persona}</div>
+    <div class="resume-paper-contact">john@email.com · San Francisco, CA</div>
+    
+    <div class="resume-paper-section">
+      <div class="resume-paper-title">Summary</div>
+      <div style="color:var(--fg-2)">${summary}</div>
+    </div>
+    
+    <div class="resume-paper-section">
+      <div class="resume-paper-title">Skills</div>
+      <div class="resume-paper-skills">
+        ${skills.map(s => `<span class="resume-paper-skill">${s}</span>`).join('')}
+      </div>
+    </div>
+    
+    <div class="resume-paper-section">
+      <div class="resume-paper-title">Experience</div>
+      ${expHtml}
+    </div>
+  `;
+}
+
+function renderResumeDetailView(r){
+  document.getElementById('resHeaderName').textContent = r.name;
+  document.getElementById('resHeaderScore').textContent = `${r.score}% Match`;
+  
+  renderResumePaper(r);
+  
+  currentPolicyFilter = 'all';
+  currentScoreFilter = 0;
+  currentSearchFilter = '';
+  const searchInput = document.getElementById('filterSearch');
+  if(searchInput) searchInput.value = '';
+  
+  applyFilters();
+}
+
 function switchResume(id){
   activeResumeId=id;
   renderSwitcher();
   const r=getActiveResume();
   if(r){
-    addUserMsg(`Switch to ${r.name}`);
-    coachReply(`Switched to <strong>${r.name}</strong> (${r.score}%). Matches:${renderInlineMatches(r.companies)}`);
+    switchView('resume');
+    renderResumeDetailView(r);
   }
 }
 
