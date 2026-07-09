@@ -171,10 +171,32 @@
       --warn:#EAB308;--warn-soft:rgba(234,179,8,0.10);
     }
 
+    .topbar .toggle-sidebar {
+      display: none;
+    }
+
     /* ══ RESPONSIVE ══ */
     @media(max-width:768px){
-      .sidebar{position:fixed;left:0;top:var(--topbar-h);bottom:0;z-index:90}
-      .sidebar.collapsed{margin-left:calc(var(--sidebar-w) * -1)}
+      .topbar .toggle-sidebar {
+        display: flex;
+      }
+      .sidebar {
+        position: fixed;
+        left: 0;
+        top: var(--topbar-h);
+        bottom: 0;
+        z-index: 90;
+        width: var(--sidebar-w) !important;
+        margin-left: 0;
+        transition: margin-left var(--motion-base) var(--ease);
+      }
+      .sidebar.collapsed {
+        margin-left: calc(var(--sidebar-w) * -1) !important;
+        width: var(--sidebar-w) !important;
+      }
+      .sidebar-toggle-row {
+        display: none !important;
+      }
       .kanban{grid-template-columns:1fr}
       .pipeline-view{padding-left:16px;padding-right:16px}
       .pipeline-stats{flex-wrap:wrap}
@@ -210,26 +232,31 @@
       <div class="nav-label">Navigate</div>
       <a href="index.html" class="nav-item">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-        Chat
+        <span>Chat</span>
       </a>
       <a href="pipeline.html" class="nav-item active">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="1"/><line x1="9" y1="3" x2="9" y2="21"/><line x1="15" y1="3" x2="15" y2="21"/></svg>
-        Pipeline
+        <span>Pipeline</span>
         <span class="nav-badge" id="pipelineBadge">0</span>
       </a>
       <div class="nav-label">Resumes</div>
       <div class="resume-switcher" id="resumeSwitcher"></div>
       <div class="resume-add-btn" onclick="chatAddResume()">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
-        Add Resume
+        <span>Add Resume</span>
       </div>
       <div class="nav-label">Account</div>
       <a href="index.html#settings" class="nav-item">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
-        Settings
+        <span>Settings</span>
       </a>
       <div class="sidebar-footer">
         <div class="sidebar-user"><div class="avatar">JD</div><div><div class="sidebar-user-name">John Doe</div><div class="sidebar-user-plan">FREE PLAN</div></div></div>
+      </div>
+      <div class="sidebar-toggle-row">
+        <button class="sidebar-toggle-btn" id="toggleSidebarSidebar" title="Toggle sidebar">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="9" y1="3" x2="9" y2="21"/></svg>
+        </button>
       </div>
     </aside>
 
@@ -486,6 +513,11 @@ document.getElementById('themeToggle').addEventListener('click',toggleTheme);
 loadResumesState();
 renderSwitcher();
 renderPipeline();
+
+['toggleSidebar', 'toggleSidebarSidebar'].forEach(id => {
+  const el = document.getElementById(id);
+  if(el) el.addEventListener('click', () => document.getElementById('sidebar').classList.toggle('collapsed'));
+});
 </script>
 </body>
 </html>
