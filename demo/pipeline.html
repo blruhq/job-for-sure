@@ -60,6 +60,18 @@
     .nav-item svg{flex-shrink:0;opacity:0.7}
     .nav-item.active svg{opacity:1;color:var(--accent)}
     .nav-badge{margin-left:auto;font-size:10px;font-family:var(--font-mono);background:var(--accent-soft);color:var(--accent);padding:1px 6px;border-radius:var(--radius-xs);font-weight:600}
+    .resume-switcher{padding:4px;margin-bottom:4px}
+    .resume-switcher:empty{display:none}
+    .resume-switch-item{display:flex;align-items:center;gap:8px;padding:6px 8px;margin:0 4px;border-radius:var(--radius-sm);cursor:pointer;transition:all var(--motion-fast)}
+    .resume-switch-item:hover{background:var(--sidebar-hover)}
+    .resume-switch-item.active{background:var(--sidebar-active)}
+    .resume-switch-dot{width:8px;height:8px;border-radius:50%;border:2px solid var(--muted);flex-shrink:0;transition:all var(--motion-fast)}
+    .resume-switch-item.active .resume-switch-dot{border-color:var(--accent);background:var(--accent)}
+    .resume-switch-info{flex-grow:1;min-width:0}
+    .resume-switch-name{font-size:var(--text-sm);font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .resume-switch-score{font-size:10px;font-family:var(--font-mono);color:var(--success);font-weight:600}
+    .resume-add-btn{display:flex;align-items:center;gap:6px;padding:6px 8px;margin:0 4px;border-radius:var(--radius-sm);font-size:var(--text-sm);color:var(--accent);cursor:pointer;transition:all var(--motion-fast)}
+    .resume-add-btn:hover{background:var(--accent-soft)}
     .sidebar-footer{margin-top:auto;padding:8px;border-top:1px solid var(--border)}
     .sidebar-user{display:flex;align-items:center;gap:8px;padding:4px}
     .sidebar-user-name{font-size:var(--text-sm);font-weight:600}
@@ -185,10 +197,12 @@
         Pipeline
         <span class="nav-badge" id="pipelineBadge">0</span>
       </a>
-      <a href="index.html" class="nav-item">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
-        Resumes
-      </a>
+      <div class="nav-label">Resumes</div>
+      <div class="resume-switcher" id="resumeSwitcher"></div>
+      <div class="resume-add-btn" onclick="chatAddResume()">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+        Add Resume
+      </div>
       <div class="nav-label">Account</div>
       <a href="index.html#settings" class="nav-item">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
@@ -231,6 +245,45 @@
 // PIPELINE DATA (localStorage — shared with index.html)
 // ═══════════════════════════════════════════════════════════════
 const PIPELINE_KEY='jfs_pipeline';
+const RESUMES_KEY = 'jfs_resumes';
+const ACTIVE_RESUME_KEY = 'jfs_active_resume_id';
+
+let RESUMES = [];
+let activeResumeId = null;
+
+function loadResumesState(){
+  try{
+    RESUMES = JSON.parse(localStorage.getItem(RESUMES_KEY)) || [];
+    const storedId = localStorage.getItem(ACTIVE_RESUME_KEY);
+    activeResumeId = storedId ? parseInt(storedId) : null;
+  }catch(e){
+    RESUMES = [];
+    activeResumeId = null;
+  }
+}
+
+function renderSwitcher(){
+  const el=document.getElementById('resumeSwitcher');
+  if(!el) return;
+  if(RESUMES.length===0){el.innerHTML='';return}
+  el.innerHTML=RESUMES.map(r=>`
+    <div class="resume-switch-item ${r.id===activeResumeId?'active':''}" onclick="switchResume(${r.id})">
+      <div class="resume-switch-dot"></div>
+      <div class="resume-switch-info"><div class="resume-switch-name">${r.name}</div></div>
+      <div class="resume-switch-score">${r.score}%</div>
+    </div>
+  `).join('');
+}
+
+function switchResume(id){
+  localStorage.setItem(ACTIVE_RESUME_KEY, id);
+  window.location.href = 'index.html?showResume=' + id;
+}
+
+function chatAddResume(){
+  window.location.href = 'index.html?action=addResume';
+}
+
 const COLUMNS=[
   {id:'bookmark',label:'Bookmark',dot:'#9F9E98',next:'applied'},
   {id:'applied',label:'Applied',dot:'#5B6ABF',next:'interviewing'},
@@ -414,6 +467,8 @@ document.getElementById('themeToggle').addEventListener('click',toggleTheme);
 // ═══════════════════════════════════════════════════════════════
 // INIT
 // ═══════════════════════════════════════════════════════════════
+loadResumesState();
+renderSwitcher();
 renderPipeline();
 </script>
 </body>

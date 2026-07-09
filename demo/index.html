@@ -656,8 +656,32 @@ const COMPANY_DB = {
 // ═══════════════════════════════════════════════════════════════
 // STATE
 // ═══════════════════════════════════════════════════════════════
-let RESUMES=[];
-let activeResumeId=null;
+const RESUMES_KEY = 'jfs_resumes';
+const ACTIVE_RESUME_KEY = 'jfs_active_resume_id';
+let RESUMES = [];
+let activeResumeId = null;
+
+function loadResumesState(){
+  try{
+    RESUMES = JSON.parse(localStorage.getItem(RESUMES_KEY)) || [];
+    const storedId = localStorage.getItem(ACTIVE_RESUME_KEY);
+    activeResumeId = storedId ? parseInt(storedId) : null;
+  }catch(e){
+    RESUMES = [];
+    activeResumeId = null;
+  }
+}
+
+function saveResumesState(){
+  localStorage.setItem(RESUMES_KEY, JSON.stringify(RESUMES));
+  if (activeResumeId !== null) {
+    localStorage.setItem(ACTIVE_RESUME_KEY, activeResumeId);
+  } else {
+    localStorage.removeItem(ACTIVE_RESUME_KEY);
+  }
+}
+
+loadResumesState();
 
 // ═══════════════════════════════════════════════════════════════
 // SIDEBAR + VIEW SWITCHING
@@ -1134,6 +1158,7 @@ function onTargetCompanyChange(val){
 
 function renderSwitcher(){
   const el=document.getElementById('resumeSwitcher');
+  saveResumesState(); // Persist the switcher state to localStorage
   updateChatStatusBar();
   if(RESUMES.length===0){el.innerHTML='';return}
   el.innerHTML=RESUMES.map(r=>`
@@ -1398,6 +1423,20 @@ document.getElementById('themeToggle').addEventListener('click',toggleTheme);
 // INIT
 // ═══════════════════════════════════════════════════════════════
 renderSwitcher();
+
+// URL Query Handler
+const urlParams = new URLSearchParams(window.location.search);
+const showResumeId = urlParams.get('showResume');
+const actionParam = urlParams.get('action');
+
+if (showResumeId) {
+  const parsedId = parseInt(showResumeId);
+  switchResume(parsedId);
+} else if (actionParam === 'addResume') {
+  setTimeout(() => {
+    chatUploadClick();
+  }, 100);
+}
 
 // Welcome message
 addCoachMsg(`Welcome to Job For Sure! I'm your AI career coach. I can match your resume with companies, tailor it for specific roles, and help you prep for interviews.<br><br>How do you want to start?
