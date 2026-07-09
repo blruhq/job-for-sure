@@ -305,6 +305,8 @@
   50%      { opacity: 1; transform: translateY(-2px); }
 }
 
+
+
 .animate-fade-up { animation: fade-up 0.25s var(--ease); }
 .animate-scale-in { animation: scale-in 0.2s var(--ease); }
 .animate-slide-in { animation: slide-in 0.2s var(--ease); }

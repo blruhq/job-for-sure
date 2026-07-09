@@ -147,6 +147,16 @@ export const applications = pgTable("applications", {
 // APPLICATION RELATIONS
 // ═══════════════════════════════════════════════════════════════
 
+export const userPreferences = pgTable("user_preferences", {
+  userId: text("user_id")
+    .primaryKey()
+    .references(() => user.id, { onDelete: "cascade" }),
+  emailNotifications: boolean("email_notifications").default(true).notNull(),
+  weeklyDigest: boolean("weekly_digest").default(false).notNull(),
+  marketingEmails: boolean("marketing_emails").default(false).notNull(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
 export const pipelineData = pgTable("pipeline_data", {
   userId: text("user_id")
     .primaryKey()
