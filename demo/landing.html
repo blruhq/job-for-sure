@@ -660,7 +660,7 @@
         <a href="index.html">Dashboard</a>
         <a href="index.html">Resumes</a>
         <a href="ats.html">ATS Optimizer</a>
-        <a href="pipeline.html">Job Pipeline</a>
+        <a href="pipeline.html">Applications</a>
       </nav>
       <div class="nav-actions">
         <button id="themeToggle" class="btn btn-ghost nav-icon-btn" title="Toggle Light/Dark Theme">
@@ -679,7 +679,7 @@
       <div class="container hero-center">
         <p class="eyebrow">INTELLIGENT CAREER SUITE</p>
         <h1>Own your career path with AI-driven precision.</h1>
-        <p class="lead" style="margin-top: 16px;">Job For Sure optimizes your resume against live ATS algorithms, tracks job pipelines, and imports listings instantly from LinkedIn.</p>
+        <p class="lead" style="margin-top: 16px;">Job For Sure optimizes your resume against live ATS algorithms, tracks job applications, and imports listings instantly from LinkedIn.</p>
         <div class="hero-cta" style="margin-top: 32px;">
           <a href="ats.html" class="btn btn-primary btn-arrow">Optimize Resume Now</a>
           <a href="index.html" class="btn btn-secondary">Enter Dashboard</a>
@@ -707,7 +707,7 @@
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
             </div>
             <h3>Sleek Kanban Tracker</h3>
-            <p>Maintain complete clarity over your pipeline. Track applications from initial contact to final signed offer in a neat workspace.</p>
+            <p>Maintain complete clarity over your applications. Track them from initial contact to final signed offer in a neat workspace.</p>
           </div>
           <div class="feature-card">
             <div class="feature-icon">
@@ -767,7 +767,7 @@
             <div class="ext-toast" id="extToast">
               <svg class="toast-success-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
               <div style="font-size: 12px;">
-                <strong style="color: var(--fg);">Linear - Lead Frontend Engineer</strong> imported to your Job For Sure pipeline.
+                <strong style="color: var(--fg);">Linear - Lead Frontend Engineer</strong> imported to your Job For Sure applications.
               </div>
             </div>
           </div>
@@ -989,10 +989,10 @@
         
         if (normalizedText.includes('resume') || normalizedText.includes('optimize') || normalizedText.includes('ats')) {
           reply = "I recommend uploading your resume in the ATS Optimizer. It will run an automated scan for keywords like PostgreSQL, React, and Durable Objects, giving you a detailed score and direct rewrite suggestions.";
-        } else if (normalizedText.includes('pipeline') || normalizedText.includes('dashboard') || normalizedText.includes('kanban')) {
-          reply = "Your job application dashboard (Kanban pipeline) is located in the Dashboard section. You can view all imported jobs and prep for interviews there.";
+        } else if (normalizedText.includes('pipeline') || normalizedText.includes('dashboard') || normalizedText.includes('kanban') || normalizedText.includes('applications')) {
+          reply = "Your job application dashboard (Kanban board) is located in the Dashboard section. You can view all imported jobs and prep for interviews there.";
         } else if (normalizedText.includes('chrome') || normalizedText.includes('linkedin') || normalizedText.includes('extension')) {
-          reply = "The Chrome extension allows you to click 'Import to Job For Sure' on any LinkedIn job listing. It instantly adds it to your Applied pipeline column.";
+          reply = "The Chrome extension allows you to click 'Import to Job For Sure' on any LinkedIn job listing. It instantly adds it to your Applied column.";
         } else if (normalizedText.includes('hello') || normalizedText.includes('hi')) {
           reply = "Hello! Ready to refine your applications today? Let me know how I can guide your job hunt.";
         }

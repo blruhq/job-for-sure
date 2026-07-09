@@ -13,7 +13,7 @@ const COLUMNS: { id: PipelineColumnId; label: string; dot: string; next: Pipelin
   { id: 'offers', label: 'Offers', dot: '#2B5F45', next: null },
 ]
 
-export function PipelineView() {
+export function ApplicationsView() {
   const { pipeline, resumes, moveJob, removeJob, clearPipeline } = useAppStore()
   const [filter, setFilter] = useState('all')
   const [draggedKey, setDraggedKey] = useState<string | null>(null)
@@ -58,12 +58,12 @@ export function PipelineView() {
       {/* Header */}
       <div className="mb-5 flex items-center justify-between">
         <div>
-          <h1 className="text-lg font-semibold">Pipeline</h1>
+          <h1 className="text-lg font-semibold">Applications</h1>
           <div className="text-xs text-muted-foreground">Track your job applications</div>
         </div>
         <div className="flex gap-2">
           <button
-            onClick={() => { if (confirm('Remove all jobs from your pipeline?')) clearPipeline() }}
+            onClick={() => { if (confirm('Remove all jobs from your applications?')) clearPipeline() }}
             className="flex items-center gap-1.5 rounded-sm border border-border bg-card px-3 py-1.5 text-xs font-medium text-muted-foreground transition-all hover:bg-background hover:text-foreground"
           >
             <Trash2 size={13} /> Clear All

@@ -3,40 +3,17 @@
 import { useRef } from 'react'
 import { useChat } from '@ai-sdk/react'
 import { AgentChat } from '@/components/agent-elements/agent-chat'
-import { Paperclip, Upload, FileText, ClipboardList } from 'lucide-react'
 import { useAppStore } from '~/lib/store'
 import { createResumeFromUpload } from '~/lib/company-data'
-
-const SUGGESTIONS = [
-  { id: 'upload', label: 'Upload resume' },
-  { id: 'find-jobs', label: 'Find matching jobs' },
-  { id: 'interview', label: 'Interview prep' },
-  { id: 'salary', label: 'Salary advice' },
-]
 
 export function ChatView() {
   const { activeResume, addResume, targetCompanyKey, setTargetCompanyKey, resumes, activeResumeId, setActiveResumeId } = useAppStore()
   const fileRef = useRef<HTMLInputElement>(null)
 
-  // Build context for the AI
-  const targetCompany = targetCompanyKey !== 'none' && activeResume
-    ? [...activeResume.companies, ...(activeResume.stretch || [])].find(
-        (c) => (c.name + c.role).replace(/\s+/g, '-').toLowerCase() === targetCompanyKey
-      )
-    : null
-
   const { messages, status, sendMessage, stop } = useChat()
 
   const handleSend = (message: { role: 'user'; content: string }) => {
     sendMessage({ text: message.content })
-  }
-
-  const handleSuggestion = (label: string) => {
-    if (label === 'Upload resume') {
-      fileRef.current?.click()
-      return
-    }
-    sendMessage({ text: label })
   }
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -96,11 +73,15 @@ export function ChatView() {
           status={status}
           onSend={handleSend}
           onStop={stop}
-          suggestions={SUGGESTIONS.map((s) => ({
-            id: s.id,
-            label: s.label,
-            onClick: () => handleSuggestion(s.label),
-          }))}
+          attachments={{
+            onAttach: () => fileRef.current?.click(),
+          }}
+          suggestions={[
+            { id: 'upload', label: '📎 Upload resume', value: 'I want to upload my resume' },
+            { id: 'find-jobs', label: 'Find matching jobs', value: 'Find matching jobs for my resume' },
+            { id: 'interview', label: 'Interview prep', value: 'Help me prepare for an interview' },
+            { id: 'salary', label: 'Salary advice', value: 'Give me salary advice for my role' },
+          ]}
           className="h-full"
         />
       </div>
