@@ -1,5 +1,11 @@
+import type { Metadata } from 'next'
 import Link from 'next/link'
 import { FileText } from 'lucide-react'
+
+export const metadata: Metadata = {
+  title: { absolute: 'Job For Sure — AI Career Coach' },
+  description: 'Upload your resume once. Get AI-matched jobs, ATS-optimized resumes, and a full application pipeline. Free to start.',
+}
 
 export default function LandingPage() {
   return (
