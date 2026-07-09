@@ -15,7 +15,7 @@ function companyKey(c: Company) {
 
 export function ResumeDetail({ resumeId }: { resumeId: number }) {
   const router = useRouter()
-  const { getResume, resumes, setActiveResumeId, isBookmarked, bookmarkJob, activeResume, toggleBookmark, updateResume } = useAppStore()
+  const { getResume, resumes, addResume, setActiveResumeId, isBookmarked, bookmarkJob, activeResume, toggleBookmark, updateResume } = useAppStore()
   const [tab, setTab] = useState<'jobs' | 'view' | 'editor'>('jobs')
   const [policyFilter, setPolicyFilter] = useState('all')
   const [scoreFilter, setScoreFilter] = useState(0)
@@ -30,6 +30,7 @@ export function ResumeDetail({ resumeId }: { resumeId: number }) {
   const [editLocation, setEditLocation] = useState(resume?.location ?? '')
   const [editSummary, setEditSummary] = useState(resume?.summary ?? '')
   const [editSkills, setEditSkills] = useState((resume?.skills ?? []).join(', '))
+  const [optimizing, setOptimizing] = useState(false)
 
   if (!resume) {
     return (
@@ -67,6 +68,39 @@ export function ResumeDetail({ resumeId }: { resumeId: number }) {
       skills: editSkills.split(',').map((s) => s.trim()).filter(Boolean),
     })
     setTab('jobs')
+  }
+
+  const handleOptimize = async () => {
+    setOptimizing(true)
+    try {
+      const res = await fetch('/api/ai/tailor', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          resume: {
+            name: editName,
+            persona: editPersona,
+            summary: editSummary,
+            skills: editSkills.split(',').map((s) => s.trim()).filter(Boolean),
+            experience: resume.experience || [],
+          },
+          job: 'Optimize this resume for maximum impact in the tech industry. Use strong action verbs, quantify achievements, and ensure the summary is compelling.',
+        }),
+      })
+      if (!res.ok) throw new Error('Optimization failed')
+      const data = await res.json()
+      if (data.optimized) {
+        if (data.optimized.summary) setEditSummary(data.optimized.summary)
+        if (data.optimized.skills) setEditSkills(data.optimized.skills.join(', '))
+        notify({ message: 'Resume optimized! Review the changes and click Save.', type: 'success' })
+      } else {
+        throw new Error('No optimized content returned')
+      }
+    } catch {
+      notify({ message: 'AI optimization failed. Try again or use the Co-Pilot.', type: 'error' })
+    } finally {
+      setOptimizing(false)
+    }
   }
 
   return (
@@ -208,10 +242,17 @@ export function ResumeDetail({ resumeId }: { resumeId: number }) {
                               >
                                 <Bookmark size={11} fill={bm ? 'currentColor' : 'none'} /> {bm ? 'Bookmarked' : 'Bookmark'}
                               </button>
-                              <button onClick={(e) => { e.stopPropagation(); notify({ message: 'AI coaching coming soon — ask the chat for advice!', type: 'info' }); }} className="cursor-pointer rounded-xs border border-border bg-card px-2 py-1 text-[11px] transition-colors hover:border-primary hover:text-primary">
+                              <button onClick={(e) => { e.stopPropagation(); sessionStorage.setItem('jfs_pending_chat', `I want to prepare for the ${c.role} role at ${c.name}. Can you coach me on what to expect and how to stand out?`); router.push('/chat'); }} className="cursor-pointer rounded-xs border border-border bg-card px-2 py-1 text-[11px] transition-colors hover:border-primary hover:text-primary">
                                 Coach for Job
                               </button>
-                              <button onClick={(e) => { e.stopPropagation(); notify({ message: 'Resume tailoring coming soon', type: 'info' }); }} className="cursor-pointer rounded-xs border border-border bg-card px-2 py-1 text-[11px] transition-colors hover:border-primary hover:text-primary">
+                              <button onClick={(e) => {
+                                e.stopPropagation()
+                                const tailored = { ...resume, id: Date.now(), name: `${resume.name} → ${c.name}`, updated: 'just now' }
+                                addResume(tailored)
+                                setActiveResumeId(tailored.id)
+                                router.push(`/resume/${tailored.id}`)
+                                notify({ message: `Cloned resume for ${c.name}. Edit it in the Resume Editor.`, type: 'success' })
+                              }} className="cursor-pointer rounded-xs border border-border bg-card px-2 py-1 text-[11px] transition-colors hover:border-primary hover:text-primary">
                                 Tailor Resume
                               </button>
                               <a
@@ -301,11 +342,16 @@ export function ResumeDetail({ resumeId }: { resumeId: number }) {
                   <button onClick={saveChanges} className="flex items-center gap-1 rounded-sm bg-primary px-2.5 py-1 text-[11px] font-medium text-primary-foreground transition-opacity hover:opacity-90">
                     <Download size={11} /> Save Changes
                   </button>
-                  <button onClick={() => notify({ message: 'Save as new coming soon', type: 'info' })} className="flex items-center gap-1 rounded-sm border border-border bg-card px-2.5 py-1 text-[11px] hover:bg-background">
+                  <button onClick={() => {
+                    const copy = { ...resume, id: Date.now(), name: `${resume.name} (Copy)`, updated: 'just now' }
+                    addResume(copy)
+                    setActiveResumeId(copy.id)
+                    notify({ message: 'Resume cloned', type: 'success' })
+                  }} className="flex cursor-pointer items-center gap-1 rounded-sm border border-border bg-card px-2.5 py-1 text-[11px] hover:bg-muted">
                     Save as New
                   </button>
-                  <button onClick={() => notify({ message: 'AI Optimize coming soon', type: 'info' })} className="flex items-center gap-1 rounded-sm border border-border bg-card px-2.5 py-1 text-[11px] hover:bg-background">
-                    <Wand2 size={11} /> AI Optimize
+                  <button onClick={handleOptimize} disabled={optimizing} className="flex cursor-pointer items-center gap-1 rounded-sm border border-border bg-card px-2.5 py-1 text-[11px] hover:bg-muted disabled:opacity-50">
+                    <Wand2 size={11} /> {optimizing ? 'Optimizing…' : 'AI Optimize'}
                   </button>
                 </div>
               </div>

@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef, useState } from 'react'
+import { useRef, useState, useEffect } from 'react'
 import { useChat } from '@ai-sdk/react'
 import { AgentChat } from '@/components/agent-elements/agent-chat'
 import { useAppStore } from '~/lib/store'
@@ -18,6 +18,15 @@ export function ChatView() {
   const [processing, setProcessing] = useState(false)
 
   const { messages, status, sendMessage, stop } = useChat()
+
+  // ── Auto-send pending chat message (from "Coach for Job" button) ──
+  useEffect(() => {
+    const pending = sessionStorage.getItem('jfs_pending_chat')
+    if (pending) {
+      sessionStorage.removeItem('jfs_pending_chat')
+      sendMessage({ text: pending })
+    }
+  }, [sendMessage])
 
   const handleSend = (message: { role: 'user'; content: string }) => {
     sendMessage({ text: message.content })

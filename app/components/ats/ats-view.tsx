@@ -127,11 +127,23 @@ export function AtsView() {
           <div className="label-mono mb-2">Keyword Analysis</div>
           <div className="flex flex-col gap-3">
             <div>
-              <div className="label-mono mb-1.5 text-[8px]">Missing Keywords</div>
+              <div className="label-mono mb-1.5 text-[8px]">Missing Keywords (click to add)</div>
               <div className="flex flex-wrap gap-1.5">
                 {missing.length > 0 ? missing.map((k) => (
-                  <span key={k} className="rounded-full border px-2 py-0.5 text-[11px]" style={{ background: 'var(--danger-soft)', color: 'var(--destructive)', borderColor: 'rgba(220,38,38,0.2)' }}>{k}</span>
-                )) : <span className="text-[11px] text-muted-foreground">None</span>}
+                  <button
+                    key={k}
+                    onClick={() => {
+                      if (resume) {
+                        updateResume(resume.id, { skills: [...resume.skills, k] })
+                        notify({ message: `Added "${k}" to your skills`, type: 'success' })
+                      }
+                    }}
+                    className="cursor-pointer rounded-full border px-2 py-0.5 text-[11px] transition-all hover:scale-105 active:scale-95"
+                    style={{ background: 'var(--danger-soft)', color: 'var(--destructive)', borderColor: 'rgba(220,38,38,0.2)' }}
+                  >
+                    + {k}
+                  </button>
+                )) : <span className="text-[11px] text-muted-foreground">None — great match!</span>}
               </div>
             </div>
             <div>
@@ -147,7 +159,7 @@ export function AtsView() {
 
         <button
           onClick={injectKeywords}
-          className="flex w-full items-center justify-center gap-1.5 rounded-sm bg-primary py-2 text-xs font-medium text-white hover:bg-primary/80"
+          className="flex w-full cursor-pointer items-center justify-center gap-1.5 rounded-sm bg-primary py-2 text-xs font-medium text-primary-foreground transition-opacity hover:opacity-90"
         >
           <Wand2 size={13} /> Auto-Inject Missing Keywords
         </button>
