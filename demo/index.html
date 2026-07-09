@@ -683,6 +683,7 @@
                 <div style="display:flex; justify-content:space-between; width:100%; align-items:center; background:var(--surface); padding:8px 12px; border:1px solid var(--border); border-radius:var(--radius-sm); flex-shrink:0;">
                   <div style="display:flex; gap:8px">
                     <button class="btn btn-primary btn-xs" onclick="saveActiveResumeEdit()">💾 Save Changes</button>
+                    <button class="btn btn-secondary btn-xs" onclick="saveActiveResumeAsNew()">➕ Save as New</button>
                     <button class="btn btn-secondary btn-xs" onclick="aiOptimizeActiveResume()">🪄 AI Optimize</button>
                   </div>
                   <div style="display:flex; gap:6px">
@@ -1686,6 +1687,71 @@ function saveActiveResumeEdit(){
   // Alert & Switch Tab back to Recommended Jobs
   alert('Resume saved successfully! Switch back to view updated matches.');
   switchResumeTab('jobs');
+}
+
+function saveActiveResumeAsNew(){
+  const r = getActiveResume();
+  if(!r) return;
+  
+  const defaultName = "Copy of " + (document.getElementById('editResumeName').value.trim() || r.name);
+  const newName = prompt("Enter a name for this new resume profile:", defaultName);
+  if (newName === null) return; // User cancelled
+  const cleanNewName = newName.trim();
+  if (!cleanNewName) {
+    alert("Resume name cannot be empty!");
+    return;
+  }
+
+  const newPersona = document.getElementById('editCandidateName').value.trim();
+  const newSummary = document.getElementById('editSummary').value.trim();
+  const newSkillsText = document.getElementById('editSkills').value;
+  const newSkills = newSkillsText.split(',').map(s => s.trim()).filter(Boolean);
+  
+  const newCompany = document.getElementById('editExpCompany').value.trim();
+  const newRole = document.getElementById('editExpRole').value.trim();
+  const newDates = document.getElementById('editExpDates').value.trim();
+  const newBullets = document.getElementById('editExpBullets').value.split('\n').map(b => b.trim()).filter(Boolean);
+  
+  // Calculate Score
+  let baseScore = 70;
+  const allMatchedSkills = ['React', 'TypeScript', 'CSS', 'JavaScript', 'HTML5', 'Node.js', 'PostgreSQL', 'Durable Objects', 'WebSockets', 'Figma'];
+  newSkills.forEach(s => {
+    if (allMatchedSkills.some(m => s.toLowerCase().includes(m.toLowerCase()))) {
+      baseScore += 3;
+    }
+  });
+  const newScore = Math.min(95, baseScore);
+
+  const newId = Date.now();
+  const newResume = {
+    id: newId,
+    name: cleanNewName,
+    persona: newPersona || 'Your Name',
+    score: newScore,
+    updated: 'just now',
+    skills: newSkills,
+    summary: newSummary,
+    experience: [{
+      company: newCompany || 'Company Name',
+      role: newRole || 'Role Title',
+      dates: newDates || '2020 - Present',
+      bullets: newBullets.length > 0 ? newBullets : ['Add achievements here.']
+    }],
+    companies: r.companies, // clone matches
+    stretch: r.stretch
+  };
+
+  // Add to RESUMES and set active
+  RESUMES.push(newResume);
+  activeResumeId = newId;
+  
+  // Persist State
+  saveResumesState();
+  renderSwitcher();
+  
+  // Update detail view and switch to Recommended Jobs tab
+  renderResumeDetailView(newResume);
+  alert(`Created new resume profile "${cleanNewName}" and set it as active!`);
 }
 
 function aiOptimizeActiveResume(){
