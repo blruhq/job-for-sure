@@ -86,8 +86,8 @@ export function ResumeCopilot({ resume }: { resume: Resume }) {
           </div>
         )}
 
-        {messages.map((msg) => (
-          <div key={msg.id} className="mb-3 flex items-start gap-2.5">
+        {messages.map((msg, idx) => (
+          <div key={msg.id} className="mb-3 flex items-start gap-2.5 animate-fade-up" style={{ animationDelay: `${idx * 80}ms`, animationFillMode: 'both' }}>
             {msg.role === 'assistant' && (
               <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-sm bg-primary text-[11px] font-bold text-primary-foreground">AI</div>
             )}

@@ -8,6 +8,7 @@ import { createResume, companyColor, companyLogo } from '~/lib/company-data'
 import { notify } from '~/lib/toast'
 import { BuildWizard, type WizardData } from '~/components/chat/build-wizard'
 import { PasteJDModal } from '~/components/chat/paste-jd-modal'
+import { SkeletonChatMessage, SkeletonCard } from '~/components/ui/skeleton'
 import { Upload, FileText, ClipboardList, Loader2 } from 'lucide-react'
 
 export function ChatView() {
@@ -131,7 +132,7 @@ export function ChatView() {
   }
 
   // ── FETCH AI COMPANY MATCHES ──
-  const fetchCompanyMatches = async (resumeId: number, skills: string[], role: string, summary?: string, experience?: any[]) => {
+  const fetchCompanyMatches = async (resumeId: string, skills: string[], role: string, summary?: string, experience?: any[]) => {
     try {
       const res = await fetch('/api/match-companies', {
         method: 'POST',
@@ -176,7 +177,7 @@ export function ChatView() {
             value={activeResumeId ?? 'none'}
             onChange={(e) => {
               const val = e.target.value
-              if (val !== 'none') setActiveResumeId(parseInt(val))
+              if (val !== 'none') setActiveResumeId(val)
             }}
             disabled={resumes.length === 0}
             className="rounded-xs border border-border bg-background px-1.5 py-0.5 text-[11px] text-foreground outline-none focus:border-primary"
@@ -207,11 +208,20 @@ export function ChatView() {
         </div>
       </div>
 
-      {/* Processing overlay */}
+      {/* Processing skeleton — replaces spinner text with real-looking cards */}
       {processing && (
-        <div className="flex items-center justify-center gap-2 border-b border-border bg-accent-soft/30 px-4 py-2">
-          <Loader2 size={12} className="animate-spin text-primary" />
-          <span className="font-mono text-[10px] text-primary">AI is analyzing your resume…</span>
+        <div className="border-b border-border/50 px-4 py-3 md:px-8">
+          <div className="mx-auto max-w-[680px] space-y-3">
+            <SkeletonChatMessage />
+            <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+              <SkeletonCard lines={2} />
+              <SkeletonCard lines={2} />
+            </div>
+            <div className="flex items-center gap-2 text-muted-foreground">
+              <Loader2 size={10} className="animate-spin text-primary" />
+              <span className="font-mono text-[10px]">AI is analyzing your resume…</span>
+            </div>
+          </div>
         </div>
       )}
 
@@ -219,8 +229,8 @@ export function ChatView() {
       {showEntryCards && (
         <div className="flex flex-col items-center justify-center px-6 py-10">
           <div
-            className="mb-6 text-center text-2xl text-foreground"
-            style={{ fontFamily: 'var(--font-instrument-serif), serif' }}
+            className="mb-6 animate-fade-up text-center text-2xl text-foreground"
+            style={{ fontFamily: 'var(--font-instrument-serif), serif', animationDelay: '0ms', animationFillMode: 'both' }}
           >
             How do you want to start?
           </div>
@@ -228,7 +238,8 @@ export function ChatView() {
             {/* Upload */}
             <button
               onClick={() => fileRef.current?.click()}
-              className="group flex cursor-pointer flex-col items-center rounded-lg border border-border bg-card p-5 text-center transition-all hover:border-primary/30 hover:shadow-sm"
+              className="group flex cursor-pointer flex-col items-center rounded-lg border border-border bg-card p-5 text-center transition-all hover:border-primary/30 hover:shadow-sm animate-fade-up"
+              style={{ animationDelay: '100ms', animationFillMode: 'both' }}
             >
               <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-md bg-accent-soft text-primary transition-transform group-hover:scale-110">
                 <Upload size={18} />
@@ -240,7 +251,8 @@ export function ChatView() {
             {/* Build from Template */}
             <button
               onClick={() => setWizardOpen(true)}
-              className="group flex cursor-pointer flex-col items-center rounded-lg border border-border bg-card p-5 text-center transition-all hover:border-primary/30 hover:shadow-sm"
+              className="group flex cursor-pointer flex-col items-center rounded-lg border border-border bg-card p-5 text-center transition-all hover:border-primary/30 hover:shadow-sm animate-fade-up"
+              style={{ animationDelay: '200ms', animationFillMode: 'both' }}
             >
               <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-md bg-success-soft text-success transition-transform group-hover:scale-110">
                 <FileText size={18} />
@@ -252,7 +264,8 @@ export function ChatView() {
             {/* Paste Job Posting */}
             <button
               onClick={() => setPasteOpen(true)}
-              className="group flex cursor-pointer flex-col items-center rounded-lg border border-border bg-card p-5 text-center transition-all hover:border-primary/30 hover:shadow-sm"
+              className="group flex cursor-pointer flex-col items-center rounded-lg border border-border bg-card p-5 text-center transition-all hover:border-primary/30 hover:shadow-sm animate-fade-up"
+              style={{ animationDelay: '300ms', animationFillMode: 'both' }}
             >
               <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-md bg-warn-soft text-[var(--warn)] transition-transform group-hover:scale-110">
                 <ClipboardList size={18} />
@@ -281,7 +294,7 @@ export function ChatView() {
             { id: 'salary', label: 'Salary advice', value: 'Give me salary advice for my role' },
             { id: 'score', label: 'Score my resume', value: 'Can you score my resume and tell me how to improve it?' },
           ]}
-          className="h-full"
+          className="h-full chat-fade-in"
         />
       </div>
 

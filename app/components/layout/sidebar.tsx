@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { usePathname } from 'next/navigation'
-import { MessageSquare, KanbanSquare, CheckSquare, Settings, Plus } from 'lucide-react'
+import { MessageSquare, KanbanSquare, CheckSquare, Settings, Plus, LogOut } from 'lucide-react'
 import { cn } from '~/lib/utils'
 import { useAppStore } from '~/lib/store'
 import { notify } from '~/lib/toast'
@@ -131,8 +131,11 @@ export function Sidebar() {
       {/* ── Footer ── */}
       <div className="mt-auto border-t border-border p-2">
         <button
-          onClick={() => {
-            localStorage.removeItem('jfs_auth')
+          onClick={async () => {
+            try {
+              const { authClient } = await import('~/lib/auth-client')
+              await authClient.signOut()
+            } catch { /* ignore */ }
             window.location.href = '/login'
           }}
           className={cn(
@@ -142,12 +145,12 @@ export function Sidebar() {
           title="Sign out"
         >
           <div className="flex h-[26px] w-[26px] shrink-0 items-center justify-center rounded-full bg-primary text-[10px] font-semibold text-primary-foreground">
-            JD
+            <LogOut size={13} />
           </div>
           {!c && (
             <div className="min-w-0 flex-1 text-left">
-              <div className="text-xs font-semibold">John Doe</div>
-              <div className="font-mono text-[10px] text-muted-foreground">Sign out →</div>
+              <div className="text-xs font-semibold">Sign out</div>
+              <div className="font-mono text-[10px] text-muted-foreground">End session →</div>
             </div>
           )}
         </button>

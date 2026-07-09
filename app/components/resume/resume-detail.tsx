@@ -13,7 +13,7 @@ function companyKey(c: Company) {
   return (c.name + c.role).replace(/\s+/g, '-').toLowerCase()
 }
 
-export function ResumeDetail({ resumeId }: { resumeId: number }) {
+export function ResumeDetail({ resumeId }: { resumeId: string }) {
   const router = useRouter()
   const { getResume, resumes, addResume, setActiveResumeId, isBookmarked, bookmarkJob, activeResume, toggleBookmark, updateResume } = useAppStore()
   const [tab, setTab] = useState<'jobs' | 'view' | 'editor'>('jobs')
@@ -237,7 +237,7 @@ export function ResumeDetail({ resumeId }: { resumeId: number }) {
                                 }) }}
                                 className={cn(
                                   'flex cursor-pointer items-center gap-1 rounded-xs border px-2 py-1 text-[11px] transition-all hover:scale-[1.02] active:scale-[0.98]',
-                                  bm ? 'border-primary bg-primary text-white' : 'border-border bg-card hover:border-primary hover:text-primary',
+                                  bm ? 'border-primary bg-primary text-primary-foreground' : 'border-border bg-card hover:border-primary hover:text-primary',
                                 )}
                               >
                                 <Bookmark size={11} fill={bm ? 'currentColor' : 'none'} /> {bm ? 'Bookmarked' : 'Bookmark'}
@@ -247,7 +247,7 @@ export function ResumeDetail({ resumeId }: { resumeId: number }) {
                               </button>
                               <button onClick={(e) => {
                                 e.stopPropagation()
-                                const tailored = { ...resume, id: Date.now(), name: `${resume.name} → ${c.name}`, updated: 'just now' }
+                                const tailored = { ...resume, id: String(Date.now()), name: `${resume.name} → ${c.name}`, updated: 'just now' }
                                 addResume(tailored)
                                 setActiveResumeId(tailored.id)
                                 router.push(`/resume/${tailored.id}`)
@@ -343,7 +343,7 @@ export function ResumeDetail({ resumeId }: { resumeId: number }) {
                     <Download size={11} /> Save Changes
                   </button>
                   <button onClick={() => {
-                    const copy = { ...resume, id: Date.now(), name: `${resume.name} (Copy)`, updated: 'just now' }
+                    const copy = { ...resume, id: String(Date.now()), name: `${resume.name} (Copy)`, updated: 'just now' }
                     addResume(copy)
                     setActiveResumeId(copy.id)
                     notify({ message: 'Resume cloned', type: 'success' })

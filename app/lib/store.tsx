@@ -4,26 +4,17 @@ import { createContext, useCallback, useContext, useEffect, useState, type React
 import type { Pipeline, PipelineJob, Resume } from '~/types/resume'
 
 // ═══════════════════════════════════════════════════════════════
-// STORAGE KEYS
-// ═══════════════════════════════════════════════════════════════
-const RESUMES_KEY = 'jfs_resumes'
-const ACTIVE_RESUME_KEY = 'jfs_active_resume_id'
-const PIPELINE_KEY = 'jfs_pipeline'
-
-const EMPTY_PIPELINE: Pipeline = { bookmark: [], applied: [], interviewing: [], offers: [] }
-
-// ═══════════════════════════════════════════════════════════════
 // CONTEXT TYPE
 // ═══════════════════════════════════════════════════════════════
 interface AppStore {
   // Resumes
   resumes: Resume[]
-  activeResumeId: number | null
+  activeResumeId: string | null
   activeResume: Resume | null
-  setActiveResumeId: (id: number) => void
+  setActiveResumeId: (id: string) => void
   addResume: (resume: Resume) => void
-  updateResume: (id: number, updates: Partial<Resume>) => void
-  getResume: (id: number) => Resume | undefined
+  updateResume: (id: string, updates: Partial<Resume>) => void
+  getResume: (id: string) => Resume | undefined
 
   // Pipeline
   pipeline: Pipeline
@@ -44,77 +35,123 @@ interface AppStore {
 
   // Hydration
   hydrated: boolean
+  loading: boolean
 }
 
 const AppCtx = createContext<AppStore | null>(null)
+
+const EMPTY_PIPELINE: Pipeline = { bookmark: [], applied: [], interviewing: [], offers: [] }
+
+// ═══════════════════════════════════════════════════════════════
+// API HELPERS
+// ═══════════════════════════════════════════════════════════════
+
+async function apiGet<T>(url: string): Promise<T> {
+  const res = await fetch(url)
+  if (!res.ok) throw new Error(`GET ${url} failed: ${res.status}`)
+  return res.json()
+}
+
+async function apiPost(url: string, body: unknown): Promise<unknown> {
+  const res = await fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
+  })
+  if (!res.ok) throw new Error(`POST ${url} failed: ${res.status}`)
+  return res.json()
+}
+
+async function apiPatch(url: string, body: unknown): Promise<unknown> {
+  const res = await fetch(url, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
+  })
+  if (!res.ok) throw new Error(`PATCH ${url} failed: ${res.status}`)
+  return res.json()
+}
+
+async function apiDelete(url: string): Promise<unknown> {
+  const res = await fetch(url, { method: 'DELETE' })
+  if (!res.ok) throw new Error(`DELETE ${url} failed: ${res.status}`)
+  return res.json()
+}
 
 // ═══════════════════════════════════════════════════════════════
 // PROVIDER
 // ═══════════════════════════════════════════════════════════════
 export function AppStoreProvider({ children }: { children: ReactNode }) {
   const [hydrated, setHydrated] = useState(false)
+  const [loading, setLoading] = useState(true)
   const [resumes, setResumes] = useState<Resume[]>([])
-  const [activeResumeId, setActiveResumeIdState] = useState<number | null>(null)
+  const [activeResumeId, setActiveResumeIdState] = useState<string | null>(null)
   const [pipeline, setPipeline] = useState<Pipeline>(EMPTY_PIPELINE)
   const [targetCompanyKey, setTargetCompanyKey] = useState<string>('none')
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
 
-  // ── Hydrate from localStorage ──
+  // ── Hydrate from API ──
   useEffect(() => {
-    try {
-      const r = JSON.parse(localStorage.getItem(RESUMES_KEY) || '[]')
-      setResumes(r)
-      const storedId = localStorage.getItem(ACTIVE_RESUME_KEY)
-      setActiveResumeIdState(storedId ? parseInt(storedId) : null)
-      const p = JSON.parse(localStorage.getItem(PIPELINE_KEY) || 'null')
-      if (p) setPipeline(p)
-    } catch { /* noop */ }
-    setHydrated(true)
-  }, [])
+    async function load() {
+      try {
+        const [resumeList, pipelineData] = await Promise.all([
+          apiGet<Array<{ id: string; data: string }>>('/api/resumes'),
+          apiGet<Pipeline>('/api/pipeline').catch(() => EMPTY_PIPELINE),
+        ])
 
-  // ── Persist resumes ──
-  const persistResumes = useCallback((next: Resume[], nextId: number | null) => {
-    localStorage.setItem(RESUMES_KEY, JSON.stringify(next))
-    if (nextId !== null) localStorage.setItem(ACTIVE_RESUME_KEY, String(nextId))
-    else localStorage.removeItem(ACTIVE_RESUME_KEY)
-  }, [])
+        const parsed = resumeList.map((r) => {
+          try { return { ...JSON.parse(r.data), id: r.id } as Resume }
+          catch { return null }
+        }).filter(Boolean) as Resume[]
 
-  // ── Persist pipeline ──
-  const persistPipeline = useCallback((next: Pipeline) => {
-    localStorage.setItem(PIPELINE_KEY, JSON.stringify(next))
+        setResumes(parsed)
+        if (parsed.length > 0) setActiveResumeIdState(parsed[0].id)
+        setPipeline(pipelineData)
+      } catch {
+        // Not authenticated or no data — start empty
+      } finally {
+        setHydrated(true)
+        setLoading(false)
+      }
+    }
+    load()
   }, [])
 
   // ── Actions ──
-  const setActiveResumeId = useCallback((id: number) => {
+  const setActiveResumeId = useCallback((id: string) => {
     setActiveResumeIdState(id)
-    setResumes(prev => {
-      persistResumes(prev, id)
-      return prev
-    })
-  }, [persistResumes])
+  }, [])
 
   const addResume = useCallback((resume: Resume) => {
     setResumes(prev => {
       const next = [...prev, resume]
       setActiveResumeIdState(resume.id)
-      persistResumes(next, resume.id)
+      // Persist to API
+      apiPost('/api/resumes', { id: resume.id, data: resume }).catch(console.error)
       return next
     })
-  }, [persistResumes])
+  }, [])
 
-  const updateResume = useCallback((id: number, updates: Partial<Resume>) => {
+  const updateResume = useCallback((id: string, updates: Partial<Resume>) => {
     setResumes(prev => {
-      const next = prev.map(r => r.id === id ? { ...r, ...updates } : r)
-      persistResumes(next, activeResumeId)
+      const next = prev.map(r => r.id === id ? { ...r, ...updates } as Resume : r)
+      const updated = next.find(r => r.id === id)
+      if (updated) {
+        apiPatch(`/api/resumes/${id}`, { data: updated }).catch(console.error)
+      }
       return next
     })
-  }, [persistResumes, activeResumeId])
+  }, [])
 
-  const getResume = useCallback((id: number) => resumes.find(r => r.id === id), [resumes])
+  const getResume = useCallback((id: string) => resumes.find(r => r.id === id), [resumes])
 
   const activeResume = resumes.find(r => r.id === activeResumeId) ?? null
 
   // ── Pipeline actions ──
+  const persistPipeline = useCallback((next: Pipeline) => {
+    apiPost('/api/pipeline', next).catch(console.error)
+  }, [])
+
   const bookmarkJob = useCallback((job: PipelineJob) => {
     setPipeline(prev => {
       if (prev.bookmark.some(j => j.key === job.key)) return prev
@@ -129,7 +166,7 @@ export function AppStoreProvider({ children }: { children: ReactNode }) {
       const exists = prev.bookmark.some(j => j.key === key)
       const next = exists
         ? { ...prev, bookmark: prev.bookmark.filter(j => j.key !== key) }
-        : prev // only toggle from bookmark col; adding is via bookmarkJob
+        : prev
       persistPipeline(next)
       return next
     })
@@ -190,6 +227,7 @@ export function AppStoreProvider({ children }: { children: ReactNode }) {
     sidebarCollapsed,
     toggleSidebar,
     hydrated,
+    loading,
   }
 
   return <AppCtx.Provider value={value}>{children}</AppCtx.Provider>

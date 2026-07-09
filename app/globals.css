@@ -309,6 +309,9 @@
 .animate-scale-in { animation: scale-in 0.2s var(--ease); }
 .animate-slide-in { animation: slide-in 0.2s var(--ease); }
 
+/* ── AgentElements chat container fade ── */
+.chat-fade-in { animation: fade-up 0.3s var(--ease) both; }
+
 /* ── Scrollbar ── */
 ::-webkit-scrollbar { width: 6px; height: 6px; }
 ::-webkit-scrollbar-track { background: transparent; }

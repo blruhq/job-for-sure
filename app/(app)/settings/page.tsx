@@ -61,7 +61,7 @@ export default function SettingsPage() {
             </div>
             <div className="text-[11px] text-muted-foreground">Free tier · upgrade for unlimited</div>
           </div>
-          <button className="rounded-sm bg-primary px-3 py-1.5 text-xs font-medium text-white hover:bg-primary/80">
+          <button className="cursor-pointer rounded-sm bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground transition-opacity hover:opacity-90">
             Upgrade to Pro
           </button>
         </div>

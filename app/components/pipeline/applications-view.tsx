@@ -1,7 +1,8 @@
 'use client'
 
 import { useState } from 'react'
-import { Trash2, Plus, Link2 } from 'lucide-react'
+import { useRouter } from 'next/navigation'
+import { Trash2, Plus, Link2, MessageSquare, KanbanSquare } from 'lucide-react'
 import { cn } from '~/lib/utils'
 import { useAppStore } from '~/lib/store'
 import { notify } from '~/lib/toast'
@@ -15,6 +16,7 @@ const COLUMNS: { id: PipelineColumnId; label: string; dot: string; next: Pipelin
 ]
 
 export function ApplicationsView() {
+  const router = useRouter()
   const { pipeline, resumes, moveJob, removeJob, clearPipeline } = useAppStore()
   const [filter, setFilter] = useState('all')
   const [draggedKey, setDraggedKey] = useState<string | null>(null)
@@ -76,7 +78,7 @@ export function ApplicationsView() {
                 notify({ message: `Job import from "${url.slice(0, 40)}..." coming soon!`, type: 'info' })
               }
             }}
-            className="flex items-center gap-1.5 rounded-sm bg-primary px-3 py-1.5 text-xs font-medium text-white hover:bg-primary/80"
+            className="flex cursor-pointer items-center gap-1.5 rounded-sm bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground transition-opacity hover:opacity-90"
           >
             <Link2 size={13} /> Import Job
           </button>
@@ -112,7 +114,40 @@ export function ApplicationsView() {
         </select>
       </div>
 
+      {/* Empty state — no jobs at all */}
+      {total === 0 && (
+        <div className="flex flex-col items-center justify-center py-16 text-center">
+          <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-xl border border-border bg-card">
+            <KanbanSquare size={24} className="text-muted-foreground/50" />
+          </div>
+          <h3 className="mb-1 text-sm font-semibold text-foreground">No applications yet</h3>
+          <p className="mb-4 max-w-xs text-xs text-muted-foreground">
+            Bookmark matching jobs from the chat or import a job URL to start tracking.
+          </p>
+          <div className="flex gap-2">
+            <button
+              onClick={() => router.push('/chat')}
+              className="flex cursor-pointer items-center gap-1.5 rounded-sm bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground transition-opacity hover:opacity-90"
+            >
+              <MessageSquare size={12} /> Go to Chat
+            </button>
+            <button
+              onClick={() => {
+                const url = window.prompt('Paste a job URL to import:')
+                if (url && url.trim()) {
+                  notify({ message: `Job import from "${url.slice(0, 40)}..." coming soon!`, type: 'info' })
+                }
+              }}
+              className="flex cursor-pointer items-center gap-1.5 rounded-sm border border-border bg-card px-3 py-1.5 text-xs text-muted-foreground transition-colors hover:bg-background hover:text-foreground"
+            >
+              <Link2 size={12} /> Import Job
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Kanban board */}
+      {total > 0 && (
       <div className="grid grid-cols-4 gap-2.5 items-start max-[1100px]:grid-cols-2 max-[768px]:grid-cols-1">
         {COLUMNS.map((col) => {
           const jobs = filterJobs(pipeline[col.id])
@@ -199,6 +234,7 @@ export function ApplicationsView() {
           )
         })}
       </div>
+      )}
     </div>
   )
 }

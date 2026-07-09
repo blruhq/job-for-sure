@@ -49,7 +49,7 @@ export function Topbar() {
         >
           {theme === 'dark' ? <Sun size={16} /> : <Moon size={16} />}
         </button>
-        <div className="mr-1 flex h-[26px] w-[26px] items-center justify-center rounded-full bg-primary text-[10px] font-semibold text-white">
+        <div className="mr-1 flex h-[26px] w-[26px] items-center justify-center rounded-full bg-primary text-[10px] font-semibold text-primary-foreground">
           JD
         </div>
       </div>

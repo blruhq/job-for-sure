@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { AppStoreProvider, useAppStore } from '~/lib/store'
 import { Sidebar } from '~/components/layout/sidebar'
 import { Topbar } from '~/components/layout/navbar'
+import { Skeleton } from '~/components/ui/skeleton'
 
 function AuthGuard({ children }: { children: React.ReactNode }) {
   const router = useRouter()
@@ -14,29 +15,22 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
     let cancelled = false
 
     async function check() {
-      // 1. Try real Better Auth session
       try {
         const { authClient } = await import('~/lib/auth-client')
         const { data: session } = await authClient.getSession()
-        if (!cancelled && session) {
-          setChecked(true)
-          return
+        if (!cancelled) {
+          if (session) {
+            setChecked(true)
+            return
+          }
+          router.replace('/login')
         }
       } catch {
-        // Auth not configured — fall through to dev bypass
+        // Auth not configured or API unavailable
+        if (!cancelled) {
+          router.replace('/login')
+        }
       }
-
-      // 2. Dev bypass: admin / 123 sets localStorage['jfs_auth']
-      const localAuth = localStorage.getItem('jfs_auth')
-
-      if (cancelled) return
-      if (localAuth) {
-        setChecked(true)
-        return
-      }
-
-      // 3. Not authenticated → redirect
-      router.replace('/login')
     }
 
     check()
@@ -48,8 +42,17 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
 
   if (!checked) {
     return (
-      <div className="flex h-screen items-center justify-center bg-background">
-        <div className="font-mono text-xs text-muted-foreground">Loading…</div>
+      <div className="flex h-screen flex-col items-center justify-center gap-4 bg-background">
+        <div className="flex items-center gap-2">
+          <Skeleton className="h-5 w-5 rounded-[3px]" />
+          <Skeleton className="h-4 w-32" />
+        </div>
+        <div className="flex items-center gap-2 text-muted-foreground">
+          <div className="h-1.5 w-1.5 animate-bounce rounded-full bg-primary/60" style={{ animationDelay: '0ms' }} />
+          <div className="h-1.5 w-1.5 animate-bounce rounded-full bg-primary/60" style={{ animationDelay: '150ms' }} />
+          <div className="h-1.5 w-1.5 animate-bounce rounded-full bg-primary/60" style={{ animationDelay: '300ms' }} />
+        </div>
+        <span className="font-mono text-[10px] text-muted-foreground">Verifying session…</span>
       </div>
     )
   }

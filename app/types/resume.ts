@@ -28,7 +28,7 @@ export interface ResumeExperience {
 export type ResumeTemplate = 'minimalist' | 'modern' | 'classic'
 
 export interface Resume {
-  id: number
+  id: string
   name: string
   persona: string
   email?: string

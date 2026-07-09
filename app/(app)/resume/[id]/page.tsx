@@ -5,5 +5,5 @@ import { ResumeDetail } from '~/components/resume/resume-detail'
 
 export default function ResumeDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params)
-  return <ResumeDetail resumeId={parseInt(id)} />
+  return <ResumeDetail resumeId={id} />
 }

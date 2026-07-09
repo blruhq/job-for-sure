@@ -17,17 +17,6 @@ export default function RegisterPage() {
     setLoading(true)
     setError('')
 
-    // ── DEV BYPASS: admin / 123 ──
-    if (email === 'admin' && password === '123') {
-      localStorage.setItem('jfs_auth', JSON.stringify({
-        user: { name: 'Admin', email: 'admin@jobforsure.app' },
-        ts: Date.now(),
-      }))
-      router.push('/chat')
-      return
-    }
-
-    // ── Better Auth: email/password signup ──
     try {
       const { authClient } = await import('~/lib/auth-client')
       const { data, error: authError } = await authClient.signUp.email({ name, email, password })
@@ -36,8 +25,9 @@ export default function RegisterPage() {
       } else if (data) {
         router.push('/chat')
       }
-    } catch {
-      setError('Auth not configured. Use admin / 123 to demo.')
+    } catch (err) {
+      console.error(err)
+      setError('Failed to create account. Try again.')
     } finally {
       setLoading(false)
     }
@@ -48,7 +38,7 @@ export default function RegisterPage() {
       const { authClient } = await import('~/lib/auth-client')
       await authClient.signIn.social({ provider: 'google' })
     } catch {
-      setError('Google OAuth not configured. Use admin / 123 to demo.')
+      setError('Google OAuth not configured.')
     }
   }
 
@@ -168,9 +158,8 @@ export default function RegisterPage() {
           </p>
         </div>
 
-        {/* Dev hint */}
         <p className="mt-4 text-center font-mono text-[10px] text-muted-foreground/40">
-          Demo? Use <span className="text-muted-foreground/70">admin</span> / <span className="text-muted-foreground/70">123</span>
+          Create an account to sync your data across devices.
         </p>
       </div>
     </div>

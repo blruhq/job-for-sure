@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useMemo } from 'react'
-import { Wand2 } from 'lucide-react'
+import { Wand2, Upload, FileText, ArrowRight } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { cn } from '~/lib/utils'
 import { useAppStore } from '~/lib/store'
@@ -85,7 +85,7 @@ export function AtsView() {
           <label className="label-mono mb-1.5 block">2. Target Resume Profile</label>
           <select
             value={activeResumeId ?? 'none'}
-            onChange={(e) => e.target.value !== 'none' && setActiveResumeId(parseInt(e.target.value))}
+            onChange={(e) => e.target.value !== 'none' && setActiveResumeId(e.target.value)}
             disabled={resumes.length === 0}
             className="w-full rounded-sm border border-border bg-background py-1.5 pl-2.5 pr-8 text-xs outline-none focus:border-primary"
           >
@@ -206,7 +206,35 @@ export function AtsView() {
             </div>
           </div>
         ) : (
-          <div className="py-12 text-center text-sm text-muted-foreground">Upload a resume to scan it.</div>
+          <div className="flex flex-col items-center justify-center py-16 text-center">
+            <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-xl border border-border bg-card">
+              <FileText size={24} className="text-muted-foreground/50" />
+            </div>
+            <h3 className="mb-1 text-sm font-semibold text-foreground">No resume selected</h3>
+            <p className="mb-4 max-w-xs text-xs text-muted-foreground">
+              Select a resume from the dropdown or upload one in chat, then paste a job description to get an ATS match score.
+            </p>
+            <div className="flex gap-2">
+              <button
+                onClick={() => router.push('/chat')}
+                className="flex cursor-pointer items-center gap-1.5 rounded-sm bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground transition-opacity hover:opacity-90"
+              >
+                <Upload size={12} /> Upload Resume
+              </button>
+              <span className="flex items-center text-muted-foreground">
+                <ArrowRight size={14} />
+              </span>
+              <div className="flex items-center gap-1.5 rounded-sm border border-border bg-card px-3 py-1.5 text-xs text-muted-foreground">
+                Select Profile
+              </div>
+              <span className="flex items-center text-muted-foreground">
+                <ArrowRight size={14} />
+              </span>
+              <div className="flex items-center gap-1.5 rounded-sm border border-border bg-card px-3 py-1.5 text-xs text-muted-foreground">
+                Paste JD
+              </div>
+            </div>
+          </div>
         )}
       </div>
     </div>

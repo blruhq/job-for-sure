@@ -19,7 +19,7 @@ export function createResume(data: {
 }): Resume {
   resumeCounter++
   return {
-    id: Date.now() + resumeCounter,
+    id: String(Date.now()) + '_' + resumeCounter,
     name: data.name,
     persona: data.persona,
     email: data.email,

@@ -71,8 +71,8 @@ export function InlineMatchRow({ company }: { company: Company }) {
         className={cn(
           'shrink-0 rounded-xs border px-2 py-1 text-[11px] font-medium transition-all',
           bookmarked
-            ? 'border-primary bg-primary text-white'
-            : 'border-primary/15 bg-accent-soft text-primary hover:bg-primary hover:text-white',
+            ? 'border-primary bg-primary text-primary-foreground'
+            : 'border-primary/15 bg-accent-soft text-primary hover:bg-primary hover:text-primary-foreground',
         )}
       >
         {bookmarked ? (
