@@ -89,6 +89,36 @@
   --shadow-md: 0 1px 3px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.06);
   --shadow-lg: 0 4px 12px rgba(0, 0, 0, 0.06), 0 2px 4px rgba(0, 0, 0, 0.04);
   --shadow-paper: 0 8px 32px rgba(0, 0, 0, 0.06), 0 0 0 1px var(--border);
+
+  /* ── Agent Elements overrides (match our design system) ── */
+  --an-border-radius: 6px;              /* enterprise, not 16px pills */
+  --an-message-border-radius: 6px;
+  --an-input-border-radius: 6px;
+  --an-tool-border-radius: 6px;
+  --an-message-radius-inner-offset: 2px;
+  --an-max-width: 680px;                /* match our chat container */
+  --an-background: var(--background);   /* #F7F6F2 warm paper */
+  --an-background-secondary: var(--secondary);
+  --an-background-tertiary: var(--muted);
+  --an-foreground: var(--foreground);   /* #1C1B16 warm off-black */
+  --an-foreground-muted: var(--muted-foreground);
+  --an-foreground-subtle: #9F9E98;
+  --an-border-color: var(--border);     /* #E6E5DF warm border */
+  --an-primary-color: var(--primary);   /* #5B6ABF steel blue */
+  --an-user-message-bg: var(--accent-soft);  /* soft steel-blue tint */
+  --an-user-message-text: var(--foreground);
+  --an-input-background: var(--card);   /* white surface */
+  --an-input-border-color: var(--border);
+  --an-input-color: var(--foreground);
+  --an-input-placeholder-color: var(--muted-foreground);
+  --an-input-focus-outline: transparent;
+  --an-context-padding: 10px;
+  --an-send-button-bg: var(--primary);
+  --an-send-button-color: #ffffff;
+  --an-tool-background: var(--card);
+  --an-tool-border-color: var(--border);
+  --an-tool-color: var(--foreground);
+  --an-tool-color-muted: var(--muted-foreground);
 }
 
 /* ── Dark mode ── */
@@ -137,6 +167,28 @@
   --shadow-md: 0 1px 3px rgba(0, 0, 0, 0.3), 0 1px 2px rgba(0, 0, 0, 0.2);
   --shadow-lg: 0 4px 12px rgba(0, 0, 0, 0.3), 0 2px 4px rgba(0, 0, 0, 0.2);
   --shadow-paper: 0 8px 32px rgba(0, 0, 0, 0.3), 0 0 0 1px var(--border);
+
+  /* ── Agent Elements dark overrides ── */
+  --an-background: #131312;
+  --an-background-secondary: #1F1F1D;
+  --an-background-tertiary: #1A1A18;
+  --an-foreground: #EFEEE9;
+  --an-foreground-muted: #A5A49D;
+  --an-foreground-subtle: #7D7C76;
+  --an-border-color: rgba(255, 255, 255, 0.07);
+  --an-primary-color: #7B8AD8;
+  --an-user-message-bg: rgba(123, 138, 216, 0.12);
+  --an-user-message-text: #EFEEE9;
+  --an-input-background: #1A1A18;
+  --an-input-border-color: rgba(255, 255, 255, 0.07);
+  --an-input-color: #EFEEE9;
+  --an-input-placeholder-color: #7D7C76;
+  --an-send-button-bg: #7B8AD8;
+  --an-send-button-color: #0a0a0a;
+  --an-tool-background: #1A1A18;
+  --an-tool-border-color: rgba(255, 255, 255, 0.07);
+  --an-tool-color: #EFEEE9;
+  --an-tool-color-muted: #A5A49D;
 }
 
 /* ═══════════════════════════════════════════════════════════════
