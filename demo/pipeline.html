@@ -1,0 +1,329 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Job For Sure · Pipeline</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    /* ══ TOKENS ══ */
+    :root{
+      --bg:#F7F6F2;--surface:#FFFFFF;--sidebar-bg:#EFEEE9;--sidebar-hover:#E8E7E1;--sidebar-active:#E2E1DA;
+      --fg:#1C1B16;--fg-2:#71706A;--muted:#9F9E98;
+      --border:#E6E5DF;--border-soft:#F0EFEA;
+      --accent:#5B6ABF;--accent-hover:#6B7AD0;--accent-soft:rgba(91,106,191,0.08);
+      --success:#2B5F45;--success-soft:rgba(43,95,69,0.08);
+      --warn:#D4A316;--warn-soft:rgba(212,163,22,0.08);
+      --danger:#DC2626;
+      --font-body:"Inter",-apple-system,BlinkMacSystemFont,sans-serif;
+      --font-mono:"JetBrains Mono",ui-monospace,monospace;
+      --text-xs:11px;--text-sm:12px;--text-base:13px;--text-md:14px;--text-lg:16px;--text-xl:18px;--text-2xl:22px;
+      --radius-xs:4px;--radius-sm:6px;--radius-md:8px;
+      --motion-fast:120ms;--motion-base:200ms;--ease:cubic-bezier(0.2,0,0,1);
+      --sidebar-w:220px;--topbar-h:48px;
+    }
+    *,*::before,*::after{box-sizing:border-box;margin:0}
+    body{font-family:var(--font-body);font-size:var(--text-base);line-height:1.5;color:var(--fg);background:var(--bg);-webkit-font-smoothing:antialiased;height:100vh;overflow:hidden}
+    a{color:inherit;text-decoration:none}
+    button{font:inherit;cursor:pointer;border:none;background:none;padding:0;color:inherit}
+    svg{display:block}
+    h1,h2,h3,h4{font-weight:600;letter-spacing:-0.01em}
+    input,textarea,select{font-family:var(--font-body);font-size:var(--text-base);color:var(--fg);outline:none}
+
+    /* ══ APP SHELL ══ */
+    .app{display:flex;flex-direction:column;height:100vh}
+
+    /* ── Topbar ── */
+    .topbar{height:var(--topbar-h);background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 12px;gap:8px;flex-shrink:0;z-index:100}
+    .toggle-sidebar{width:30px;height:30px;display:flex;align-items:center;justify-content:center;border-radius:var(--radius-sm);color:var(--fg-2);transition:all var(--motion-fast)}
+    .toggle-sidebar:hover{background:var(--bg);color:var(--fg)}
+    .brand{display:flex;align-items:center;gap:8px}
+    .brand-mark{width:14px;height:14px;background:var(--accent);border-radius:3px;flex-shrink:0}
+    .brand-name{font-size:var(--text-md);font-weight:600;letter-spacing:-0.02em}
+    .topbar-spacer{flex-grow:1}
+    .icon-btn{width:30px;height:30px;display:flex;align-items:center;justify-content:center;border-radius:var(--radius-sm);color:var(--fg-2);transition:all var(--motion-fast)}
+    .icon-btn:hover{background:var(--bg);color:var(--fg)}
+    .avatar{width:26px;height:26px;border-radius:50%;background:var(--accent);color:white;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;flex-shrink:0}
+
+    /* ── App Body ── */
+    .app-body{display:flex;flex-grow:1;overflow:hidden}
+
+    /* ── Sidebar ── */
+    .sidebar{width:var(--sidebar-w);background:var(--sidebar-bg);border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;transition:margin-left var(--motion-base) var(--ease);overflow:hidden}
+    .sidebar.collapsed{margin-left:calc(var(--sidebar-w) * -1)}
+    .nav-label{font-size:10px;font-family:var(--font-mono);text-transform:uppercase;letter-spacing:0.06em;color:var(--muted);padding:12px 10px 4px 10px}
+    .nav-item{display:flex;align-items:center;gap:8px;padding:6px 10px;margin:0 4px;border-radius:var(--radius-sm);font-size:var(--text-sm);font-weight:500;color:var(--fg-2);transition:all var(--motion-fast);cursor:pointer}
+    .nav-item:hover{background:var(--sidebar-hover);color:var(--fg)}
+    .nav-item.active{background:var(--sidebar-active);color:var(--fg);font-weight:600}
+    .nav-item svg{flex-shrink:0;opacity:0.7}
+    .nav-item.active svg{opacity:1;color:var(--accent)}
+    .nav-badge{margin-left:auto;font-size:10px;font-family:var(--font-mono);background:var(--accent-soft);color:var(--accent);padding:1px 6px;border-radius:var(--radius-xs);font-weight:600}
+    .resume-switcher{padding:4px;margin-bottom:4px}
+    .resume-switcher:empty{display:none}
+    .resume-switch-item{display:flex;align-items:center;gap:8px;padding:6px 8px;margin:0 4px;border-radius:var(--radius-sm);cursor:pointer;transition:all var(--motion-fast)}
+    .resume-switch-item:hover{background:var(--sidebar-hover)}
+    .resume-switch-item.active{background:var(--sidebar-active)}
+    .resume-switch-dot{width:8px;height:8px;border-radius:50%;border:2px solid var(--muted);flex-shrink:0;transition:all var(--motion-fast)}
+    .resume-switch-item.active .resume-switch-dot{border-color:var(--accent);background:var(--accent)}
+    .resume-switch-info{flex-grow:1;min-width:0}
+    .resume-switch-name{font-size:var(--text-sm);font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .resume-switch-score{font-size:10px;font-family:var(--font-mono);color:var(--success);font-weight:600}
+    .sidebar-footer{margin-top:auto;padding:8px;border-top:1px solid var(--border)}
+    .sidebar-user{display:flex;align-items:center;gap:8px;padding:4px}
+    .sidebar-user-name{font-size:var(--text-sm);font-weight:600}
+    .sidebar-user-plan{font-size:10px;color:var(--muted);font-family:var(--font-mono)}
+
+    /* ── Main ── */
+    .main{flex-grow:1;overflow-y:auto;min-width:0;display:flex;flex-direction:column}
+
+    /* ── Buttons ── */
+    .btn{display:inline-flex;align-items:center;gap:5px;padding:6px 12px;border-radius:var(--radius-sm);font-size:var(--text-sm);font-weight:500;transition:all var(--motion-fast);white-space:nowrap;border:1px solid transparent;font-family:var(--font-body);line-height:1.3}
+    .btn:active{transform:translateY(1px)}
+    .btn-primary{background:var(--accent);color:white}
+    .btn-primary:hover{background:var(--accent-hover)}
+    .btn-secondary{background:var(--surface);color:var(--fg-2);border-color:var(--border)}
+    .btn-secondary:hover{background:var(--bg);color:var(--fg)}
+    .btn-ghost{color:var(--fg-2)}
+    .btn-ghost:hover{background:var(--bg);color:var(--fg)}
+
+    /* ══ PIPELINE VIEW ══ */
+    .pipeline-view{padding:24px 32px;overflow-y:auto;flex-grow:1}
+    .pipeline-filters{display:flex;align-items:center;gap:8px;margin-bottom:16px}
+    .pipeline-filter-label{font-size:var(--text-sm);color:var(--muted);font-family:var(--font-mono);text-transform:uppercase;letter-spacing:0.04em;font-size:10px}
+    .pipeline-filter-select{
+      padding:5px 10px;background:var(--surface);border:1px solid var(--border);
+      border-radius:var(--radius-sm);font-family:var(--font-body);font-size:var(--text-sm);
+      color:var(--fg);cursor:pointer;outline:none;transition:border-color var(--motion-fast);
+    }
+    .pipeline-filter-select:focus{border-color:var(--accent)}
+    .page-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
+    .page-head h1{font-size:var(--text-xl);font-weight:600}
+    .page-head .subtitle{font-size:var(--text-sm);color:var(--muted);margin-top:2px}
+    .kanban{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;align-items:start}
+    .kanban-col{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px;min-height:300px}
+    .kanban-col-head{display:flex;align-items:center;justify-content:space-between;padding-bottom:8px;border-bottom:1px solid var(--border-soft);margin-bottom:8px}
+    .kanban-col-name{font-size:var(--text-xs);font-family:var(--font-mono);text-transform:uppercase;letter-spacing:0.05em;color:var(--muted);font-weight:600;display:flex;align-items:center;gap:6px}
+    .kanban-dot{width:6px;height:6px;border-radius:50%}
+    .kanban-count{font-size:10px;font-family:var(--font-mono);color:var(--muted);background:var(--bg);padding:1px 5px;border-radius:var(--radius-xs)}
+    .pipe-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-xs);padding:10px;margin-bottom:6px;transition:border-color var(--motion-fast);cursor:pointer}
+    .pipe-card:hover{border-color:var(--accent)}
+    .pipe-top{display:flex;align-items:center;gap:6px;margin-bottom:6px}
+    .pipe-logo{width:20px;height:20px;border-radius:var(--radius-xs);display:flex;align-items:center;justify-content:center;font-family:var(--font-mono);font-size:8px;font-weight:700;color:white;flex-shrink:0}
+    .pipe-company{font-size:var(--text-xs);font-weight:600}
+    .pipe-score{margin-left:auto;font-family:var(--font-mono);font-size:10px;font-weight:600;padding:1px 5px;border-radius:var(--radius-xs)}
+    .pipe-score.high{background:var(--success-soft);color:var(--success)}
+    .pipe-score.mid{background:var(--warn-soft);color:var(--warn)}
+    .pipe-title{font-size:var(--text-sm);font-weight:500;margin-bottom:4px}
+    .pipe-loc{font-size:var(--text-xs);color:var(--muted);margin-bottom:8px}
+    .pipe-foot{display:flex;align-items:center;justify-content:space-between;padding-top:6px;border-top:1px solid var(--border-soft)}
+    .pipe-time{font-size:10px;color:var(--muted);font-family:var(--font-mono)}
+    .pipe-apply{font-size:var(--text-xs);color:var(--accent);font-weight:500}
+    .pipe-resume{font-size:9px;font-family:var(--font-mono);color:var(--muted);background:var(--bg);padding:1px 5px;border-radius:var(--radius-xs);margin-bottom:6px;display:inline-block}
+
+    /* ══ PIPELINE STATS BAR ══ */
+    .pipeline-stats{display:flex;gap:16px;margin-bottom:20px}
+    .pipeline-stat{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px 16px;flex:1}
+    .pipeline-stat-value{font-size:var(--text-xl);font-weight:600;font-family:var(--font-mono)}
+    .pipeline-stat-label{font-size:var(--text-xs);color:var(--muted);margin-top:2px}
+
+    /* ══ DARK MODE ══ */
+    body.dark{
+      --bg:#131312;--surface:#1A1A18;--sidebar-bg:#161614;--sidebar-hover:#1F1F1D;--sidebar-active:#252522;
+      --fg:#EFEEE9;--fg-2:#A5A49D;--muted:#7D7C76;
+      --border:rgba(255,255,255,0.07);--border-soft:rgba(255,255,255,0.04);
+      --accent:#7B8AD8;--accent-hover:#8B9AE8;--accent-soft:rgba(123,138,216,0.12);
+      --success:#4ADE80;--success-soft:rgba(74,222,128,0.10);
+      --warn:#EAB308;--warn-soft:rgba(234,179,8,0.10);
+    }
+
+    /* ══ RESPONSIVE ══ */
+    @media(max-width:768px){
+      .sidebar{position:fixed;left:0;top:var(--topbar-h);bottom:0;z-index:90}
+      .sidebar.collapsed{margin-left:calc(var(--sidebar-w) * -1)}
+      .kanban{grid-template-columns:1fr}
+      .pipeline-view{padding-left:16px;padding-right:16px}
+      .pipeline-stats{flex-wrap:wrap}
+      .pipeline-stat{min-width:calc(50% - 8px)}
+    }
+    @media(max-width:1100px) and (min-width:769px){
+      .kanban{grid-template-columns:repeat(2,1fr)}
+    }
+  </style>
+</head>
+<body>
+<div class="app">
+
+  <!-- ══ TOPBAR ══ -->
+  <header class="topbar">
+    <button class="toggle-sidebar" id="toggleSidebar" title="Toggle sidebar">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
+    <a href="index.html" class="brand"><div class="brand-mark"></div><span class="brand-name">JOB FOR SURE</span></a>
+    <div class="topbar-spacer"></div>
+    <button class="icon-btn" id="themeToggle" title="Toggle theme">
+      <svg id="iconMoon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      <svg id="iconSun" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+    </button>
+    <div class="avatar">JD</div>
+  </header>
+
+  <!-- ══ APP BODY ══ -->
+  <div class="app-body">
+
+    <!-- ══ SIDEBAR ══ -->
+    <aside class="sidebar" id="sidebar">
+      <div class="nav-label">Navigate</div>
+      <a href="index.html" class="nav-item">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        Chat
+      </a>
+      <a href="pipeline.html" class="nav-item active">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="1"/><line x1="9" y1="3" x2="9" y2="21"/><line x1="15" y1="3" x2="15" y2="21"/></svg>
+        Pipeline
+        <span class="nav-badge" id="pipelineBadge">6</span>
+      </a>
+      <a href="resumes.html" class="nav-item">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+        Resumes
+      </a>
+      <div class="nav-label">Account</div>
+      <a href="index.html#settings" class="nav-item">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        Settings
+      </a>
+      <div class="sidebar-footer">
+        <div class="sidebar-user"><div class="avatar">JD</div><div><div class="sidebar-user-name">John Doe</div><div class="sidebar-user-plan">FREE PLAN</div></div></div>
+      </div>
+    </aside>
+
+    <!-- ══ MAIN ══ -->
+    <main class="main">
+      <section class="pipeline-view">
+        <div class="page-head">
+          <div><h1>Pipeline</h1><div class="subtitle">Track applications across companies</div></div>
+          <button class="btn btn-primary" onclick="alert('Paste a job URL to import')"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>Import Job</button>
+        </div>
+
+        <!-- Stats bar -->
+        <div class="pipeline-stats" id="pipelineStats"></div>
+
+        <div class="pipeline-filters">
+          <span class="pipeline-filter-label">Resume:</span>
+          <select class="pipeline-filter-select" id="pipelineFilter" onchange="renderPipeline()">
+            <option value="all">All Resumes</option>
+          </select>
+        </div>
+        <div class="kanban" id="pipelineBoard"></div>
+      </section>
+    </main>
+
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+// DATA
+// ═══════════════════════════════════════════════════════════════
+const PIPELINE_DATA=[
+  {col:'Sandbox',dot:'#9F9E98',jobs:[
+    {logo:'LN',color:'#5E6AD2',company:'Linear',title:'Lead Frontend Engineer',loc:'Remote',score:94,level:'high',time:'1h ago',url:'https://linear.app/careers',resume:'Frontend Developer'},
+    {logo:'ST',color:'#635BFF',company:'Stripe',title:'Backend Engineer',loc:'South SF',score:95,level:'high',time:'4h ago',url:'https://stripe.com/jobs',resume:'Full-Stack Architect'}
+  ]},
+  {col:'Applied',dot:'#5B6ABF',jobs:[
+    {logo:'VC',color:'#000000',company:'Vercel',title:'Frontend Architect',loc:'Remote',score:90,level:'high',time:'2d ago',url:'https://vercel.com/careers',resume:'Frontend Developer'},
+    {logo:'SB',color:'#3ECF8E',company:'Supabase',title:'Database Engineer',loc:'Remote',score:89,level:'high',time:'4d ago',url:'https://supabase.com/careers',resume:'Full-Stack Architect'}
+  ]},
+  {col:'Interviewing',dot:'#D4A316',jobs:[
+    {logo:'CF',color:'#F38020',company:'Cloudflare',title:'Developer Advocate',loc:'Austin, TX',score:92,level:'high',time:'Tomorrow',url:'https://cloudflare.com/careers',resume:'Frontend Developer'}
+  ]},
+  {col:'Offers',dot:'#2B5F45',jobs:[
+    {logo:'FL',color:'#7B3FF2',company:'Fly.io',title:'Platform UI Designer',loc:'Remote',score:89,level:'high',time:'Received',url:'https://fly.io/about',resume:'Product Designer'}
+  ]}
+];
+
+// ═══════════════════════════════════════════════════════════════
+// SIDEBAR TOGGLE
+// ═══════════════════════════════════════════════════════════════
+document.getElementById('toggleSidebar').addEventListener('click',()=>document.getElementById('sidebar').classList.toggle('collapsed'));
+
+// ═══════════════════════════════════════════════════════════════
+// PIPELINE RENDERER
+// ═══════════════════════════════════════════════════════════════
+function renderPipeline(){
+  // Build filter options
+  const filterEl=document.getElementById('pipelineFilter');
+  const currentFilter=filterEl?filterEl.value:'all';
+  if(filterEl){
+    const resumeNames=['all',...new Set(PIPELINE_DATA.flatMap(c=>c.jobs.map(j=>j.resume)))];
+    filterEl.innerHTML=resumeNames.map(r=>`<option value="${r}" ${r===currentFilter?'selected':''}>${r==='all'?'All Resumes':r}</option>`).join('');
+  }
+
+  // Stats
+  const allJobs=PIPELINE_DATA.flatMap(c=>c.jobs);
+  const total=allJobs.length;
+  const avgScore=Math.round(allJobs.reduce((s,j)=>s+j.score,0)/total);
+  const interviews=PIPELINE_DATA.find(c=>c.col==='Interviewing')?.jobs.length||0;
+  const offers=PIPELINE_DATA.find(c=>c.col==='Offers')?.jobs.length||0;
+  document.getElementById('pipelineStats').innerHTML=`
+    <div class="pipeline-stat"><div class="pipeline-stat-value">${total}</div><div class="pipeline-stat-label">Total Applications</div></div>
+    <div class="pipeline-stat"><div class="pipeline-stat-value" style="color:var(--success)">${avgScore}%</div><div class="pipeline-stat-label">Avg Match Score</div></div>
+    <div class="pipeline-stat"><div class="pipeline-stat-value" style="color:var(--warn)">${interviews}</div><div class="pipeline-stat-label">Interviews</div></div>
+    <div class="pipeline-stat"><div class="pipeline-stat-value" style="color:var(--accent)">${offers}</div><div class="pipeline-stat-label">Offers</div></div>
+  `;
+
+  // Update badge
+  const badge=document.getElementById('pipelineBadge');
+  if(badge)badge.textContent=total;
+
+  // Kanban board
+  document.getElementById('pipelineBoard').innerHTML=PIPELINE_DATA.map(col=>{
+    const jobs=col.jobs.filter(j=>currentFilter==='all'||j.resume===currentFilter);
+    return `
+    <div class="kanban-col">
+      <div class="kanban-col-head">
+        <span class="kanban-col-name"><span class="kanban-dot" style="background:${col.dot}"></span>${col.col}</span>
+        <span class="kanban-count">${jobs.length}</span>
+      </div>
+      ${jobs.map(job=>`
+        <div class="pipe-card" onclick="window.open('${job.url}','_blank')">
+          <div class="pipe-top">
+            <div class="pipe-logo" style="background:${job.color}">${job.logo}</div>
+            <span class="pipe-company">${job.company}</span>
+            <span class="pipe-score ${job.level}">${job.score}%</span>
+          </div>
+          <div class="pipe-title">${job.title}</div>
+          <div class="pipe-loc">${job.loc}</div>
+          <span class="pipe-resume">${job.resume||''}</span>
+          <div class="pipe-foot"><span class="pipe-time">${job.time}</span><span class="pipe-apply">Apply →</span></div>
+        </div>
+      `).join('')}
+    </div>
+  `}).join('');
+}
+
+// ═══════════════════════════════════════════════════════════════
+// THEME
+// ═══════════════════════════════════════════════════════════════
+function toggleTheme(){
+  document.body.classList.toggle('dark');
+  const dark=document.body.classList.contains('dark');
+  localStorage.setItem('theme',dark?'dark':'light');
+  document.getElementById('iconMoon').style.display=dark?'none':'block';
+  document.getElementById('iconSun').style.display=dark?'block':'none';
+}
+if(localStorage.getItem('theme')==='dark'){
+  document.body.classList.add('dark');
+  document.getElementById('iconMoon').style.display='none';
+  document.getElementById('iconSun').style.display='block';
+}
+document.getElementById('themeToggle').addEventListener('click',toggleTheme);
+
+// ═══════════════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════════════
+renderPipeline();
+</script>
+</body>
+</html>
