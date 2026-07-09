@@ -1583,6 +1583,7 @@ function renderMatchesList(list){
               ${bm ? '✓ Bookmarked' : '☆ Bookmark'}
             </button>
             <button class="btn btn-secondary btn-xs" onclick="event.stopPropagation(); coachForJob('${cKey}', '${c.name.replace(/'/g,"\\'")}', '${c.role.replace(/'/g,"\\'")}')">💬 Coach for Job</button>
+            <button class="btn btn-secondary btn-xs" onclick="event.stopPropagation(); cloneAndTailorActiveResume('${c.name.replace(/'/g,"\\'")}', ${c.score})">🪄 Tailor Resume</button>
             <button class="btn btn-primary btn-xs" onclick="window.open('${c.url}','_blank')">Apply Now</button>
           </div>
         </div>
