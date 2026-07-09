@@ -1,48 +1,54 @@
 'use client'
 
-import { Menu, Sun, Moon } from 'lucide-react'
-import { useTheme } from './theme-provider'
+import Link from 'next/link'
+import { PanelLeft, Sun, Moon } from 'lucide-react'
+import { cn } from '~/lib/utils'
+import { useTheme } from '~/components/layout/theme-provider'
+import { useAppStore } from '~/lib/store'
 
-interface Props {
-  collapsed: boolean
-  onMenuToggle: () => void
-}
-
-export function Navbar({ collapsed, onMenuToggle }: Props) {
+export function Topbar() {
   const { theme, toggle } = useTheme()
+  const { sidebarCollapsed, toggleSidebar } = useAppStore()
 
   return (
-    <header className="flex h-[--header-height] shrink-0 border-b border-border">
-      {/* Brand area — matches sidebar width, collapses with it */}
+    <header className="flex h-[var(--topbar-height)] shrink-0 items-center border-b border-border bg-card z-50">
+      {/* Brand area — matches sidebar width, collapses */}
       <div
-        className="flex items-center gap-2.5 h-full border-r border-border px-3 transition-all duration-200 ease-[cubic-bezier(0.2,0,0,1)] overflow-hidden shrink-0"
-        style={{ width: collapsed ? 'var(--sidebar-collapsed)' : 'var(--sidebar-width)' }}
-      >
-        <button
-          onClick={onMenuToggle}
-          className="rounded-lg p-1.5 text-text-secondary hover:bg-hover transition-colors duration-150 shrink-0"
-          aria-label="Toggle sidebar"
-        >
-          <Menu className="h-4 w-4" />
-        </button>
-        {!collapsed && (
-          <span className="text-sm font-[600] tracking-[-0.02em] text-text-primary whitespace-nowrap">
-            Job For Sure
-          </span>
+        className={cn(
+          'flex h-full items-center border-r border-border px-3 transition-all duration-200 shrink-0',
+          sidebarCollapsed ? 'w-[var(--sidebar-collapsed-width)] justify-center px-0' : 'w-[var(--sidebar-width)]',
         )}
+      >
+        <Link href="/chat" className="flex items-center gap-2">
+          <div className="h-3.5 w-3.5 shrink-0 rounded-[3px] bg-primary" />
+          {!sidebarCollapsed && (
+            <span className="text-sm font-semibold tracking-[-0.02em]">JOB FOR SURE</span>
+          )}
+        </Link>
       </div>
 
-      {/* Spacer + actions */}
-      <div className="flex items-center justify-end flex-1 px-4 gap-2">
+      {/* Sidebar toggle */}
+      <button
+        onClick={toggleSidebar}
+        className="ml-1 flex h-[30px] w-[30px] items-center justify-center rounded-sm text-muted-foreground transition-all hover:bg-background hover:text-foreground"
+        title="Toggle sidebar"
+      >
+        <PanelLeft size={15} />
+      </button>
+
+      <div className="flex-1" />
+
+      {/* Actions */}
+      <div className="flex items-center gap-1 pr-1">
         <button
           onClick={toggle}
-          className="rounded-lg p-1.5 text-text-secondary hover:bg-hover transition-colors duration-150"
-          aria-label="Toggle theme"
+          className="relative flex h-[30px] w-[30px] items-center justify-center rounded-sm text-muted-foreground transition-all hover:bg-background hover:text-foreground"
+          title="Toggle theme"
         >
-          {theme === 'dark' ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+          {theme === 'dark' ? <Sun size={16} /> : <Moon size={16} />}
         </button>
-        <div className="h-7 w-7 rounded-full bg-accent-muted flex items-center justify-center text-xs font-[600] text-accent">
-          U
+        <div className="mr-1 flex h-[26px] w-[26px] items-center justify-center rounded-full bg-primary text-[10px] font-semibold text-white">
+          JD
         </div>
       </div>
     </header>

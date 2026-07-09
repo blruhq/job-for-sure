@@ -29,6 +29,9 @@
       ],
       "@/*": [
         "./*"
+      ],
+      "@base-ui/react/*": [
+        "./node_modules/@base-ui-components/react/*"
       ]
     }
   },

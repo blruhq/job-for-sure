@@ -1,22 +1,83 @@
-export interface ResumeData {
-  id: string
-  userId: string
+// ═══════════════════════════════════════════════════════════════
+// DOMAIN TYPES — Match the demo's data model
+// ═══════════════════════════════════════════════════════════════
+
+export interface Company {
+  logo: string
+  color: string
   name: string
-  email: string
-  phone: string
-  location: string
-  summary: string
-  education: Education[]
-  experience: Experience[]
-  skills: Skill[]
-  projects: Project[]
-  extracurricular: Activity[]
-  languages: Language[]
-  templateId: string
-  createdAt: string
-  updatedAt: string
+  role: string
+  loc: string
+  work: 'remote' | 'hybrid' | 'onsite'
+  visa: boolean
+  salary: string
+  score: number
+  level: 'high' | 'mid'
+  url: string
+  missing?: string[]
+  transferable?: string[]
 }
 
+export interface ResumeExperience {
+  company: string
+  role: string
+  dates: string
+  bullets: string[]
+}
+
+export type ResumeTemplate = 'minimalist' | 'modern' | 'classic'
+
+export interface Resume {
+  id: number
+  name: string
+  persona: string
+  email?: string
+  phone?: string
+  location?: string
+  github?: string
+  score: number
+  updated: string
+  skills: string[]
+  summary?: string
+  experience?: ResumeExperience[]
+  companies: Company[]
+  stretch: Company[]
+  template?: ResumeTemplate
+}
+
+export interface PipelineJob {
+  key: string
+  logo: string
+  color: string
+  company: string
+  title: string
+  loc: string
+  score: number
+  level: 'high' | 'mid'
+  time: string
+  url: string
+  resume: string
+}
+
+export interface Pipeline {
+  bookmark: PipelineJob[]
+  applied: PipelineJob[]
+  interviewing: PipelineJob[]
+  offers: PipelineJob[]
+}
+
+export type PipelineColumnId = keyof Pipeline
+
+export interface ChatMessage {
+  id: string
+  role: 'coach' | 'user'
+  name: string
+  content: string
+  kind?: 'text' | 'matches' | 'resume' | 'form' | 'entry'
+  data?: unknown
+}
+
+// Keep legacy types for API routes
 export interface Education {
   institution: string
   degree: string
@@ -24,15 +85,6 @@ export interface Education {
   startDate: string
   endDate: string
   gpa?: string
-}
-
-export interface Experience {
-  company: string
-  role: string
-  location: string
-  startDate: string
-  endDate: string
-  bullets: string[]
 }
 
 export interface Skill {
@@ -56,20 +108,6 @@ export interface Activity {
 export interface Language {
   name: string
   proficiency: 'basic' | 'conversational' | 'fluent' | 'native'
-}
-
-export interface Application {
-  id: string
-  userId: string
-  company: string
-  jobTitle: string
-  jobUrl: string
-  status: 'bookmarked' | 'pending' | 'applied' | 'interview' | 'rejected' | 'offer'
-  tailoredResumeId?: string
-  notes: string
-  appliedAt?: string
-  createdAt: string
-  updatedAt: string
 }
 
 export interface JobDescription {
