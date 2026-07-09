@@ -1066,7 +1066,7 @@
             <!-- Toolbar -->
             <div style="display:flex; justify-content:space-between; width:100%; max-width:550px; align-items:center; background:var(--surface); padding:8px 12px; border:1px solid var(--border); border-radius:var(--radius-sm); margin-bottom:16px; flex-shrink:0;">
               <span style="font-weight:600; font-size:var(--text-xs); color:var(--fg-2)">ATS Real-Time Sheet</span>
-              <button class="btn btn-secondary btn-xs" onclick="switchView('resume')">Edit Resume</button>
+              <button class="btn btn-secondary btn-xs" onclick="editResumeFromAts()">Edit Resume Based on ATS</button>
             </div>
             <!-- Document preview paper sheet -->
             <div class="resume-view-doc-paper" id="atsResumePaper" style="font-family:Georgia, serif; max-width:550px; width:100%; box-shadow:0 8px 32px rgba(0,0,0,0.06), 0 0 0 1px var(--border); min-height:650px;">
@@ -1153,6 +1153,14 @@ function saveResumesState(){
 }
 
 loadResumesState();
+
+// ═══════════════════════════════════════════════════════════════
+// ATS GLOBAL STATE (stores last scan results for cross-tab flow)
+// ═══════════════════════════════════════════════════════════════
+let lastAtsMissing = [];
+let lastAtsMatched = [];
+let lastAtsScore = 0;
+let lastAtsJdText = '';
 
 // ═══════════════════════════════════════════════════════════════
 // SIDEBAR + VIEW SWITCHING
@@ -2369,6 +2377,12 @@ function onAtsInputChange(){
   matchedContainer.innerHTML = matched.length > 0
     ? matched.map(k => `<span class="kw-badge matched" style="background:rgba(16,185,129,0.1); color:var(--success); border:1px solid rgba(16,185,129,0.2); padding:3px 8px; font-size:11px; border-radius:12px;">${k}</span>`).join('')
     : '<span style="color:var(--muted); font-size:11px">None</span>';
+    
+  // Store in globals for cross-tab ATS-to-editor flow
+  lastAtsMissing = missing;
+  lastAtsMatched = matched;
+  lastAtsScore = scorePercent;
+  lastAtsJdText = jdText;
 }
 
 function runAtsOptimization(){
@@ -2402,6 +2416,174 @@ function runAtsOptimization(){
   } else {
     alert('Profile already optimized for this job description.');
   }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// ATS → EDITOR FLOW (Edit Resume from ATS tab)
+// ═══════════════════════════════════════════════════════════════
+// Stores AI-generated bullet suggestions for the Insert buttons
+let atsSuggestions = [];
+
+function editResumeFromAts(){
+  // Switch to resume view → editor tab
+  switchView('resume');
+  switchResumeTab('editor');
+  loadActiveResumeIntoForm();
+  
+  // If no ATS scan data, just show a generic message
+  if (lastAtsMissing.length === 0 && lastAtsScore === 0) {
+    addCopilotMsg("Co-Pilot", "No ATS scan data found. Paste a job description in the **ATS Optimizer** tab first — I'll analyze it and suggest targeted improvements here.", "coach");
+    return;
+  }
+  
+  // Build AI suggestion message based on missing keywords
+  const missing = lastAtsMissing;
+  const matched = lastAtsMatched;
+  const score = lastAtsScore;
+  
+  let summary = '';
+  if (score >= 85) {
+    summary = `✅ **Score: ${score}%** — Your resume is already a strong match! I'll suggest some polish to keep it sharp.`;
+  } else if (score >= 75) {
+    summary = `👍 **Score: ${score}%** — Good match! Injecting the keywords below should push you past 85%.`;
+  } else {
+    summary = `⚠️ **Score: ${score}%** — Several key terms are missing. Add the suggestions below to boost your match rate.`;
+  }
+  
+  // Generate 3 bullet-point suggestions that incorporate missing keywords
+  atsSuggestions = generateAtsSuggestions(missing, matched);
+  
+  let suggestionsHtml = '';
+  atsSuggestions.forEach((s, i) => {
+    suggestionsHtml += `
+      <div style="background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:10px; margin-bottom:8px; font-size:12px; line-height:1.5;">
+        <div style="margin-bottom:6px;">${s.bullet}</div>
+        <button onclick="insertAtsSuggestion(${i})" style="background:var(--primary); color:#fff; border:none; border-radius:6px; padding:4px 12px; font-size:11px; cursor:pointer;">Insert</button>
+        <button onclick="copyAtsSuggestion(${i})" style="background:transparent; color:var(--fg-2); border:1px solid var(--border); border-radius:6px; padding:4px 12px; font-size:11px; cursor:pointer; margin-left:4px;">Copy</button>
+      </div>`;
+  });
+  
+  const missingBadges = missing.length > 0
+    ? missing.map(k => `<span style="display:inline-block; background:rgba(220,38,38,0.1); color:var(--danger); border:1px solid rgba(220,38,38,0.2); padding:2px 8px; font-size:10px; border-radius:10px; margin:2px;">${k}</span>`).join('')
+    : 'None';
+  
+  const matchedBadges = matched.length > 0
+    ? matched.map(k => `<span style="display:inline-block; background:rgba(16,185,129,0.1); color:var(--success); border:1px solid rgba(16,185,129,0.2); padding:2px 8px; font-size:10px; border-radius:10px; margin:2px;">${k}</span>`).join('')
+    : 'None';
+  
+  const msg = `
+    <div style="margin-bottom:8px;">${summary}</div>
+    <div style="margin-bottom:8px;">
+      <strong>Missing:</strong> ${missingBadges}<br>
+      <strong>Matched:</strong> ${matchedBadges}
+    </div>
+    <div style="margin-bottom:6px;"><strong>Suggested bullet points</strong> (click Insert to add to Experience):</div>
+    ${suggestionsHtml}
+    <div style="margin-top:8px; font-size:11px; color:var(--muted);">Edit freely in the form above, then click <strong>Save Changes</strong>.</div>
+  `;
+  
+  addCopilotMsg("ATS Coach", msg, "coach");
+}
+
+function generateAtsSuggestions(missing, matched){
+  const suggestions = [];
+  const r = getActiveResume();
+  const currentRole = (r && r.experience && r.experience[0] && r.experience[0].role) ? r.experience[0].role : 'Lead Engineer';
+  
+  // Template bullet starters keyed by keyword
+  const templates = {
+    'React': [`Architected scalable ${currentRole} component libraries in React, reducing UI development time across 3 product squads.`,
+               `Migrated legacy jQuery interfaces to React, cutting page load times by 38% and improving developer velocity.`],
+    'TypeScript': [`Introduced strict TypeScript typing across the frontend codebase, eliminating an entire class of production runtime errors.`,
+                   `Built and maintained a shared TypeScript type library consumed by 4 micro-frontend applications.`],
+    'Node.js': [`Designed a Node.js API gateway handling 10k+ req/s with sub-50ms p99 latency.`,
+                `Developed Node.js middleware for auth, rate limiting, and request logging serving 2M+ daily users.`],
+    'PostgreSQL': [`Optimized PostgreSQL query performance with strategic indexing and materialized views, reducing report generation from 12s to 400ms.`,
+                   `Designed PostgreSQL schema for a multi-tenant SaaS platform supporting 500+ organizations.`],
+    'Cloudflare Workers': [`Deployed edge functions on Cloudflare Workers for A/B testing and geolocation-based routing, serving 99% of requests in under 10ms.`,
+                           `Built a serverless API on Cloudflare Workers with Durable Objects for real-time collaborative features.`],
+    'Durable Objects': [`Implemented real-time collaboration using Cloudflare Durable Objects with WebSockets, enabling live cursor sync for 50+ concurrent users.`,
+                        `Designed a Durable Objects-based coordination layer for distributed job queues and stateful WebSocket connections.`],
+    'WebSockets': [`Engineered a WebSocket-based real-time notification system handling 100k+ concurrent connections.`,
+                   `Built bidirectional real-time data sync over WebSockets, reducing polling overhead by 90%.`],
+    'Figma': [`Collaborated with design in Figma to prototype, iterate, and hand off UI components, cutting design-to-dev handoff time by 40%.`,
+              `Implemented pixel-perfect UI from Figma mockups, maintaining design system consistency across 120+ components.`],
+    'Git': [`Established Git branching strategy and CI/CD pipelines, enabling 3× weekly deployments with zero regression incidents.`,
+            `Led Git-based monorepo migration, consolidating 5 disparate repos into a unified codebase with shared tooling.`],
+    'HTML5': [`Built accessible HTML5 interfaces complying with WCAG 2.1 AA standards across all public-facing pages.`,
+              `Optimized HTML5 semantic markup for SEO and screen reader compatibility, improving Lighthouse accessibility score from 68 to 96.`],
+    'CSS3': [`Developed a scalable CSS3 design system with CSS custom properties, reducing visual inconsistency bugs by 60%.`,
+             `Implemented responsive CSS3 layouts supporting mobile-first design across 15+ breakpoints.`]
+  };
+  
+  // Default template for any keyword not in the map
+  const defaultTemplate = (kw, role) => [
+    `Applied ${kw} expertise to deliver high-impact features in the ${role} capacity, driving measurable product improvements.`,
+    `Integrated ${kw} into existing architecture, improving system reliability and team velocity.`
+  ];
+  
+  // Pick 2 missing keywords to base suggestions on
+  const keywordsToUse = missing.length >= 2 ? missing.slice(0, 2) : [...missing, ...matched.slice(0, 2 - missing.length)];
+  
+  keywordsToUse.forEach(kw => {
+    const tpls = templates[kw] || defaultTemplate(kw, currentRole);
+    suggestions.push({
+      keyword: kw,
+      bullet: `• ${tpls[0]}`
+    });
+    suggestions.push({
+      keyword: kw,
+      bullet: `• ${tpls[1]}`
+    });
+  });
+  
+  // If we have very few, pad with generic ones
+  if (suggestions.length < 3) {
+    suggestions.push({
+      keyword: 'General',
+      bullet: `• Led cross-functional initiatives to deliver ${currentRole} outcomes ahead of schedule and under budget.`
+    });
+  }
+  
+  return suggestions.slice(0, 4); // max 4 suggestions
+}
+
+function insertAtsSuggestion(index){
+  const bulletText = document.getElementById('editExpBullets');
+  if (!bulletText) return;
+  
+  const suggestion = atsSuggestions[index];
+  if (!suggestion) return;
+  
+  // Append the bullet point on a new line
+  const current = bulletText.value.trim();
+  if (current) {
+    bulletText.value = current + '\n' + suggestion.bullet;
+  } else {
+    bulletText.value = suggestion.bullet;
+  }
+  
+  // Flash effect on the textarea
+  bulletText.style.transition = 'box-shadow 0.3s';
+  bulletText.style.boxShadow = '0 0 0 3px var(--success)';
+  setTimeout(() => { bulletText.style.boxShadow = 'none'; }, 1500);
+}
+
+function copyAtsSuggestion(index){
+  const suggestion = atsSuggestions[index];
+  if (!suggestion) return;
+  
+  navigator.clipboard.writeText(suggestion.bullet.replace('• ', '')).catch(() => {
+    // Fallback: select and copy from a temporary element
+    const textarea = document.createElement('textarea');
+    textarea.value = suggestion.bullet.replace('• ', '');
+    document.body.appendChild(textarea);
+    textarea.select();
+    document.execCommand('copy');
+    document.body.removeChild(textarea);
+  });
+  
+  addCopilotMsg("ATS Coach", `Copied suggestion to clipboard! Paste it anywhere in the form above.`, "coach");
 }
 
 function aiOptimizeActiveResume(){
