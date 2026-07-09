@@ -9,7 +9,7 @@ import { useAppStore } from '~/lib/store'
 
 const NAV_ITEMS = [
   { href: '/chat', label: 'Chat', icon: MessageSquare },
-  { href: '/pipeline', label: 'Pipeline', icon: KanbanSquare, badge: true },
+  { href: '/applications', label: 'Applications', icon: KanbanSquare, badge: true },
   { href: '/ats', label: 'ATS Optimizer', icon: CheckSquare },
 ]
 
