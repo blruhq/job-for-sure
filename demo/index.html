@@ -1094,17 +1094,88 @@ function pasteJD(){
   addCoachMsg(renderInlineForm(formHTML));
 }
 
+let lastPastedJDText = '';
+
 function analyzeJD(){
   const text=document.getElementById('jdPasteArea').value.trim();
   if(!text)return;
   const r=getActiveResume();
   addUserMsg('Analyze this job posting');
   if(!r){coachReply('Upload a resume first, then I can analyze job postings against it!');return}
-  // Simulated analysis
-  const score=Math.floor(Math.random()*20)+75;
+  
+  lastPastedJDText = text;
+  
+  // Detect company
+  let companyName = 'Target Job';
+  const textLower = text.toLowerCase();
+  if(textLower.includes('vercel')) companyName = 'Vercel';
+  else if(textLower.includes('linear')) companyName = 'Linear';
+  else if(textLower.includes('stripe')) companyName = 'Stripe';
+  else if(textLower.includes('supabase')) companyName = 'Supabase';
+  else if(textLower.includes('cloudflare')) companyName = 'Cloudflare';
+  else if(textLower.includes('fly.io') || textLower.includes('fly')) companyName = 'Fly.io';
+
+  const score=Math.floor(Math.random()*15)+75;
   const found=r.skills.filter(s=>text.toLowerCase().includes(s.toLowerCase()));
   const missing=r.skills.filter(s=>!text.toLowerCase().includes(s.toLowerCase())).slice(0,3);
-  coachReply(`I analyzed this posting against your <strong>${r.name}</strong> resume:<br><br><strong>Match: ${score}%</strong><br><br>Skills found in JD: ${found.length>0?found.map(s=>`<span style="color:var(--success);font-weight:600">${s}</span>`).join(', '):'none directly'}<br><br>Your skills not mentioned: ${missing.length>0?missing.join(', '):'none — great overlap!'}<br><br>${score>=85?'Strong match — apply now!':score>=75?'Decent match — consider highlighting your relevant experience.':'Gap is significant — consider building skills first.'}`);
+  
+  coachReply(`
+    I analyzed this posting against your <strong>${r.name}</strong> resume:<br><br>
+    <strong>Match: ${score}%</strong><br><br>
+    Skills found in JD: ${found.length>0?found.map(s=>`<span style="color:var(--success);font-weight:600">${s}</span>`).join(', '):'none directly'}<br><br>
+    Your skills not mentioned in JD: ${missing.length>0?missing.join(', '):'none — great overlap!'}<br><br>
+    Would you like to create a dedicated copy of your resume to optimize specifically for this ${companyName} role? This will preserve your original resume profile.
+    <div style="display:flex; gap:8px; margin-top:12px">
+      <button class="btn btn-primary btn-xs" onclick="cloneAndTailorActiveResume('${companyName.replace(/'/g,"\\'")}', ${score})">Yes, Clone &amp; Tailor</button>
+      <button class="btn btn-secondary btn-xs" onclick="coachReply('No problem! We\\'ll keep working on your master resume profile.')">Keep Master Profile</button>
+    </div>
+  `, 800);
+}
+
+function cloneAndTailorActiveResume(companyName, score){
+  const r = getActiveResume();
+  if(!r) {
+    alert("Please upload or create a resume first!");
+    return;
+  }
+  
+  const newId = Date.now();
+  // Deep clone
+  const newResume = JSON.parse(JSON.stringify(r));
+  newResume.id = newId;
+  newResume.name = `${r.name} - ${companyName}`;
+  newResume.score = score;
+  newResume.updated = 'just now';
+  
+  // Save clone
+  RESUMES.push(newResume);
+  activeResumeId = newId;
+  
+  // Target company automatically
+  const matchedKey = companyName.toLowerCase().replace(/\s+/g, '-');
+  targetCompanyKey = matchedKey;
+  
+  saveResumesState();
+  renderSwitcher();
+  
+  // Transition View & Tab
+  switchView('resume');
+  renderResumeDetailView(newResume);
+  switchResumeTab('editor');
+  
+  // Update AI Co-Pilot chat context
+  const copilotChatBody = document.getElementById('copilotChatBody');
+  if(copilotChatBody){
+    copilotChatBody.innerHTML = `
+      <div class="chat-msg coach">
+        <div class="chat-msg-avatar coach">AI</div>
+        <div class="chat-msg-content">
+          <div class="chat-msg-name">Co-Pilot</div>
+          <div class="chat-msg-bubble">🎯 Loaded context for **${companyName}**! I've created a copy of your resume specifically for this job description.<br><br>I suggest using the **"🪄 AI Optimize"** button in the toolbar above to automatically inject required keywords, or ask me below for specific copy improvements!</div>
+        </div>
+      </div>
+    `;
+  }
 }
 
 // ═══════════════════════════════════════════════════════════════
