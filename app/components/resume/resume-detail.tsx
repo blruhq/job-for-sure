@@ -292,7 +292,7 @@ export function ResumeDetail({ resumeId }: { resumeId: string }) {
                 </select>
               </div>
               <div className="flex gap-1.5">
-                <button onClick={() => notify({ message: 'PDF export coming soon', type: 'info' })} className="rounded-sm px-2 py-1 text-[11px] text-muted-foreground hover:bg-background hover:text-foreground">Export PDF</button>
+                <button onClick={() => window.open(`/api/export/pdf?id=${resume.id}`, '_blank')} className="rounded-sm px-2 py-1 text-[11px] text-muted-foreground hover:bg-background hover:text-foreground">Export PDF</button>
                 <button onClick={() => notify({ message: 'DOCX export coming soon', type: 'info' })} className="rounded-sm px-2 py-1 text-[11px] text-muted-foreground hover:bg-background hover:text-foreground">Export DOCX</button>
               </div>
             </div>

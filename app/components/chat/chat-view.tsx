@@ -9,6 +9,7 @@ import { notify } from '~/lib/toast'
 import { BuildWizard, type WizardData } from '~/components/chat/build-wizard'
 import { PasteJDModal } from '~/components/chat/paste-jd-modal'
 import { SkeletonChatMessage, SkeletonCard } from '~/components/ui/skeleton'
+import { extractPdfText } from '~/lib/pdf-parse'
 import { Upload, FileText, ClipboardList, Loader2 } from 'lucide-react'
 
 export function ChatView() {
@@ -41,12 +42,17 @@ export function ChatView() {
 
     setProcessing(true)
     try {
-      // Read file as text
-      const text = await readFileAsText(file)
+      let text: string
+
+      // Read file based on type
+      if (file.type === 'application/pdf' || file.name.endsWith('.pdf')) {
+        text = await extractPdfText(file)
+      } else {
+        text = await readFileAsText(file)
+      }
 
       if (text.trim().length < 20) {
-        // For PDFs/DOCX that can't be read as plain text
-        notify({ message: 'Could not extract text from this file. Try the Build from Template option.', type: 'error' })
+        notify({ message: 'Could not extract enough text from this file. Try the Build from Template option.', type: 'error' })
         setProcessing(false)
         return
       }
@@ -245,7 +251,7 @@ export function ChatView() {
                 <Upload size={18} />
               </div>
               <div className="text-sm font-semibold text-foreground">Upload Resume</div>
-              <div className="mt-0.5 text-[11px] text-muted-foreground">PDF or text file</div>
+              <div className="mt-0.5 text-[11px] text-muted-foreground">PDF, DOCX, or text</div>
             </button>
 
             {/* Build from Template */}
@@ -302,7 +308,7 @@ export function ChatView() {
       <input
         ref={fileRef}
         type="file"
-        accept=".txt,.md,.text"
+        accept=".txt,.md,.text,.pdf"
         className="hidden"
         onChange={handleFileChange}
       />
