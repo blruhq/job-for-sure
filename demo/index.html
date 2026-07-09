@@ -620,6 +620,7 @@
               <button class="btn btn-secondary btn-xs" onclick="switchView('chat')">← Back to Chat</button>
               <div class="resume-view-tabs">
                 <button class="resume-view-tab active" id="tabBtnJobs" onclick="switchResumeTab('jobs')">Recommended Jobs</button>
+                <button class="resume-view-tab" id="tabBtnView" onclick="switchResumeTab('view')">View Resume</button>
                 <button class="resume-view-tab" id="tabBtnEditor" onclick="switchResumeTab('editor')">Resume Editor</button>
               </div>
             </div>
@@ -630,19 +631,12 @@
           </div>
           <div class="resume-view-body">
             
-            <!-- SUB-VIEW 1: RECOMMENDED JOBS (2 Columns: Doc Preview + Jobs List) -->
+            <!-- SUB-VIEW 1: RECOMMENDED JOBS (Filters + Jobs List ONLY, no resume doc) -->
             <div class="resume-sub-view active" id="subViewJobs">
-              <!-- Left: View-Only Resume Document Preview (40%) -->
-              <div class="resume-view-doc" style="width:40%; max-width:400px;">
-                <div class="resume-view-doc-paper" id="resumePaperDocJobs" style="font-family:Georgia, serif; font-size:10px; padding:18px;">
-                  <!-- Populated by JS -->
-                </div>
-              </div>
-              
-              <!-- Right: Recommended Jobs List with Filters inside (60%) -->
-              <div class="resume-view-matches">
+              <!-- Recommended Jobs List with Filters (100% width) -->
+              <div class="resume-view-matches" style="width: 100%">
                 <!-- Filter Sidebar -->
-                <div class="matches-filter-sidebar">
+                <div class="matches-filter-sidebar" style="border-right:1px solid var(--border)">
                   <div>
                     <div class="filter-group-title">Search Skills</div>
                     <input type="text" class="filter-search-input" id="filterSearch" placeholder="Type a skill..." oninput="onFilterChange()" />
@@ -675,7 +669,24 @@
               </div>
             </div>
 
-            <!-- SUB-VIEW 2: RESUME EDITOR (2 Columns: Form Editor + AI Co-Pilot) -->
+            <!-- SUB-VIEW 2: VIEW RESUME (Centered Document Mockup) -->
+            <div class="resume-sub-view" id="subViewView" style="flex-direction:column; align-items:center; padding:24px; overflow-y:auto; width:100%; height:100%;">
+              <!-- View Toolbar -->
+              <div style="display:flex; justify-content:space-between; width:100%; max-width:600px; align-items:center; background:var(--surface); padding:8px 12px; border:1px solid var(--border); border-radius:var(--radius-sm); margin-bottom:16px; flex-shrink:0;">
+                <span style="font-weight:600; font-size:var(--text-xs); color:var(--fg-2)">Print/Export Options</span>
+                <div style="display:flex; gap:6px">
+                  <button class="btn btn-ghost btn-xs" onclick="alert('PDF export simulated!')">Export PDF</button>
+                  <button class="btn btn-ghost btn-xs" onclick="alert('DOCX export simulated!')">Export DOCX</button>
+                </div>
+              </div>
+              
+              <!-- Paper Document Preview -->
+              <div class="resume-view-doc-paper" id="resumePaperDocView" style="font-family:Georgia, serif; max-width:600px; width:100%; padding:32px; box-shadow:0 8px 32px rgba(0,0,0,0.06), 0 0 0 1px var(--border); min-height:750px;">
+                <!-- Populated by JS -->
+              </div>
+            </div>
+
+            <!-- SUB-VIEW 3: RESUME EDITOR (2 Columns: Form Editor + AI Co-Pilot) -->
             <div class="resume-sub-view" id="subViewEditor">
               <!-- Left Column: Form Editor (65%) -->
               <div class="resume-view-doc" style="width:65%; max-width:none; border-right:none; display:flex; flex-direction:column; gap:12px;">
@@ -1513,9 +1524,9 @@ function toggleDetailBookmark(key, logo, color, name, role, loc, work, score, le
 }
 
 function renderResumePaper(r){
-  // Render Recommended Jobs side paper preview
-  const containerJobs = document.getElementById('resumePaperDocJobs');
-  if(!containerJobs) return;
+  // Render View Resume paper preview
+  const container = document.getElementById('resumePaperDocView');
+  if(!container) return;
   
   const persona = r.persona || 'Your Name';
   const summary = r.summary || `Experienced developer specializing in frontend components, layouts, and web application state.`;
@@ -1552,7 +1563,7 @@ function renderResumePaper(r){
     `;
   }
   
-  containerJobs.innerHTML = `
+  container.innerHTML = `
     <div class="resume-paper-name" style="font-size:14px; font-weight:700">${persona}</div>
     <div class="resume-paper-contact">john@email.com · San Francisco, CA</div>
     
@@ -1584,25 +1595,29 @@ function switchResumeTab(tabName){
   
   // Update tab buttons class
   const tabJobs = document.getElementById('tabBtnJobs');
+  const tabView = document.getElementById('tabBtnView');
   const tabEditor = document.getElementById('tabBtnEditor');
+  
   const viewJobs = document.getElementById('subViewJobs');
+  const viewView = document.getElementById('subViewView');
   const viewEditor = document.getElementById('subViewEditor');
   
-  if(tabJobs && tabEditor && viewJobs && viewEditor){
+  if(tabJobs && tabView && tabEditor && viewJobs && viewView && viewEditor){
+    // Reset active states
+    [tabJobs, tabView, tabEditor].forEach(btn => btn.classList.remove('active'));
+    [viewJobs, viewView, viewEditor].forEach(view => view.classList.remove('active'));
+    
     if(tabName === 'jobs'){
       tabJobs.classList.add('active');
-      tabEditor.classList.remove('active');
       viewJobs.classList.add('active');
-      viewEditor.classList.remove('active');
-      
+    } else if(tabName === 'view'){
+      tabView.classList.add('active');
+      viewView.classList.add('active');
       const r = getActiveResume();
       if(r) renderResumePaper(r);
-    } else {
-      tabJobs.classList.remove('active');
+    } else if(tabName === 'editor'){
       tabEditor.classList.add('active');
-      viewJobs.classList.remove('active');
       viewEditor.classList.add('active');
-      
       loadActiveResumeIntoForm();
     }
   }
