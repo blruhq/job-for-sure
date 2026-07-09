@@ -22,6 +22,14 @@ export function ResumeDetail({ resumeId }: { resumeId: number }) {
 
   const resume = getResume(resumeId)
 
+  // ── Editor form state (MUST be before early return to keep hook order stable) ──
+  const [editName, setEditName] = useState(resume?.name ?? '')
+  const [editPersona, setEditPersona] = useState(resume?.persona ?? '')
+  const [editEmail, setEditEmail] = useState(resume?.email ?? '')
+  const [editLocation, setEditLocation] = useState(resume?.location ?? '')
+  const [editSummary, setEditSummary] = useState(resume?.summary ?? '')
+  const [editSkills, setEditSkills] = useState((resume?.skills ?? []).join(', '))
+
   if (!resume) {
     return (
       <div className="flex flex-1 items-center justify-center text-sm text-muted-foreground">
@@ -47,14 +55,6 @@ export function ResumeDetail({ resumeId }: { resumeId: number }) {
     }
     return true
   })
-
-  // ── Editor form state ──
-  const [editName, setEditName] = useState(resume.name)
-  const [editPersona, setEditPersona] = useState(resume.persona || '')
-  const [editEmail, setEditEmail] = useState(resume.email || '')
-  const [editLocation, setEditLocation] = useState(resume.location || '')
-  const [editSummary, setEditSummary] = useState(resume.summary || '')
-  const [editSkills, setEditSkills] = useState((resume.skills || []).join(', '))
 
   const saveChanges = () => {
     updateResume(resume.id, {
