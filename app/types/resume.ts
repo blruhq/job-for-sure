@@ -77,7 +77,7 @@ export interface ChatMessage {
   data?: unknown
 }
 
-// Keep legacy types for API routes
+// ── Legacy types for API route compatibility ──
 export interface Education {
   institution: string
   degree: string
@@ -85,6 +85,15 @@ export interface Education {
   startDate: string
   endDate: string
   gpa?: string
+}
+
+export interface Experience {
+  company: string
+  role: string
+  location: string
+  startDate: string
+  endDate: string
+  bullets: string[]
 }
 
 export interface Skill {
@@ -108,6 +117,25 @@ export interface Activity {
 export interface Language {
   name: string
   proficiency: 'basic' | 'conversational' | 'fluent' | 'native'
+}
+
+export interface ResumeData {
+  id: string
+  userId: string
+  name: string
+  email: string
+  phone: string
+  location: string
+  summary: string
+  education: Education[]
+  experience: Experience[]
+  skills: Skill[]
+  projects: Project[]
+  extracurricular: Activity[]
+  languages: Language[]
+  templateId: string
+  createdAt: string
+  updatedAt: string
 }
 
 export interface JobDescription {
