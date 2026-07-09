@@ -232,6 +232,14 @@
 
     /* ══ PIPELINE VIEW ══ */
     .pipeline-view{padding:24px 32px;overflow-y:auto;flex-grow:1}
+    .pipeline-filters{display:flex;align-items:center;gap:8px;margin-bottom:16px}
+    .pipeline-filter-label{font-size:var(--text-sm);color:var(--muted);font-family:var(--font-mono);text-transform:uppercase;letter-spacing:0.04em;font-size:10px}
+    .pipeline-filter-select{
+      padding:5px 10px;background:var(--surface);border:1px solid var(--border);
+      border-radius:var(--radius-sm);font-family:var(--font-body);font-size:var(--text-sm);
+      color:var(--fg);cursor:pointer;outline:none;transition:border-color var(--motion-fast);
+    }
+    .pipeline-filter-select:focus{border-color:var(--accent)}
     .page-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
     .page-head h1{font-size:var(--text-xl);font-weight:600}
     .page-head .subtitle{font-size:var(--text-sm);color:var(--muted);margin-top:2px}
@@ -254,6 +262,7 @@
     .pipe-foot{display:flex;align-items:center;justify-content:space-between;padding-top:6px;border-top:1px solid var(--border-soft)}
     .pipe-time{font-size:10px;color:var(--muted);font-family:var(--font-mono)}
     .pipe-apply{font-size:var(--text-xs);color:var(--accent);font-weight:500}
+    .pipe-resume{font-size:9px;font-family:var(--font-mono);color:var(--muted);background:var(--bg);padding:1px 5px;border-radius:var(--radius-xs);margin-bottom:6px;display:inline-block}
 
     /* ══ SETTINGS VIEW ══ */
     .settings-view{padding:24px 32px;max-width:640px;overflow-y:auto;flex-grow:1}
@@ -372,6 +381,12 @@
             <div><h1>Pipeline</h1><div class="subtitle">Track applications across companies</div></div>
             <button class="btn btn-secondary" onclick="alert('Paste a job URL to import')"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>Import Job</button>
           </div>
+          <div class="pipeline-filters">
+            <span class="pipeline-filter-label">Resume:</span>
+            <select class="pipeline-filter-select" id="pipelineFilter" onchange="renderPipeline()">
+              <option value="all">All Resumes</option>
+            </select>
+          </div>
           <div class="kanban" id="pipelineBoard"></div>
         </div>
       </section>
@@ -441,18 +456,18 @@ const COMPANY_DB = {
 
 const PIPELINE_DATA=[
   {col:'Sandbox',dot:'#9F9E98',jobs:[
-    {logo:'LN',color:'#5E6AD2',company:'Linear',title:'Lead Frontend Engineer',loc:'Remote',score:94,level:'high',time:'1h ago',url:'https://linear.app/careers'},
-    {logo:'ST',color:'#635BFF',company:'Stripe',title:'UI Engineer',loc:'South SF',score:86,level:'high',time:'4h ago',url:'https://stripe.com/jobs'}
+    {logo:'LN',color:'#5E6AD2',company:'Linear',title:'Lead Frontend Engineer',loc:'Remote',score:94,level:'high',time:'1h ago',url:'https://linear.app/careers',resume:'Frontend Developer'},
+    {logo:'ST',color:'#635BFF',company:'Stripe',title:'Backend Engineer',loc:'South SF',score:95,level:'high',time:'4h ago',url:'https://stripe.com/jobs',resume:'Full-Stack Architect'}
   ]},
   {col:'Applied',dot:'#5B6ABF',jobs:[
-    {logo:'VC',color:'#000000',company:'Vercel',title:'Frontend Architect',loc:'Remote',score:90,level:'high',time:'2d ago',url:'https://vercel.com/careers'},
-    {logo:'SB',color:'#3ECF8E',company:'Supabase',title:'Database Engineer',loc:'Remote',score:82,level:'mid',time:'4d ago',url:'https://supabase.com/careers'}
+    {logo:'VC',color:'#000000',company:'Vercel',title:'Frontend Architect',loc:'Remote',score:90,level:'high',time:'2d ago',url:'https://vercel.com/careers',resume:'Frontend Developer'},
+    {logo:'SB',color:'#3ECF8E',company:'Supabase',title:'Database Engineer',loc:'Remote',score:89,level:'high',time:'4d ago',url:'https://supabase.com/careers',resume:'Full-Stack Architect'}
   ]},
   {col:'Interviewing',dot:'#D4A316',jobs:[
-    {logo:'CF',color:'#F38020',company:'Cloudflare',title:'Developer Advocate',loc:'Austin, TX',score:92,level:'high',time:'Tomorrow',url:'https://cloudflare.com/careers'}
+    {logo:'CF',color:'#F38020',company:'Cloudflare',title:'Developer Advocate',loc:'Austin, TX',score:92,level:'high',time:'Tomorrow',url:'https://cloudflare.com/careers',resume:'Frontend Developer'}
   ]},
   {col:'Offers',dot:'#2B5F45',jobs:[
-    {logo:'FL',color:'#7B3FF2',company:'Fly.io',title:'Platform UI Designer',loc:'Remote',score:89,level:'high',time:'Received',url:'https://fly.io/about'}
+    {logo:'FL',color:'#7B3FF2',company:'Fly.io',title:'Platform UI Designer',loc:'Remote',score:89,level:'high',time:'Received',url:'https://fly.io/about',resume:'Product Designer'}
   ]}
 ];
 
@@ -869,13 +884,23 @@ function switchResume(id){
 // PIPELINE
 // ═══════════════════════════════════════════════════════════════
 function renderPipeline(){
-  document.getElementById('pipelineBoard').innerHTML=PIPELINE_DATA.map(col=>`
+  // Build filter options
+  const filterEl=document.getElementById('pipelineFilter');
+  const currentFilter=filterEl?filterEl.value:'all';
+  if(filterEl){
+    const resumeNames=['all',...new Set(PIPELINE_DATA.flatMap(c=>c.jobs.map(j=>j.resume)))];
+    filterEl.innerHTML=resumeNames.map(r=>`<option value="${r}" ${r===currentFilter?'selected':''}>${r==='all'?'All Resumes':r}</option>`).join('');
+  }
+
+  document.getElementById('pipelineBoard').innerHTML=PIPELINE_DATA.map(col=>{
+    const jobs=col.jobs.filter(j=>currentFilter==='all'||j.resume===currentFilter);
+    return `
     <div class="kanban-col">
       <div class="kanban-col-head">
         <span class="kanban-col-name"><span class="kanban-dot" style="background:${col.dot}"></span>${col.col}</span>
-        <span class="kanban-count">${col.jobs.length}</span>
+        <span class="kanban-count">${jobs.length}</span>
       </div>
-      ${col.jobs.map(job=>`
+      ${jobs.map(job=>`
         <div class="pipe-card" onclick="window.open('${job.url}','_blank')">
           <div class="pipe-top">
             <div class="pipe-logo" style="background:${job.color}">${job.logo}</div>
@@ -884,11 +909,12 @@ function renderPipeline(){
           </div>
           <div class="pipe-title">${job.title}</div>
           <div class="pipe-loc">${job.loc}</div>
+          <span class="pipe-resume">${job.resume||''}</span>
           <div class="pipe-foot"><span class="pipe-time">${job.time}</span><span class="pipe-apply">Apply →</span></div>
         </div>
       `).join('')}
     </div>
-  `).join('');
+  `}).join('');
 }
 
 // ═══════════════════════════════════════════════════════════════
