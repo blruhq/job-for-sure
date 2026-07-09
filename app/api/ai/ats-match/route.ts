@@ -1,17 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { generateText } from 'ai'
-import { openai } from '@ai-sdk/openai'
+import { generateWithFailover } from '~/lib/ai-providers'
 
 export async function POST(req: NextRequest) {
   try {
     const { resume, jdText } = await req.json()
 
-    const { text } = await generateText({
-      model: openai.chat('glm-4.5-air'),
-      messages: [
-        {
-          role: 'system',
-          content: `You are an ATS (Applicant Tracking System) expert.
+    const text = await generateWithFailover({
+      system: `You are an ATS (Applicant Tracking System) expert.
 You analyze a resume against a job description and return a JSON object with:
 {
   "score": number (0-100),
@@ -21,16 +16,17 @@ You analyze a resume against a job description and return a JSON object with:
 }
 
 Be strict but fair. Only count a keyword as "matched" if it appears with similar meaning.
-Group related terms (e.g., "React" and "React.js" should match).`,
-        },
-        {
-          role: 'user',
-          content: JSON.stringify({ resume, jobDescription: jdText }),
-        },
-      ],
+Group related terms (e.g., "React" and "React.js" should match).
+
+Return ONLY the JSON object, no markdown formatting.`,
+      prompt: `Resume: ${JSON.stringify(resume)}\n\nJob Description: ${jdText}`,
+      temperature: 0.3,
+      maxOutputTokens: 800,
     })
 
-    const result = JSON.parse(text)
+    // Extract JSON from the response (handle markdown code blocks)
+    const jsonMatch = text.match(/\{[\s\S]*\}/)
+    const result = jsonMatch ? JSON.parse(jsonMatch[0]) : JSON.parse(text)
     return NextResponse.json(result)
   } catch (error) {
     return NextResponse.json(

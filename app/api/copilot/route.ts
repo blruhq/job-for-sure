@@ -1,5 +1,4 @@
-import { streamText, convertToModelMessages } from 'ai'
-import { openai } from '@ai-sdk/openai'
+import { streamWithFailover } from '~/lib/ai-providers'
 
 export const maxDuration = 30
 
@@ -35,13 +34,10 @@ Rules:
 - Keep responses under 150 words unless the user asks for detail.
 - If the user asks to "add keywords", list the keywords and show where to add them.`
 
-  const result = streamText({
-    model: openai.chat('glm-4.5-air'),
+  return streamWithFailover({
     system: systemPrompt,
-    messages: await convertToModelMessages(messages),
+    messages,
     temperature: 0.7,
     maxOutputTokens: 800,
   })
-
-  return result.toUIMessageStreamResponse()
 }

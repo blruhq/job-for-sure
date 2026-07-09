@@ -1,5 +1,4 @@
-import { streamText, convertToModelMessages } from 'ai'
-import { openai } from '@ai-sdk/openai'
+import { streamWithFailover } from '~/lib/ai-providers'
 
 export const maxDuration = 30
 
@@ -37,13 +36,10 @@ Rules:
 - For interview prep, give specific questions based on their skills.
 - Keep responses under 200 words unless the user asks for detail.`
 
-  const result = streamText({
-    model: openai.chat('glm-4.5-air'),
+  return streamWithFailover({
     system: systemPrompt,
-    messages: await convertToModelMessages(messages),
+    messages,
     temperature: 0.7,
     maxOutputTokens: 1024,
   })
-
-  return result.toUIMessageStreamResponse()
 }
