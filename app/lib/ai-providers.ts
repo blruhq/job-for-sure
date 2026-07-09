@@ -90,10 +90,12 @@ export async function streamWithFailover(
         maxOutputTokens,
       })
 
-      const uiStream = result.toUIMessageStream()
-      const reader = uiStream.getReader()
+      // Get the SSE-formatted Response (byte stream, not object stream)
+      const response = result.toUIMessageStreamResponse()
+      const body = response.body!
 
-      // Peek at the first chunk with a timeout
+      // Peek at the first chunk to verify the provider is responding
+      const reader = body.getReader()
       const firstChunk = await Promise.race([
         reader.read(),
         timeoutPromise(provider.timeout, provider.name),
@@ -103,23 +105,21 @@ export async function streamWithFailover(
         throw new Error(`${provider.name}: stream ended before any data`)
       }
 
-      const chunkType = (firstChunk.value as any)?.type
-      if (chunkType === 'error') {
-        throw new Error(
-          `${provider.name}: stream error — ` +
-          JSON.stringify((firstChunk.value as any)?.error || 'unknown'),
-        )
+      // Decode the first chunk to check for errors
+      const firstText = new TextDecoder().decode(firstChunk.value)
+      if (firstText.includes('"type":"error"') || response.status >= 400) {
+        throw new Error(`${provider.name}: stream error — ${firstText.slice(0, 200)}`)
       }
 
       // ── SUCCESS ──
-      // Provider is responding. Create a new stream that replays
+      // Provider is responding. Create a byte stream that replays
       // the first chunk, then pipes the rest through.
-      const combinedStream = new ReadableStream({
+      const combinedStream = new ReadableStream<Uint8Array>({
         async start(controller) {
-          // Replay the first chunk we already consumed
+          // Replay the first bytes we already consumed
           controller.enqueue(firstChunk.value)
 
-          // Pipe the remaining chunks
+          // Pipe the remaining bytes
           try {
             while (true) {
               const { value, done } = await reader.read()
