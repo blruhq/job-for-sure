@@ -308,6 +308,65 @@
 
     /* ══ RESUME VIEW ══ */
     .resume-view{display:flex;flex-direction:column;height:100%;flex-grow:1}
+    
+    /* Tabs styling */
+    .resume-view-tabs{
+      display:flex;gap:4px;background:var(--border-soft);padding:3px;border-radius:var(--radius-sm);
+      margin-left: 20px;
+    }
+    .resume-view-tab{
+      font-size:var(--text-xs);padding:4px 12px;border-radius:var(--radius-xs);
+      font-weight:500;color:var(--fg-2);cursor:pointer;transition:all var(--motion-fast);
+      border:none;background:none;font-family:var(--font-body);
+    }
+    .resume-view-tab:hover{color:var(--fg)}
+    .resume-view-tab.active{background:var(--surface);color:var(--fg);box-shadow:0 1px 2px rgba(0,0,0,0.06);font-weight:600}
+
+    /* Sub-views inside view-resume */
+    .resume-sub-view{display:none;flex-grow:1;overflow:hidden;width:100%;height:100%}
+    .resume-sub-view.active{display:flex}
+
+    /* Editor Form Styles */
+    .editor-form{
+      display:flex;flex-direction:column;gap:12px;width:100%;
+    }
+    .editor-form-row{
+      display:flex;gap:12px;
+    }
+    .editor-form-group{
+      display:flex;flex-direction:column;gap:4px;width:100%;
+    }
+    .editor-form-label{
+      font-size:9px;font-family:var(--font-mono);text-transform:uppercase;color:var(--muted);font-weight:600;
+      letter-spacing:0.04em;text-align:left;
+    }
+    .editor-form-input, .editor-form-textarea{
+      width:100%;padding:6px 10px;background:var(--bg);border:1px solid var(--border);
+      border-radius:var(--radius-xs);color:var(--fg);font-family:var(--font-body);font-size:var(--text-xs);
+      outline:none;transition:border-color var(--motion-fast);
+    }
+    .editor-form-textarea{resize:vertical;min-height:60px}
+    .editor-form-input:focus, .editor-form-textarea:focus{border-color:var(--accent)}
+
+    /* Co-pilot sidebar */
+    .copilot-sidebar{
+      width:30%;min-width:280px;max-width:360px;
+      border-left:1px solid var(--border);background:var(--surface);
+      display:flex;flex-direction:column;overflow:hidden;flex-shrink:0;
+    }
+    .copilot-chat-body{
+      flex-grow:1;padding:16px;overflow-y:auto;display:flex;flex-direction:column;gap:10px;background:var(--bg);
+    }
+    .copilot-chat-input-bar{
+      padding:10px;border-top:1px solid var(--border-soft);display:flex;gap:6px;background:var(--surface);
+      align-items:center;
+    }
+    .copilot-chat-input-bar input{
+      flex-grow:1;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-xs);
+      padding:6px 10px;color:var(--fg);font-size:var(--text-xs);outline:none;
+    }
+    .copilot-chat-input-bar input:focus{border-color:var(--accent)}
+
     .resume-view-header{
       display:flex;align-items:center;justify-content:space-between;
       padding:12px 24px;border-bottom:1px solid var(--border);
@@ -497,7 +556,10 @@
         <div class="chat-status-bar">
           <div class="chat-status-item">
             <span class="chat-status-label">Active Profile:</span>
-            <span class="chat-status-value" id="chatActiveResumeName" style="cursor:pointer" onclick="switchResume(activeResumeId)">None (Upload first)</span>
+            <select class="chat-status-select" id="chatActiveResumeSelect" onchange="onChatActiveResumeChange(this.value)">
+              <option value="none">None (Upload first)</option>
+            </select>
+            <button class="btn btn-secondary btn-xs" id="chatViewDetailBtn" onclick="viewActiveResumeDetail()" style="padding: 2px 8px; font-size: 10px; margin-left: 4px;" disabled>👁 View Detail</button>
           </div>
           <div class="chat-status-item">
             <span class="chat-status-label">Target Company:</span>
@@ -554,53 +616,148 @@
       <section class="view" id="view-resume">
         <div class="resume-view">
           <div class="resume-view-header">
-            <button class="btn btn-secondary btn-xs" onclick="switchView('chat')">← Back to Chat</button>
+            <div style="display:flex; align-items:center; gap:8px">
+              <button class="btn btn-secondary btn-xs" onclick="switchView('chat')">← Back to Chat</button>
+              <div class="resume-view-tabs">
+                <button class="resume-view-tab active" id="tabBtnJobs" onclick="switchResumeTab('jobs')">Recommended Jobs</button>
+                <button class="resume-view-tab" id="tabBtnEditor" onclick="switchResumeTab('editor')">Resume Editor</button>
+              </div>
+            </div>
             <div class="resume-view-header-title">
               <h1 id="resHeaderName">resume thai (3)</h1>
               <span class="score" id="resHeaderScore">85% Match</span>
             </div>
           </div>
           <div class="resume-view-body">
-            <!-- Left Panel: Resume Document Preview -->
-            <div class="resume-view-doc">
-              <div class="resume-view-doc-paper" id="resumePaperDoc">
-                <!-- Populated by JS -->
-              </div>
-            </div>
-            <!-- Right Panel: Matching Companies with Filters -->
-            <div class="resume-view-matches">
-              <!-- Filter Sidebar -->
-              <div class="matches-filter-sidebar">
-                <div>
-                  <div class="filter-group-title">Search Skills</div>
-                  <input type="text" class="filter-search-input" id="filterSearch" placeholder="Type a skill..." oninput="onFilterChange()" />
-                </div>
-                <div>
-                  <div class="filter-group-title">Work Policy</div>
-                  <div class="filter-chips">
-                    <button class="filter-chip active" id="chip-policy-all" onclick="togglePolicyFilter('all')">All Policies</button>
-                    <button class="filter-chip" id="chip-policy-remote" onclick="togglePolicyFilter('remote')">Remote Only</button>
-                    <button class="filter-chip" id="chip-policy-hybrid" onclick="togglePolicyFilter('hybrid')">Hybrid Only</button>
-                    <button class="filter-chip" id="chip-policy-onsite" onclick="togglePolicyFilter('onsite')">On-site Only</button>
-                  </div>
-                </div>
-                <div>
-                  <div class="filter-group-title">Min Match Score</div>
-                  <div class="filter-chips">
-                    <button class="filter-chip active" id="chip-score-all" onclick="toggleScoreFilter(0)">All Scores</button>
-                    <button class="filter-chip" id="chip-score-80" onclick="toggleScoreFilter(80)">80%+ Match</button>
-                    <button class="filter-chip" id="chip-score-90" onclick="toggleScoreFilter(90)">90%+ Match</button>
-                  </div>
-                </div>
-              </div>
-              <!-- Matches List -->
-              <div class="matches-cards-pane">
-                <h2 class="matches-pane-title" id="matchesCountTitle">Recommended Roles (0)</h2>
-                <div id="matchesListContainer" style="display:flex; flex-direction:column; gap:12px;">
+            
+            <!-- SUB-VIEW 1: RECOMMENDED JOBS (2 Columns: Doc Preview + Jobs List) -->
+            <div class="resume-sub-view active" id="subViewJobs">
+              <!-- Left: View-Only Resume Document Preview (40%) -->
+              <div class="resume-view-doc" style="width:40%; max-width:400px;">
+                <div class="resume-view-doc-paper" id="resumePaperDocJobs" style="font-family:Georgia, serif; font-size:10px; padding:18px;">
                   <!-- Populated by JS -->
                 </div>
               </div>
+              
+              <!-- Right: Recommended Jobs List with Filters inside (60%) -->
+              <div class="resume-view-matches">
+                <!-- Filter Sidebar -->
+                <div class="matches-filter-sidebar">
+                  <div>
+                    <div class="filter-group-title">Search Skills</div>
+                    <input type="text" class="filter-search-input" id="filterSearch" placeholder="Type a skill..." oninput="onFilterChange()" />
+                  </div>
+                  <div>
+                    <div class="filter-group-title">Work Policy</div>
+                    <div class="filter-chips">
+                      <button class="filter-chip active" id="chip-policy-all" onclick="togglePolicyFilter('all')">All Policies</button>
+                      <button class="filter-chip" id="chip-policy-remote" onclick="togglePolicyFilter('remote')">Remote Only</button>
+                      <button class="filter-chip" id="chip-policy-hybrid" onclick="togglePolicyFilter('hybrid')">Hybrid Only</button>
+                      <button class="filter-chip" id="chip-policy-onsite" onclick="togglePolicyFilter('onsite')">On-site Only</button>
+                    </div>
+                  </div>
+                  <div>
+                    <div class="filter-group-title">Min Match Score</div>
+                    <div class="filter-chips">
+                      <button class="filter-chip active" id="chip-score-all" onclick="toggleScoreFilter(0)">All Scores</button>
+                      <button class="filter-chip" id="chip-score-80" onclick="toggleScoreFilter(80)">80%+ Match</button>
+                      <button class="filter-chip" id="chip-score-90" onclick="toggleScoreFilter(90)">90%+ Match</button>
+                    </div>
+                  </div>
+                </div>
+                <!-- Matches List -->
+                <div class="matches-cards-pane">
+                  <h2 class="matches-pane-title" id="matchesCountTitle">Recommended Roles (0)</h2>
+                  <div id="matchesListContainer" style="display:flex; flex-direction:column; gap:12px;">
+                    <!-- Populated by JS -->
+                  </div>
+                </div>
+              </div>
             </div>
+
+            <!-- SUB-VIEW 2: RESUME EDITOR (2 Columns: Form Editor + AI Co-Pilot) -->
+            <div class="resume-sub-view" id="subViewEditor">
+              <!-- Left Column: Form Editor (65%) -->
+              <div class="resume-view-doc" style="width:65%; max-width:none; border-right:none; display:flex; flex-direction:column; gap:12px;">
+                <!-- Editor Toolbar -->
+                <div style="display:flex; justify-content:space-between; width:100%; align-items:center; background:var(--surface); padding:8px 12px; border:1px solid var(--border); border-radius:var(--radius-sm); flex-shrink:0;">
+                  <div style="display:flex; gap:8px">
+                    <button class="btn btn-primary btn-xs" onclick="saveActiveResumeEdit()">💾 Save Changes</button>
+                    <button class="btn btn-secondary btn-xs" onclick="aiOptimizeActiveResume()">🪄 AI Optimize</button>
+                  </div>
+                  <div style="display:flex; gap:6px">
+                    <button class="btn btn-ghost btn-xs" onclick="alert('PDF export simulated!')">Export PDF</button>
+                    <button class="btn btn-ghost btn-xs" onclick="alert('DOCX export simulated!')">Export DOCX</button>
+                  </div>
+                </div>
+                
+                <!-- Form Paper -->
+                <div class="resume-view-doc-paper" style="font-family:var(--font-body); font-size:12px; overflow-y:auto; flex-grow:1; width:100%">
+                  <div class="editor-form">
+                    <div class="editor-form-row">
+                      <div class="editor-form-group">
+                        <label class="editor-form-label">Resume Name</label>
+                        <input type="text" class="editor-form-input" id="editResumeName" />
+                      </div>
+                      <div class="editor-form-group">
+                        <label class="editor-form-label">Full Name</label>
+                        <input type="text" class="editor-form-input" id="editCandidateName" />
+                      </div>
+                    </div>
+                    
+                    <div class="editor-form-group">
+                      <label class="editor-form-label">Summary</label>
+                      <textarea class="editor-form-textarea" id="editSummary" rows="3"></textarea>
+                    </div>
+                    
+                    <div class="editor-form-group">
+                      <label class="editor-form-label">Technical Skills (comma separated)</label>
+                      <input type="text" class="editor-form-input" id="editSkills" />
+                    </div>
+                    
+                    <div style="border-top:1px solid var(--border-soft); padding-top:12px; margin-top:4px;">
+                      <div class="filter-group-title" style="margin-bottom:12px;">Work Experience</div>
+                      <div class="editor-form-row">
+                        <div class="editor-form-group">
+                          <label class="editor-form-label">Company</label>
+                          <input type="text" class="editor-form-input" id="editExpCompany" />
+                        </div>
+                        <div class="editor-form-group">
+                          <label class="editor-form-label">Job Title</label>
+                          <input type="text" class="editor-form-input" id="editExpRole" />
+                        </div>
+                      </div>
+                      <div class="editor-form-row" style="margin-top:8px">
+                        <div class="editor-form-group">
+                          <label class="editor-form-label">Dates</label>
+                          <input type="text" class="editor-form-input" id="editExpDates" />
+                        </div>
+                      </div>
+                      <div class="editor-form-group" style="margin-top:8px">
+                        <label class="editor-form-label">Job Highlights / Bullets (one per line)</label>
+                        <textarea class="editor-form-textarea" id="editExpBullets" rows="4"></textarea>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Right Column: AI Co-Pilot Chat Sidebar (35%) -->
+              <div class="copilot-sidebar">
+                <div style="padding:10px 16px; border-bottom:1px solid var(--border-soft); background:var(--surface); display:flex; align-items:center; gap:8px">
+                  <span style="font-weight:600; font-size:var(--text-sm)">AI Co-Pilot</span>
+                  <span style="font-family:var(--font-mono); font-size:9px; background:var(--success-soft); color:var(--success); padding:1px 5px; border-radius:var(--radius-xs); font-weight:600">Active</span>
+                </div>
+                <div class="copilot-chat-body" id="copilotChatBody">
+                  <!-- Messages populated by JS -->
+                </div>
+                <div class="copilot-chat-input-bar">
+                  <input type="text" id="copilotChatInput" placeholder="Ask co-pilot to rewrite..." onkeydown="handleCopilotKeypress(event)" />
+                  <button class="btn btn-primary btn-xs" onclick="sendCopilotChat()">Send</button>
+                </div>
+              </div>
+            </div>
+
           </div>
         </div>
       </section>
@@ -1111,31 +1268,61 @@ let targetCompanyKey = 'none';
 
 function updateChatStatusBar(){
   const r = getActiveResume();
-  const nameEl = document.getElementById('chatActiveResumeName');
-  const selectEl = document.getElementById('chatTargetCompanySelect');
-  if(!nameEl || !selectEl) return;
+  const selectEl = document.getElementById('chatActiveResumeSelect');
+  const viewBtn = document.getElementById('chatViewDetailBtn');
+  const targetSelectEl = document.getElementById('chatTargetCompanySelect');
+  if(!selectEl || !targetSelectEl || !viewBtn) return;
   
-  if(!r){
-    nameEl.textContent = 'None (Upload first)';
-    selectEl.innerHTML = `<option value="none">General Career Coach</option>`;
+  if(RESUMES.length === 0){
+    selectEl.innerHTML = `<option value="none">None (Upload first)</option>`;
     selectEl.disabled = true;
+    viewBtn.disabled = true;
+    targetSelectEl.innerHTML = `<option value="none">General Career Coach</option>`;
+    targetSelectEl.disabled = true;
     return;
   }
   
-  nameEl.textContent = r.name;
   selectEl.disabled = false;
+  viewBtn.disabled = false;
+  targetSelectEl.disabled = false;
   
-  const directList = r.companies || [];
-  const stretchList = r.stretch || [];
-  const allCompanies = [...directList, ...stretchList];
+  // Populate active resumes dropdown
+  selectEl.innerHTML = RESUMES.map(res => `
+    <option value="${res.id}" ${res.id === activeResumeId ? 'selected' : ''}>${res.name} (${res.score}%)</option>
+  `).join('');
   
-  let optionsHtml = `<option value="none" ${targetCompanyKey==='none'?'selected':''}>General Career Coach</option>`;
-  allCompanies.forEach(c => {
-    const key = (c.name+c.role).replace(/\s+/g,'-').toLowerCase();
-    optionsHtml += `<option value="${key}" data-name="${c.name}" data-role="${c.role}" ${targetCompanyKey===key?'selected':''}>${c.name} (${c.role})</option>`;
-  });
-  
-  selectEl.innerHTML = optionsHtml;
+  // Populate matching companies dropdown based on active profile
+  const activeRes = getActiveResume();
+  if (activeRes) {
+    const directList = activeRes.companies || [];
+    const stretchList = activeRes.stretch || [];
+    const allCompanies = [...directList, ...stretchList];
+    
+    let optionsHtml = `<option value="none" ${targetCompanyKey === 'none' ? 'selected' : ''}>General Career Coach</option>`;
+    allCompanies.forEach(c => {
+      const key = (c.name+c.role).replace(/\s+/g,'-').toLowerCase();
+      optionsHtml += `<option value="${key}" data-name="${c.name}" data-role="${c.role}" ${targetCompanyKey === key ? 'selected' : ''}>${c.name} (${c.role})</option>`;
+    });
+    targetSelectEl.innerHTML = optionsHtml;
+  }
+}
+
+function onChatActiveResumeChange(val){
+  activeResumeId = parseInt(val);
+  renderSwitcher(); // updates sidebar and status bar
+  const r = getActiveResume();
+  if (r) {
+    addUserMsg(`Switch profile to ${r.name}`);
+    coachReply(`Switched active profile to <strong>${r.name}</strong> (${r.score}% Match). Matches have been updated!`);
+  }
+}
+
+function viewActiveResumeDetail(){
+  const r = getActiveResume();
+  if(r) {
+    switchView('resume');
+    renderResumeDetailView(r);
+  }
 }
 
 function onTargetCompanyChange(val){
@@ -1156,9 +1343,17 @@ function onTargetCompanyChange(val){
   }
 }
 
+function coachForJob(companyKey, companyName, roleName) {
+  switchView('chat');
+  targetCompanyKey = companyKey;
+  updateChatStatusBar();
+  addUserMsg(`Target ${companyName} (${roleName})`);
+  coachReply(`🎯 **Tailored Coaching for ${companyName} Active!**<br><br>I've loaded the specifications for the **${roleName}** position at ${companyName}. Ask me anything about their interview process, how to answer behaviorals, or how to optimize your resume for them!`);
+}
+
 function renderSwitcher(){
   const el=document.getElementById('resumeSwitcher');
-  saveResumesState(); // Persist the switcher state to localStorage
+  saveResumesState(); // Persist switcher state to localStorage
   updateChatStatusBar();
   if(RESUMES.length===0){el.innerHTML='';return}
   el.innerHTML=RESUMES.map(r=>`
@@ -1275,6 +1470,7 @@ function renderMatchesList(list){
             <button id="bm-detail-${cKey}" class="btn btn-secondary btn-xs" onclick="event.stopPropagation(); toggleDetailBookmark('${cKey}', '${c.logo}', '${c.color}', '${c.name.replace(/'/g,"\\'")}', '${c.role.replace(/'/g,"\\'")}', '${c.loc}', '${c.work}', ${c.score}, '${c.level}', '${c.url}')">
               ${bm ? '✓ Bookmarked' : '☆ Bookmark'}
             </button>
+            <button class="btn btn-secondary btn-xs" onclick="event.stopPropagation(); coachForJob('${cKey}', '${c.name.replace(/'/g,"\\'")}', '${c.role.replace(/'/g,"\\'")}')">💬 Coach for Job</button>
             <button class="btn btn-primary btn-xs" onclick="window.open('${c.url}','_blank')">Apply Now</button>
           </div>
         </div>
@@ -1316,8 +1512,9 @@ function toggleDetailBookmark(key, logo, color, name, role, loc, work, score, le
 }
 
 function renderResumePaper(r){
-  const container = document.getElementById('resumePaperDoc');
-  if(!container) return;
+  // Render Recommended Jobs side paper preview
+  const containerJobs = document.getElementById('resumePaperDocJobs');
+  if(!containerJobs) return;
   
   const persona = r.persona || 'Your Name';
   const summary = r.summary || `Experienced developer specializing in frontend components, layouts, and web application state.`;
@@ -1328,11 +1525,11 @@ function renderResumePaper(r){
     expHtml = r.experience.map(exp => `
       <div class="resume-paper-job">
         <div class="resume-paper-job-header">
-          <span>${exp.role}</span>
-          <span style="font-family:var(--font-mono); font-size:9px; color:var(--muted)">${exp.dates || '2020 - Present'}</span>
+          <span style="font-weight:600">${exp.role}</span>
+          <span style="font-family:var(--font-mono); font-size:8px; color:var(--muted)">${exp.dates || '2020 - Present'}</span>
         </div>
-        <div style="font-style:italic; font-size:10px; margin-bottom:4px">${exp.company}</div>
-        <ul style="padding-left:14px; margin:0; color:var(--fg-2)">
+        <div style="font-style:italic; font-size:9px; margin-bottom:2px">${exp.company}</div>
+        <ul style="padding-left:12px; margin:0; color:var(--fg-2)">
           ${(exp.bullets || []).map(b => `<li>${b}</li>`).join('')}
         </ul>
       </div>
@@ -1341,11 +1538,11 @@ function renderResumePaper(r){
     expHtml = `
       <div class="resume-paper-job">
         <div class="resume-paper-job-header">
-          <span>Software Engineer</span>
-          <span style="font-family:var(--font-mono); font-size:9px; color:var(--muted)">2022 - Present</span>
+          <span style="font-weight:600">Software Engineer</span>
+          <span style="font-family:var(--font-mono); font-size:8px; color:var(--muted)">2022 - Present</span>
         </div>
-        <div style="font-style:italic; font-size:10px; margin-bottom:4px">Cloudburst Software</div>
-        <ul style="padding-left:14px; margin:0; color:var(--fg-2)">
+        <div style="font-style:italic; font-size:9px; margin-bottom:2px">Cloudburst Software</div>
+        <ul style="padding-left:12px; margin:0; color:var(--fg-2)">
           <li>Engineered modular codebases using clean design patterns.</li>
           <li>Optimized critical user flows, boosting performance by 25%.</li>
           <li>Collaborated with design and product teams on design system features.</li>
@@ -1354,8 +1551,8 @@ function renderResumePaper(r){
     `;
   }
   
-  container.innerHTML = `
-    <div class="resume-paper-name">${persona}</div>
+  containerJobs.innerHTML = `
+    <div class="resume-paper-name" style="font-size:14px; font-weight:700">${persona}</div>
     <div class="resume-paper-contact">john@email.com · San Francisco, CA</div>
     
     <div class="resume-paper-section">
@@ -1377,11 +1574,218 @@ function renderResumePaper(r){
   `;
 }
 
+// ═══════════════════════════════════════════════════════════════
+// TABS SWITCHING (Jobs vs Editor)
+// ═══════════════════════════════════════════════════════════════
+let currentResumeTab = 'jobs';
+function switchResumeTab(tabName){
+  currentResumeTab = tabName;
+  
+  // Update tab buttons class
+  const tabJobs = document.getElementById('tabBtnJobs');
+  const tabEditor = document.getElementById('tabBtnEditor');
+  const viewJobs = document.getElementById('subViewJobs');
+  const viewEditor = document.getElementById('subViewEditor');
+  
+  if(tabJobs && tabEditor && viewJobs && viewEditor){
+    if(tabName === 'jobs'){
+      tabJobs.classList.add('active');
+      tabEditor.classList.remove('active');
+      viewJobs.classList.add('active');
+      viewEditor.classList.remove('active');
+      
+      const r = getActiveResume();
+      if(r) renderResumePaper(r);
+    } else {
+      tabJobs.classList.remove('active');
+      tabEditor.classList.add('active');
+      viewJobs.classList.remove('active');
+      viewEditor.classList.add('active');
+      
+      loadActiveResumeIntoForm();
+    }
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// RESUME EDITOR FORM BINDINGS & ACTIONS
+// ═══════════════════════════════════════════════════════════════
+function loadActiveResumeIntoForm(){
+  const r = getActiveResume();
+  if(!r) return;
+  
+  document.getElementById('editResumeName').value = r.name || '';
+  document.getElementById('editCandidateName').value = r.persona || 'Your Name';
+  document.getElementById('editSummary').value = r.summary || '';
+  document.getElementById('editSkills').value = (r.skills || []).join(', ');
+  
+  const exp = r.experience && r.experience[0] ? r.experience[0] : {company:'', role:'', dates:'', bullets:[]};
+  document.getElementById('editExpCompany').value = exp.company || '';
+  document.getElementById('editExpRole').value = exp.role || '';
+  document.getElementById('editExpDates').value = exp.dates || '';
+  document.getElementById('editExpBullets').value = (exp.bullets || []).join('\n');
+  
+  // Clear co-pilot chat except welcoming message
+  const chatBody = document.getElementById('copilotChatBody');
+  if (chatBody) {
+    chatBody.innerHTML = `
+      <div class="chat-msg coach">
+        <div class="chat-msg-avatar coach">AI</div>
+        <div class="chat-msg-content">
+          <div class="chat-msg-name">Co-Pilot</div>
+          <div class="chat-msg-bubble">Hey! I'm your AI Resume Co-pilot. Ask me to rewrite sections of your resume, add new keywords, or generate experience bullet points matching your target job!</div>
+        </div>
+      </div>
+    `;
+  }
+}
+
+function saveActiveResumeEdit(){
+  const r = getActiveResume();
+  if(!r) return;
+  
+  const newName = document.getElementById('editResumeName').value.trim();
+  const newPersona = document.getElementById('editCandidateName').value.trim();
+  const newSummary = document.getElementById('editSummary').value.trim();
+  const newSkillsText = document.getElementById('editSkills').value;
+  const newSkills = newSkillsText.split(',').map(s => s.trim()).filter(Boolean);
+  
+  const newCompany = document.getElementById('editExpCompany').value.trim();
+  const newRole = document.getElementById('editExpRole').value.trim();
+  const newDates = document.getElementById('editExpDates').value.trim();
+  const newBullets = document.getElementById('editExpBullets').value.split('\n').map(b => b.trim()).filter(Boolean);
+  
+  // Save edits back to RESUMES array
+  r.name = newName || r.name;
+  r.persona = newPersona || r.persona;
+  r.summary = newSummary;
+  r.skills = newSkills;
+  r.experience = [{
+    company: newCompany || 'Company Name',
+    role: newRole || 'Role Title',
+    dates: newDates || '2020 - Present',
+    bullets: newBullets.length > 0 ? newBullets : ['Add achievements here.']
+  }];
+  
+  // Dynamic Score Calculation
+  let baseScore = 70;
+  // Look at target company or matches to boost score if skills overlap
+  const targetKey = targetCompanyKey !== 'none' ? targetCompanyKey : '';
+  const allMatchedSkills = ['React', 'TypeScript', 'CSS', 'JavaScript', 'HTML5', 'Node.js', 'PostgreSQL', 'Durable Objects', 'WebSockets', 'Figma'];
+  newSkills.forEach(s => {
+    if (allMatchedSkills.some(m => s.toLowerCase().includes(m.toLowerCase()))) {
+      baseScore += 3;
+    }
+  });
+  r.score = Math.min(95, baseScore);
+  
+  // Persist State
+  saveResumesState();
+  renderSwitcher();
+  
+  // Alert & Switch Tab back to Recommended Jobs
+  alert('Resume saved successfully! Switch back to view updated matches.');
+  switchResumeTab('jobs');
+}
+
+function aiOptimizeActiveResume(){
+  const r = getActiveResume();
+  if(!r) return;
+  
+  // Trigger co-pilot response with progress
+  addCopilotMsg("Co-Pilot", "Starting AI Optimization sequence...", "coach");
+  
+  setTimeout(() => {
+    // Collect active target details if any
+    let missingSkills = ['PostgreSQL', 'WebSockets', 'Cloudflare Workers'];
+    if (targetCompanyKey !== 'none') {
+      const selectEl = document.getElementById('chatTargetCompanySelect');
+      const opt = selectEl.querySelector(`option[value="${targetCompanyKey}"]`);
+      const targetName = opt ? opt.getAttribute('data-name') : 'target company';
+      addCopilotMsg("Co-Pilot", `Analyzing keyword intersections for **${targetName}**...`, "coach");
+    } else {
+      addCopilotMsg("Co-Pilot", `Analyzing keyword intersections for standard Lead Frontend stacks...`, "coach");
+    }
+  }, 800);
+  
+  setTimeout(() => {
+    // Inject skills
+    const skillsInput = document.getElementById('editSkills');
+    let currentSkills = skillsInput.value.split(',').map(s => s.trim()).filter(Boolean);
+    const skillsToInject = ['PostgreSQL', 'WebSockets', 'Cloudflare Workers', 'Durable Objects'];
+    skillsToInject.forEach(s => {
+      if(!currentSkills.some(cs => cs.toLowerCase() === s.toLowerCase())) {
+        currentSkills.push(s);
+      }
+    });
+    skillsInput.value = currentSkills.join(', ');
+    
+    // Optimize Summary
+    const summaryText = document.getElementById('editSummary');
+    summaryText.value = `Lead Frontend Developer with expert command over single-page architectures, WebSockets, PostgreSQL, and scalable serverless runtimes like Cloudflare Workers and Durable Objects.`;
+    
+    addCopilotMsg("Co-Pilot", `✨ **ATS Optimization complete!**<br><br>I've injected matching technical keys (PostgreSQL, WebSockets, Cloudflare Workers, Durable Objects) and updated your professional summary to highlight system designs. Click **"Save Changes"** to commit this directly!`, "coach");
+  }, 1800);
+}
+
+// ═══════════════════════════════════════════════════════════════
+// AI CO-PILOT CHAT FUNCTIONALITY (Sidebar inside Resume Editor)
+// ═══════════════════════════════════════════════════════════════
+function addCopilotMsg(sender, text, role){
+  const chatBody = document.getElementById('copilotChatBody');
+  if(!chatBody) return;
+  
+  const div = document.createElement('div');
+  div.className = `chat-msg ${role}`;
+  div.innerHTML = `<div class="chat-msg-avatar ${role === 'coach' ? 'coach' : 'user'}">${role === 'coach' ? 'AI' : 'JD'}</div><div class="chat-msg-content"><div class="chat-msg-name">${sender}</div><div class="chat-msg-bubble">${text}</div></div>`;
+  chatBody.appendChild(div);
+  chatBody.scrollTop = chatBody.scrollHeight;
+}
+
+function handleCopilotKeypress(e){
+  if(e.key === 'Enter') sendCopilotChat();
+}
+
+function sendCopilotChat(){
+  const input = document.getElementById('copilotChatInput');
+  if(!input) return;
+  const text = input.value.trim();
+  if(!text) return;
+  
+  addCopilotMsg("You", text, "user");
+  input.value = '';
+  
+  setTimeout(() => {
+    let reply = `I can help rewrite sections of your resume! Try typing:
+    - *"rewrite my summary to sound more senior"*
+    - *"improve my job bullet points"*
+    - *"suggest technical skills to add"*`;
+    
+    const lower = text.toLowerCase();
+    if(lower.includes('summary') || lower.includes('rewrite summary')){
+      reply = `Here is a tailored summary proposal:<br><br>*"Results-oriented Lead Engineer specializing in performance-optimized user interfaces, micro-frontends, and real-time state management systems."*<br><br>Copy and paste it into the summary box above!`;
+    } else if(lower.includes('bullet') || lower.includes('job') || lower.includes('experience')){
+      reply = `Here are optimized experience highlights:<br><br>1. *"- Engineered real-time UI components using WebSockets, driving user interaction by 32%."*<br>2. *"- Streamlined frontend bundle size by 24% via modular imports and code-splitting."*<br><br>You can append these to your bullets list!`;
+    } else if(lower.includes('skills') || lower.includes('technical')){
+      reply = `I suggest adding **Docker, Node.js, GraphQL, WebSockets, PostgreSQL** to your technical skills matrix.`;
+    }
+    
+    addCopilotMsg("Co-Pilot", reply, "coach");
+  }, 800);
+}
+
+// ═══════════════════════════════════════════════════════════════
+// RESUME DETAIL VIEW MAIN RENDERER
+// ═══════════════════════════════════════════════════════════════
 function renderResumeDetailView(r){
   document.getElementById('resHeaderName').textContent = r.name;
   document.getElementById('resHeaderScore').textContent = `${r.score}% Match`;
   
+  // Render view-only preview on jobs tab
   renderResumePaper(r);
+  
+  // Reset tabs back to Recommended Jobs by default
+  switchResumeTab('jobs');
   
   currentPolicyFilter = 'all';
   currentScoreFilter = 0;
