@@ -962,26 +962,35 @@ function bookmarkJob(c){
 // ═══════════════════════════════════════════════════════════════
 function renderInlineMatches(companies,title){
   if(!companies||companies.length===0)return '';
-  return `<div class="inline-card"><div class="inline-match-list">${companies.map(c=>{
-    const cKey=(c.name+c.role).replace(/\s+/g,'-').toLowerCase();
-    const bm=isBookmarked(cKey);
-    return `
-    <div class="inline-match-row">
-      <div class="inline-match-logo" style="background:${c.color}" onclick="window.open('${c.url}','_blank')">${c.logo}</div>
-      <div class="inline-match-info" onclick="window.open('${c.url}','_blank')">
-        <div class="inline-match-company">${c.name} — ${c.role}</div>
-        <div class="inline-match-meta">${c.loc} · ${c.work}${c.visa?' · visa':''} · ${c.salary}</div>
-      </div>
-      <span class="inline-match-score ${c.level}">${c.score}%</span>
-      <div class="inline-match-actions">
-        <button id="bm-${cKey}" class="btn-bookmark${bm?' bookmarked':''}" onclick="event.stopPropagation();bookmarkJob({key:'${cKey}',logo:'${c.logo}',color:'${c.color}',name:'${c.name.replace(/'/g,"\\'")}',role:'${c.role.replace(/'/g,"\\'")}',loc:'${c.loc}',work:'${c.work}',score:${c.score},level:'${c.level}',url:'${c.url}'})" ${bm?'style="pointer-events:none"':''}>
-          ${bm
-            ?'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg> Bookmarked'
-            :'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg> Bookmark'}
-        </button>
-      </div>
-    </div>`;
-  }).join('')}</div></div>`;
+  const activeResId = getActiveResume()?.id;
+  const viewMoreBtn = activeResId 
+    ? `<div style="padding: 10px; border-top:1px solid var(--border-soft); text-align:center; background:var(--surface);">
+         <button class="btn btn-secondary btn-xs" style="width:100%; justify-content:center; font-weight:500;" onclick="switchResume(${activeResId})">🔍 View More Jobs &amp; Details</button>
+       </div>`
+    : '';
+  return `<div class="inline-card">
+    <div class="inline-match-list">${companies.map(c=>{
+      const cKey=(c.name+c.role).replace(/\s+/g,'-').toLowerCase();
+      const bm=isBookmarked(cKey);
+      return `
+      <div class="inline-match-row">
+        <div class="inline-match-logo" style="background:${c.color}" onclick="window.open('${c.url}','_blank')">${c.logo}</div>
+        <div class="inline-match-info" onclick="window.open('${c.url}','_blank')">
+          <div class="inline-match-company">${c.name} — ${c.role}</div>
+          <div class="inline-match-meta">${c.loc} · ${c.work}${c.visa?' · visa':''} · ${c.salary}</div>
+        </div>
+        <span class="inline-match-score ${c.level}">${c.score}%</span>
+        <div class="inline-match-actions">
+          <button id="bm-${cKey}" class="btn-bookmark${bm?' bookmarked':''}" onclick="event.stopPropagation();bookmarkJob({key:'${cKey}',logo:'${c.logo}',color:'${c.color}',name:'${c.name.replace(/'/g,"\\'")}',role:'${c.role.replace(/'/g,"\\'")}',loc:'${c.loc}',work:'${c.work}',score:${c.score},level:'${c.level}',url:'${c.url}'})" ${bm?'style="pointer-events:none"':''}>
+            ${bm
+              ?'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg> Bookmarked'
+              :'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg> Bookmark'}
+          </button>
+        </div>
+      </div>`;
+    }).join('')}</div>
+    ${viewMoreBtn}
+  </div>`;
 }
 
 function renderInlineResume(resume,tailoredFor){
