@@ -40,7 +40,7 @@
     .topbar-left {
       display: flex;
       align-items: center;
-      justify-content: space-between;
+      justify-content: flex-start;
       width: var(--sidebar-w);
       border-right: 1px solid var(--border);
       height: 100%;
@@ -64,11 +64,10 @@
       align-items: center;
       gap: 8px;
     }
-    .topbar-left .icon-btn svg {
-      transition: transform var(--motion-base) var(--ease);
-    }
-    .topbar-left.collapsed .icon-btn svg {
-      transform: scaleX(-1);
+    .topbar-actions {
+      display: flex;
+      align-items: center;
+      gap: 4px;
     }
     .brand-mark{width:14px;height:14px;background:var(--accent);border-radius:3px;flex-shrink:0}
     .brand-name{font-size:var(--text-md);font-weight:600;letter-spacing:-0.02em}
@@ -573,6 +572,74 @@
     .match-item-score-badge.high{background:var(--success-soft);color:var(--success)}
     .match-item-score-badge.mid{background:var(--warn-soft);color:var(--warn)}
 
+    /* ══ RESUME TEMPLATE STYLES ══ */
+    .resume-view-doc-paper.template-modern {
+      font-family: var(--font-body);
+      font-size: 11px;
+      line-height: 1.5;
+    }
+    .resume-view-doc-paper.template-modern .resume-paper-name {
+      text-align: left;
+      font-size: 20px;
+      color: var(--accent);
+      font-weight: 700;
+    }
+    .resume-view-doc-paper.template-modern .resume-paper-contact {
+      text-align: left;
+      border-bottom: 2px solid var(--accent);
+      padding-bottom: 8px;
+    }
+    .resume-view-doc-paper.template-modern .resume-paper-title {
+      color: var(--accent);
+      font-size: 11px;
+      border-bottom: none;
+      font-weight: 600;
+    }
+    
+    .resume-view-doc-paper.template-classic {
+      font-family: "Times New Roman", Times, serif;
+      font-size: 12px;
+      line-height: 1.4;
+    }
+    .resume-view-doc-paper.template-classic .resume-paper-name {
+      font-size: 22px;
+      font-family: "Times New Roman", Times, serif;
+      font-weight: normal;
+    }
+    .resume-view-doc-paper.template-classic .resume-paper-title {
+      border-bottom: 1px dashed var(--fg);
+      font-weight: bold;
+    }
+
+    /* ══ ATS VIEW STYLE ══ */
+    .ats-view-container {
+      display: flex; height: 100%; width: 100%; overflow: hidden;
+    }
+    .ats-left-panel {
+      width: 45%; border-right: 1px solid var(--border); background: var(--surface);
+      overflow-y: auto; padding: 24px; display: flex; flex-direction: column; gap: 20px;
+    }
+    .ats-right-panel {
+      width: 55%; background: var(--bg); overflow-y: auto; padding: 24px;
+      display: flex; flex-direction: column; align-items: center;
+    }
+    
+    /* ATS Gauge Circle */
+    .ats-gauge-circle {
+      position: relative; width: 80px; height: 80px; flex-shrink: 0;
+    }
+    .ats-circle-svg { transform: rotate(-90deg); width: 80px; height: 80px; }
+    .ats-circle-bg { fill: none; stroke: var(--border-soft); stroke-width: 6; }
+    .ats-circle-fill {
+      fill: none; stroke: var(--warn); stroke-width: 6; stroke-linecap: round;
+      stroke-dasharray: 220; stroke-dashoffset: 220;
+      transition: stroke-dashoffset 1s ease-in-out, stroke var(--motion-base);
+    }
+    .ats-circle-text {
+      position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+      font-family: var(--font-mono); font-size: 16px; font-weight: 600; color: var(--fg);
+    }
+
     /* ══ DARK MODE ══ */
     body.dark{
       --bg:#131312;--surface:#1A1A18;--sidebar-bg:#161614;--sidebar-hover:#1F1F1D;--sidebar-active:#252522;
@@ -625,9 +692,6 @@
         <div class="brand-mark"></div>
         <span class="brand-name">JOB FOR SURE</span>
       </a>
-      <button class="icon-btn" id="toggleSidebar" title="Toggle sidebar">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="9" y1="3" x2="9" y2="21"/></svg>
-      </button>
     </div>
     
     <button class="toggle-sidebar" id="toggleSidebarMobile" title="Toggle sidebar" style="margin-left: 12px">
@@ -635,11 +699,16 @@
     </button>
     
     <div class="topbar-spacer"></div>
-    <button class="icon-btn theme-toggle-btn" id="themeToggle" title="Toggle theme">
+    <div class="topbar-actions">
+      <button class="icon-btn" id="toggleSidebar" title="Toggle sidebar">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="9" y1="3" x2="9" y2="21"/></svg>
+      </button>
+      <button class="icon-btn theme-toggle-btn" id="themeToggle" title="Toggle theme">
       <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>
       <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
     </button>
-    <div class="avatar" style="margin-right: 12px">JD</div>
+      <div class="avatar" style="margin-right: 4px">JD</div>
+    </div>
   </header>
 
   <!-- ══ APP BODY ══ -->
@@ -657,6 +726,10 @@
         <span>Pipeline</span>
         <span class="nav-badge">6</span>
       </a>
+      <div class="nav-item" data-view="ats">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+        <span>ATS Optimizer</span>
+      </div>
       <div class="nav-label">Resumes</div>
       <div class="resume-switcher" id="resumeSwitcher"></div>
       <div class="resume-add-btn" onclick="chatUploadClick()">
@@ -797,8 +870,15 @@
             <!-- SUB-VIEW 2: VIEW RESUME (Centered Document Mockup) -->
             <div class="resume-sub-view" id="subViewView" style="flex-direction:column; align-items:center; padding:24px; overflow-y:auto; width:100%; height:100%;">
               <!-- View Toolbar -->
-              <div style="display:flex; justify-content:space-between; width:100%; max-width:600px; align-items:center; background:var(--surface); padding:8px 12px; border:1px solid var(--border); border-radius:var(--radius-sm); margin-bottom:16px; flex-shrink:0;">
-                <span style="font-weight:600; font-size:var(--text-xs); color:var(--fg-2)">Print/Export Options</span>
+              <div style="display:flex; justify-content:space-between; width:100%; max-width:600px; align-items:center; background:var(--surface); padding:8px 12px; border:1px solid var(--border); border-radius:var(--radius-sm); margin-bottom:16px; flex-shrink:0; gap:12px">
+                <div style="display:flex; align-items:center; gap:8px">
+                  <span class="editor-form-label" style="font-size:10px; margin-bottom:0">Style Template:</span>
+                  <select class="chat-status-select" id="templateSelect" onchange="changeResumeTemplate(this.value)">
+                    <option value="minimalist">Minimalist (Georgia)</option>
+                    <option value="modern">Modern (Inter)</option>
+                    <option value="classic">Classic (Times New Roman)</option>
+                  </select>
+                </div>
                 <div style="display:flex; gap:6px">
                   <button class="btn btn-ghost btn-xs" onclick="alert('PDF export simulated!')">Export PDF</button>
                   <button class="btn btn-ghost btn-xs" onclick="alert('DOCX export simulated!')">Export DOCX</button>
@@ -839,6 +919,28 @@
                       <div class="editor-form-group">
                         <label class="editor-form-label">Full Name</label>
                         <input type="text" class="editor-form-input" id="editCandidateName" />
+                      </div>
+                    </div>
+                    
+                    <div class="editor-form-row">
+                      <div class="editor-form-group">
+                        <label class="editor-form-label">Email</label>
+                        <input type="text" class="editor-form-input" id="editEmail" />
+                      </div>
+                      <div class="editor-form-group">
+                        <label class="editor-form-label">Phone</label>
+                        <input type="text" class="editor-form-input" id="editPhone" />
+                      </div>
+                    </div>
+                    
+                    <div class="editor-form-row">
+                      <div class="editor-form-group">
+                        <label class="editor-form-label">Location</label>
+                        <input type="text" class="editor-form-input" id="editLocation" />
+                      </div>
+                      <div class="editor-form-group">
+                        <label class="editor-form-label">GitHub / Website</label>
+                        <input type="text" class="editor-form-input" id="editGithub" />
                       </div>
                     </div>
                     
@@ -894,7 +996,81 @@
                 </div>
               </div>
             </div>
+          </div>
+        </div>
+      </section>
 
+      <!-- ── ATS OPTIMIZER VIEW ── -->
+      <section class="view" id="view-ats">
+        <div class="ats-view-container">
+          <!-- Left Panel: Inputs, match score gauge & keywords -->
+          <div class="ats-left-panel">
+            <div class="page-head" style="margin-bottom:0">
+              <div><h1>ATS Optimizer</h1><div class="subtitle">Evaluate and score your resume matches</div></div>
+            </div>
+            
+            <div class="form-group" style="margin-bottom:12px; width:100%;">
+              <label class="editor-form-label">1. Job Description</label>
+              <textarea class="editor-form-textarea" id="atsJdText" rows="6" placeholder="Paste target job description here..." oninput="onAtsInputChange()"></textarea>
+            </div>
+            
+            <div class="form-group" style="margin-bottom:16px; width:100%;">
+              <label class="editor-form-label">2. Target Resume Profile</label>
+              <select class="pipeline-filter-select" id="atsResumeSelect" style="width:100%" onchange="onAtsResumeChange(this.value)">
+                <!-- populated by JS -->
+              </select>
+            </div>
+            
+            <!-- Gauge Card -->
+            <div class="inline-card" style="padding:16px; display:flex; gap:16px; align-items:center; background:var(--surface); width:100%;">
+              <div class="ats-gauge-circle">
+                <svg class="ats-circle-svg">
+                  <circle class="ats-circle-bg" cx="40" cy="40" r="35"></circle>
+                  <circle class="ats-circle-fill" id="atsGaugeFill" cx="40" cy="40" r="35"></circle>
+                </svg>
+                <div class="ats-circle-text" id="atsGaugeText">0%</div>
+              </div>
+              <div>
+                <h3 id="atsGaugeHeading" style="font-weight:600; font-size:14px; color:var(--warn)">Scan Pending</h3>
+                <p id="atsGaugeDesc" style="font-size:12px; color:var(--muted)">Paste a job description to trigger ATS analysis.</p>
+              </div>
+            </div>
+
+            <!-- Keyword Badges Lists -->
+            <div style="width:100%;">
+              <div class="filter-group-title" style="margin-bottom:8px">Keyword Analysis</div>
+              <div style="display:flex; flex-direction:column; gap:12px">
+                <div>
+                  <div class="editor-form-label" style="font-size:8px; margin-bottom:4px">Missing Keywords</div>
+                  <div class="filter-chips" id="atsMissingList" style="flex-direction:row; flex-wrap:wrap">
+                    <!-- badges -->
+                  </div>
+                </div>
+                <div>
+                  <div class="editor-form-label" style="font-size:8px; margin-bottom:4px">Matched Keywords</div>
+                  <div class="filter-chips" id="atsMatchedList" style="flex-direction:row; flex-wrap:wrap">
+                    <!-- badges -->
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <button class="btn btn-primary" id="atsOptimizeBtn" style="justify-content:center; width:100%" onclick="runAtsOptimization()">
+              🪄 Auto-Inject Missing Keywords
+            </button>
+          </div>
+          
+          <!-- Right Panel: Live Resume Preview Sheet -->
+          <div class="ats-right-panel">
+            <!-- Toolbar -->
+            <div style="display:flex; justify-content:space-between; width:100%; max-width:550px; align-items:center; background:var(--surface); padding:8px 12px; border:1px solid var(--border); border-radius:var(--radius-sm); margin-bottom:16px; flex-shrink:0;">
+              <span style="font-weight:600; font-size:var(--text-xs); color:var(--fg-2)">ATS Real-Time Sheet</span>
+              <button class="btn btn-secondary btn-xs" onclick="switchView('resume')">Edit Resume</button>
+            </div>
+            <!-- Document preview paper sheet -->
+            <div class="resume-view-doc-paper" id="atsResumePaper" style="font-family:Georgia, serif; max-width:550px; width:100%; box-shadow:0 8px 32px rgba(0,0,0,0.06), 0 0 0 1px var(--border); min-height:650px;">
+              <!-- Populated by JS -->
+            </div>
           </div>
         </div>
       </section>
@@ -997,6 +1173,7 @@ function switchView(name){
   const nav=document.querySelector(`.nav-item[data-view="${name}"]`);
   if(nav)nav.classList.add('active');
   if(name==='chat')updateChatStatusBar();
+  if(name==='ats')syncAtsView();
 }
 document.querySelectorAll('.nav-item').forEach(item=>item.addEventListener('click',()=>switchView(item.dataset.view)));
 
@@ -1465,7 +1642,7 @@ function handleUpload(filename){
   const resume={
     id:Date.now(),
     name:role,
-    persona:'Uploaded Resume',
+    persona:'Alex Rivera',
     score:db.direct[0].score,
     updated:'just now',
     skills,
@@ -1738,12 +1915,20 @@ function toggleDetailBookmark(key, logo, color, name, role, loc, work, score, le
 
 function renderResumePaper(r){
   // Render View Resume paper preview
-  const container = document.getElementById('resumePaperDocView');
+  const container = document.getElementById('resumePaperDoc');
   if(!container) return;
   
   const persona = r.persona || 'Your Name';
+  const email = r.email || 'john@email.com';
+  const phone = r.phone || '(555) 019-2834';
+  const location = r.location || 'San Francisco, CA';
+  const github = r.github || 'github.com/arivera';
   const summary = r.summary || `Experienced developer specializing in frontend components, layouts, and web application state.`;
   const skills = r.skills || ['JavaScript', 'HTML5', 'CSS3'];
+  const template = r.template || 'minimalist';
+  
+  // Apply template class
+  container.className = `resume-view-doc-paper template-${template}`;
   
   let expHtml = '';
   if(r.experience && r.experience.length > 0){
@@ -1778,7 +1963,7 @@ function renderResumePaper(r){
   
   container.innerHTML = `
     <div class="resume-paper-name" style="font-size:14px; font-weight:700">${persona}</div>
-    <div class="resume-paper-contact">john@email.com · San Francisco, CA</div>
+    <div class="resume-paper-contact">${email} · ${phone} · ${location} · ${github}</div>
     
     <div class="resume-paper-section">
       <div class="resume-paper-title">Summary</div>
@@ -1827,7 +2012,12 @@ function switchResumeTab(tabName){
       tabView.classList.add('active');
       viewView.classList.add('active');
       const r = getActiveResume();
-      if(r) renderResumePaper(r);
+      if(r) {
+        renderResumePaper(r);
+        // Set template dropdown
+        const select = document.getElementById('templateSelect');
+        if (select) select.value = r.template || 'minimalist';
+      }
     } else if(tabName === 'editor'){
       tabEditor.classList.add('active');
       viewEditor.classList.add('active');
@@ -1845,6 +2035,10 @@ function loadActiveResumeIntoForm(){
   
   document.getElementById('editResumeName').value = r.name || '';
   document.getElementById('editCandidateName').value = r.persona || 'Your Name';
+  document.getElementById('editEmail').value = r.email || 'john@email.com';
+  document.getElementById('editPhone').value = r.phone || '(555) 019-2834';
+  document.getElementById('editLocation').value = r.location || 'San Francisco, CA';
+  document.getElementById('editGithub').value = r.github || 'github.com/arivera';
   document.getElementById('editSummary').value = r.summary || '';
   document.getElementById('editSkills').value = (r.skills || []).join(', ');
   
@@ -1875,6 +2069,10 @@ function saveActiveResumeEdit(){
   
   const newName = document.getElementById('editResumeName').value.trim();
   const newPersona = document.getElementById('editCandidateName').value.trim();
+  const newEmail = document.getElementById('editEmail').value.trim();
+  const newPhone = document.getElementById('editPhone').value.trim();
+  const newLocation = document.getElementById('editLocation').value.trim();
+  const newGithub = document.getElementById('editGithub').value.trim();
   const newSummary = document.getElementById('editSummary').value.trim();
   const newSkillsText = document.getElementById('editSkills').value;
   const newSkills = newSkillsText.split(',').map(s => s.trim()).filter(Boolean);
@@ -1887,6 +2085,10 @@ function saveActiveResumeEdit(){
   // Save edits back to RESUMES array
   r.name = newName || r.name;
   r.persona = newPersona || r.persona;
+  r.email = newEmail;
+  r.phone = newPhone;
+  r.location = newLocation;
+  r.github = newGithub;
   r.summary = newSummary;
   r.skills = newSkills;
   r.experience = [{
@@ -1931,6 +2133,10 @@ function saveActiveResumeAsNew(){
   }
 
   const newPersona = document.getElementById('editCandidateName').value.trim();
+  const newEmail = document.getElementById('editEmail').value.trim();
+  const newPhone = document.getElementById('editPhone').value.trim();
+  const newLocation = document.getElementById('editLocation').value.trim();
+  const newGithub = document.getElementById('editGithub').value.trim();
   const newSummary = document.getElementById('editSummary').value.trim();
   const newSkillsText = document.getElementById('editSkills').value;
   const newSkills = newSkillsText.split(',').map(s => s.trim()).filter(Boolean);
@@ -1955,6 +2161,10 @@ function saveActiveResumeAsNew(){
     id: newId,
     name: cleanNewName,
     persona: newPersona || 'Your Name',
+    email: newEmail,
+    phone: newPhone,
+    location: newLocation,
+    github: newGithub,
     score: newScore,
     updated: 'just now',
     skills: newSkills,
@@ -1980,6 +2190,217 @@ function saveActiveResumeAsNew(){
   // Update detail view and switch to Recommended Jobs tab
   renderResumeDetailView(newResume);
   alert(`Created new resume profile "${cleanNewName}" and set it as active!`);
+}
+
+function changeResumeTemplate(val){
+  const r = getActiveResume();
+  if(!r) return;
+  r.template = val;
+  saveResumesState();
+  renderResumePaper(r);
+  
+  // Also sync ATS preview paper if currently loaded
+  const atsPaper = document.getElementById('atsResumePaper');
+  if (atsPaper) {
+    renderAtsResumePaper(r);
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// ATS OPTIMIZER TAB FUNCTIONALITY (Interactive Live Scanner)
+// ═══════════════════════════════════════════════════════════════
+function syncAtsView(){
+  const r = getActiveResume();
+  const select = document.getElementById('atsResumeSelect');
+  if (!select) return;
+  
+  if (RESUMES.length === 0) {
+    select.innerHTML = `<option value="none">None (Upload first)</option>`;
+    select.disabled = true;
+    document.getElementById('atsResumePaper').innerHTML = `<div style="padding:48px; color:var(--muted); text-align:center">Upload a resume to scan it.</div>`;
+    return;
+  }
+  
+  select.disabled = false;
+  select.innerHTML = RESUMES.map(res => `
+    <option value="${res.id}" ${res.id === activeResumeId ? 'selected' : ''}>${res.name}</option>
+  `).join('');
+  
+  if (r) {
+    renderAtsResumePaper(r);
+    onAtsInputChange(); // Recalculate score and keywords real-time!
+  }
+}
+
+function onAtsResumeChange(val){
+  activeResumeId = parseInt(val);
+  renderSwitcher();
+  syncAtsView();
+}
+
+function renderAtsResumePaper(r){
+  const container = document.getElementById('atsResumePaper');
+  if(!container) return;
+  
+  const persona = r.persona || 'Your Name';
+  const email = r.email || 'john@email.com';
+  const phone = r.phone || '(555) 019-2834';
+  const location = r.location || 'San Francisco, CA';
+  const github = r.github || 'github.com/arivera';
+  const summary = r.summary || '';
+  const skills = r.skills || [];
+  const template = r.template || 'minimalist';
+  
+  container.className = `resume-view-doc-paper template-${template}`;
+  
+  let expHtml = '';
+  if(r.experience && r.experience[0]){
+    const exp = r.experience[0];
+    expHtml = `
+      <div class="resume-paper-job">
+        <div class="resume-paper-job-header">
+          <span style="font-weight:600">${exp.role}</span>
+          <span style="font-family:var(--font-mono); font-size:8px; color:var(--muted)">${exp.dates}</span>
+        </div>
+        <div style="font-style:italic; font-size:9px; margin-bottom:2px">${exp.company}</div>
+        <ul style="padding-left:12px; margin:0; color:var(--fg-2)">
+          ${(exp.bullets || []).map(b => `<li>${b}</li>`).join('')}
+        </ul>
+      </div>
+    `;
+  }
+  
+  container.innerHTML = `
+    <div class="resume-paper-name" style="font-size:14px; font-weight:700">${persona}</div>
+    <div class="resume-paper-contact">${email} · ${phone} · ${location} · ${github}</div>
+    <div class="resume-paper-section">
+      <div class="resume-paper-title">Summary</div>
+      <div style="color:var(--fg-2)">${summary}</div>
+    </div>
+    <div class="resume-paper-section">
+      <div class="resume-paper-title">Skills</div>
+      <div class="resume-paper-skills" id="atsPaperSkillsContainer">
+        ${skills.map(s => `<span class="resume-paper-skill">${s}</span>`).join('')}
+      </div>
+    </div>
+    <div class="resume-paper-section">
+      <div class="resume-paper-title">Experience</div>
+      ${expHtml}
+    </div>
+  `;
+}
+
+function onAtsInputChange(){
+  const jdText = document.getElementById('atsJdText').value.trim();
+  const r = getActiveResume();
+  if(!r) return;
+  
+  const gaugeFill = document.getElementById('atsGaugeFill');
+  const gaugeText = document.getElementById('atsGaugeText');
+  const heading = document.getElementById('atsGaugeHeading');
+  const desc = document.getElementById('atsGaugeDesc');
+  const missingContainer = document.getElementById('atsMissingList');
+  const matchedContainer = document.getElementById('atsMatchedList');
+  
+  if(!jdText){
+    gaugeFill.style.strokeDashoffset = 220;
+    gaugeText.textContent = '0%';
+    heading.textContent = 'Scan Pending';
+    heading.style.color = 'var(--warn)';
+    desc.textContent = 'Paste a job description to trigger ATS analysis.';
+    missingContainer.innerHTML = '';
+    matchedContainer.innerHTML = '';
+    return;
+  }
+  
+  // Keyword mapping logic
+  const jdLower = jdText.toLowerCase();
+  const allKeywords = ['React', 'TypeScript', 'Node.js', 'PostgreSQL', 'Cloudflare Workers', 'Durable Objects', 'WebSockets', 'Figma', 'Git', 'HTML5', 'CSS3'];
+  
+  const matched = [];
+  const missing = [];
+  
+  allKeywords.forEach(k => {
+    if (jdLower.includes(k.toLowerCase())) {
+      // Check if candidate has it
+      if (r.skills.some(s => s.toLowerCase().includes(k.toLowerCase()))) {
+        matched.push(k);
+      } else {
+        missing.push(k);
+      }
+    }
+  });
+  
+  // Calculate score
+  const totalRelevant = matched.length + missing.length;
+  let scorePercent = 60; // base score
+  if (totalRelevant > 0) {
+    scorePercent = Math.round((matched.length / totalRelevant) * 35) + 60;
+  }
+  
+  // Update gauge circle offset: formula (1 - score/100) * 220
+  const offset = 220 - (scorePercent / 100 * 220);
+  gaugeFill.style.strokeDashoffset = offset;
+  gaugeText.textContent = `${scorePercent}%`;
+  
+  if (scorePercent >= 85) {
+    gaugeFill.style.stroke = 'var(--success)';
+    heading.textContent = 'Excellent Match';
+    heading.style.color = 'var(--success)';
+    desc.textContent = 'High probability of clearing recruiter ATS screening.';
+  } else if (scorePercent >= 75) {
+    gaugeFill.style.stroke = 'var(--warn)';
+    heading.textContent = 'Good Match';
+    heading.style.color = 'var(--warn)';
+    desc.textContent = 'Inject missing keywords to reach 85%+ recommended score.';
+  } else {
+    gaugeFill.style.stroke = 'var(--danger)';
+    heading.textContent = 'Poor Match';
+    heading.style.color = 'var(--danger)';
+    desc.textContent = 'Missing critical technical keyword matches.';
+  }
+  
+  // Render badges
+  missingContainer.innerHTML = missing.length > 0 
+    ? missing.map(k => `<span class="kw-badge missing" style="background:rgba(220,38,38,0.1); color:var(--danger); border:1px solid rgba(220,38,38,0.2); padding:3px 8px; font-size:11px; border-radius:12px;">${k}</span>`).join('')
+    : '<span style="color:var(--muted); font-size:11px">None</span>';
+    
+  matchedContainer.innerHTML = matched.length > 0
+    ? matched.map(k => `<span class="kw-badge matched" style="background:rgba(16,185,129,0.1); color:var(--success); border:1px solid rgba(16,185,129,0.2); padding:3px 8px; font-size:11px; border-radius:12px;">${k}</span>`).join('')
+    : '<span style="color:var(--muted); font-size:11px">None</span>';
+}
+
+function runAtsOptimization(){
+  const r = getActiveResume();
+  if(!r) return;
+  
+  const jdText = document.getElementById('atsJdText').value.trim();
+  if(!jdText){
+    alert('Please paste a job description first to scan and optimize against!');
+    return;
+  }
+  
+  const jdLower = jdText.toLowerCase();
+  const allKeywords = ['React', 'TypeScript', 'Node.js', 'PostgreSQL', 'Cloudflare Workers', 'Durable Objects', 'WebSockets', 'Figma', 'Git', 'HTML5', 'CSS3'];
+  
+  let addedAny = false;
+  allKeywords.forEach(k => {
+    if (jdLower.includes(k.toLowerCase())) {
+      if (!r.skills.some(s => s.toLowerCase().includes(k.toLowerCase()))) {
+        r.skills.push(k);
+        addedAny = true;
+      }
+    }
+  });
+  
+  if (addedAny) {
+    saveResumesState();
+    renderSwitcher();
+    syncAtsView(); // Re-scans and updates gauge + preview in real-time!
+    alert('Real-time scan updated! Missing keywords have been injected into your profile.');
+  } else {
+    alert('Profile already optimized for this job description.');
+  }
 }
 
 function aiOptimizeActiveResume(){
@@ -2122,10 +2543,13 @@ renderSwitcher();
 const urlParams = new URLSearchParams(window.location.search);
 const showResumeId = urlParams.get('showResume');
 const actionParam = urlParams.get('action');
+const viewParam = urlParams.get('view');
 
 if (showResumeId) {
   const parsedId = parseInt(showResumeId);
   switchResume(parsedId);
+} else if (viewParam === 'ats') {
+  switchView('ats');
 } else if (actionParam === 'addResume') {
   setTimeout(() => {
     chatUploadClick();
