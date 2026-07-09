@@ -11,12 +11,39 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
   const [checked, setChecked] = useState(false)
 
   useEffect(() => {
-    const auth = localStorage.getItem('jfs_auth')
-    if (!auth) {
+    let cancelled = false
+
+    async function check() {
+      // 1. Try real Better Auth session
+      try {
+        const { authClient } = await import('~/lib/auth-client')
+        const { data: session } = await authClient.getSession()
+        if (!cancelled && session) {
+          setChecked(true)
+          return
+        }
+      } catch {
+        // Auth not configured — fall through to dev bypass
+      }
+
+      // 2. Dev bypass: admin / 123 sets localStorage['jfs_auth']
+      const localAuth = localStorage.getItem('jfs_auth')
+
+      if (cancelled) return
+      if (localAuth) {
+        setChecked(true)
+        return
+      }
+
+      // 3. Not authenticated → redirect
       router.replace('/login')
-      return
     }
-    setChecked(true)
+
+    check()
+
+    return () => {
+      cancelled = true
+    }
   }, [router])
 
   if (!checked) {
