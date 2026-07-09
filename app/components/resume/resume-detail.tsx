@@ -167,61 +167,62 @@ export function ResumeDetail({ resumeId }: { resumeId: number }) {
                   const key = companyKey(c)
                   const bm = isBookmarked(key)
                   return (
-                    <div key={key} className="flex gap-4 rounded-sm border border-border bg-card p-4 transition-all hover:border-primary">
-                      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-sm font-mono text-xs font-bold text-white" style={{ background: c.color }}>
-                        {c.logo}
-                      </div>
-                      <div className="min-w-0 flex-1">
-                        <div className="mb-0.5 flex items-center justify-between">
-                          <span className="text-[13px] font-semibold">{c.role}</span>
-                          <span className={cn(
-                            'rounded-xs px-2 py-0.5 font-mono text-xs font-semibold',
-                            c.score >= 85 ? 'bg-success-soft text-success' : 'bg-warn-soft text-[var(--warn)]',
-                          )}>{c.score}% Match</span>
+                      <div key={key} className="flex gap-4 rounded-sm border border-border bg-card p-4 transition-colors hover:border-primary cursor-pointer">
+                        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-sm font-mono text-xs font-bold text-white" style={{ background: c.color }}>
+                          {c.logo}
                         </div>
-                        <div className="text-xs text-muted-foreground">{c.name}</div>
-                        <div className="my-1.5 flex gap-2 text-[11px] text-muted-foreground">
-                          <span className="rounded-xs border border-border bg-background px-1.5 py-0.5">{c.loc}</span>
-                          <span className="rounded-xs border border-border bg-background px-1.5 py-0.5">{c.work.toUpperCase()}</span>
-                          <span className="rounded-xs border border-border bg-background px-1.5 py-0.5">{c.salary}</span>
-                        </div>
-                        {c.missing && c.missing.length > 0 && (
-                          <div className="mt-2 text-[11px] text-muted-foreground">
-                            <strong className="text-destructive">Missing skills:</strong> {c.missing.join(', ')}
+                        <div className="min-w-0 flex-1">
+                          <div className="mb-0.5 flex items-center justify-between">
+                            <span className="text-[13px] font-semibold">{c.role}</span>
+                            <span className={cn(
+                              'rounded-xs px-2 py-0.5 font-mono text-xs font-semibold',
+                              c.score >= 85 ? 'bg-success-soft text-success' : 'bg-warn-soft text-[var(--warn)]',
+                            )}>{c.score}% Match</span>
                           </div>
-                        )}
-                        <div className="mt-3 flex items-center justify-between border-t border-border/50 pt-3">
-                          <span className="font-mono text-[10px] text-muted-foreground">{c.type}</span>
-                          <div className="flex gap-2">
-                            <button
-                              onClick={() => bm ? toggleBookmark(key) : bookmarkJob({
-                                key, logo: c.logo, color: c.color, company: c.name, title: c.role,
-                                loc: c.loc, score: c.score, level: c.level, time: 'just now', url: c.url,
-                                resume: resume.name,
-                              })}
-                              className={cn(
-                                'flex items-center gap-1 rounded-xs border px-2 py-1 text-[11px] transition-all',
-                                bm ? 'border-primary bg-primary text-white' : 'border-border bg-card hover:bg-background',
-                              )}
-                            >
-                              <Bookmark size={11} fill={bm ? 'currentColor' : 'none'} /> {bm ? 'Bookmarked' : 'Bookmark'}
-                            </button>
-                            <button className="rounded-xs border border-border bg-card px-2 py-1 text-[11px] hover:bg-background">
-                              Coach for Job
-                            </button>
-                            <button className="rounded-xs border border-border bg-card px-2 py-1 text-[11px] hover:bg-background">
-                              Tailor Resume
-                            </button>
-                            <a
-                              href={c.url}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="flex items-center gap-1 rounded-xs bg-primary px-2 py-1 text-[11px] font-medium text-white hover:bg-primary/80"
-                            >
-                              Apply Now <ExternalLink size={10} />
-                            </a>
+                          <div className="text-xs text-muted-foreground">{c.name}</div>
+                          <div className="my-1.5 flex gap-2 text-[11px] text-muted-foreground">
+                            <span className="rounded-xs border border-border bg-background px-1.5 py-0.5">{c.loc}</span>
+                            <span className="rounded-xs border border-border bg-background px-1.5 py-0.5">{c.work.toUpperCase()}</span>
+                            <span className="rounded-xs border border-border bg-background px-1.5 py-0.5">{c.salary}</span>
                           </div>
-                        </div>
+                          {c.missing && c.missing.length > 0 && (
+                            <div className="mt-2 text-[11px] text-muted-foreground">
+                              <strong className="text-destructive">Missing skills:</strong> {c.missing.join(', ')}
+                            </div>
+                          )}
+                          <div className="mt-3 flex items-center justify-between border-t border-border/50 pt-3">
+                            <span className="font-mono text-[10px] text-muted-foreground">{c.type}</span>
+                            <div className="flex gap-2">
+                              <button
+                                onClick={(e) => { e.stopPropagation(); bm ? toggleBookmark(key) : bookmarkJob({
+                                  key, logo: c.logo, color: c.color, company: c.name, title: c.role,
+                                  loc: c.loc, score: c.score, level: c.level, time: 'just now', url: c.url,
+                                  resume: resume.name,
+                                }) }}
+                                className={cn(
+                                  'flex cursor-pointer items-center gap-1 rounded-xs border px-2 py-1 text-[11px] transition-all hover:scale-[1.02] active:scale-[0.98]',
+                                  bm ? 'border-primary bg-primary text-white' : 'border-border bg-card hover:border-primary hover:text-primary',
+                                )}
+                              >
+                                <Bookmark size={11} fill={bm ? 'currentColor' : 'none'} /> {bm ? 'Bookmarked' : 'Bookmark'}
+                              </button>
+                              <button className="cursor-pointer rounded-xs border border-border bg-card px-2 py-1 text-[11px] transition-colors hover:border-primary hover:text-primary">
+                                Coach for Job
+                              </button>
+                              <button className="cursor-pointer rounded-xs border border-border bg-card px-2 py-1 text-[11px] transition-colors hover:border-primary hover:text-primary">
+                                Tailor Resume
+                              </button>
+                              <a
+                                href={c.url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                onClick={(e) => e.stopPropagation()}
+                                className="flex cursor-pointer items-center gap-1 rounded-xs bg-primary px-2 py-1 text-[11px] font-medium text-primary-foreground transition-all hover:opacity-90 hover:scale-[1.02] active:scale-[0.98]"
+                              >
+                                Apply Now <ExternalLink size={10} />
+                              </a>
+                            </div>
+                          </div>
                       </div>
                     </div>
                   )

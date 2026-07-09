@@ -9,7 +9,7 @@ import { useAppStore } from '~/lib/store'
 
 const NAV_ITEMS = [
   { href: '/chat', label: 'Chat', icon: MessageSquare },
-  { href: '/applications', label: 'Applications', icon: KanbanSquare, badge: true },
+  { href: '/pipeline', label: 'Pipeline', icon: KanbanSquare, badge: true },
   { href: '/ats', label: 'ATS Optimizer', icon: CheckSquare },
 ]
 
@@ -77,7 +77,7 @@ export function Sidebar() {
             }}
             title={c ? r.name : undefined}
             className={cn(
-              'flex items-center gap-2 rounded-sm px-2 py-1.5 text-xs transition-colors',
+              'flex cursor-pointer items-center gap-2 rounded-sm px-2 py-1.5 text-xs transition-colors',
               r.id === activeResumeId ? 'bg-sidebar-active' : 'hover:bg-sidebar-hover',
               c && 'justify-center px-0 mx-2',
             )}
