@@ -4,36 +4,41 @@ export default function MarketingLayout({ children }: { children: React.ReactNod
   return (
     <>
       {/* Topnav */}
-      <header className="sticky top-0 z-100 h-16 bg-surface border-b border-border">
-        <div className="max-w-[1120px] mx-auto flex items-center justify-between h-full px-6">
-          <Link href="/" className="flex items-center gap-2.5 no-underline text-inherit">
-            <div className="w-4 h-4 bg-accent rounded-[4px]" />
-            <span className="font-[600] text-[16px] tracking-[-0.01em]">JOB FOR SURE</span>
+      <header className="sticky top-0 z-50 h-14 border-b border-border bg-background/80 backdrop-blur-md">
+        <div className="mx-auto flex h-full max-w-[1120px] items-center justify-between px-6">
+          {/* Brand */}
+          <Link href="/" className="flex cursor-pointer items-center gap-2 no-underline">
+            <div className="h-3.5 w-3.5 rounded-[3px] bg-primary" />
+            <span className="text-sm font-semibold tracking-tight text-foreground">JOB FOR SURE</span>
           </Link>
-          <nav className="flex gap-8 max-md:hidden">
-            <Link href="/" className="text-[13px] text-text-tertiary hover:text-text-primary transition-colors duration-150 no-underline">
-              Product
-            </Link>
-            <Link href="/dashboard" className="text-[13px] text-text-tertiary hover:text-text-primary transition-colors duration-150 no-underline">
-              Dashboard
-            </Link>
-            <Link href="/resume" className="text-[13px] text-text-tertiary hover:text-text-primary transition-colors duration-150 no-underline">
-              Resumes
-            </Link>
-            <Link href="/ats" className="text-[13px] text-text-tertiary hover:text-text-primary transition-colors duration-150 no-underline">
-              ATS Optimizer
-            </Link>
+
+          {/* Nav links — anchor scroll only */}
+          <nav className="flex gap-6 max-md:hidden">
+            <a
+              href="#features"
+              className="cursor-pointer text-[13px] text-muted-foreground transition-colors hover:text-foreground"
+            >
+              Features
+            </a>
+            <a
+              href="#how-it-works"
+              className="cursor-pointer text-[13px] text-muted-foreground transition-colors hover:text-foreground"
+            >
+              How it Works
+            </a>
           </nav>
-          <div className="flex items-center gap-3">
+
+          {/* Auth buttons */}
+          <div className="flex items-center gap-2">
             <Link
               href="/login"
-              className="rounded-[6px] border border-border bg-surface px-4 py-2 text-[13px] font-[510] text-text-secondary hover:bg-hover hover:text-text-primary transition-all duration-150 no-underline"
+              className="cursor-pointer rounded-md px-3 py-1.5 text-[13px] font-medium text-muted-foreground transition-colors hover:text-foreground"
             >
               Sign In
             </Link>
             <Link
               href="/register"
-              className="rounded-[6px] bg-accent px-4 py-2 text-[13px] font-[510] text-white hover:bg-accent-hover transition-all duration-150 no-underline"
+              className="cursor-pointer rounded-md bg-primary px-4 py-1.5 text-[13px] font-medium text-primary-foreground transition-opacity hover:opacity-90"
             >
               Get Started
             </Link>

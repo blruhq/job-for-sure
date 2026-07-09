@@ -130,17 +130,27 @@ export function Sidebar() {
 
       {/* ── Footer ── */}
       <div className="mt-auto border-t border-border p-2">
-        <div className={cn('flex items-center gap-2 p-1', c && 'justify-center')}>
-          <div className="flex h-[26px] w-[26px] shrink-0 items-center justify-center rounded-full bg-primary text-[10px] font-semibold text-white">
+        <button
+          onClick={() => {
+            localStorage.removeItem('jfs_auth')
+            window.location.href = '/login'
+          }}
+          className={cn(
+            'flex w-full cursor-pointer items-center gap-2 rounded-sm p-1 transition-colors hover:bg-sidebar-hover',
+            c && 'justify-center',
+          )}
+          title="Sign out"
+        >
+          <div className="flex h-[26px] w-[26px] shrink-0 items-center justify-center rounded-full bg-primary text-[10px] font-semibold text-primary-foreground">
             JD
           </div>
           {!c && (
-            <div className="min-w-0">
+            <div className="min-w-0 flex-1 text-left">
               <div className="text-xs font-semibold">John Doe</div>
-              <div className="font-mono text-[10px] text-muted-foreground">FREE PLAN</div>
+              <div className="font-mono text-[10px] text-muted-foreground">Sign out →</div>
             </div>
           )}
-        </div>
+        </button>
       </div>
     </aside>
   )

@@ -1,8 +1,34 @@
 'use client'
 
+import { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { AppStoreProvider, useAppStore } from '~/lib/store'
 import { Sidebar } from '~/components/layout/sidebar'
 import { Topbar } from '~/components/layout/navbar'
+
+function AuthGuard({ children }: { children: React.ReactNode }) {
+  const router = useRouter()
+  const [checked, setChecked] = useState(false)
+
+  useEffect(() => {
+    const auth = localStorage.getItem('jfs_auth')
+    if (!auth) {
+      router.replace('/login')
+      return
+    }
+    setChecked(true)
+  }, [router])
+
+  if (!checked) {
+    return (
+      <div className="flex h-screen items-center justify-center bg-background">
+        <div className="font-mono text-xs text-muted-foreground">Loading…</div>
+      </div>
+    )
+  }
+
+  return <>{children}</>
+}
 
 function AppShell({ children }: { children: React.ReactNode }) {
   const { sidebarCollapsed, toggleSidebar } = useAppStore()
@@ -38,7 +64,9 @@ function AppShell({ children }: { children: React.ReactNode }) {
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   return (
     <AppStoreProvider>
-      <AppShell>{children}</AppShell>
+      <AuthGuard>
+        <AppShell>{children}</AppShell>
+      </AuthGuard>
     </AppStoreProvider>
   )
 }
