@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '~/lib/auth'
 import { headers } from 'next/headers'
 import { generateObjectWithFailover } from '~/lib/ai-providers'
+import { db } from '~/lib/db'
+import { interviewSessions } from '~/lib/schema'
+import { eq, desc, and } from 'drizzle-orm'
 import { z } from 'zod'
 
 export const maxDuration = 60
@@ -24,6 +27,30 @@ const InterviewEvaluateSchema = z.object({
   improvements: z.array(z.string()),
   modelAnswer: z.string(),
 })
+
+// GET /api/ai/interview - Retrieve past interview history for the logged-in user
+export async function GET(req: NextRequest) {
+  try {
+    const user = await getSessionUser()
+    if (!user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
+    const history = await db
+      .select()
+      .from(interviewSessions)
+      .where(eq(interviewSessions.userId, user.id))
+      .orderBy(desc(interviewSessions.createdAt))
+
+    return NextResponse.json(history)
+  } catch (error) {
+    console.error('Interview history fetch error:', error)
+    return NextResponse.json(
+      { error: error instanceof Error ? error.message : 'Failed to fetch interview history' },
+      { status: 500 },
+    )
+  }
+}
 
 export async function POST(req: NextRequest) {
   try {
@@ -129,6 +156,24 @@ Return your response in structured JSON format. Provide a fair, constructive eva
       })
 
       return NextResponse.json(result)
+    } else if (action === 'save') {
+      const { resumeId, company, role, type, difficulty, score, exchanges } = body
+      if (!company || !role || !score || !exchanges) {
+        return NextResponse.json({ error: 'Missing required session parameters' }, { status: 400 })
+      }
+      const id = 'int_' + Date.now() + '_' + Math.random().toString(36).substring(7)
+      await db.insert(interviewSessions).values({
+        id,
+        userId: user.id,
+        resumeId: resumeId || null,
+        company,
+        role,
+        type,
+        difficulty,
+        score: String(score),
+        exchanges,
+      })
+      return NextResponse.json({ success: true, id })
     }
 
     return NextResponse.json({ error: 'Invalid action' }, { status: 400 })

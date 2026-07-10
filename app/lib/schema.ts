@@ -171,3 +171,29 @@ export const resumeRelations = relations(resumes, ({ one }) => ({
     references: [user.id],
   }),
 }));
+
+export const interviewSessions = pgTable("interview_sessions", {
+  id: text("id").primaryKey(),
+  userId: text("user_id")
+    .notNull()
+    .references(() => user.id, { onDelete: "cascade" }),
+  resumeId: text("resume_id").references(() => resumes.id, { onDelete: "set null" }),
+  company: text("company").notNull(),
+  role: text("role").notNull(),
+  type: text("type").notNull(), // behavioral | technical | mixed
+  difficulty: text("difficulty").notNull(), // entry | mid | senior
+  score: text("score").notNull(), // average score, e.g. "8.2"
+  exchanges: jsonb("exchanges").notNull(), // JSON array of InterviewExchange
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const interviewSessionsRelations = relations(interviewSessions, ({ one }) => ({
+  user: one(user, {
+    fields: [interviewSessions.userId],
+    references: [user.id],
+  }),
+  resume: one(resumes, {
+    fields: [interviewSessions.resumeId],
+    references: [resumes.id],
+  }),
+}));

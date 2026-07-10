@@ -8,6 +8,13 @@
       "when": 1783664931682,
       "tag": "0000_massive_scarlet_witch",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1783715232615,
+      "tag": "0001_nifty_cable",
+      "breakpoints": true
     }
   ]
 }
