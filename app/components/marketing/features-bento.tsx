@@ -61,29 +61,51 @@ export function FeaturesBento() {
                 {large.desc}
               </p>
             </div>
-            {/* Mini chat mockup */}
+            {/* Chat mockup — blown up */}
             <div className="mt-8 overflow-hidden rounded-xl border border-border/60 bg-card shadow-sm">
-              <div className="flex items-center gap-1.5 border-b border-border px-4 py-2.5">
-                <span className="h-2.5 w-2.5 rounded-full bg-[#FF5F57]" />
-                <span className="h-2.5 w-2.5 rounded-full bg-[#FFBD2E]" />
-                <span className="h-2.5 w-2.5 rounded-full bg-[#27C93F]" />
-                <span className="ml-2 text-[11px] font-medium text-muted-foreground">Career Coach</span>
+              <div className="flex items-center gap-2 border-b border-border px-5 py-3">
+                <span className="h-3 w-3 rounded-full bg-[#FF5F57]" />
+                <span className="h-3 w-3 rounded-full bg-[#FFBD2E]" />
+                <span className="h-3 w-3 rounded-full bg-[#27C93F]" />
+                <span className="ml-2 text-sm font-medium text-muted-foreground">Career Coach</span>
               </div>
-              <div className="space-y-3 p-4">
-                <div className="flex items-start gap-2.5">
-                  <div className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-primary/10 text-[10px] font-bold text-primary">
+              <div className="space-y-4 p-5">
+                {/* AI message */}
+                <div className="flex items-start gap-3">
+                  <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary/10 text-xs font-bold text-primary">
                     AI
                   </div>
-                  <div className="rounded-lg bg-muted px-3 py-2">
-                    <p className="text-[13px] leading-relaxed text-foreground">
-                      Your resume matches <strong>3 of 5</strong> requirements. Let&apos;s tailor the
-                      missing skills.
+                  <div className="max-w-[80%] rounded-xl bg-muted px-4 py-3">
+                    <p className="text-sm leading-relaxed text-foreground">
+                      Your resume matches <strong>3 of 5</strong> key requirements for{" "}
+                      <strong>Senior Frontend Engineer</strong>.
+                    </p>
+                    <p className="mt-2 text-sm leading-relaxed text-foreground">
+                      Missing keywords: <span className="text-warn">TypeScript generics</span>,{" "}
+                      <span className="text-warn">Next.js App Router</span>. Let&apos;s tailor them.
                     </p>
                   </div>
                 </div>
-                <div className="flex items-start gap-2.5 justify-end">
-                  <div className="rounded-lg bg-primary/10 px-3 py-2">
-                    <p className="text-[13px] text-foreground">Which keywords am I missing?</p>
+                {/* User message */}
+                <div className="flex items-start gap-3 justify-end">
+                  <div className="max-w-[75%] rounded-xl bg-primary/10 px-4 py-3">
+                    <p className="text-sm text-foreground">
+                      Which keywords should I add first?
+                    </p>
+                  </div>
+                  <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-muted-foreground/10 text-xs font-bold text-muted-foreground">
+                    U
+                  </div>
+                </div>
+                {/* AI typing indicator */}
+                <div className="flex items-start gap-3">
+                  <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary/10 text-xs font-bold text-primary">
+                    AI
+                  </div>
+                  <div className="flex items-center gap-1.5 rounded-xl bg-muted px-4 py-3">
+                    <span className="h-2 w-2 animate-bounce rounded-full bg-muted-foreground/40 [animation-delay:0ms]" />
+                    <span className="h-2 w-2 animate-bounce rounded-full bg-muted-foreground/40 [animation-delay:150ms]" />
+                    <span className="h-2 w-2 animate-bounce rounded-full bg-muted-foreground/40 [animation-delay:300ms]" />
                   </div>
                 </div>
               </div>

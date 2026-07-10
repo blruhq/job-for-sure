@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * 21st.dev Component Fetcher
- * 
+ *
  * Usage:
  *   node fetch-component.mjs <component-url>
  *   node fetch-component.mjs --kind component https://21st.dev/@author/components/name
@@ -11,6 +11,8 @@
  *
  * Kind: component | usage | all (default: all)
  */
+
+import { writeFileSync } from "node:fs";
 
 const args = process.argv.slice(2);
 let kind = "all";
@@ -33,14 +35,19 @@ if (!url) {
   process.exit(1);
 }
 
+function isCodeFile(url) { return /\/code\.tsx(\?|$)/.test(url); }
+function isDemoFile(url) { return /\/code\.demo\.tsx(\?|$)/.test(url); }
+function isRegistryFile(url) { return /\/registry\.[^/?#]+\.json(\?|$)/.test(url); }
+function isTargetFile(url) { return isCodeFile(url) || isDemoFile(url) || isRegistryFile(url); }
+
 async function main() {
   try {
     const html = await fetchHTML(url);
     const urls = extractPublicUrls(html);
 
-    const registryUrl = urls.find((u) => u.endsWith(".json") && u.includes("/registry."));
-    const componentUrl = urls.find((u) => /\/code\.[^/]+\.tsx$/.test(u));
-    const usageUrl = urls.find((u) => /\/code\.demo\.[^/]+\.tsx$/.test(u));
+    const registryUrl = urls.find(isRegistryFile);
+    const componentUrl = urls.find(isCodeFile);
+    const usageUrl = urls.find(isDemoFile);
 
     const files = [];
 
@@ -76,7 +83,7 @@ async function main() {
     }
 
     if (!files.length) {
-      console.error("No code files found on this page. URLs found:");
+      console.error("No code files found on this page. CDN URLs found:");
       for (const u of urls) console.error(`  ${u}`);
       process.exit(1);
     }
@@ -84,14 +91,14 @@ async function main() {
     const selected = files.filter((f) => kind === "all" || f.kind === kind);
 
     if (!selected.length) {
-      console.error(`No ${kind} code found`);
+      console.error(`No "${kind}" code found. Available kinds: ${[...new Set(files.map((f) => f.kind))].join(", ")}`);
       process.exit(1);
     }
 
     if (download) {
       for (const file of selected) {
         const dest = `${process.cwd()}/${file.name}`;
-        require("fs").writeFileSync(dest, file.content, "utf-8");
+        writeFileSync(dest, file.content, "utf-8");
         console.error(`[save] ${dest}`);
       }
     } else {
@@ -140,7 +147,7 @@ function extractPublicUrls(html) {
   let m;
   while ((m = re.exec(normalized)) !== null) {
     const clean = m[0].replace(/\\+$/, "");
-    if (/\/(code(\.demo)?|registry)\.[^/]+\.(tsx|json)$/.test(clean)) {
+    if (isTargetFile(clean)) {
       matches.add(clean);
     }
   }
