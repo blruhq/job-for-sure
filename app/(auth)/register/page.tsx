@@ -23,7 +23,7 @@ export default function RegisterPage() {
       if (authError) {
         setError(authError.message || 'Registration failed')
       } else if (data) {
-        router.push('/chat')
+        router.push('/dashboard')
       }
     } catch (err) {
       console.error(err)

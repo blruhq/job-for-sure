@@ -1,7 +1,7 @@
 import { NextResponse, type NextRequest } from 'next/server'
 import { getSessionCookie } from 'better-auth/cookies'
 
-const protectedRoutes = ['/chat', '/ats', '/pipeline', '/resume', '/settings', '/interview']
+const protectedRoutes = ['/chat', '/ats', '/pipeline', '/resume', '/settings', '/interview', '/dashboard']
 const publicRoutes = ['/', '/login', '/register']
 
 function isProtected(pathname: string) {
@@ -18,9 +18,9 @@ export async function middleware(request: NextRequest) {
   const sessionCookie = getSessionCookie(request)
   const hasSession = !!sessionCookie
 
-  // Authenticated user trying to access a public page → redirect to /chat
+  // Authenticated user trying to access a public page → redirect to /dashboard
   if (hasSession && isPublic(pathname)) {
-    return NextResponse.redirect(new URL('/chat', request.url))
+    return NextResponse.redirect(new URL('/dashboard', request.url))
   }
 
   // Unauthenticated user trying to access a protected route → redirect to /login
@@ -42,5 +42,6 @@ export const config = {
     '/resume/:path*',
     '/settings/:path*',
     '/interview/:path*',
+    '/dashboard/:path*',
   ],
 }

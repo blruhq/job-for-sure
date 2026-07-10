@@ -19,7 +19,7 @@ export function Topbar() {
           sidebarCollapsed ? 'w-[var(--sidebar-collapsed-width)] justify-center px-0' : 'w-[var(--sidebar-width)]',
         )}
       >
-        <Link href="/chat" className="flex items-center gap-2">
+        <Link href="/dashboard" className="flex items-center gap-2">
           {/* Always show the brand mark */}
           <div className="h-3.5 w-3.5 shrink-0 rounded-[3px] bg-primary transition-transform duration-200 hover:scale-110" />
           {/* Show text when expanded */}

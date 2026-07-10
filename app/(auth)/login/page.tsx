@@ -23,7 +23,7 @@ export default function LoginPage() {
       if (authError) {
         setError(authError.message || 'Invalid credentials')
       } else if (data) {
-        router.push('/chat')
+        router.push('/dashboard')
       }
     } catch (err) {
       console.error(err)
