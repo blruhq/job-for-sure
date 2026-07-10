@@ -1,8 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { scrapeJob } from '~/lib/scraper'
+import { auth } from '~/lib/auth'
+import { headers } from 'next/headers'
+
+async function getSessionUser() {
+  const h = await headers()
+  const session = await auth.api.getSession({ headers: h })
+  return session?.user ?? null
+}
 
 export async function POST(req: NextRequest) {
   try {
+    const user = await getSessionUser()
+    if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+
     const { url } = await req.json()
 
     if (!url || typeof url !== 'string') {

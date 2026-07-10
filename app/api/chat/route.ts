@@ -1,8 +1,20 @@
 import { streamWithFailover } from '~/lib/ai-providers'
+import { auth } from '~/lib/auth'
+import { headers } from 'next/headers'
+import { NextResponse } from 'next/server'
 
 export const maxDuration = 30
 
+async function getSessionUser() {
+  const h = await headers()
+  const session = await auth.api.getSession({ headers: h })
+  return session?.user ?? null
+}
+
 export async function POST(req: Request) {
+  const user = await getSessionUser()
+  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+
   const { messages, context } = await req.json()
 
   const systemPrompt = `You are Job For Sure — an AI career coach embedded in a job search app.
