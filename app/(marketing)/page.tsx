@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { ArrowRight } from 'lucide-react'
-import { DotPattern } from '~/components/marketing/dot-pattern'
+import { GridPattern } from '~/components/marketing/grid-pattern'
 import { HowItWorks } from '~/components/marketing/how-it-works'
 import { FeaturesBento } from '~/components/marketing/features-bento'
 import { Testimonials } from '~/components/marketing/testimonials'
@@ -99,7 +99,7 @@ function AnimatedMockup() {
 export default function LandingPage() {
   return (
     <div className="flex min-h-screen flex-col bg-background">
-      <DotPattern>
+      <GridPattern>
         {/* ── HERO ── */}
         <section className="relative flex min-h-screen flex-col items-center px-6 pt-[12vh] md:pt-[15vh]">
           <div
@@ -140,7 +140,7 @@ export default function LandingPage() {
             </div>
           </div>
         </section>
-      </DotPattern>
+      </GridPattern>
 
       {/* ── HOW IT WORKS ── */}
       <HowItWorks />
