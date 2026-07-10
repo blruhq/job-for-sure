@@ -1,6 +1,7 @@
 'use client'
 
 import { useRef, useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import { useChat } from '@ai-sdk/react'
 import { AgentChat } from '@/components/agent-elements/agent-chat'
 import { useAppStore } from '~/lib/store'
@@ -13,6 +14,7 @@ import { extractPdfText } from '~/lib/pdf-parse'
 import { Upload, FileText, ClipboardList, Loader2 } from 'lucide-react'
 
 export function ChatView() {
+  const router = useRouter()
   const { activeResume, addResume, updateResume, targetCompanyKey, setTargetCompanyKey, resumes, activeResumeId, setActiveResumeId } = useAppStore()
   const fileRef = useRef<HTMLInputElement>(null)
   const [wizardOpen, setWizardOpen] = useState(false)
@@ -85,6 +87,11 @@ export function ChatView() {
 
       addResume(resume)
       sendMessage({ text: `I just uploaded my resume: ${file.name}. I have skills in ${resume.skills.slice(0, 5).join(', ')}.` })
+
+      // Navigate to Find Jobs tab after a short delay (let the message render)
+      setTimeout(() => {
+        router.push(`/resume/${resume.id}`)
+      }, 1500)
     } catch (err) {
       console.error(err)
       notify({ message: 'Failed to process resume. Try Build from Template instead.', type: 'error' })
@@ -114,6 +121,11 @@ export function ChatView() {
 
       addResume(resume)
       sendMessage({ text: `I'm a ${data.role} with skills in ${data.skills.slice(0, 5).join(', ')}.` })
+
+      // Navigate to Find Jobs tab
+      setTimeout(() => {
+        router.push(`/resume/${resume.id}`)
+      }, 1500)
     } catch (err) {
       console.error(err)
       notify({ message: 'Failed to create resume from wizard', type: 'error' })

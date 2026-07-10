@@ -3,7 +3,16 @@
 // Every source adapter normalizes to this shape.
 // ═══════════════════════════════════════════════════════════════
 
-export type JobSource = 'greenhouse' | 'ashby' | 'remoteok' | 'adzuna'
+export type JobSource =
+  | 'greenhouse'
+  | 'ashby'
+  | 'remoteok'
+  | 'himalayas'
+  | 'remotive'
+  | 'themuse'
+  | 'arbeitnow'
+  | 'adzuna'
+  | 'jsearch'
 
 export interface JobResult {
   id: string               // unique: `{source}:{nativeId}`
@@ -19,7 +28,10 @@ export interface JobResult {
   postedAt?: string        // ISO date
   companyLogo?: string
   department?: string
-  tags?: string[]          // keyword tags (RemoteOK provides these)
+  tags?: string[]          // keyword tags
+  visaSponsorship?: boolean // only from arbeitnow (partial coverage)
+  experienceLevel?: 'entry' | 'mid' | 'senior'  // inferred from title
+  employmentType?: string  // Full-time, Part-time, Contract, etc.
 }
 
 export interface ScoredJob extends JobResult {
@@ -34,6 +46,7 @@ export interface SearchParams {
   role?: string
   sources?: JobSource[]    // defaults to all available
   limit?: number           // default 30
+  fresh?: boolean          // bypass cache, fetch fresh
 }
 
 export interface SearchResult {

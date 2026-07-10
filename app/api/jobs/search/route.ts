@@ -20,7 +20,7 @@ export async function POST(req: NextRequest) {
     if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
     const body = await req.json()
-    const { query, location, skills, role, sources, limit } = body
+    const { query, location, skills, role, sources, limit, fresh } = body
 
     if (!query || typeof query !== 'string' || query.trim().length < 2) {
       return NextResponse.json(
@@ -36,6 +36,7 @@ export async function POST(req: NextRequest) {
       role: role || undefined,
       sources: Array.isArray(sources) ? sources as JobSource[] : undefined,
       limit: Math.min(limit || 30, 60),
+      fresh: Boolean(fresh),
     })
 
     return NextResponse.json(result)

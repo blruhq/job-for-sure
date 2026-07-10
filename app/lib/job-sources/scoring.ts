@@ -85,3 +85,13 @@ export function rankJobs(jobs: JobResult[], skills: string[], role?: string): Sc
     .map((job) => scoreJob(job, skills, role))
     .sort((a, b) => b.score - a.score)
 }
+
+// ── Experience inference (from job title keywords) ────────────
+const SENIOR_KEYWORDS = /\b(senior|lead|principal|staff|director|head|chief|vp|architect)\b/i
+const ENTRY_KEYWORDS = /\b(junior|entry|intern|internship|graduate|associate|trainee|apprentice)\b/i
+
+export function inferExperienceLevel(title: string): 'entry' | 'mid' | 'senior' {
+  if (SENIOR_KEYWORDS.test(title)) return 'senior'
+  if (ENTRY_KEYWORDS.test(title)) return 'entry'
+  return 'mid'
+}
