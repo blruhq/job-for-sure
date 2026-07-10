@@ -74,20 +74,20 @@ Break down the user's request into a component plan:
 
 | Building... | Search these categories on 21st.dev |
 |-------------|-------------------------------------|
-| Landing page | `hero`, `features`, `pricing`, `testimonials`, `call-to-action`, `footer`, `navbar-navigation`, `background`, `announcement`, `clients`, `gradients` |
+| Landing page | `hero`, `features`, `pricing-section`, `testimonials`, `call-to-action`, `footer`, `navbar-navigation`, `background`, `announcement`, `clients`, `text`, `image` |
 | Dashboard | `sidebar`, `cards`, `tables`, `tabs`, `buttons`, `menus`, `badges`, `number` |
 | Auth pages | `sign-in`, `registration-signup`, `forms`, `inputs`, `buttons` |
-| Blog / Content | `cards`, `texts`, `images`, `pagination`, `scroll-areas` |
+| Blog / Content | `cards`, `text`, `image`, `scroll-area` |
 | E-commerce | `cards`, `carousels`, `badges`, `buttons`, `modal-dialog`, `inputs`, `tabs`, `selects` |
 | Form-heavy app | `inputs`, `selects`, `checkboxes`, `radio-groups`, `date-pickers`, `forms`, `text-areas`, `toggles` |
 | AI / Chat app | `ai-chats`, `inputs`, `buttons`, `cards`, `spinner-loader` |
 | Settings page | `forms`, `inputs`, `toggles`, `tabs`, `selects`, `checkboxes`, `accordions` |
-| Portfolio | `hero`, `cards`, `images`, `texts`, `scroll-areas`, `background`, `navigation-menus` |
-| SaaS product | `hero`, `pricing`, `features`, `testimonials`, `navbar-navigation`, `footer`, `call-to-action`, `comparison` |
+| Portfolio | `hero`, `cards`, `image`, `text`, `scroll-area`, `background`, `navbar-navigation` |
+| SaaS product | `hero`, `pricing-section`, `features`, `testimonials`, `navbar-navigation`, `footer`, `call-to-action`, `comparison` |
 
 ### Phase 3: Live Component Discovery
 
-**Every build session must include live discovery.** 21st.dev adds new components constantly — never rely on memory alone.
+**Before writing any custom code, check 21st.dev first.** 21st.dev has 284+ hero components, 100+ button variants, and more — there's almost always a component that matches your need. Always check the registry before building from scratch. 21st.dev adds new components daily — never rely on memory alone.
 
 #### Discovery Strategy
 
@@ -111,13 +111,48 @@ WebSearch: "site:21st.dev {specific style or feature}"
 ```
 Example: `site:21st.dev animated gradient hero` or `site:21st.dev glassmorphism card`
 
-#### Category Slugs
+**Step 4: Extract full source code (optional)**
+For components where you need to inspect the raw `.tsx` source before installing (to check props, dependencies, or customization complexity):
+```bash
+node .agents/skills/21st-dev-builder-v2/fetch-component.mjs --kind component "https://21st.dev/@{author}/components/{component-name}"
+```
+Or download directly:
+```bash
+node .agents/skills/21st-dev-builder-v2/fetch-component.mjs --download "https://21st.dev/@{author}/components/{component-name}"
+```
 
-Verified live slugs. Browse at `https://21st.dev/community/components/s/{slug}`. Both new-style and legacy aliases resolve to the same page, but prefer canonical (first) slugs.
+#### Landing Section Categories (live from 21st.dev sidebar)
 
-**Landing Sections:** `hero`, `features`, `pricing`, `testimonials`, `call-to-action` (canonical; `cta` also works), `footer`, `navbar-navigation` (canonical; `navbars` also works), `background`, `announcement`, `clients`, `comparison`, `dock`, `shaders`, `gradients`
+Browse at `https://21st.dev/community/components/s/{slug}`. Counts verified live.
 
-**UI Components:** `buttons`, `inputs`, `cards`, `selects`, `sliders`, `accordions`, `tabs`, `modal-dialog` (canonical; `dialogs` also works), `calendars`, `ai-chats`, `tables`, `badges`, `dropdowns`, `alerts`, `forms`, `popovers`, `text-areas`, `radio-groups`, `spinner-loader` (canonical; `spinner-loaders` also works), `pagination`, `checkboxes`, `menus`, `number`, `avatars`, `carousels`, `links`, `toggles`, `date-pickers`, `tooltips`, `toasts`, `sidebar`, `sign-in` (canonical; `sign-ins` also works), `registration-signup` (canonical; `sign-ups` also works), `upload-download` (canonical; `file-uploads` also works), `file-trees`, `icons`, `chip-tag` (canonical; `tags` also works), `notifications`, `empty-states`, `border`, `hook`, `map`, `video`
+| Category | Slug | Count |
+|----------|------|-------|
+| Heroes | `hero` | 73 |
+| Texts | `text` | 58 |
+| Features | `features` | 36 |
+| Calls to Action | `call-to-action` | 34 |
+| Backgrounds | `background` | 33 |
+| Hooks | `hook` | 31 |
+| Images | `image` | 26 |
+| Scroll Areas | `scroll-area` | 24 |
+| Pricing Sections | `pricing-section` | 17 |
+| Clients | `clients` | 16 |
+| Shaders | `shader` | 15 |
+| Testimonials | `testimonials` | 15 |
+| Footers | `footer` | 14 |
+| Borders | `border` | 12 |
+| Navigation Menus | `navbar-navigation` | 11 |
+| Announcements | `announcement` | 10 |
+| Videos | `video` | 9 |
+| Comparisons | `comparison` | 6 |
+| Docks | `dock` | 6 |
+| Maps | `map` | 2 |
+
+#### UI Component Categories
+
+Browse at `https://21st.dev/community/components/s/{slug}`.
+
+`buttons`, `inputs`, `cards`, `selects`, `sliders`, `accordions`, `tabs`, `modal-dialog`, `calendars`, `ai-chats`, `tables`, `badges`, `dropdowns`, `alerts`, `forms`, `popovers`, `text-areas`, `radio-groups`, `spinner-loader`, `pagination`, `checkboxes`, `menus`, `number`, `avatars`, `carousels`, `links`, `toggles`, `date-pickers`, `tooltips`, `toasts`, `sidebar`, `sign-in`, `registration-signup`, `upload-download`, `file-trees`, `icons`, `chip-tag`, `notifications`, `empty-states`, `gradients`, `animated-hero-section`, `modern-hero-ui`
 
 ### Phase 4: Component Analysis & Selection
 
@@ -279,7 +314,11 @@ Don't put gradient decorative elements with `-z-10` behind a parent that has its
 1. Check error message — usually a missing peer dependency
 2. Try `npm install {missing-dep}` then retry
 3. If component URL is wrong, search 21st.dev for the correct path
-4. Last resort: fetch the component code via WebFetch and create files manually
+4. Last resort: fetch the component source directly via the skill's fetch script:
+   ```bash
+   node .agents/skills/21st-dev-builder-v2/fetch-component.mjs --download "https://21st.dev/@{author}/components/{component-name}"
+   ```
+   This extracts the raw `.tsx` from the CDN — create the file manually in your project.
 
 ### Phase 6: Page Composition
 
@@ -517,6 +556,7 @@ This means: if you last browsed `https://21st.dev/community/components/s/hero` a
 |---------|----------|
 | Component not found | Try alternative spellings, browse the parent category, or search with WebSearch |
 | npx install fails | Check for missing peer deps, verify URL format, try `npm install` for deps first |
+| Need raw component source | `node .agents/skills/21st-dev-builder-v2/fetch-component.mjs --download <component-url>` |
 | Component looks wrong | Check if Tailwind config was updated, verify CSS variables are defined |
 | Dark mode broken | Ensure ThemeProvider wraps the app, check CSS variable definitions |
 | TypeScript errors | Check component's expected props, install missing @types packages |
