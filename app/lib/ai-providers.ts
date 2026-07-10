@@ -21,6 +21,9 @@ function createNoThinkingProvider(opts: { baseURL: string; apiKey?: string }) {
         try {
           const body = JSON.parse(init.body)
           body.thinking = { type: 'disabled' }
+          // DeepSeek doesn't support response_format (json_schema) —
+          // strip it so generateObject falls back to prompt-based JSON
+          delete body.response_format
           init = { ...init, body: JSON.stringify(body) }
         } catch {
           // non-JSON body — leave untouched

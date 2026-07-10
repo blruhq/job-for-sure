@@ -13,7 +13,7 @@ function isPublic(pathname: string) {
   return publicRoutes.includes(pathname)
 }
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl
   const sessionCookie = getSessionCookie(request)
   const hasSession = !!sessionCookie
