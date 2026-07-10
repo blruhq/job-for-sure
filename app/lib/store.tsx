@@ -129,13 +129,9 @@ export function AppStoreProvider({ children }: { children: ReactNode }) {
   }, [])
 
   const addResume = useCallback((resume: Resume) => {
-    setResumes(prev => {
-      const next = [...prev, resume]
-      setActiveResumeIdState(resume.id)
-      // Persist to API
-      apiPost('/api/resumes', { id: resume.id, data: resume }).catch(console.error)
-      return next
-    })
+    apiPost('/api/resumes', { id: resume.id, data: resume }).catch(console.error)
+    setResumes(prev => [...prev, resume])
+    setActiveResumeIdState(resume.id)
   }, [])
 
   const updateResume = useCallback((id: string, updates: Partial<Resume>) => {

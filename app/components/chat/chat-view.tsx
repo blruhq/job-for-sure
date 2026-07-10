@@ -87,7 +87,7 @@ export function ChatView() {
       sendMessage({ text: `I just uploaded my resume: ${file.name}. Can you analyze it and find matching companies?` })
 
       // Fetch AI company matches
-      await fetchCompanyMatches(resume.id, resume.skills, resume.name, resume.summary, resume.experience)
+      fetchCompanyMatches(resume.id, resume.skills, resume.name, resume.summary, resume.experience)
     } catch (err) {
       console.error(err)
       notify({ message: 'Failed to process resume. Try Build from Template instead.', type: 'error' })
@@ -118,7 +118,7 @@ export function ChatView() {
       addResume(resume)
       sendMessage({ text: `I'm a ${data.role} with skills in ${data.skills.slice(0, 5).join(', ')}. Find me matching companies.` })
 
-      await fetchCompanyMatches(resume.id, resume.skills, resume.name, resume.summary, resume.experience)
+      fetchCompanyMatches(resume.id, resume.skills, resume.name, resume.summary, resume.experience)
     } catch (err) {
       console.error(err)
       notify({ message: 'Failed to create resume from wizard', type: 'error' })

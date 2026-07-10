@@ -42,6 +42,9 @@ export async function POST(request: Request) {
     updatedAt: new Date(),
   }
 
-  await db.insert(resumes).values(resume)
+  await db.insert(resumes).values(resume).onConflictDoUpdate({
+    target: resumes.id,
+    set: { data: resume.data, updatedAt: new Date() },
+  })
   return NextResponse.json(resume)
 }
