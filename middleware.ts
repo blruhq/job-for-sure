@@ -1,16 +1,30 @@
 import { NextResponse, type NextRequest } from 'next/server'
 import { getSessionCookie } from 'better-auth/cookies'
 
+const protectedRoutes = ['/chat', '/ats', '/pipeline', '/resume', '/settings']
+const publicRoutes = ['/', '/login', '/register']
+
+function isProtected(pathname: string) {
+  return protectedRoutes.some((r) => pathname === r || pathname.startsWith(r + '/'))
+}
+
+function isPublic(pathname: string) {
+  // Exact match only — don't block API routes, _next, static assets, etc.
+  return publicRoutes.includes(pathname)
+}
+
 export async function middleware(request: NextRequest) {
-  // Dev bypass (admin/123) uses localStorage, not cookies.
-  // Skip cookie check in development so the bypass still works.
-  if (process.env.NODE_ENV !== 'production') {
-    return NextResponse.next()
+  const { pathname } = request.nextUrl
+  const sessionCookie = getSessionCookie(request)
+  const hasSession = !!sessionCookie
+
+  // Authenticated user trying to access a public page → redirect to /chat
+  if (hasSession && isPublic(pathname)) {
+    return NextResponse.redirect(new URL('/chat', request.url))
   }
 
-  const sessionCookie = getSessionCookie(request)
-
-  if (!sessionCookie) {
+  // Unauthenticated user trying to access a protected route → redirect to /login
+  if (!hasSession && isProtected(pathname)) {
     return NextResponse.redirect(new URL('/login', request.url))
   }
 
@@ -18,5 +32,14 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/chat/:path*', '/ats/:path*', '/pipeline/:path*', '/resume/:path*', '/settings/:path*'],
+  matcher: [
+    '/',
+    '/login',
+    '/register',
+    '/chat/:path*',
+    '/ats/:path*',
+    '/pipeline/:path*',
+    '/resume/:path*',
+    '/settings/:path*',
+  ],
 }
