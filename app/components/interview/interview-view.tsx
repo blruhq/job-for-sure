@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, Suspense } from 'react'
 import { InterviewSetup } from './interview-setup'
 import { InterviewSession } from './interview-session'
 import { InterviewSummary } from './interview-summary'
@@ -34,7 +34,15 @@ export function InterviewView() {
 
   return (
     <div className="flex h-full w-full flex-col overflow-hidden bg-background">
-      {phase === 'setup' && <InterviewSetup onStart={handleStart} />}
+      {phase === 'setup' && (
+        <Suspense fallback={
+          <div className="flex h-full w-full items-center justify-center p-6">
+            <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-primary" />
+          </div>
+        }>
+          <InterviewSetup onStart={handleStart} />
+        </Suspense>
+      )}
       {phase === 'session' && config && (
         <InterviewSession config={config} resume={currentResume} onEnd={handleEndSession} />
       )}

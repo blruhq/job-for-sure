@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { Brain, FileText, ArrowRight } from 'lucide-react'
 import { useAppStore } from '~/lib/store'
 import type { InterviewConfig } from '~/types/interview'
@@ -12,6 +12,7 @@ interface InterviewSetupProps {
 
 export function InterviewSetup({ onStart }: InterviewSetupProps) {
   const router = useRouter()
+  const searchParams = useSearchParams()
   const { resumes, activeResumeId, setActiveResumeId } = useAppStore()
 
   // Find active resume
@@ -38,14 +39,20 @@ export function InterviewSetup({ onStart }: InterviewSetupProps) {
     }
   }, [activeResume])
 
-  // Sync target selector options
+  // Sync target selector options from URL query parameters (?company=X&role=Y)
   useEffect(() => {
-    if (currentResume && currentResume.companies && currentResume.companies.length > 0) {
+    const companyParam = searchParams.get('company')
+    const roleParam = searchParams.get('role')
+    if (companyParam || roleParam) {
+      setTargetSelect('custom')
+      if (companyParam) setCustomCompany(companyParam)
+      if (roleParam) setCustomRole(roleParam)
+    } else if (currentResume && currentResume.companies && currentResume.companies.length > 0) {
       setTargetSelect(currentResume.companies[0].name)
     } else {
       setTargetSelect('custom')
     }
-  }, [currentResume])
+  }, [currentResume, searchParams])
 
   if (resumes.length === 0) {
     return (

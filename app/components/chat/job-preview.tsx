@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import {
-  Bookmark, ExternalLink, Loader2, ChevronRight, MessageSquare, Plane, X,
+  Bookmark, ExternalLink, Loader2, ChevronRight, MessageSquare, Plane, X, Brain,
 } from 'lucide-react'
 import { cn } from '~/lib/utils'
 import { useAppStore } from '~/lib/store'
@@ -22,6 +22,8 @@ const SOURCE_SHORT: Record<JobSource, string> = {
   arbeitnow: 'Arbeitnow',
   adzuna: 'Adzuna',
   jsearch: 'JSearch',
+  linkedin: 'LinkedIn',
+  indeed: 'Indeed',
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -212,12 +214,11 @@ export function JobPreview({ resume, onDismiss }: { resume: Resume; onDismiss?: 
                   </button>
                   <button
                     onClick={() => {
-                      sessionStorage.setItem('jfs_pending_chat', `I want to prepare for the ${job.title} role at ${job.company}. Can you coach me on what to expect and how to stand out?`)
-                      router.push('/chat')
+                      router.push(`/interview?company=${encodeURIComponent(job.company)}&role=${encodeURIComponent(job.title)}`)
                     }}
                     className="flex cursor-pointer items-center gap-0.5 rounded-xs border border-border bg-card px-1.5 py-0.5 text-[10px] transition-colors hover:border-primary hover:text-primary"
                   >
-                    <MessageSquare size={9} /> Interview
+                    <Brain size={9} /> Interview
                   </button>
                   <a
                     href={job.url}

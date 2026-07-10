@@ -28,6 +28,8 @@ const SOURCE_NAMES: Record<JobSource, string> = {
   arbeitnow: 'Arbeitnow',
   adzuna: 'Adzuna',
   jsearch: 'JSearch',
+  linkedin: 'LinkedIn (Apify)',
+  indeed: 'Indeed (Apify)',
 }
 
 interface SourceMeta { source: JobSource; count: number; error?: string }
@@ -196,8 +198,7 @@ export function JobSearchPanel({ resume }: { resume: Resume }) {
   }
 
   const handleInterview = (job: ScoredJob) => {
-    sessionStorage.setItem('jfs_pending_chat', `I want to prepare for the ${job.title} role at ${job.company}. Can you coach me on what to expect and how to stand out?`)
-    router.push('/chat')
+    router.push(`/interview?company=${encodeURIComponent(job.company)}&role=${encodeURIComponent(job.title)}`)
   }
 
   const handleRefresh = () => {
