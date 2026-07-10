@@ -101,7 +101,7 @@ export default function LandingPage() {
     <div className="flex min-h-screen flex-col bg-background">
       <DotPattern>
         {/* ── HERO ── */}
-        <section className="relative flex flex-1 flex-col items-center justify-center px-6 py-16 md:py-24">
+        <section className="relative flex min-h-screen flex-col items-center justify-center px-6">
           <div
             className="pointer-events-none absolute inset-0 opacity-[0.04]"
             style={{
