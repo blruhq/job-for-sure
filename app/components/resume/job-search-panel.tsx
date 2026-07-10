@@ -1,10 +1,11 @@
 'use client'
 
-import { useState, useEffect, useCallback, useMemo } from 'react'
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import {
   Search, Bookmark, ExternalLink, MapPin, Loader2, AlertCircle,
   RefreshCw, Filter, X, Globe, Clock, Star, Plane, MessageSquare,
+  ChevronDown, Briefcase,
 } from 'lucide-react'
 import { cn } from '~/lib/utils'
 import { useAppStore } from '~/lib/store'
@@ -31,6 +32,16 @@ const SOURCE_NAMES: Record<JobSource, string> = {
   linkedin: 'LinkedIn (Apify)',
   indeed: 'Indeed (Apify)',
 }
+
+// Source tiers used by the search flow (see plan)
+const FAST_FREE_SOURCES: JobSource[] = [
+  'remoteok', 'himalayas', 'remotive',
+  'themuse', 'arbeitnow', 'adzuna',
+]
+const FULL_FREE_SOURCES: JobSource[] = [
+  'greenhouse', 'ashby', 'jsearch',
+]
+const PAID_SOURCES: JobSource[] = ['linkedin', 'indeed']
 
 interface SourceMeta { source: JobSource; count: number; error?: string }
 
@@ -72,14 +83,39 @@ export function JobSearchPanel({ resume }: { resume: Resume }) {
   const [showFilters, setShowFilters] = useState(false)
   const [filters, setFilters] = useState<Filters>({ ...DEFAULT_FILTERS })
 
+  // ── Infinite scroll & paid sources ──
+  const [displayLimit, setDisplayLimit] = useState(25)
+  const [paidLoaded, setPaidLoaded] = useState(false)
+  const [paidLoading, setPaidLoading] = useState(false)
+  const sentinelRef = useRef<HTMLDivElement>(null)
+  const searchRunRef = useRef(0) // track latest search to avoid stale merges
+
+  // ── Merge helper: combines two search results, dedup by id ──
+  const mergeResults = useCallback((existing: ScoredJob[], incoming: ScoredJob[]): ScoredJob[] => {
+    const seen = new Set(existing.map(j => j.id))
+    const added = incoming.filter(j => !seen.has(j.id))
+    if (added.length === 0) return existing
+    return [...existing, ...added].sort((a, b) => b.score - a.score)
+  }, [])
+
   const handleSearch = useCallback(async (q?: string, loc?: string, fresh?: boolean) => {
     const searchQuery = (q ?? query).trim()
     if (searchQuery.length < 2) return
 
+    const runId = ++searchRunRef.current
     setLoading(true)
     setSearched(true)
+    setResults([])
+    setPaidLoaded(false)
+    setPaidLoading(false)
+    setDisplayLimit(25)
+    setSources([])
+
+    let combinedSources: typeof sources = []
+
     try {
-      const res = await fetch('/api/jobs/search', {
+      // ── Phase 1: Fast free sources (1-3s) ──
+      const fastRes = await fetch('/api/jobs/search', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -87,24 +123,54 @@ export function JobSearchPanel({ resume }: { resume: Resume }) {
           location: (loc ?? location).trim() || undefined,
           skills: resume.skills,
           role: resume.name,
-          limit: 30,
+          sources: FAST_FREE_SOURCES,
+          limit: 100,
           fresh,
         }),
       })
 
-      if (!res.ok) throw new Error('Search failed')
-      const data: SearchResult = await res.json()
+      if (runId !== searchRunRef.current) return // stale, another search started
+      if (!fastRes.ok) throw new Error('Fast search failed')
+      const fastData: SearchResult = await fastRes.json()
+      setResults(fastData.jobs)
+      combinedSources = [...combinedSources, ...fastData.sources]
+      setSources(combinedSources)
+      setCached(fastData.cached)
+      setLoading(false) // release loading — user sees 25 jobs now
 
-      setResults(data.jobs)
-      setSources(data.sources)
-      setCached(data.cached)
+      // ── Phase 2: Slow free sources (3-10s, background) ──
+      try {
+        const fullRes = await fetch('/api/jobs/search', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            query: searchQuery,
+            location: (loc ?? location).trim() || undefined,
+            skills: resume.skills,
+            role: resume.name,
+            sources: FULL_FREE_SOURCES,
+            limit: 100,
+            fresh,
+          }),
+        })
+        if (runId !== searchRunRef.current) return
+        if (fullRes.ok) {
+          const fullData: SearchResult = await fullRes.json()
+          setResults(prev => mergeResults(prev, fullData.jobs))
+          combinedSources = [...combinedSources, ...fullData.sources]
+          setSources(combinedSources)
+        }
+      } catch {
+        // Silent fail — fast results are already showing
+      }
     } catch (err) {
-      console.error('[job-search] Error:', err)
-      notify({ message: 'Job search failed. Try again.', type: 'error' })
-    } finally {
-      setLoading(false)
+      if (runId === searchRunRef.current) {
+        console.error('[job-search] Error:', err)
+        notify({ message: 'Job search failed. Try again.', type: 'error' })
+        setLoading(false)
+      }
     }
-  }, [query, location, resume.skills, resume.name])
+  }, [query, location, resume.skills, resume.name, mergeResults])
 
   // Auto-search on mount
   useEffect(() => {
@@ -137,6 +203,34 @@ export function JobSearchPanel({ resume }: { resume: Resume }) {
       return true
     })
   }, [results, filters])
+
+  // Only show displayLimit items — rest revealed on scroll
+  const displayedJobs = useMemo(() => {
+    return filtered.slice(0, displayLimit)
+  }, [filtered, displayLimit])
+
+  const hasMore = filtered.length > displayedJobs.length
+
+  // ── Infinite scroll: observe sentinel at bottom of job list ──
+  useEffect(() => {
+    const sentinel = sentinelRef.current
+    if (!sentinel) return
+
+    let loadingMore = false
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && !loadingMore) {
+          loadingMore = true
+          setDisplayLimit(prev => prev + 25)
+          setTimeout(() => { loadingMore = false }, 500)
+        }
+      },
+      { threshold: 0, rootMargin: '400px' },
+    )
+
+    observer.observe(sentinel)
+    return () => observer.disconnect()
+  }, [filtered.length])
 
   const activeFilterCount =
     (filters.remoteOnly ? 1 : 0) +
@@ -205,6 +299,37 @@ export function JobSearchPanel({ resume }: { resume: Resume }) {
     handleSearch(undefined, undefined, true)
     notify({ message: 'Fetching fresh results (bypassing cache)…', type: 'info' })
   }
+
+  // ── Load paid sources (LinkedIn/Indeed via Apify) — user-initiated ──
+  const handleLoadPaid = useCallback(async () => {
+    if (paidLoading || paidLoaded) return
+    setPaidLoading(true)
+    try {
+      const res = await fetch('/api/jobs/search', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          query,
+          location: location.trim() || undefined,
+          skills: resume.skills,
+          role: resume.name,
+          sources: PAID_SOURCES,
+          includePaid: true,
+          limit: 50,
+        }),
+      })
+      if (!res.ok) throw new Error('Paid search failed')
+      const data: SearchResult = await res.json()
+      setResults(prev => mergeResults(prev, data.jobs))
+      setPaidLoaded(true)
+      notify({ message: `Added ${data.jobs.length} jobs from LinkedIn & Indeed`, type: 'success' })
+    } catch (err) {
+      console.error('[job-search-paid] Error:', err)
+      notify({ message: 'LinkedIn/Indeed search failed. They may be rate-limited.', type: 'error' })
+    } finally {
+      setPaidLoading(false)
+    }
+  }, [query, location, resume.skills, resume.name, paidLoading, paidLoaded, mergeResults])
 
   // ═══════════════════════════════════════════════════════════════
   // RENDER
@@ -434,11 +559,14 @@ export function JobSearchPanel({ resume }: { resume: Resume }) {
         {!loading && filtered.length > 0 && (
           <>
             <div className="mb-3 text-[11px] text-muted-foreground">
-              {filtered.length} real job{filtered.length !== 1 ? 's' : ''} · scored against your {resume.skills.length} skills
+              {filtered.length} real job{filtered.length !== 1 ? 's' : ''}
+              {displayedJobs.length < filtered.length && ` · showing ${displayedJobs.length}`}
+              {' · '}scored against your {resume.skills.length} skills
               {cached && ' · cached results'}
             </div>
+
             <div className="flex flex-col gap-3">
-              {filtered.map((job) => (
+              {displayedJobs.map((job) => (
                 <JobCard
                   key={job.id}
                   job={job}
@@ -449,6 +577,46 @@ export function JobSearchPanel({ resume }: { resume: Resume }) {
                 />
               ))}
             </div>
+
+            {/* Infinite scroll sentinel */}
+            <div ref={sentinelRef} className="h-1" />
+
+            {/* Loading more spinner */}
+            {hasMore && (
+              <div className="flex items-center justify-center py-4 gap-2 text-muted-foreground">
+                <Loader2 size={12} className="animate-spin" />
+                <span className="font-mono text-[10px]">Loading more…</span>
+              </div>
+            )}
+
+            {/* Paid sources button (only when no more free jobs to load) */}
+            {!hasMore && !paidLoaded && (
+              <div className="mt-4 flex flex-col items-center gap-2 border-t border-border pt-4">
+                <p className="text-[11px] text-muted-foreground">
+                  No more free results. Want jobs from LinkedIn & Indeed?
+                </p>
+                <button
+                  onClick={handleLoadPaid}
+                  disabled={paidLoading}
+                  className="flex cursor-pointer items-center gap-1.5 rounded-sm border border-primary/40 bg-accent-soft px-3 py-2 text-[11px] font-medium text-primary transition-all hover:bg-primary hover:text-primary-foreground disabled:opacity-50"
+                >
+                  {paidLoading ? (
+                    <Loader2 size={12} className="animate-spin" />
+                  ) : (
+                    <Briefcase size={12} />
+                  )}
+                  {paidLoading ? 'Loading…' : `Load jobs from LinkedIn & Indeed (uses Apify credit)`}
+                </button>
+              </div>
+            )}
+
+            {/* Paid loaded confirmation */}
+            {paidLoaded && (
+              <div className="mt-4 flex items-center justify-center gap-1.5 rounded-sm border border-border bg-card px-3 py-2 text-[11px] text-muted-foreground">
+                <Briefcase size={12} className="text-primary" />
+                LinkedIn & Indeed jobs loaded
+              </div>
+            )}
           </>
         )}
       </div>

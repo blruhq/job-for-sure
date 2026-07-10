@@ -47,6 +47,7 @@ export function setCached<T>(key: string, data: T): void {
   })
 }
 
-export function cacheKey(query: string, location?: string): string {
-  return `${query.toLowerCase().trim()}::${(location || '').toLowerCase().trim()}`
+export function cacheKey(query: string, location?: string, sources?: string[]): string {
+  const srcKey = sources ? '-' + [...sources].sort().join(',') : ''
+  return `${query.toLowerCase().trim()}::${(location || '').toLowerCase().trim()}${srcKey}`
 }

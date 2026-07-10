@@ -22,6 +22,8 @@ import { fetchTheMuse } from './themuse'
 import { fetchArbeitnow } from './arbeitnow'
 import { fetchAdzuna } from './adzuna'
 import { fetchJSearch } from './jsearch'
+import { fetchApifyLinkedIn } from './apify-linkedin'
+import { fetchApifyIndeed } from './apify-indeed'
 import { rankJobs, inferExperienceLevel } from './scoring'
 import { getCached, setCached, cacheKey } from './cache'
 import {
@@ -33,18 +35,24 @@ import {
 
 const SEARCH_TIMEOUT_MS = 15_000 // per-source timeout
 
-// All sources, in priority order
-const ALL_SOURCES: JobSource[] = [
-  'remoteok',
-  'himalayas',
-  'remotive',
-  'themuse',
-  'arbeitnow',
-  'greenhouse',
-  'ashby',
-  'adzuna',
-  'jsearch',
+// Source tiers (see DESIGN.md for the full flow)
+//   FAST_FREE — single API calls, 1-3s
+//   SLOW_FREE — multi-company ATS, 3-10s
+//   BUDGET    — free tier with monthly limit (200/mo)
+//   PAID      — Apify credits (LinkedIn, Indeed)
+const FAST_FREE_SOURCES: JobSource[] = [
+  'remoteok', 'himalayas', 'remotive',
+  'themuse', 'arbeitnow', 'adzuna',
 ]
+const SLOW_FREE_SOURCES: JobSource[] = ['greenhouse', 'ashby']
+const BUDGET_SOURCES: JobSource[] = ['jsearch']
+const PAID_SOURCES: JobSource[] = ['linkedin', 'indeed']
+const FREE_SOURCES: JobSource[] = [
+  ...FAST_FREE_SOURCES, ...SLOW_FREE_SOURCES, ...BUDGET_SOURCES,
+]
+
+// All sources (used when includePaid is true or explicit sources given)
+const ALL_SOURCES: JobSource[] = [...FREE_SOURCES, ...PAID_SOURCES]
 
 export async function searchJobs(params: SearchParams): Promise<SearchResult> {
   const {
@@ -52,13 +60,17 @@ export async function searchJobs(params: SearchParams): Promise<SearchResult> {
     location,
     skills = [],
     role,
-    sources = ALL_SOURCES,
+    sources: rawSources,
     limit = 30,
     fresh = false,
+    includePaid = false,
   } = params
 
+  // Resolve sources: default to free sources unless includePaid is true
+  const sources = rawSources ?? (includePaid ? ALL_SOURCES : FREE_SOURCES)
+
   // 1. Check cache (unless fresh=true)
-  const key = cacheKey(query, location)
+  const key = cacheKey(query, location, sources)
   if (!fresh) {
     const cached = getCached<SearchResult>(key)
     if (cached) {
@@ -109,6 +121,14 @@ export async function searchJobs(params: SearchParams): Promise<SearchResult> {
   if (sources.includes('jsearch')) {
     fetchers.push(wrapSource('jsearch', () => fetchJSearch(query, location)))
     fetcherSources.push('jsearch')
+  }
+  if (sources.includes('linkedin')) {
+    fetchers.push(wrapSource('linkedin', () => fetchApifyLinkedIn(query, location)))
+    fetcherSources.push('linkedin')
+  }
+  if (sources.includes('indeed')) {
+    fetchers.push(wrapSource('indeed', () => fetchApifyIndeed(query, location)))
+    fetcherSources.push('indeed')
   }
 
   const results = await Promise.allSettled(fetchers)

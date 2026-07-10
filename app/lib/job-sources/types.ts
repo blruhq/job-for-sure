@@ -13,6 +13,8 @@ export type JobSource =
   | 'arbeitnow'
   | 'adzuna'
   | 'jsearch'
+  | 'linkedin'
+  | 'indeed'
 
 export interface JobResult {
   id: string               // unique: `{source}:{nativeId}`
@@ -47,6 +49,7 @@ export interface SearchParams {
   sources?: JobSource[]    // defaults to all available
   limit?: number           // default 30
   fresh?: boolean          // bypass cache, fetch fresh
+  includePaid?: boolean    // include Apify LinkedIn/Indeed (costs $)
 }
 
 export interface SearchResult {
