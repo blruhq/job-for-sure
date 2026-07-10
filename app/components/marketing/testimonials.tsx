@@ -27,35 +27,35 @@ const TESTIMONIALS = [
 
 export function Testimonials() {
   return (
-    <section className="border-t border-border py-20 md:py-28">
+    <section className="border-t border-border bg-muted/30 py-24 md:py-32">
       <div className="mx-auto max-w-[1120px] px-6">
         <div className="max-w-xl">
-          <h2 className="text-3xl font-semibold tracking-tight text-foreground md:text-4xl">
+          <h2 className="text-4xl font-semibold tracking-tight text-foreground md:text-5xl">
             Loved by job seekers.
           </h2>
-          <p className="mt-4 text-lg text-muted-foreground">
+          <p className="mt-5 text-lg leading-relaxed text-muted-foreground">
             Real results from people who actually used it.
           </p>
         </div>
-        <div className="mt-16 grid gap-6 md:grid-cols-3">
+        <div className="mt-20 grid gap-6 md:grid-cols-3">
           {TESTIMONIALS.map((t) => (
             <div
               key={t.name}
-              className="flex flex-col rounded-2xl border border-border bg-card p-6 shadow-sm"
+              className="flex flex-col rounded-2xl border border-border bg-card p-8 shadow-sm"
             >
-              <div className="flex items-center gap-3">
-                <div className="flex h-9 w-9 items-center justify-center rounded-full bg-primary/10 text-xs font-semibold text-primary">
+              <div className="flex items-center gap-4">
+                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 text-sm font-semibold text-primary">
                   {t.avatar}
                 </div>
                 <div>
-                  <div className="text-sm font-semibold text-foreground">{t.name}</div>
-                  <div className="text-[11px] text-muted-foreground">{t.role}</div>
+                  <div className="text-base font-semibold text-foreground">{t.name}</div>
+                  <div className="text-xs text-muted-foreground">{t.role}</div>
                 </div>
               </div>
-              <p className="mt-4 flex-1 text-sm leading-relaxed text-muted-foreground">
+              <p className="mt-6 flex-1 text-base leading-relaxed text-muted-foreground">
                 &ldquo;{t.quote}&rdquo;
               </p>
-              <div className="mt-4 inline-flex self-start rounded-full bg-success/10 px-3 py-1 text-[11px] font-medium text-success">
+              <div className="mt-6 inline-flex self-start rounded-full bg-success/10 px-4 py-1.5 text-xs font-medium text-success">
                 {t.result}
               </div>
             </div>

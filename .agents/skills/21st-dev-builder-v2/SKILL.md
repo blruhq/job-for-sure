@@ -19,7 +19,7 @@ This skill makes you exceptionally good at:
 An open-source community registry (the "npm for design engineers") with 1400+ React components. Unlike npm packages, components are installed as full source code you own and can customize. Built on shadcn/ui philosophy.
 
 ### Tech Stack
-- **Framework**: React 18+ / Next.js (App Router preferred)
+- **Framework**: React 19+ / Next.js (App Router preferred)
 - **Styling**: Tailwind CSS 4+
 - **Primitives**: Radix UI
 - **Language**: TypeScript

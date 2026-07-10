@@ -27,37 +27,37 @@ const STEPS = [
 
 export function HowItWorks() {
   return (
-    <section id="how-it-works" className="border-t border-border py-20 md:py-28">
+    <section id="how-it-works" className="border-t border-border bg-muted/30 py-24 md:py-32">
       <div className="mx-auto max-w-[1120px] px-6">
         <div className="max-w-xl">
-          <h2 className="text-3xl font-semibold tracking-tight text-foreground md:text-4xl">
+          <h2 className="text-4xl font-semibold tracking-tight text-foreground md:text-5xl">
             From upload to offer in four steps.
           </h2>
-          <p className="mt-4 text-lg text-muted-foreground">
+          <p className="mt-5 text-lg leading-relaxed text-muted-foreground">
             No fluff. No spreadsheets. Just a clear path from resume to offer.
           </p>
         </div>
-        <div className="mt-16 grid gap-8 md:grid-cols-4">
+        <div className="mt-20 grid gap-10 md:grid-cols-4">
           {STEPS.map((step, i) => {
             const Icon = step.icon
             return (
               <div key={step.title} className="relative">
                 {i < STEPS.length - 1 && (
-                  <div className="absolute -right-4 top-6 hidden h-px w-8 border-t border-dashed border-border md:block" />
+                  <div className="absolute -right-5 top-8 hidden h-px w-10 border-t border-dashed border-border/40 md:block" />
                 )}
-                <div className="flex h-12 w-12 items-center justify-center rounded-xl border border-border bg-card text-primary">
-                  <Icon size={20} />
+                <div className="flex h-14 w-14 items-center justify-center rounded-xl border border-border bg-card text-primary shadow-sm">
+                  <Icon size={24} />
                 </div>
-                <div className="mt-4 font-mono text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">
+                <div className="mt-5 font-mono text-xs font-semibold uppercase tracking-widest text-muted-foreground">
                   Step {i + 1}
                 </div>
-                <h3 className="mt-2 text-lg font-semibold text-foreground">{step.title}</h3>
+                <h3 className="mt-3 text-xl font-semibold text-foreground">{step.title}</h3>
                 <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{step.desc}</p>
               </div>
             )
           })}
         </div>
-        <div className="mt-12">
+        <div className="mt-16">
           <Link
             href="/register"
             className="inline-flex cursor-pointer items-center gap-1.5 text-sm font-medium text-primary transition-colors hover:text-primary/80"
