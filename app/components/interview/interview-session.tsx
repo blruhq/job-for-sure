@@ -155,7 +155,7 @@ export function InterviewSession({ config, resume, onEnd }: InterviewSessionProp
   return (
     <div className="flex h-full w-full flex-col bg-background">
       {/* Header bar */}
-      <div className="flex items-center justify-between border-b border-border bg-card px-6 py-3.5 shrink-0">
+      <div className="flex items-center justify-between border-b border-border bg-card px-4 md:px-6 py-3.5 shrink-0">
         <div className="flex items-center gap-2">
           <div className="rounded bg-primary/10 p-1 text-primary">
             <Brain size={16} />

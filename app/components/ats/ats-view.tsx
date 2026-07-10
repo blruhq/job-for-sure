@@ -214,20 +214,20 @@ export function AtsView() {
             <p className="mb-4 max-w-xs text-xs text-muted-foreground">
               Select a resume from the dropdown or upload one in chat, then paste a job description to get an ATS match score.
             </p>
-            <div className="flex gap-2">
+            <div className="flex flex-col items-start gap-2 sm:flex-row sm:items-center">
               <button
                 onClick={() => router.push('/chat')}
                 className="flex cursor-pointer items-center gap-1.5 rounded-sm bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground transition-opacity hover:opacity-90"
               >
                 <Upload size={12} /> Upload Resume
               </button>
-              <span className="flex items-center text-muted-foreground">
+              <span className="hidden items-center text-muted-foreground sm:flex">
                 <ArrowRight size={14} />
               </span>
               <div className="flex items-center gap-1.5 rounded-sm border border-border bg-card px-3 py-1.5 text-xs text-muted-foreground">
                 Select Profile
               </div>
-              <span className="flex items-center text-muted-foreground">
+              <span className="hidden items-center text-muted-foreground sm:flex">
                 <ArrowRight size={14} />
               </span>
               <div className="flex items-center gap-1.5 rounded-sm border border-border bg-card px-3 py-1.5 text-xs text-muted-foreground">

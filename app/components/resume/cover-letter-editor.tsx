@@ -99,7 +99,7 @@ export function CoverLetterEditor({ resume, updateResume }: CoverLetterEditorPro
       {/* Preview / Edit Panel */}
       <div className="flex-1 flex flex-col overflow-hidden bg-background">
         {/* Actions bar */}
-        <div className="flex shrink-0 items-center justify-between border-b border-border bg-card px-6 py-2.5">
+        <div className="flex shrink-0 items-center justify-between border-b border-border bg-card px-4 md:px-6 py-2.5">
           <div className="flex items-center gap-2">
             <span className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">Letter Editor</span>
           </div>

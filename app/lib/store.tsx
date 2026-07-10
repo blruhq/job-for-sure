@@ -90,6 +90,12 @@ export function AppStoreProvider({ children }: { children: ReactNode }) {
   const [targetCompanyKey, setTargetCompanyKey] = useState<string>('none')
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
 
+  useEffect(() => {
+    if (typeof window !== 'undefined' && window.innerWidth < 768) {
+      setSidebarCollapsed(true)
+    }
+  }, [])
+
   // ── Hydrate from API ──
   useEffect(() => {
     async function load() {

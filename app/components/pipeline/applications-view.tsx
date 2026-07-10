@@ -86,7 +86,7 @@ export function ApplicationsView() {
       </div>
 
       {/* Stats */}
-      <div className="mb-5 flex gap-4">
+      <div className="mb-5 grid grid-cols-2 gap-2 sm:flex sm:gap-4">
         {[
           { value: total, label: 'Total Applications' },
           { value: `${avgScore}%`, label: 'Avg Match Score', color: 'text-success' },
@@ -124,7 +124,7 @@ export function ApplicationsView() {
           <p className="mb-4 max-w-xs text-xs text-muted-foreground">
             Bookmark matching jobs from the chat or import a job URL to start tracking.
           </p>
-          <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
             <button
               onClick={() => router.push('/chat')}
               className="flex cursor-pointer items-center gap-1.5 rounded-sm bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground transition-opacity hover:opacity-90"

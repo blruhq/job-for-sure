@@ -107,21 +107,21 @@ export function ResumeDetail({ resumeId }: { resumeId: string }) {
   return (
     <div className="flex h-full flex-col">
       {/* Header with tabs */}
-      <div className="flex shrink-0 items-center justify-between border-b border-border bg-card px-6 py-3">
-        <div className="flex items-center gap-2">
+      <div className="flex shrink-0 flex-col md:flex-row md:items-center justify-between gap-2 border-b border-border bg-card px-4 md:px-6 py-3">
+        <div className="flex items-center gap-2 overflow-x-auto min-w-0 max-w-full">
           <button
             onClick={() => router.push('/chat')}
-            className="flex items-center gap-1 rounded-sm border border-border bg-card px-2 py-1 text-[11px] text-muted-foreground hover:bg-background"
+            className="flex shrink-0 items-center gap-1 rounded-sm border border-border bg-card px-2 py-1 text-[11px] text-muted-foreground hover:bg-background"
           >
             <ArrowLeft size={12} /> Back
           </button>
-          <div className="ml-3 flex gap-1 rounded-sm bg-border/30 p-0.5">
+          <div className="ml-3 flex gap-1 overflow-x-auto rounded-sm bg-border/30 p-0.5">
             {(['jobs', 'view', 'editor', 'cover-letter'] as const).map((t) => (
               <button
                 key={t}
                 onClick={() => setTab(t)}
                 className={cn(
-                  'rounded-xs px-3 py-1 text-[11px] font-medium transition-all',
+                  'shrink-0 rounded-xs px-3 py-1 text-[11px] font-medium transition-all',
                   tab === t ? 'bg-card text-foreground shadow-sm font-semibold' : 'text-muted-foreground hover:text-foreground',
                 )}
               >
@@ -130,8 +130,8 @@ export function ResumeDetail({ resumeId }: { resumeId: string }) {
             ))}
           </div>
         </div>
-        <div className="flex items-center gap-3">
-          <h1 className="text-sm font-semibold">{resume.name}</h1>
+        <div className="flex shrink-0 items-center gap-3">
+          <h1 className="truncate text-sm font-semibold max-w-[150px] sm:max-w-xs">{resume.name}</h1>
           <span className="rounded-xs bg-success-soft px-1.5 py-0.5 font-mono text-[11px] font-semibold text-success">{resume.score}% Match</span>
         </div>
       </div>
@@ -229,7 +229,7 @@ export function ResumeDetail({ resumeId }: { resumeId: string }) {
                           )}
                           <div className="mt-3 flex items-center justify-between border-t border-border/50 pt-3">
                             <span className="font-mono text-[10px] text-muted-foreground">{c.type}</span>
-                            <div className="flex gap-2">
+                            <div className="flex flex-wrap gap-2">
                               <button
                                 onClick={(e) => { e.stopPropagation(); bm ? toggleBookmark(key) : bookmarkJob({
                                   key, logo: c.logo, color: c.color, company: c.name, title: c.role,
