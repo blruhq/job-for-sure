@@ -101,7 +101,7 @@ export default function LandingPage() {
     <div className="flex min-h-screen flex-col bg-background">
       <DotPattern>
         {/* ── HERO ── */}
-        <section className="relative flex min-h-screen flex-col items-center justify-center px-6">
+        <section className="relative flex min-h-screen flex-col items-center px-6 pt-[12vh] md:pt-[15vh]">
           <div
             className="pointer-events-none absolute inset-0 opacity-[0.04]"
             style={{
@@ -111,11 +111,7 @@ export default function LandingPage() {
           />
           <div className="relative mx-auto grid w-full max-w-[1120px] items-center gap-12 md:grid-cols-[1fr_1.2fr] md:gap-16">
             <div className="max-w-lg">
-              <div className="inline-flex items-center gap-1.5 rounded-full border border-border bg-muted/50 px-3 py-1 text-[11px] font-medium text-muted-foreground">
-                <span className="h-1.5 w-1.5 rounded-full bg-primary animate-pulse" />
-                AI-powered career platform
-              </div>
-              <h1 className="mt-6 text-4xl font-semibold leading-[1.08] tracking-tight text-foreground sm:text-5xl md:text-[3.5rem] md:leading-[1.05]">
+              <h1 className="text-4xl font-semibold leading-[1.08] tracking-tight text-foreground sm:text-5xl md:text-[3.5rem] md:leading-[1.05]">
                 Know your chances
                 <br />
                 before you apply.
