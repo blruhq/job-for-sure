@@ -41,15 +41,24 @@ Rules:
 - Return ONLY the JSON.`,
       prompt: text.slice(0, 8000), // Cap at 8K chars to stay within token limits
       temperature: 0.2,
-      maxOutputTokens: 1500,
+      maxOutputTokens: 3000,
     })
 
     const jsonMatch = result.match(/\{[\s\S]*\}/)
     if (!jsonMatch) {
+      console.error('[parse-resume] Failed to find JSON block. Raw AI output:', result)
       throw new Error('AI returned invalid JSON')
     }
 
-    const parsed = JSON.parse(jsonMatch[0])
+    let parsed
+    try {
+      parsed = JSON.parse(jsonMatch[0])
+    } catch (parseError) {
+      console.error('[parse-resume] JSON parse error. Extracted substring:', jsonMatch[0])
+      console.error('[parse-resume] Raw AI output:', result)
+      throw new Error('AI returned malformed JSON structure')
+    }
+    
     return NextResponse.json(parsed)
   } catch (error) {
     console.error('[parse-resume] Error:', error)
