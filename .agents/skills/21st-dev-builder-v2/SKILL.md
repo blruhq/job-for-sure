@@ -28,10 +28,19 @@ An open-source community registry (the "npm for design engineers") with 1400+ Re
 ### URL Patterns
 | Purpose | URL Pattern |
 |---------|-------------|
-| Browse category | `https://21st.dev/s/{slug}` |
-| Component detail | `https://21st.dev/r/{author}/{component}` |
-| Author profile | `https://21st.dev/{author}` |
+| Browse category | `https://21st.dev/community/components/s/{slug}` |
+| Component detail | `https://21st.dev/@{author}/components/{component}` |
+| Author profile | `https://21st.dev/@{author}` |
+| Author library | `https://21st.dev/@{author}/library/default` |
+| Component install | `https://21st.dev/r/{author}/{component}` (for `npx shadcn add`) |
 | Community search | `https://21st.dev/community/components/search` |
+| Themes | `https://21st.dev/community/themes` |
+| Templates | `https://21st.dev/community/templates` |
+| ASCII Art | `https://21st.dev/community/ascii` |
+| CLI & MCP | `https://21st.dev/mcp` |
+| Bookmarks | `https://21st.dev/community/bookmarks` |
+| 21st AI | `https://21st.dev/ai` |
+| My Studio | `https://21st.dev/studio/{user}` |
 
 ## Workflow
 
@@ -86,13 +95,13 @@ For each component category you need, follow this search sequence:
 
 **Step 1: Browse the category page**
 ```
-WebFetch: https://21st.dev/s/{category-slug}
+WebFetch: https://21st.dev/community/components/s/{category-slug}
 ```
 This shows all available components in that category with names, authors, and popularity.
 
 **Step 2: Deep-dive on promising components**
 ```
-WebFetch: https://21st.dev/r/{author}/{component}
+WebFetch: https://21st.dev/@{author}/components/{component-name}
 ```
 View the component's demo, code, dependencies, and installation command.
 
@@ -143,9 +152,12 @@ For each component slot:
 When building a full page or site, try to use components from a small set of authors. This dramatically improves visual coherence. Notable authors with broad component ranges:
 
 - **shadcn** — The foundation. Clean, minimal, highly composable.
+- **aceternity** — Motion-rich, animated components (sparkles, background beams, spotlights).
+- **kokonutd** (Kokonut UI) — Modern landing section components (backgrounds, grids, announcements).
+- **magicui** — Marquee, dock, animated beam components.
+- **serafim** — Themes and presets.
 - **bundui** — Animated, modern components.
-- **magicui** — Motion-rich, creative components.
-- Other prolific authors can be discovered during live browsing.
+- Other prolific authors can be discovered during live browsing. Check an author's full catalog at `https://21st.dev/@{author}/library/default`.
 
 ### Phase 4.5: Build vs Install Decision
 
@@ -168,7 +180,7 @@ A typical landing page might install 2-3 complex components (hero, navbar, foote
 
 #### Install components:
 ```bash
-npx shadcn@latest add "https://21st.dev/r/{author}/{component-name}"
+npx shadcn@latest add "https://21st.dev/r/{author}/{component-name}"  # detail page: https://21st.dev/@{author}/components/{component-name}
 ```
 
 What this does:
@@ -497,7 +509,7 @@ If 21st.dev doesn't have exactly what you need:
 
 **At the start of every build session**, refresh your knowledge of available components by browsing the relevant category pages on 21st.dev. The platform adds new components daily, so what was the best option last week might be surpassed by something better today.
 
-This means: if you last browsed `https://21st.dev/s/hero` an hour ago, browse it again if you're starting a new build. Fresh data leads to better component choices.
+This means: if you last browsed `https://21st.dev/community/components/s/hero` an hour ago, browse it again if you're starting a new build. Fresh data leads to better component choices.
 
 ## Error Recovery
 
@@ -509,7 +521,6 @@ This means: if you last browsed `https://21st.dev/s/hero` an hour ago, browse it
 | Dark mode broken | Ensure ThemeProvider wraps the app, check CSS variable definitions |
 | TypeScript errors | Check component's expected props, install missing @types packages |
 | Styling conflicts | Check for conflicting Tailwind classes, CSS variable naming collisions |
-| 21st.dev unreachable | Use WebSearch to find component names, construct install URLs from cached knowledge |
 | Component too complex | Simplify by removing unused features from the source code |
 | `render` prop errors | Component uses @base-ui/react pattern — convert to `asChild` pattern |
 | Giant blank space | Hero/section using `min-h-screen` — reduce to `min-h-[80vh]` or remove |

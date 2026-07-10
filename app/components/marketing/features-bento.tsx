@@ -63,10 +63,10 @@ export function FeaturesBento() {
             </div>
             {/* Chat mockup — blown up */}
             <div className="mt-8 overflow-hidden rounded-xl border border-border/60 bg-card shadow-sm">
-              <div className="flex items-center gap-2 border-b border-border px-5 py-3">
-                <span className="h-3 w-3 rounded-full bg-[#FF5F57]" />
-                <span className="h-3 w-3 rounded-full bg-[#FFBD2E]" />
-                <span className="h-3 w-3 rounded-full bg-[#27C93F]" />
+              <div className="flex items-center gap-2.5 border-b border-border px-5 py-3">
+                <span className="h-5 w-5 rounded-full bg-[#FF5F57]" />
+                <span className="h-5 w-5 rounded-full bg-[#FFBD2E]" />
+                <span className="h-5 w-5 rounded-full bg-[#27C93F]" />
                 <span className="ml-2 text-sm font-medium text-muted-foreground">Career Coach</span>
               </div>
               <div className="space-y-4 p-5">
