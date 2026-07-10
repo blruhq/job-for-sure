@@ -4,6 +4,8 @@ import { useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { authClient } from '~/lib/auth-client'
 import { Loader2, User, Bell, AlertTriangle, Check, X, Eye, EyeOff } from 'lucide-react'
+import { Sun, Moon, Linkedin, Chrome, Crown } from 'lucide-react'
+import { useTheme } from '~/components/layout/theme-provider'
 
 // ── TYPES ──
 type Tab = 'profile' | 'notifications' | 'danger'
@@ -420,10 +422,6 @@ export default function SettingsPage() {
     </div>
   )
 }
-
-// ── LEGACY SETTINGS (theme, LinkedIn, chrome, plan) ──
-import { Sun, Moon, Linkedin, Chrome, Crown } from 'lucide-react'
-import { useTheme } from '~/components/layout/theme-provider'
 
 function LegacySettings() {
   const { theme, toggle } = useTheme()
