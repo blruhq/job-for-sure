@@ -76,7 +76,9 @@ export function ChatView() {
         name: parsed.role || file.name.replace(/\.(pdf|docx|txt|md)$/i, ''),
         persona: parsed.name || 'Your Name',
         email: parsed.email,
+        phone: parsed.phone,
         location: parsed.location,
+        github: parsed.github,
         summary: parsed.summary,
         skills: parsed.skills?.length > 0 ? parsed.skills : ['JavaScript', 'Git'],
         experience: parsed.experience?.map((e: any) => ({
@@ -84,6 +86,27 @@ export function ChatView() {
           role: e.role || '',
           dates: e.dates || '',
           bullets: e.bullets || [],
+        })),
+        education: parsed.education?.map((e: any) => ({
+          institution: e.institution || '',
+          degree: e.degree || '',
+          field: e.field || '',
+          dates: e.dates || '',
+        })),
+        projects: parsed.projects?.map((p: any) => ({
+          name: p.name || '',
+          description: p.description || '',
+          techStack: p.techStack || [],
+          link: p.link || '',
+        })),
+        certifications: parsed.certifications?.map((c: any) => ({
+          name: c.name || '',
+          issuer: c.issuer || '',
+          date: c.date || '',
+        })),
+        languages: parsed.languages?.map((l: any) => ({
+          name: l.name || '',
+          proficiency: l.proficiency || '',
         })),
       })
 

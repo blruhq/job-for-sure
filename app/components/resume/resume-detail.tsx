@@ -24,6 +24,8 @@ export function ResumeDetail({ resumeId }: { resumeId: string }) {
   const [editLocation, setEditLocation] = useState(resume?.location ?? '')
   const [editSummary, setEditSummary] = useState(resume?.summary ?? '')
   const [editSkills, setEditSkills] = useState((resume?.skills ?? []).join(', '))
+  const [editEducation, setEditEducation] = useState(JSON.stringify(resume?.education ?? []))
+  const [editProjects, setEditProjects] = useState(JSON.stringify(resume?.projects ?? []))
   const [optimizing, setOptimizing] = useState(false)
 
   if (!resume) {
@@ -35,6 +37,10 @@ export function ResumeDetail({ resumeId }: { resumeId: string }) {
   }
 
   const saveChanges = () => {
+    let education: typeof resume.education = undefined
+    let projects: typeof resume.projects = undefined
+    try { education = JSON.parse(editEducation) } catch {}
+    try { projects = JSON.parse(editProjects) } catch {}
     updateResume(resume.id, {
       name: editName,
       persona: editPersona,
@@ -42,6 +48,8 @@ export function ResumeDetail({ resumeId }: { resumeId: string }) {
       location: editLocation,
       summary: editSummary,
       skills: editSkills.split(',').map((s) => s.trim()).filter(Boolean),
+      education,
+      projects,
     })
     setTab('jobs')
   }
@@ -227,6 +235,26 @@ export function ResumeDetail({ resumeId }: { resumeId: string }) {
                   <div>
                     <label className="label-mono mb-1 block">Technical Skills (comma separated)</label>
                     <input value={editSkills} onChange={(e) => setEditSkills(e.target.value)} className="w-full rounded-xs border border-border bg-background px-2.5 py-1.5 text-[11px] outline-none focus:border-primary" />
+                  </div>
+                  <div className="border-t border-border/50 pt-3">
+                    <div className="label-mono mb-3">Education (JSON array)</div>
+                    <textarea
+                      value={editEducation}
+                      onChange={(e) => setEditEducation(e.target.value)}
+                      rows={3}
+                      className="w-full resize-y rounded-xs border border-border bg-background px-2.5 py-1.5 font-mono text-[10px] outline-none focus:border-primary"
+                      placeholder='[{"institution":"MIT","degree":"BS","field":"Computer Science","dates":"2018-2022"}]'
+                    />
+                  </div>
+                  <div className="border-t border-border/50 pt-3">
+                    <div className="label-mono mb-3">Projects (JSON array)</div>
+                    <textarea
+                      value={editProjects}
+                      onChange={(e) => setEditProjects(e.target.value)}
+                      rows={3}
+                      className="w-full resize-y rounded-xs border border-border bg-background px-2.5 py-1.5 font-mono text-[10px] outline-none focus:border-primary"
+                      placeholder='[{"name":"My App","description":"Built with React","techStack":["React"],"link":""}]'
+                    />
                   </div>
                   <div className="border-t border-border/50 pt-3">
                     <div className="label-mono mb-3">Work Experience</div>

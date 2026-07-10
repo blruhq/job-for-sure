@@ -15,7 +15,9 @@ async function getSessionUser() {
 const ParseResumeSchema = z.object({
   name: z.string(),
   email: z.string(),
+  phone: z.string(),
   location: z.string(),
+  github: z.string(),
   summary: z.string(),
   skills: z.array(z.string()),
   experience: z.array(
@@ -24,6 +26,35 @@ const ParseResumeSchema = z.object({
       role: z.string(),
       dates: z.string(),
       bullets: z.array(z.string()),
+    })
+  ),
+  education: z.array(
+    z.object({
+      institution: z.string(),
+      degree: z.string(),
+      field: z.string(),
+      dates: z.string(),
+    })
+  ),
+  projects: z.array(
+    z.object({
+      name: z.string(),
+      description: z.string(),
+      techStack: z.array(z.string()),
+      link: z.string(),
+    })
+  ),
+  certifications: z.array(
+    z.object({
+      name: z.string(),
+      issuer: z.string(),
+      date: z.string(),
+    })
+  ),
+  languages: z.array(
+    z.object({
+      name: z.string(),
+      proficiency: z.string(),
     })
   ),
   role: z.string(),
@@ -44,17 +75,18 @@ export async function POST(req: NextRequest) {
     }
 
     const parsed = await generateObjectWithFailover<z.infer<typeof ParseResumeSchema>>({
-      system: `You are a resume parser. Extract structured information from resume text.
+      system: `You are a resume parser. Extract ALL structured information from resume text.
 
 Rules:
+- Extract EVERY section present in the text: experience, education, projects, certifications, languages.
 - Extract ONLY what's in the text. Don't fabricate.
 - If a field isn't present, use empty string or empty array.
 - Skills should be individual technologies/tools (e.g. "React", not "Frontend Development")
 - Keep bullet points concise (one line each)`,
-      prompt: text.slice(0, 8000), // Cap at 8K chars to stay within token limits
+      prompt: text.slice(0, 12000), // Cap at 12K chars
       schema: ParseResumeSchema,
       temperature: 0.2,
-      maxOutputTokens: 2000,
+      maxOutputTokens: 3000,
     })
 
     return NextResponse.json(parsed)

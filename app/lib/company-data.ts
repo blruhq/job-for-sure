@@ -12,10 +12,16 @@ export function createResume(data: {
   name: string
   persona: string
   email?: string
+  phone?: string
   location?: string
+  github?: string
   summary?: string
   skills: string[]
   experience?: Resume['experience']
+  education?: Resume['education']
+  projects?: Resume['projects']
+  certifications?: Resume['certifications']
+  languages?: Resume['languages']
 }): Resume {
   resumeCounter++
   return {
@@ -23,13 +29,19 @@ export function createResume(data: {
     name: data.name,
     persona: data.persona,
     email: data.email,
+    phone: data.phone,
     location: data.location,
+    github: data.github,
     summary: data.summary,
-    score: 0, // Will be set by AI matching
+    score: 0,
     updated: 'just now',
     skills: data.skills,
     experience: data.experience,
-    companies: [], // Will be populated by /api/match-companies
+    education: data.education,
+    projects: data.projects,
+    certifications: data.certifications,
+    languages: data.languages,
+    companies: [],
     stretch: [],
   }
 }

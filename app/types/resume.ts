@@ -27,6 +27,31 @@ export interface ResumeExperience {
 
 export type ResumeTemplate = 'minimalist' | 'modern' | 'classic'
 
+export interface ResumeEducation {
+  institution: string
+  degree: string
+  field: string
+  dates: string
+}
+
+export interface ResumeProject {
+  name: string
+  description: string
+  techStack: string[]
+  link: string
+}
+
+export interface ResumeCertification {
+  name: string
+  issuer: string
+  date: string
+}
+
+export interface ResumeLanguage {
+  name: string
+  proficiency: string
+}
+
 export interface Resume {
   id: string
   name: string
@@ -40,6 +65,10 @@ export interface Resume {
   skills: string[]
   summary?: string
   experience?: ResumeExperience[]
+  education?: ResumeEducation[]
+  projects?: ResumeProject[]
+  certifications?: ResumeCertification[]
+  languages?: ResumeLanguage[]
   companies: Company[]
   stretch: Company[]
   template?: ResumeTemplate
