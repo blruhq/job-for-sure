@@ -1,10 +1,15 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import { ArrowRight, MessageSquare, KanbanSquare, ShieldCheck } from 'lucide-react'
+import { ArrowRight } from 'lucide-react'
+import { DotPattern } from '~/components/marketing/dot-pattern'
+import { HowItWorks } from '~/components/marketing/how-it-works'
+import { FeaturesBento } from '~/components/marketing/features-bento'
+import { Testimonials } from '~/components/marketing/testimonials'
 
 export const metadata: Metadata = {
   title: { absolute: 'Job For Sure' },
-  description: 'Upload your resume once. Get AI-matched jobs, ATS-optimized resumes, and a full application pipeline.',
+  description:
+    'Upload your resume once. Get AI-matched jobs, ATS-optimized resumes, and a full application tracker.',
 }
 
 function AnimatedMockup() {
@@ -40,7 +45,10 @@ function AnimatedMockup() {
               { label: 'Education', value: 'B.S. CS', color: 'text-warn' },
               { label: 'Skills Gap', value: '2 items', color: 'text-muted-foreground' },
             ].map((stat) => (
-              <div key={stat.label} className="rounded-lg border border-border/60 bg-muted/30 p-2.5">
+              <div
+                key={stat.label}
+                className="rounded-lg border border-border/60 bg-muted/30 p-2.5"
+              >
                 <span className="text-[11px] text-muted-foreground">{stat.label}</span>
                 <div className="mt-0.5 flex items-baseline gap-1">
                   <span className={'text-sm font-semibold ' + stat.color}>{stat.value}</span>
@@ -48,7 +56,7 @@ function AnimatedMockup() {
               </div>
             ))}
           </div>
-          <div className="rounded-xl border border-border/60 bg-muted/20 p-3 animate-fade-up [animation-delay:2s] [animation-fill-mode:backwards]">
+          <div className="animate-fade-up rounded-xl border border-border/60 bg-muted/20 p-3 [animation-delay:2s] [animation-fill-mode:backwards]">
             <div className="flex items-start gap-2.5">
               <div className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-primary/10 text-[11px] font-bold text-primary">
                 AI
@@ -58,7 +66,7 @@ function AnimatedMockup() {
                   <span className="text-[11px] font-semibold text-foreground">Career Coach</span>
                   <span className="text-[10px] text-muted-foreground">just now</span>
                 </div>
-                <div className="mt-1 overflow-hidden whitespace-nowrap animate-fade-up [animation-delay:2.2s] [animation-fill-mode:backwards]">
+                <div className="mt-1 animate-fade-up overflow-hidden whitespace-nowrap [animation-delay:2.2s] [animation-fill-mode:backwards]">
                   <span className="inline-block text-[13px] leading-relaxed text-muted-foreground">
                     Your resume matches <strong className="text-foreground">3 of 5</strong> key
                     requirements. Let&apos;s tailor the missing skills.
@@ -91,96 +99,61 @@ function AnimatedMockup() {
 export default function LandingPage() {
   return (
     <div className="flex min-h-screen flex-col bg-background">
-      <section className="relative flex flex-1 flex-col items-center justify-center px-6 py-16 md:py-24">
-        <div
-          className="pointer-events-none absolute inset-0 opacity-[0.04]"
-          style={{
-            backgroundImage:
-              'radial-gradient(circle at 70% 40%, rgba(91,106,191,0.4) 0%, transparent 50%), radial-gradient(circle at 30% 80%, rgba(91,106,191,0.15) 0%, transparent 40%)',
-          }}
-        />
-        <div className="relative mx-auto grid w-full max-w-[1120px] items-center gap-12 md:grid-cols-[1fr_1.2fr] md:gap-16">
-          <div className="max-w-lg">
-            <div className="inline-flex items-center gap-1.5 rounded-full border border-border bg-muted/50 px-3 py-1 text-[11px] font-medium text-muted-foreground">
-              <span className="h-1.5 w-1.5 rounded-full bg-primary animate-pulse" />
-              AI-powered career platform
-            </div>
-            <h1 className="mt-6 text-4xl font-semibold leading-[1.08] tracking-tight text-foreground sm:text-5xl md:text-[3.5rem] md:leading-[1.05]">
-              Know your chances
-              <br />
-              before you apply.
-            </h1>
-            <p className="mt-5 max-w-md text-base leading-relaxed text-muted-foreground md:text-lg">
-              Upload your resume. Get instant match scores against real jobs,
-              ATS-tailored applications, and track every step — from saved to offer.
-            </p>
-            <div className="mt-8 flex items-center gap-3">
-              <Link
-                href="/chat"
-                className="inline-flex cursor-pointer items-center gap-1.5 rounded-lg bg-primary px-6 py-3 text-sm font-medium text-primary-foreground shadow-lg shadow-primary/20 transition-all hover:bg-primary/90 hover:-translate-y-0.5 active:scale-[0.98]"
-              >
-                Start Chat <ArrowRight size={14} />
-              </Link>
-              <Link
-                href="/register"
-                className="inline-flex cursor-pointer items-center rounded-lg border border-border px-6 py-3 text-sm font-medium text-foreground transition-colors hover:bg-muted active:scale-[0.98]"
-              >
-                Create Account
-              </Link>
-            </div>
-          </div>
-          <div className="flex justify-center md:justify-end">
-            <AnimatedMockup />
-          </div>
-        </div>
-      </section>
-
-      {/* ── FEATURES ── */}
-      <section id="features" className="border-t border-border">
-        <div className="mx-auto max-w-[1120px] px-6 py-20 md:py-28">
-          <div className="max-w-xl">
-            <h2 className="text-3xl font-semibold tracking-tight text-foreground md:text-4xl">
-              Three tools. One workflow.
-            </h2>
-            <p className="mt-4 text-lg text-muted-foreground">
-              From the first upload to the final offer — no spreadsheets, no guesswork.
-            </p>
-          </div>
-
-          <div className="mt-16 divide-y divide-border border-t border-border">
-            {[
-              {
-                icon: MessageSquare,
-                title: 'AI Chat Coach',
-                desc: 'Talk to an AI that knows your resume inside out. Get interview prep, salary guidance, and instant keyword analysis — in real time, not after three business days.',
-                color: 'text-primary',
-              },
-              {
-                icon: KanbanSquare,
-                title: 'Pipeline Tracker',
-                desc: 'Bookmark jobs, drag them through stages, and never lose track. See your entire search at a glance — saved, applied, interviewing, offer.',
-                color: 'text-success',
-              },
-              {
-                icon: ShieldCheck,
-                title: 'ATS Optimizer',
-                desc: 'Paste a job description. Get an instant match score with missing keywords highlighted. Inject them with one click, not thirty minutes of manual editing.',
-                color: 'text-[var(--warn)]',
-              },
-            ].map(({ icon: Icon, title, desc, color }) => (
-              <div key={title} className="grid grid-cols-1 gap-4 py-10 md:grid-cols-[200px_1fr] md:gap-16">
-                <div className="flex items-center gap-3">
-                  <Icon size={20} className={`shrink-0 ${color}`} />
-                  <h3 className="text-lg font-semibold text-foreground">{title}</h3>
-                </div>
-                <p className="max-w-xl text-base leading-relaxed text-muted-foreground">
-                  {desc}
-                </p>
+      <DotPattern>
+        {/* ── HERO ── */}
+        <section className="relative flex flex-1 flex-col items-center justify-center px-6 py-16 md:py-24">
+          <div
+            className="pointer-events-none absolute inset-0 opacity-[0.04]"
+            style={{
+              backgroundImage:
+                'radial-gradient(circle at 70% 40%, rgba(91,106,191,0.4) 0%, transparent 50%), radial-gradient(circle at 30% 80%, rgba(91,106,191,0.15) 0%, transparent 40%)',
+            }}
+          />
+          <div className="relative mx-auto grid w-full max-w-[1120px] items-center gap-12 md:grid-cols-[1fr_1.2fr] md:gap-16">
+            <div className="max-w-lg">
+              <div className="inline-flex items-center gap-1.5 rounded-full border border-border bg-muted/50 px-3 py-1 text-[11px] font-medium text-muted-foreground">
+                <span className="h-1.5 w-1.5 rounded-full bg-primary animate-pulse" />
+                AI-powered career platform
               </div>
-            ))}
+              <h1 className="mt-6 text-4xl font-semibold leading-[1.08] tracking-tight text-foreground sm:text-5xl md:text-[3.5rem] md:leading-[1.05]">
+                Know your chances
+                <br />
+                before you apply.
+              </h1>
+              <p className="mt-5 max-w-md text-base leading-relaxed text-muted-foreground md:text-lg">
+                Upload your resume. Get instant match scores against real jobs, ATS-tailored
+                applications, and track every step — from saved to offer.
+              </p>
+              <div className="mt-8 flex items-center gap-3">
+                <Link
+                  href="/chat"
+                  className="inline-flex cursor-pointer items-center gap-1.5 rounded-lg bg-primary px-6 py-3 text-sm font-medium text-primary-foreground shadow-lg shadow-primary/20 transition-all hover:bg-primary/90 hover:-translate-y-0.5 active:scale-[0.98]"
+                >
+                  Start Chat <ArrowRight size={14} />
+                </Link>
+                <Link
+                  href="/register"
+                  className="inline-flex cursor-pointer items-center rounded-lg border border-border px-6 py-3 text-sm font-medium text-foreground transition-colors hover:bg-muted active:scale-[0.98]"
+                >
+                  Create Account
+                </Link>
+              </div>
+            </div>
+            <div className="flex justify-center md:justify-end">
+              <AnimatedMockup />
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      </DotPattern>
+
+      {/* ── HOW IT WORKS ── */}
+      <HowItWorks />
+
+      {/* ── FEATURES (Bento) ── */}
+      <FeaturesBento />
+
+      {/* ── TESTIMONIALS ── */}
+      <Testimonials />
 
       {/* ── CTA ── */}
       <section className="bg-primary">
@@ -203,12 +176,16 @@ export default function LandingPage() {
       </section>
 
       {/* ── FOOTER ── */}
-      <footer className="border-t border-primary-foreground/10 px-6 py-8">
+      <footer className="border-t border-primary-foreground/10 bg-primary px-6 py-8">
         <div className="mx-auto flex max-w-[1120px] items-center justify-between">
           <span className="text-sm text-primary-foreground/60">&copy; 2026 Job For Sure</span>
           <div className="flex gap-6 text-sm text-primary-foreground/60">
-            <Link href="/login" className="cursor-pointer transition-colors hover:text-primary-foreground">Sign In</Link>
-            <Link href="/register" className="cursor-pointer transition-colors hover:text-primary-foreground">Get Started</Link>
+            <Link href="/login" className="cursor-pointer transition-colors hover:text-primary-foreground">
+              Sign In
+            </Link>
+            <Link href="/register" className="cursor-pointer transition-colors hover:text-primary-foreground">
+              Get Started
+            </Link>
           </div>
         </div>
       </footer>

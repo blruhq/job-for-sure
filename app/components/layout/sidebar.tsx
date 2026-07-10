@@ -10,7 +10,7 @@ import { notify } from '~/lib/toast'
 
 const NAV_ITEMS = [
   { href: '/chat', label: 'Chat', icon: MessageSquare },
-  { href: '/pipeline', label: 'Pipeline', icon: KanbanSquare, badge: true },
+  { href: '/pipeline', label: 'Applications', icon: KanbanSquare, badge: true },
   { href: '/ats', label: 'ATS Optimizer', icon: CheckSquare },
 ]
 
