@@ -12,6 +12,7 @@ import { PasteJDModal } from '~/components/chat/paste-jd-modal'
 import { SkeletonChatMessage, SkeletonCard } from '~/components/ui/skeleton'
 import { extractPdfText } from '~/lib/pdf-parse'
 import { Upload, FileText, ClipboardList, Loader2 } from 'lucide-react'
+import { JobPreview } from '~/components/chat/job-preview'
 
 export function ChatView() {
   const router = useRouter()
@@ -20,6 +21,7 @@ export function ChatView() {
   const [wizardOpen, setWizardOpen] = useState(false)
   const [pasteOpen, setPasteOpen] = useState(false)
   const [processing, setProcessing] = useState(false)
+  const [jobPreviewResumeId, setJobPreviewResumeId] = useState<string | null>(null)
 
   const { messages, status, sendMessage, stop } = useChat()
 
@@ -87,11 +89,7 @@ export function ChatView() {
 
       addResume(resume)
       sendMessage({ text: `I just uploaded my resume: ${file.name}. I have skills in ${resume.skills.slice(0, 5).join(', ')}.` })
-
-      // Navigate to Find Jobs tab after a short delay (let the message render)
-      setTimeout(() => {
-        router.push(`/resume/${resume.id}`)
-      }, 1500)
+      setJobPreviewResumeId(resume.id)
     } catch (err) {
       console.error(err)
       notify({ message: 'Failed to process resume. Try Build from Template instead.', type: 'error' })
@@ -121,11 +119,7 @@ export function ChatView() {
 
       addResume(resume)
       sendMessage({ text: `I'm a ${data.role} with skills in ${data.skills.slice(0, 5).join(', ')}.` })
-
-      // Navigate to Find Jobs tab
-      setTimeout(() => {
-        router.push(`/resume/${resume.id}`)
-      }, 1500)
+      setJobPreviewResumeId(resume.id)
     } catch (err) {
       console.error(err)
       notify({ message: 'Failed to create resume from wizard', type: 'error' })
@@ -213,6 +207,11 @@ export function ChatView() {
             </div>
           </div>
         </div>
+      )}
+
+      {/* Job preview — shows real jobs inline after resume upload */}
+      {!processing && jobPreviewResumeId && resumes.find((r) => r.id === jobPreviewResumeId) && (
+        <JobPreview resume={resumes.find((r) => r.id === jobPreviewResumeId)!} />
       )}
 
       {/* Entry cards — shown when chat is empty */}

@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import {
   Search, Bookmark, ExternalLink, MapPin, Loader2, AlertCircle,
-  RefreshCw, Filter, X, Globe, Clock, Star, Plane,
+  RefreshCw, Filter, X, Globe, Clock, Star, Plane, MessageSquare,
 } from 'lucide-react'
 import { cn } from '~/lib/utils'
 import { useAppStore } from '~/lib/store'
@@ -193,6 +193,11 @@ export function JobSearchPanel({ resume }: { resume: Resume }) {
     setActiveResumeId(tailored.id)
     router.push(`/resume/${tailored.id}`)
     notify({ message: `Cloned resume for ${job.company}.`, type: 'success' })
+  }
+
+  const handleInterview = (job: ScoredJob) => {
+    sessionStorage.setItem('jfs_pending_chat', `I want to prepare for the ${job.title} role at ${job.company}. Can you coach me on what to expect and how to stand out?`)
+    router.push('/chat')
   }
 
   const handleRefresh = () => {
@@ -439,6 +444,7 @@ export function JobSearchPanel({ resume }: { resume: Resume }) {
                   bookmarked={isBookmarked(job.id)}
                   onBookmark={() => handleBookmark(job)}
                   onTailor={() => handleTailor(job)}
+                  onInterview={() => handleInterview(job)}
                 />
               ))}
             </div>
@@ -453,11 +459,12 @@ export function JobSearchPanel({ resume }: { resume: Resume }) {
 // SUB-COMPONENTS
 // ═══════════════════════════════════════════════════════════════
 
-function JobCard({ job, bookmarked, onBookmark, onTailor }: {
+function JobCard({ job, bookmarked, onBookmark, onTailor, onInterview }: {
   job: ScoredJob
   bookmarked: boolean
   onBookmark: () => void
   onTailor: () => void
+  onInterview: () => void
 }) {
   return (
     <div className="rounded-sm border border-border bg-card p-4 transition-colors hover:border-primary">
@@ -534,6 +541,12 @@ function JobCard({ job, bookmarked, onBookmark, onTailor }: {
           className="cursor-pointer rounded-xs border border-border bg-card px-2 py-1 text-[11px] transition-colors hover:border-primary hover:text-primary"
         >
           Tailor Resume
+        </button>
+        <button
+          onClick={onInterview}
+          className="flex cursor-pointer items-center gap-1 rounded-xs border border-border bg-card px-2 py-1 text-[11px] transition-colors hover:border-primary hover:text-primary"
+        >
+          <MessageSquare size={10} /> Interview
         </button>
         <a
           href={job.url}
