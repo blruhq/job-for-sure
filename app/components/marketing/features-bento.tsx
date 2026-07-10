@@ -63,11 +63,11 @@ export function FeaturesBento() {
             </div>
             {/* Chat mockup — blown up */}
             <div className="mt-8 overflow-hidden rounded-xl border border-border/60 bg-card shadow-sm">
-              <div className="flex items-center gap-2.5 border-b border-border px-5 py-3">
-                <span className="h-5 w-5 rounded-full bg-[#FF5F57]" />
-                <span className="h-5 w-5 rounded-full bg-[#FFBD2E]" />
-                <span className="h-5 w-5 rounded-full bg-[#27C93F]" />
-                <span className="ml-2 text-sm font-medium text-muted-foreground">Career Coach</span>
+              <div className="flex items-center gap-3 border-b border-border px-6 py-4">
+                <span className="h-10 w-10 rounded-full bg-[#FF5F57]" />
+                <span className="h-10 w-10 rounded-full bg-[#FFBD2E]" />
+                <span className="h-10 w-10 rounded-full bg-[#27C93F]" />
+                <span className="ml-3 text-base font-semibold text-muted-foreground">Career Coach</span>
               </div>
               <div className="space-y-4 p-5">
                 {/* AI message */}
