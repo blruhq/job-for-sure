@@ -1,13 +1,29 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '~/lib/auth'
 import { headers } from 'next/headers'
-import { generateWithFailover } from '~/lib/ai-providers'
+import { generateObjectWithFailover } from '~/lib/ai-providers'
+import { z } from 'zod'
+
+export const maxDuration = 60
 
 async function getSessionUser() {
   const h = await headers()
   const session = await auth.api.getSession({ headers: h })
   return session?.user ?? null
 }
+
+const InterviewQuestionSchema = z.object({
+  question: z.string(),
+  category: z.string(),
+  tags: z.array(z.string()),
+})
+
+const InterviewEvaluateSchema = z.object({
+  score: z.number().min(1).max(10),
+  strengths: z.array(z.string()),
+  improvements: z.array(z.string()),
+  modelAnswer: z.string(),
+})
 
 export async function POST(req: NextRequest) {
   try {
@@ -73,26 +89,17 @@ ${avoidSection}
 Instructions:
 1. Generate ONE realistic interview question appropriate for ${company} and ${role}.
 2. Ensure the question matches the requested difficulty (${difficulty}) and type (${type}).
-3. Return your response in STRICT JSON format matching the schema below. No conversational text outside JSON. No markdown backticks.
-4. If type is technical, ask a programming, architecture, or domain-specific problem. If behavioral, ask a scenario-based or past-experience question. If mixed, choose one.
-5. Identify a category ('behavioral' or 'technical') and 1-3 tags (e.g. "system-design", "leadership", "react", "conflict-resolution").
+3. If type is technical, ask a programming, architecture, or domain-specific problem. If behavioral, ask a scenario-based or past-experience question. If mixed, choose one.
+4. Identify a category ('behavioral' or 'technical') and 1-3 tags (e.g. "system-design", "leadership", "react", "conflict-resolution").`
 
-Response Schema:
-{
-  "question": "The question text here...",
-  "category": "behavioral" | "technical",
-  "tags": ["tag1", "tag2"]
-}`
-
-      const text = await generateWithFailover({
+      const result = await generateObjectWithFailover<z.infer<typeof InterviewQuestionSchema>>({
         system: systemPrompt,
         prompt: 'Generate the next targeted interview question.',
+        schema: InterviewQuestionSchema,
         temperature: 0.7,
         maxOutputTokens: 800,
       })
 
-      const jsonMatch = text.match(/\{[\s\S]*\}/)
-      const result = jsonMatch ? JSON.parse(jsonMatch[0]) : JSON.parse(text)
       return NextResponse.json(result)
 
     } else if (action === 'evaluate') {
@@ -111,25 +118,16 @@ Evaluation criteria:
 3. Quantification of results (e.g., "reduced latency by 20%", "led a team of 4").
 4. Relevance to the role of ${role} at ${company}.
 
-Return your response in STRICT JSON format matching the schema below. Provide a fair, constructive evaluation. No markdown wrapper outside the JSON.
+Return your response in structured JSON format. Provide a fair, constructive evaluation.`
 
-Response Schema:
-{
-  "score": 1-10 (integer rating of the answer quality),
-  "strengths": ["bullet point 1", "bullet point 2"],
-  "improvements": ["bullet point 1", "bullet point 2"],
-  "modelAnswer": "An example of a high-scoring, target-role aligned response to the question."
-}`
-
-      const text = await generateWithFailover({
+      const result = await generateObjectWithFailover<z.infer<typeof InterviewEvaluateSchema>>({
         system: systemPrompt,
         prompt: 'Evaluate the candidate answer.',
+        schema: InterviewEvaluateSchema,
         temperature: 0.3,
         maxOutputTokens: 800,
       })
 
-      const jsonMatch = text.match(/\{[\s\S]*\}/)
-      const result = jsonMatch ? JSON.parse(jsonMatch[0]) : JSON.parse(text)
       return NextResponse.json(result)
     }
 

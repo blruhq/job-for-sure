@@ -1,7 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { generateWithFailover } from '~/lib/ai-providers'
+import { generateTextWithFailover } from '~/lib/ai-providers'
 import { auth } from '~/lib/auth'
 import { headers } from 'next/headers'
+
+export const maxDuration = 60
 
 async function getSessionUser() {
   const h = await headers()
@@ -28,7 +30,7 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    const text = await generateWithFailover({
+    const text = await generateTextWithFailover({
       system: `You are an expert career coach and professional writer.
 You write persuasive, polished, and natural-sounding cover letters.
 Write a 3-4 paragraph, 300-400 word cover letter tailored to the provided resume and target job description/role.
@@ -51,6 +53,7 @@ Rules:
 
     return NextResponse.json({ letter: text.trim() })
   } catch (error) {
+    console.error('[cover-letter] Error:', error)
     return NextResponse.json(
       { error: error instanceof Error ? error.message : 'Cover letter generation failed' },
       { status: 500 },

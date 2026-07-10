@@ -1,5 +1,6 @@
-import { streamText, convertToModelMessages, type LanguageModel } from 'ai'
+import { streamText, convertToModelMessages, generateText, generateObject, type LanguageModel } from 'ai'
 import { createOpenAI } from '@ai-sdk/openai'
+import type { z } from 'zod'
 
 // ═══════════════════════════════════════════════════════════════
 // PROVIDER INSTANCES
@@ -7,27 +8,43 @@ import { createOpenAI } from '@ai-sdk/openai'
 // DeepSeek V4 Flash at different price/reliability tiers.
 // ═══════════════════════════════════════════════════════════════
 
-// Layer 1: DeepSeek Official — cheapest (98% cache discount on prefix hits)
-const deepseekOfficial = createOpenAI({
+// Layer 0: thinking-disabled via fetch wrapper
+// deepseek-v4-flash defaults to thinking ENABLED (high effort). It emits
+// chain-of-thought BEFORE the answer — pure waste for structured JSON:
+// slower, costlier, and temperature/top_p become silent no-ops.
+function createNoThinkingProvider(opts: { baseURL: string; apiKey?: string }) {
+  return createOpenAI({
+    baseURL: opts.baseURL,
+    apiKey: opts.apiKey,
+    fetch: async (input, init) => {
+      if (init?.body && typeof init.body === 'string') {
+        try {
+          const body = JSON.parse(init.body)
+          body.thinking = { type: 'disabled' }
+          init = { ...init, body: JSON.stringify(body) }
+        } catch {
+          // non-JSON body — leave untouched
+        }
+      }
+      return globalThis.fetch(input as RequestInfo, init as RequestInit)
+    },
+  })
+}
+
+const deepseekOfficial = createNoThinkingProvider({
   baseURL: 'https://api.deepseek.com/v1',
   apiKey: process.env.DEEPSEEK_API_KEY,
 })
 
-// Layer 2: DeepInfra — fast bare-metal inference, low base rates
-const deepinfraBackup = createOpenAI({
+const deepinfraBackup = createNoThinkingProvider({
   baseURL: 'https://api.deepinfra.com/v1/openai',
   apiKey: process.env.DEEPINFRA_API_KEY,
 })
 
-// ═══════════════════════════════════════════════════════════════
-// PROVIDER CHAIN
-// Order matters: first provider is primary, rest are fallbacks.
-// ═══════════════════════════════════════════════════════════════
-
 interface ProviderConfig {
   model: LanguageModel
   name: string
-  timeout: number // ms to wait for first chunk before giving up
+  timeout: number // ms to wait for response before giving up
 }
 
 const MODEL_ID = 'deepseek-v4-flash'
@@ -36,12 +53,12 @@ export const providers: ProviderConfig[] = [
   {
     model: deepseekOfficial.chat(MODEL_ID),
     name: 'DeepSeek Official',
-    timeout: 20_000,
+    timeout: 40_000,
   },
   {
     model: deepinfraBackup.chat('deepseek-ai/DeepSeek-V4-Flash'),
     name: 'DeepInfra',
-    timeout: 20_000,
+    timeout: 40_000,
   },
 ]
 
@@ -167,13 +184,9 @@ export async function streamWithFailover(
 }
 
 // ═══════════════════════════════════════════════════════════════
-// GENERATE WITH FAILOVER
-//
-// Non-streaming version for routes that just need text output
-// (ATS match, tailor). Uses generateText instead of streamText.
+// GENERATE TEXT WITH FAILOVER (kept for cover-letter — plain text)
+// Now with AbortController
 // ═══════════════════════════════════════════════════════════════
-
-import { generateText } from 'ai'
 
 interface GenerateParams {
   system: string
@@ -182,7 +195,7 @@ interface GenerateParams {
   maxOutputTokens?: number
 }
 
-export async function generateWithFailover(
+export async function generateTextWithFailover(
   params: GenerateParams,
 ): Promise<string> {
   const { system, prompt, temperature = 0.7, maxOutputTokens = 1024 } = params
@@ -190,17 +203,17 @@ export async function generateWithFailover(
   let lastError: Error | null = null
 
   for (const provider of providers) {
+    const controller = new AbortController()
+    const timer = setTimeout(() => controller.abort(), provider.timeout)
     try {
-      const result = await Promise.race([
-        generateText({
-          model: provider.model,
-          system,
-          prompt,
-          temperature,
-          maxOutputTokens,
-        }),
-        timeoutPromise(provider.timeout, provider.name),
-      ])
+      const result = await generateText({
+        model: provider.model,
+        system,
+        prompt,
+        temperature,
+        maxOutputTokens,
+        abortSignal: controller.signal,
+      })
 
       return result.text
     } catch (err) {
@@ -208,6 +221,56 @@ export async function generateWithFailover(
       console.warn(`⚠️  [AI] ${provider.name} failed: ${msg}`)
       lastError = err instanceof Error ? err : new Error(msg)
       continue
+    } finally {
+      clearTimeout(timer)
+    }
+  }
+
+  throw lastError || new Error('All AI providers failed')
+}
+
+// ═══════════════════════════════════════════════════════════════
+// GENERATE OBJECT WITH FAILOVER (new — for all JSON routes)
+// Native JSON mode + Zod schema. No more regex extraction.
+// ═══════════════════════════════════════════════════════════════
+
+interface GenerateObjectParams {
+  system: string
+  prompt: string
+  schema: z.ZodTypeAny
+  temperature?: number
+  maxOutputTokens?: number
+}
+
+export async function generateObjectWithFailover<T>(
+  params: GenerateObjectParams,
+): Promise<T> {
+  const { system, prompt, schema, temperature = 0.4, maxOutputTokens = 2048 } = params
+
+  let lastError: Error | null = null
+
+  for (const provider of providers) {
+    const controller = new AbortController()
+    const timer = setTimeout(() => controller.abort(), provider.timeout)
+    try {
+      const { object } = await generateObject({
+        model: provider.model,
+        system,
+        prompt,
+        schema,
+        temperature,
+        maxOutputTokens,
+        abortSignal: controller.signal,
+      })
+
+      return object as T
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err)
+      console.warn(`⚠️  [AI] ${provider.name} failed: ${msg}`)
+      lastError = err instanceof Error ? err : new Error(msg)
+      continue
+    } finally {
+      clearTimeout(timer)
     }
   }
 

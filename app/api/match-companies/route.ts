@@ -1,14 +1,53 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { generateWithFailover } from '~/lib/ai-providers'
+import { generateObjectWithFailover } from '~/lib/ai-providers'
 import { companyColor, companyLogo } from '~/lib/company-data'
 import { auth } from '~/lib/auth'
 import { headers } from 'next/headers'
+import { z } from 'zod'
+
+export const maxDuration = 60
 
 async function getSessionUser() {
   const h = await headers()
   const session = await auth.api.getSession({ headers: h })
   return session?.user ?? null
 }
+
+const MatchSchema = z.object({
+  score: z.number().min(0).max(100),
+  direct: z.array(
+    z.object({
+      name: z.string(),
+      role: z.string(),
+      loc: z.string(),
+      work: z.string(),
+      visa: z.boolean(),
+      salary: z.string(),
+      score: z.number().min(0).max(100),
+      level: z.string(),
+      url: z.string(),
+      missing: z.array(z.string()),
+      transferable: z.array(z.string()),
+    })
+  ),
+  stretch: z.array(
+    z.object({
+      name: z.string(),
+      role: z.string(),
+      loc: z.string(),
+      work: z.string(),
+      visa: z.boolean(),
+      salary: z.string(),
+      score: z.number().min(0).max(100),
+      level: z.string(),
+      url: z.string(),
+      missing: z.array(z.string()),
+      transferable: z.array(z.string()),
+    })
+  ),
+})
+
+type MatchResult = z.infer<typeof MatchSchema>
 
 export async function POST(req: NextRequest) {
   try {
@@ -17,55 +56,25 @@ export async function POST(req: NextRequest) {
 
     const { skills, role, summary, experience } = await req.json()
 
-    const text = await generateWithFailover({
+    const result = await generateObjectWithFailover<MatchResult>({
       system: `You are a technical recruiter and career advisor. Given a candidate's skills, role, and experience, you suggest REAL companies that are currently hiring or commonly hire for these skills.
-
-Return ONLY a JSON object (no markdown) with this exact shape:
-{
-  "score": number (overall employability score 0-100 based on skill relevance and market demand),
-  "direct": [
-    {
-      "name": "Company Name",
-      "role": "Specific Role Title",
-      "loc": "City, State or Remote",
-      "work": "remote" | "hybrid" | "onsite",
-      "visa": boolean (do they sponsor visas?),
-      "salary": "$XXX-XXXk",
-      "score": number (0-100 match for this candidate),
-      "level": "high" | "mid",
-      "url": "careers page URL",
-      "missing": ["skills the candidate lacks for this specific role"],
-      "transferable": ["candidate skills that partially apply"]
-    }
-  ],
-  "stretch": [
-    // Same shape as direct, but roles where candidate has <75% match
-  ]
-}
 
 Rules:
 - Suggest 3-4 direct matches (score 75-95%) and 2-3 stretch matches (score 50-74%)
 - Use REAL, well-known tech companies (not made-up ones)
 - Base the match score on actual skill overlap, not random numbers
 - The "missing" array should list SPECIFIC skills the JD would require that the candidate doesn't have
-- The "url" should be the actual careers page URL
-- Return ONLY the JSON, no explanation`,
+- The "url" should be the actual careers page URL`,
       prompt: JSON.stringify({
         role: role || 'Software Engineer',
         skills: skills || [],
         summary: summary || 'Not provided',
         experience: experience || [],
       }),
+      schema: MatchSchema,
       temperature: 0.4,
       maxOutputTokens: 2048,
     })
-
-    const jsonMatch = text.match(/\{[\s\S]*\}/)
-    if (!jsonMatch) {
-      throw new Error('AI returned invalid JSON')
-    }
-
-    const result = JSON.parse(jsonMatch[0])
 
     // Enrich with UI helpers (logo initials, colors)
     const enrich = (companies: any[]) => (companies || []).map((c) => ({

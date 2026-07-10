@@ -1,13 +1,33 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { generateWithFailover } from '~/lib/ai-providers'
+import { generateObjectWithFailover } from '~/lib/ai-providers'
 import { auth } from '~/lib/auth'
 import { headers } from 'next/headers'
+import { z } from 'zod'
+
+export const maxDuration = 60
 
 async function getSessionUser() {
   const h = await headers()
   const session = await auth.api.getSession({ headers: h })
   return session?.user ?? null
 }
+
+const ParseResumeSchema = z.object({
+  name: z.string(),
+  email: z.string(),
+  location: z.string(),
+  summary: z.string(),
+  skills: z.array(z.string()),
+  experience: z.array(
+    z.object({
+      company: z.string(),
+      role: z.string(),
+      dates: z.string(),
+      bullets: z.array(z.string()),
+    })
+  ),
+  role: z.string(),
+})
 
 export async function POST(req: NextRequest) {
   try {
@@ -23,53 +43,20 @@ export async function POST(req: NextRequest) {
       )
     }
 
-    const result = await generateWithFailover({
+    const parsed = await generateObjectWithFailover<z.infer<typeof ParseResumeSchema>>({
       system: `You are a resume parser. Extract structured information from resume text.
-
-Return ONLY a JSON object (no markdown) with this exact shape:
-{
-  "name": "Full Name",
-  "email": "email@example.com",
-  "location": "City, State",
-  "summary": "Professional summary (max 2 sentences)",
-  "skills": ["Skill1", "Skill2", ...],
-  "experience": [
-    {
-      "company": "Company Name",
-      "role": "Job Title",
-      "dates": "Start - End",
-      "bullets": ["Achievement 1", "Achievement 2"]
-    }
-  ],
-  "role": "Primary role/title for this person (e.g. 'Senior Frontend Engineer')"
-}
 
 Rules:
 - Extract ONLY what's in the text. Don't fabricate.
 - If a field isn't present, use empty string or empty array.
 - Skills should be individual technologies/tools (e.g. "React", not "Frontend Development")
-- Keep bullet points concise (one line each)
-- Return ONLY the JSON.`,
+- Keep bullet points concise (one line each)`,
       prompt: text.slice(0, 8000), // Cap at 8K chars to stay within token limits
+      schema: ParseResumeSchema,
       temperature: 0.2,
-      maxOutputTokens: 3000,
+      maxOutputTokens: 2000,
     })
 
-    const jsonMatch = result.match(/\{[\s\S]*\}/)
-    if (!jsonMatch) {
-      console.error('[parse-resume] Failed to find JSON block. Raw AI output:', result)
-      throw new Error('AI returned invalid JSON')
-    }
-
-    let parsed
-    try {
-      parsed = JSON.parse(jsonMatch[0])
-    } catch (parseError) {
-      console.error('[parse-resume] JSON parse error. Extracted substring:', jsonMatch[0])
-      console.error('[parse-resume] Raw AI output:', result)
-      throw new Error('AI returned malformed JSON structure')
-    }
-    
     return NextResponse.json(parsed)
   } catch (error) {
     console.error('[parse-resume] Error:', error)
