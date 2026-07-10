@@ -16,7 +16,7 @@ import { JobPreview } from '~/components/chat/job-preview'
 
 export function ChatView() {
   const router = useRouter()
-  const { activeResume, addResume, updateResume, targetCompanyKey, setTargetCompanyKey, resumes, activeResumeId, setActiveResumeId } = useAppStore()
+  const { activeResume, addResume, updateResume, targetCompanyKey, setTargetCompanyKey, resumes, activeResumeId, setActiveResumeId, pipeline } = useAppStore()
   const fileRef = useRef<HTMLInputElement>(null)
   const [wizardOpen, setWizardOpen] = useState(false)
   const [pasteOpen, setPasteOpen] = useState(false)
@@ -35,7 +35,14 @@ export function ChatView() {
   }, [sendMessage])
 
   const handleSend = (message: { role: 'user'; content: string }) => {
-    sendMessage({ text: message.content })
+    let content = message.content
+    if (targetCompanyKey !== 'none') {
+      const job = pipeline.bookmark.find((j) => j.key === targetCompanyKey)
+      if (job) {
+        content += `\n\n*(Context: I am asking this in the context of my application for the ${job.title} role at ${job.company} (Match Score: ${job.score}%). Please tailor your response for this role.)*`
+      }
+    }
+    sendMessage({ text: content })
   }
 
   // ── UPLOAD RESUME ──
@@ -203,14 +210,13 @@ export function ChatView() {
           <select
             value={targetCompanyKey}
             onChange={(e) => setTargetCompanyKey(e.target.value)}
-            disabled={!activeResume}
+            disabled={pipeline.bookmark.length === 0}
             className="rounded-xs border border-border bg-background px-1.5 py-0.5 text-[11px] text-foreground outline-none focus:border-primary"
           >
             <option value="none">General Career Coach</option>
-            {activeResume && [...activeResume.companies, ...(activeResume.stretch || [])].map((c) => {
-              const key = (c.name + c.role).replace(/\s+/g, '-').toLowerCase()
-              return <option key={key} value={key}>{c.name} ({c.role})</option>
-            })}
+            {pipeline.bookmark.map((job) => (
+              <option key={job.key} value={job.key}>{job.company} ({job.title})</option>
+            ))}
           </select>
         </div>
       </div>

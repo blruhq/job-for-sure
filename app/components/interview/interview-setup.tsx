@@ -13,7 +13,7 @@ interface InterviewSetupProps {
 export function InterviewSetup({ onStart }: InterviewSetupProps) {
   const router = useRouter()
   const searchParams = useSearchParams()
-  const { resumes, activeResumeId, setActiveResumeId } = useAppStore()
+  const { resumes, activeResumeId, setActiveResumeId, pipeline } = useAppStore()
 
   // Find active resume
   const activeResume = resumes.find((r) => r.id === activeResumeId) || resumes[0]
@@ -39,7 +39,7 @@ export function InterviewSetup({ onStart }: InterviewSetupProps) {
     }
   }, [activeResume])
 
-  // Sync target selector options from URL query parameters (?company=X&role=Y)
+  // Sync target selector options from URL query parameters (?company=X&role=Y) or pipeline bookmarks
   useEffect(() => {
     const companyParam = searchParams.get('company')
     const roleParam = searchParams.get('role')
@@ -47,12 +47,12 @@ export function InterviewSetup({ onStart }: InterviewSetupProps) {
       setTargetSelect('custom')
       if (companyParam) setCustomCompany(companyParam)
       if (roleParam) setCustomRole(roleParam)
-    } else if (currentResume && currentResume.companies && currentResume.companies.length > 0) {
-      setTargetSelect(currentResume.companies[0].name)
+    } else if (pipeline.bookmark.length > 0) {
+      setTargetSelect(pipeline.bookmark[0].key)
     } else {
       setTargetSelect('custom')
     }
-  }, [currentResume, searchParams])
+  }, [pipeline.bookmark, searchParams])
 
   if (resumes.length === 0) {
     return (
@@ -85,13 +85,13 @@ export function InterviewSetup({ onStart }: InterviewSetupProps) {
       finalCompany = customCompany.trim() || 'General Employer'
       finalRole = customRole.trim() || 'Software Engineer'
     } else {
-      const matchedCo = currentResume?.companies.find((c) => c.name === targetSelect)
-      if (matchedCo) {
-        finalCompany = matchedCo.name
-        finalRole = matchedCo.role
-        missingSkills = matchedCo.missing || []
-        transferableSkills = matchedCo.transferable || []
-        matchScore = matchedCo.score
+      const matchedJob = pipeline.bookmark.find((j) => j.key === targetSelect)
+      if (matchedJob) {
+        finalCompany = matchedJob.company
+        finalRole = matchedJob.title
+        missingSkills = []
+        transferableSkills = currentResume?.skills || []
+        matchScore = matchedJob.score
       } else {
         finalCompany = 'General Employer'
         finalRole = 'Software Engineer'
@@ -148,16 +148,16 @@ export function InterviewSetup({ onStart }: InterviewSetupProps) {
           {/* Target Company/Position Selection */}
           <div>
             <label className="label-mono mb-1.5 block">2. Target Position & Company</label>
-            {currentResume?.companies && currentResume.companies.length > 0 ? (
+            {pipeline.bookmark.length > 0 ? (
               <div className="space-y-2">
                 <select
                   value={targetSelect}
                   onChange={(e) => setTargetSelect(e.target.value)}
                   className="w-full cursor-pointer rounded-sm border border-border bg-background px-3 py-2 text-xs outline-none focus:border-primary"
                 >
-                  {currentResume.companies.map((c) => (
-                    <option key={c.name} value={c.name}>
-                      {c.name} — {c.role} (ATS Score: {c.score}%)
+                  {pipeline.bookmark.map((job) => (
+                    <option key={job.key} value={job.key}>
+                      {job.company} — {job.title} (Match Score: {job.score}%)
                     </option>
                   ))}
                   <option value="custom">✏️ Practice for another role...</option>
@@ -165,7 +165,7 @@ export function InterviewSetup({ onStart }: InterviewSetupProps) {
               </div>
             ) : (
               <div className="text-[11px] text-muted-foreground bg-muted/30 border border-border/50 rounded-sm p-2 mb-2">
-                No matching target companies scanned for this resume yet. Please fill in details below.
+                No bookmarked jobs found. Please bookmark some jobs on the Find Jobs tab, or fill in details below.
               </div>
             )}
 

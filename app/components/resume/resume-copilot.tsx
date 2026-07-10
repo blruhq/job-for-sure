@@ -3,10 +3,12 @@
 import { useRef, useEffect, useMemo } from 'react'
 import { useChat } from '@ai-sdk/react'
 import { DefaultChatTransport } from 'ai'
+import { useAppStore } from '~/lib/store'
 import type { Resume } from '~/types/resume'
 
 export function ResumeCopilot({ resume }: { resume: Resume }) {
   const scrollRef = useRef<HTMLDivElement>(null)
+  const { pipeline } = useAppStore()
 
   const transport = useMemo(() => new DefaultChatTransport({
     api: '/api/copilot',
@@ -19,10 +21,14 @@ export function ResumeCopilot({ resume }: { resume: Resume }) {
         summary: resume.summary,
         skills: resume.skills,
         experience: resume.experience,
-        companies: resume.companies,
+        companies: pipeline.bookmark.map((b) => ({
+          name: b.company,
+          role: b.title,
+          score: b.score,
+        })),
       },
     },
-  }), [resume])
+  }), [resume, pipeline.bookmark])
 
   const { messages, status, sendMessage, stop, error } = useChat({ transport })
 
@@ -40,11 +46,13 @@ export function ResumeCopilot({ resume }: { resume: Resume }) {
     sendMessage({ text })
   }
 
+  const topBookmark = pipeline.bookmark[0]
+
   const suggestions = [
     { label: 'Rewrite summary', prompt: `Rewrite my professional summary to be more impactful. Current: "${resume.summary || 'None'}"` },
     { label: 'Add missing keywords', prompt: `What keywords should I add to match my target companies? Show me exactly where to add them.` },
     { label: 'Improve bullet points', prompt: `Rewrite my experience bullet points using the XYZ formula (Accomplished X as measured by Y by doing Z). Current experience: ${JSON.stringify(resume.experience || [])}` },
-    { label: 'Tailor for top match', prompt: `Tailor my resume for ${resume.companies[0]?.name || 'my top company match'} — ${resume.companies[0]?.role || ''}. What should I change?` },
+    { label: 'Tailor for top match', prompt: `Tailor my resume for ${topBookmark?.company || 'my top bookmarked job'} — ${topBookmark?.title || ''}. What should I change?` },
   ]
 
   return (
