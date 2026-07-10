@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { usePathname } from 'next/navigation'
-import { MessageSquare, KanbanSquare, CheckSquare, Settings, Plus, LogOut, Brain, LayoutDashboard } from 'lucide-react'
+import { MessageSquare, KanbanSquare, CheckSquare, Settings, Plus, LogOut, Brain, LayoutDashboard, Mail } from 'lucide-react'
 import { cn } from '~/lib/utils'
 import { useAppStore } from '~/lib/store'
 import { notify } from '~/lib/toast'
@@ -12,6 +12,7 @@ const NAV_ITEMS = [
   { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { href: '/chat', label: 'Chat', icon: MessageSquare },
   { href: '/interview', label: 'Interview Prep', icon: Brain },
+  { href: '/cover-letter', label: 'Cover Letter', icon: Mail },
   { href: '/pipeline', label: 'Applications', icon: KanbanSquare, badge: true },
   { href: '/ats', label: 'ATS Optimizer', icon: CheckSquare },
 ]

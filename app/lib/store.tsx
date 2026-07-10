@@ -106,7 +106,10 @@ export function AppStoreProvider({ children }: { children: ReactNode }) {
         ])
 
         const parsed = resumeList.map((r) => {
-          try { return { ...JSON.parse(r.data), id: r.id } as Resume }
+          try {
+            const dataObj = typeof r.data === 'string' ? JSON.parse(r.data) : r.data
+            return { ...dataObj, id: r.id } as Resume
+          }
           catch { return null }
         }).filter(Boolean) as Resume[]
 
