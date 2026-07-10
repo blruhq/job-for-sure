@@ -4,12 +4,13 @@ import { ArrowRight } from 'lucide-react'
 import { GridPattern } from '~/components/marketing/grid-pattern'
 import { HowItWorks } from '~/components/marketing/how-it-works'
 import { FeaturesBento } from '~/components/marketing/features-bento'
+import { InterviewSection } from '~/components/marketing/interview-section'
 import { Testimonials } from '~/components/marketing/testimonials'
 
 export const metadata: Metadata = {
   title: { absolute: 'Job For Sure' },
   description:
-    'Upload your resume once. Get AI-matched jobs, ATS-optimized resumes, and a full application tracker.',
+    'Upload your resume once. Get AI-matched jobs, ATS-optimized resumes, mock interview practice, and a full application tracker.',
 }
 
 function AnimatedMockup() {
@@ -147,6 +148,9 @@ export default function LandingPage() {
 
       {/* ── FEATURES (Bento) ── */}
       <FeaturesBento />
+
+      {/* ── INTERVIEW PREP ── */}
+      <InterviewSection />
 
       {/* ── TESTIMONIALS ── */}
       <Testimonials />
