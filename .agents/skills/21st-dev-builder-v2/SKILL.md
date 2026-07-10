@@ -23,7 +23,7 @@ An open-source community registry (the "npm for design engineers") with 1400+ Re
 - **Styling**: Tailwind CSS 4+
 - **Primitives**: Radix UI
 - **Language**: TypeScript
-- **Install**: `npx shadcn@latest add "https://21st.dev/r/{author}/{component}"`
+- **Install**: `npx shadcn@latest add "https://21st.dev/r/{author}/{component-name}"`
 
 ### URL Patterns
 | Purpose | URL Pattern |
@@ -74,16 +74,16 @@ Break down the user's request into a component plan:
 
 | Building... | Search these categories on 21st.dev |
 |-------------|-------------------------------------|
-| Landing page | `hero`, `features`, `pricing`, `testimonials`, `cta`, `footers`, `navbars`, `backgrounds`, `announcements`, `clients` |
-| Dashboard | `sidebar`, `cards`, `tables`, `tabs`, `buttons`, `menus`, `badges`, `numbers` |
-| Auth pages | `sign-ins`, `sign-ups`, `forms`, `inputs`, `buttons` |
-| Blog / Content | `cards`, `texts`, `images`, `paginations`, `scroll-areas` |
-| E-commerce | `cards`, `carousels`, `badges`, `buttons`, `dialogs`, `inputs`, `tabs`, `selects` |
+| Landing page | `hero`, `features`, `pricing`, `testimonials`, `call-to-action`, `footer`, `navbar-navigation`, `background`, `announcement`, `clients`, `gradients` |
+| Dashboard | `sidebar`, `cards`, `tables`, `tabs`, `buttons`, `menus`, `badges`, `number` |
+| Auth pages | `sign-in`, `registration-signup`, `forms`, `inputs`, `buttons` |
+| Blog / Content | `cards`, `texts`, `images`, `pagination`, `scroll-areas` |
+| E-commerce | `cards`, `carousels`, `badges`, `buttons`, `modal-dialog`, `inputs`, `tabs`, `selects` |
 | Form-heavy app | `inputs`, `selects`, `checkboxes`, `radio-groups`, `date-pickers`, `forms`, `text-areas`, `toggles` |
-| AI / Chat app | `ai-chats`, `inputs`, `buttons`, `cards`, `spinner-loaders` |
+| AI / Chat app | `ai-chats`, `inputs`, `buttons`, `cards`, `spinner-loader` |
 | Settings page | `forms`, `inputs`, `toggles`, `tabs`, `selects`, `checkboxes`, `accordions` |
-| Portfolio | `hero`, `cards`, `images`, `texts`, `scroll-areas`, `backgrounds`, `navigation-menus` |
-| SaaS product | `hero`, `pricing`, `features`, `testimonials`, `navbars`, `footers`, `cta`, `comparisons` |
+| Portfolio | `hero`, `cards`, `images`, `texts`, `scroll-areas`, `background`, `navigation-menus` |
+| SaaS product | `hero`, `pricing`, `features`, `testimonials`, `navbar-navigation`, `footer`, `call-to-action`, `comparison` |
 
 ### Phase 3: Live Component Discovery
 
@@ -111,13 +111,13 @@ WebSearch: "site:21st.dev {specific style or feature}"
 ```
 Example: `site:21st.dev animated gradient hero` or `site:21st.dev glassmorphism card`
 
-#### Category Slugs Reference
+#### Category Slugs
 
-Read `references/component-catalog.md` for the full catalog of categories with slugs, counts, and top authors. Here are the most-used ones:
+Verified live slugs. Browse at `https://21st.dev/community/components/s/{slug}`. Both new-style and legacy aliases resolve to the same page, but prefer canonical (first) slugs.
 
-**Landing Sections:** `hero`, `features`, `pricing`, `testimonials`, `cta`, `footers`, `navbars`, `backgrounds`, `announcements`, `clients`, `comparisons`, `docks`, `shaders`
+**Landing Sections:** `hero`, `features`, `pricing`, `testimonials`, `call-to-action` (canonical; `cta` also works), `footer`, `navbar-navigation` (canonical; `navbars` also works), `background`, `announcement`, `clients`, `comparison`, `dock`, `shaders`, `gradients`
 
-**UI Components:** `buttons`, `inputs`, `cards`, `selects`, `sliders`, `accordions`, `tabs`, `dialogs`, `calendars`, `ai-chats`, `tables`, `badges`, `dropdowns`, `alerts`, `forms`, `popovers`, `text-areas`, `radio-groups`, `spinner-loaders`, `paginations`, `checkboxes`, `menus`, `numbers`, `avatars`, `carousels`, `links`, `toggles`, `date-pickers`, `tooltips`, `toasts`, `sidebar`, `sign-ins`, `sign-ups`, `file-uploads`, `file-trees`, `icons`, `tags`, `notifications`, `empty-states`
+**UI Components:** `buttons`, `inputs`, `cards`, `selects`, `sliders`, `accordions`, `tabs`, `modal-dialog` (canonical; `dialogs` also works), `calendars`, `ai-chats`, `tables`, `badges`, `dropdowns`, `alerts`, `forms`, `popovers`, `text-areas`, `radio-groups`, `spinner-loader` (canonical; `spinner-loaders` also works), `pagination`, `checkboxes`, `menus`, `number`, `avatars`, `carousels`, `links`, `toggles`, `date-pickers`, `tooltips`, `toasts`, `sidebar`, `sign-in` (canonical; `sign-ins` also works), `registration-signup` (canonical; `sign-ups` also works), `upload-download` (canonical; `file-uploads` also works), `file-trees`, `icons`, `chip-tag` (canonical; `tags` also works), `notifications`, `empty-states`, `border`, `hook`, `map`, `video`
 
 ### Phase 4: Component Analysis & Selection
 
