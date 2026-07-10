@@ -56,12 +56,12 @@ export const providers: ProviderConfig[] = [
   {
     model: deepseekOfficial.chat(MODEL_ID),
     name: 'DeepSeek Official',
-    timeout: 40_000,
+    timeout: 45_000,
   },
   {
     model: deepinfraBackup.chat('deepseek-ai/DeepSeek-V4-Flash'),
     name: 'DeepInfra',
-    timeout: 40_000,
+    timeout: 45_000,
   },
 ]
 
