@@ -11,10 +11,9 @@ interface CoverLetterEditorProps {
 }
 
 export function CoverLetterEditor({ resume, updateResume }: CoverLetterEditorProps) {
-  const [jdText, setJdText] = useState('')
+  const [jdText, setJdText] = useState(resume.coverLetterJD || '')
   const [letterText, setLetterText] = useState(resume.coverLetter || '')
   const [generating, setGenerating] = useState(false)
-  const [saving, setSaving] = useState(false)
 
   // Sync letterText when resume changes
   useEffect(() => {
@@ -22,6 +21,13 @@ export function CoverLetterEditor({ resume, updateResume }: CoverLetterEditorPro
       setLetterText(resume.coverLetter)
     }
   }, [resume.coverLetter])
+
+  // Sync jdText when resume changes
+  useEffect(() => {
+    if (resume.coverLetterJD !== undefined) {
+      setJdText(resume.coverLetterJD)
+    }
+  }, [resume.coverLetterJD])
 
   const handleGenerate = async () => {
     setGenerating(true)
@@ -37,7 +43,7 @@ export function CoverLetterEditor({ resume, updateResume }: CoverLetterEditorPro
       const data = await res.json()
       if (data.letter) {
         setLetterText(data.letter)
-        updateResume(resume.id, { coverLetter: data.letter })
+        updateResume(resume.id, { coverLetter: data.letter, coverLetterJD: jdText })
         notify({ message: 'Cover letter generated successfully!', type: 'success' })
       } else {
         throw new Error('No letter content returned')
@@ -51,16 +57,8 @@ export function CoverLetterEditor({ resume, updateResume }: CoverLetterEditorPro
   }
 
   const handleSave = () => {
-    setSaving(true)
-    try {
-      updateResume(resume.id, { coverLetter: letterText })
-      notify({ message: 'Cover letter saved successfully!', type: 'success' })
-    } catch (error) {
-      console.error(error)
-      notify({ message: 'Failed to save cover letter.', type: 'error' })
-    } finally {
-      setSaving(false)
-    }
+    updateResume(resume.id, { coverLetter: letterText, coverLetterJD: jdText })
+    notify({ message: 'Cover letter saved successfully!', type: 'success' })
   }
 
   const handleCopy = async () => {
@@ -93,7 +91,7 @@ export function CoverLetterEditor({ resume, updateResume }: CoverLetterEditorPro
           disabled={generating}
           className="flex cursor-pointer items-center justify-center gap-1.5 rounded-sm bg-primary py-2 text-xs font-semibold text-primary-foreground transition-opacity hover:opacity-90 disabled:opacity-50"
         >
-          <Wand2 size={13} className={generating ? "animate-spin" : ""} />
+          <Wand2 size={13} className={generating ? "animate-pulse" : ""} />
           {generating ? 'Generating Letter...' : 'Generate Cover Letter'}
         </button>
       </div>
@@ -108,7 +106,7 @@ export function CoverLetterEditor({ resume, updateResume }: CoverLetterEditorPro
           <div className="flex gap-2">
             <button
               onClick={handleSave}
-              disabled={saving || !letterText}
+              disabled={!letterText}
               className="flex cursor-pointer items-center gap-1 rounded-sm border border-border bg-card px-2.5 py-1 text-[11px] hover:bg-muted disabled:opacity-50"
             >
               <Save size={11} /> Save Letter
