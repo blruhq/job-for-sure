@@ -4,7 +4,7 @@ import { useRef, useState, useEffect } from 'react'
 import { useChat } from '@ai-sdk/react'
 import { AgentChat } from '@/components/agent-elements/agent-chat'
 import { useAppStore } from '~/lib/store'
-import { createResume, companyColor, companyLogo } from '~/lib/company-data'
+import { createResume } from '~/lib/company-data'
 import { notify } from '~/lib/toast'
 import { BuildWizard, type WizardData } from '~/components/chat/build-wizard'
 import { PasteJDModal } from '~/components/chat/paste-jd-modal'
@@ -84,10 +84,7 @@ export function ChatView() {
       })
 
       addResume(resume)
-      sendMessage({ text: `I just uploaded my resume: ${file.name}. Can you analyze it and find matching companies?` })
-
-      // Fetch AI company matches
-      fetchCompanyMatches(resume.id, resume.skills, resume.name, resume.summary, resume.experience)
+      sendMessage({ text: `I just uploaded my resume: ${file.name}. I have skills in ${resume.skills.slice(0, 5).join(', ')}.` })
     } catch (err) {
       console.error(err)
       notify({ message: 'Failed to process resume. Try Build from Template instead.', type: 'error' })
@@ -116,9 +113,7 @@ export function ChatView() {
       })
 
       addResume(resume)
-      sendMessage({ text: `I'm a ${data.role} with skills in ${data.skills.slice(0, 5).join(', ')}. Find me matching companies.` })
-
-      fetchCompanyMatches(resume.id, resume.skills, resume.name, resume.summary, resume.experience)
+      sendMessage({ text: `I'm a ${data.role} with skills in ${data.skills.slice(0, 5).join(', ')}.` })
     } catch (err) {
       console.error(err)
       notify({ message: 'Failed to create resume from wizard', type: 'error' })
@@ -135,29 +130,6 @@ export function ChatView() {
       return
     }
     sendMessage({ text: `Analyze this job posting against my resume (${activeResume.name}). Here's the JD:\n\n${jdText.slice(0, 2000)}` })
-  }
-
-  // ── FETCH AI COMPANY MATCHES ──
-  const fetchCompanyMatches = async (resumeId: string, skills: string[], role: string, summary?: string, experience?: any[]) => {
-    try {
-      const res = await fetch('/api/match-companies', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ skills, role, summary, experience }),
-      })
-
-      if (!res.ok) throw new Error('Failed to fetch matches')
-      const data = await res.json()
-
-      updateResume(resumeId, {
-        score: data.score || 0,
-        companies: data.direct || [],
-        stretch: data.stretch || [],
-      })
-    } catch (err) {
-      console.error('[match-companies] Error:', err)
-      notify({ message: 'Could not generate company matches. You can still chat with the AI coach.', type: 'info' })
-    }
   }
 
   // Helper to read file as text
