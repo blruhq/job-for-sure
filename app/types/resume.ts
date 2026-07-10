@@ -43,6 +43,7 @@ export interface Resume {
   companies: Company[]
   stretch: Company[]
   template?: ResumeTemplate
+  coverLetter?: string
 }
 
 export interface PipelineJob {
