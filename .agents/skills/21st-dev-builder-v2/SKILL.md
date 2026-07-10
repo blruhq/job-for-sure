@@ -35,7 +35,8 @@ An open-source community registry (the "npm for design engineers") with 1400+ Re
 | Component install | `https://21st.dev/r/{author}/{component}` (for `npx shadcn add`) |
 | Community search | `https://21st.dev/community/components/search` |
 | Themes | `https://21st.dev/community/themes` |
-| Templates | `https://21st.dev/community/templates` |
+| Templates (use-case) | `https://21st.dev/community/templates` |
+| Template category browse | `https://21st.dev/community/templates/s/{slug}` |
 | ASCII Art | `https://21st.dev/community/ascii` |
 | CLI & MCP | `https://21st.dev/mcp` |
 | Bookmarks | `https://21st.dev/community/bookmarks` |
@@ -72,18 +73,30 @@ Break down the user's request into a component plan:
 
 #### Component Map
 
-| Building... | Search these categories on 21st.dev |
-|-------------|-------------------------------------|
-| Landing page | `hero`, `features`, `pricing-section`, `testimonials`, `call-to-action`, `footer`, `navbar-navigation`, `background`, `announcement`, `clients`, `text`, `image` |
-| Dashboard | `sidebar`, `cards`, `tables`, `tabs`, `buttons`, `menus`, `badges`, `number` |
-| Auth pages | `sign-in`, `registration-signup`, `forms`, `inputs`, `buttons` |
-| Blog / Content | `cards`, `text`, `image`, `scroll-area` |
-| E-commerce | `cards`, `carousels`, `badges`, `buttons`, `modal-dialog`, `inputs`, `tabs`, `selects` |
-| Form-heavy app | `inputs`, `selects`, `checkboxes`, `radio-groups`, `date-pickers`, `forms`, `text-areas`, `toggles` |
-| AI / Chat app | `ai-chats`, `inputs`, `buttons`, `cards`, `spinner-loader` |
-| Settings page | `forms`, `inputs`, `toggles`, `tabs`, `selects`, `checkboxes`, `accordions` |
-| Portfolio | `hero`, `cards`, `image`, `text`, `scroll-area`, `background`, `navbar-navigation` |
-| SaaS product | `hero`, `pricing-section`, `features`, `testimonials`, `navbar-navigation`, `footer`, `call-to-action`, `comparison` |
+| Building... | Search these categories on 21st.dev (component type) | Or use template category (use-case) |
+|-------------|-------------------------------------|-----------------------------------|
+| Landing page | `hero`, `features`, `pricing-section`, `testimonials`, `call-to-action`, `footer`, `navbar-navigation`, `background`, `announcement`, `clients`, `text`, `image` | `landing-page` (87), `marketing` (48) |
+| Dashboard | `sidebar`, `cards`, `tables`, `tabs`, `buttons`, `menus`, `badges`, `number` | `dashboard` (78), `admin-panel` (68) |
+| Auth pages | `sign-in`, `registration-signup`, `forms`, `inputs`, `buttons` | `authentication` (4) |
+| Blog / Content | `cards`, `text`, `image`, `scroll-area` | `blog` (11) |
+| E-commerce | `cards`, `carousels`, `badges`, `buttons`, `modal-dialog`, `inputs`, `tabs`, `selects` | `ecommerce` (12) |
+| Form-heavy app | `inputs`, `selects`, `checkboxes`, `radio-groups`, `date-pickers`, `forms`, `text-areas`, `toggles` | — |
+| AI / Chat app | `ai-chats`, `inputs`, `buttons`, `cards`, `spinner-loader` | `ai` (38), `chat` (9) |
+| Settings page | `forms`, `inputs`, `toggles`, `tabs`, `selects`, `checkboxes`, `accordions` | — |
+| Portfolio | `hero`, `cards`, `image`, `text`, `scroll-area`, `background`, `navbar-navigation` | `portfolio` (20) |
+| SaaS product | `hero`, `pricing-section`, `features`, `testimonials`, `navbar-navigation`, `footer`, `call-to-action`, `comparison` | `saas` (57), `startup` (20), `boilerplate` (45) |
+| Agency site | — | `agency` (11) |
+| Personal site | — | `personal-website` (16) |
+| Developer tool | — | `developer-tool` (34) |
+| Analytics dashboard | — | `analytics` (11) |
+| CMS / Directory | — | `cms` (4), `directory` (7) |
+| Mobile app landing | — | `mobile-app` (5) |
+| Booking / Real Estate | — | `booking` (3), `real-estate` (3) |
+| Finance app | — | `finance` (4) |
+| Social platform | — | `social` (4) |
+| Education | — | `education` (1) |
+| Gaming | — | `gaming` (1) |
+| Travel | — | `travel` (1) |
 
 ### Phase 3: Live Component Discovery
 
@@ -93,11 +106,17 @@ Break down the user's request into a component plan:
 
 For each component category you need, follow this search sequence:
 
-**Step 1: Browse the category page**
+**Step 1: Browse the category page (component type)**
 ```
 WebFetch: https://21st.dev/community/components/s/{category-slug}
 ```
-This shows all available components in that category with names, authors, and popularity.
+This shows components by type (hero, pricing-section, etc.) with names, authors, and popularity.
+
+**Step 1b (alternative): Browse by use-case (template category)**
+```
+WebFetch: https://21st.dev/community/templates/s/{template-slug}
+```
+This shows the same components but filtered by what kind of site/template they're useful for. Use this when you want "all components for a landing page" instead of "all hero components."
 
 **Step 2: Deep-dive on promising components**
 ```
@@ -153,6 +172,74 @@ Browse at `https://21st.dev/community/components/s/{slug}`. Counts verified live
 Browse at `https://21st.dev/community/components/s/{slug}`.
 
 `buttons`, `inputs`, `cards`, `selects`, `sliders`, `accordions`, `tabs`, `modal-dialog`, `calendars`, `ai-chats`, `tables`, `badges`, `dropdowns`, `alerts`, `forms`, `popovers`, `text-areas`, `radio-groups`, `spinner-loader`, `pagination`, `checkboxes`, `menus`, `number`, `avatars`, `carousels`, `links`, `toggles`, `date-pickers`, `tooltips`, `toasts`, `sidebar`, `sign-in`, `registration-signup`, `upload-download`, `file-trees`, `icons`, `chip-tag`, `notifications`, `empty-states`, `gradients`, `animated-hero-section`, `modern-hero-ui`
+
+#### Template Categories (use-case tagged component collections)
+
+**What are "templates" on 21st.dev?** Templates at `/community/templates/s/{slug}` are **use-case category filters** — they group components by what kind of site or app they're useful for, NOT by component type. For example, "Landing Page (87)" means 87 components tagged as useful for building landing pages. These are individual components you install one at a time via `npx shadcn add`, not downloadable full-page templates.
+
+**How to use a template category:**
+1. Browse the category at `https://21st.dev/community/templates/s/{slug}` (e.g., `/s/landing-page`)
+2. Review the listed components for ones that fit your need
+3. Install each component individually: `npx shadcn@latest add "https://21st.dev/r/{author}/{component}"`
+4. Compose them in your page yourself
+
+Browse at `https://21st.dev/community/templates/s/{slug}`. Counts verified live from sidebar.
+
+**Marketing:**
+
+| Template Category | Slug | Count |
+|---|---|---|
+| Landing Page | `landing-page` | 87 |
+| Marketing | `marketing` | 48 |
+| Portfolio | `portfolio` | 20 |
+| Startup | `startup` | 20 |
+| Personal Website | `personal-website` | 16 |
+| Blog | `blog` | 11 |
+| Agency | `agency` | 11 |
+| Documentation | `documentation` | 10 |
+
+**Applications:**
+
+| Template Category | Slug | Count |
+|---|---|---|
+| Dashboard | `dashboard` | 78 |
+| Admin Panel | `admin-panel` | 68 |
+| SaaS | `saas` | 57 |
+| Boilerplate | `boilerplate` | 45 |
+| AI | `ai` | 38 |
+| Developer Tool | `developer-tool` | 34 |
+| Ecommerce | `ecommerce` | 12 |
+| Analytics | `analytics` | 11 |
+| Chat | `chat` | 9 |
+| Directory | `directory` | 7 |
+| Mobile App | `mobile-app` | 5 |
+| Authentication | `authentication` | 4 |
+| CMS | `cms` | 4 |
+| Finance | `finance` | 4 |
+| Social | `social` | 4 |
+| Booking | `booking` | 3 |
+| Landing Page | `landing-page` | 3 |
+| Productivity | `productivity` | 3 |
+| Real Estate | `real-estate` | 3 |
+| Education | `education` | 1 |
+| Gaming | `gaming` | 1 |
+| Travel | `travel` | 1 |
+
+**Design:**
+
+| Template Category | Slug | Count |
+|---|---|---|
+| Animation | `animation` | 1 |
+
+**Integration:**
+
+| Template Category | Slug | Count |
+|---|---|---|
+| Airtable | `airtable` | 1 |
+| Stripe | `stripe` | 1 |
+| Supabase | `supabase` | 1 |
+
+Note: The same slug may appear in multiple groups (e.g., `landing-page` appears under Marketing with 87 and Applications with 3). These are different tag contexts — the Marketing landing page components are section-level (hero, features, CTA), while Applications landing page components are app-specific (login forms, onboarding).
 
 ### Phase 4: Component Analysis & Selection
 
