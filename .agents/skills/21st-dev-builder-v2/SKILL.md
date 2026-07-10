@@ -1,6 +1,6 @@
 ---
 name: 21st-dev-builder-v2
-description: Build websites and web apps using 21st.dev — the largest marketplace of shadcn/ui-based React Tailwind components with 1400+ components. Use when user mentions "21st.dev", "21st", "ใช้ 21st", "จาก 21st", "build with 21st", "21st component", "21st magic MCP", or references the 21st.dev component registry in any language. Covers building complete sites (landing pages, dashboards, portfolios, e-commerce storefronts, auth pages), browsing and installing individual 21st.dev components into existing projects, and setting up the 21st.dev MCP server. Also trigger when user wants premium UI components specifically from the 21st.dev registry. Do NOT trigger for general web development, standard shadcn/ui, plain Tailwind CSS, React Native, API development, testing, deployment, or any task that doesn't explicitly reference 21st or 21st.dev.
+description: Build websites and web apps using 21st.dev — the largest marketplace of shadcn/ui-based React Tailwind components with 1400+ components. Use when user mentions "21st.dev", "21st", "ใช้ 21st", "จาก 21st", "build with 21st", "21st component", or references the 21st.dev component registry in any language. Covers building complete sites (landing pages, dashboards, portfolios, e-commerce storefronts, auth pages), browsing and installing individual 21st.dev components into existing projects. Also trigger when user wants premium UI components specifically from the 21st.dev registry. Do NOT trigger for general web development, standard shadcn/ui, plain Tailwind CSS, React Native, API development, testing, deployment, or any task that doesn't explicitly reference 21st or 21st.dev.
 ---
 
 # 21st.dev Web Builder v2
@@ -51,7 +51,6 @@ npx shadcn@latest init -d
 npx shadcn@latest init
 ```
 
-**Check MCP availability:** If `21st_magic_component_builder` tool is available, use it as the primary component generation method. Otherwise, use WebSearch + WebFetch + npx install (works perfectly well).
 
 ### Phase 2: Requirement Analysis
 
@@ -522,30 +521,3 @@ This means: if you last browsed `https://21st.dev/s/hero` an hour ago, browse it
 | oklch gradient broken | oklch renders poorly in `radial-gradient()` — use `rgba()` hex values instead |
 | Heading invisible on gradient | `bg-clip-text text-transparent` too faint — use solid `text-foreground` |
 
-## MCP Setup (Optional)
-
-For AI-powered component generation, set up the Magic MCP:
-
-```bash
-npx @21st-dev/cli@latest install claude --api-key <YOUR_API_KEY>
-```
-
-Get API key: https://21st.dev/settings/api-keys
-
-Manual config in `.claude/settings.json`:
-```json
-{
-  "mcpServers": {
-    "@21st-dev/magic": {
-      "command": "npx",
-      "args": ["-y", "@21st-dev/magic@latest"],
-      "env": { "API_KEY": "your-api-key" }
-    }
-  }
-}
-```
-
-MCP provides these tools:
-- `21st_magic_component_builder` — Generate components from descriptions
-- `21st_magic_component_inspiration` — Browse component ideas
-- `logo_search` — Find company logos (via SVGL)
