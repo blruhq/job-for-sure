@@ -88,7 +88,7 @@ export function ChatView() {
       })
 
       addResume(resume)
-      sendMessage({ text: `I just uploaded my resume: ${file.name}. I have skills in ${resume.skills.slice(0, 5).join(', ')}.` })
+      sendMessage({ text: `I just uploaded my resume. Here's my profile:\n- **Name:** ${resume.persona || 'Not specified'}\n- **Role:** ${resume.name}\n- **Skills:** ${resume.skills.join(', ')}\n- **Summary:** ${resume.summary || 'Not provided'}\n- **Location:** ${resume.location || 'Not specified'}\n\nCan you analyze my resume and give me feedback on how to improve it?` })
       setJobPreviewResumeId(resume.id)
     } catch (err) {
       console.error(err)
@@ -118,7 +118,7 @@ export function ChatView() {
       })
 
       addResume(resume)
-      sendMessage({ text: `I'm a ${data.role} with skills in ${data.skills.slice(0, 5).join(', ')}.` })
+      sendMessage({ text: `I built my resume profile:\n- **Name:** ${resume.persona || data.name}\n- **Role:** ${resume.name}\n- **Skills:** ${resume.skills.join(', ')}\n- **Summary:** ${resume.summary || 'Not provided'}\n\nCan you give me feedback and suggestions?` })
       setJobPreviewResumeId(resume.id)
     } catch (err) {
       console.error(err)
@@ -211,7 +211,10 @@ export function ChatView() {
 
       {/* Job preview — shows real jobs inline after resume upload */}
       {!processing && jobPreviewResumeId && resumes.find((r) => r.id === jobPreviewResumeId) && (
-        <JobPreview resume={resumes.find((r) => r.id === jobPreviewResumeId)!} />
+        <JobPreview
+          resume={resumes.find((r) => r.id === jobPreviewResumeId)!}
+          onDismiss={() => setJobPreviewResumeId(null)}
+        />
       )}
 
       {/* Entry cards — shown when chat is empty */}

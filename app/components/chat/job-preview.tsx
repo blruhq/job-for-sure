@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import {
-  Bookmark, ExternalLink, Loader2, ChevronRight, MessageSquare, Plane,
+  Bookmark, ExternalLink, Loader2, ChevronRight, MessageSquare, Plane, X,
 } from 'lucide-react'
 import { cn } from '~/lib/utils'
 import { useAppStore } from '~/lib/store'
@@ -30,7 +30,7 @@ const SOURCE_SHORT: Record<JobSource, string> = {
 // that navigates to the full Find Jobs search panel.
 // ═══════════════════════════════════════════════════════════════
 
-export function JobPreview({ resume }: { resume: Resume }) {
+export function JobPreview({ resume, onDismiss }: { resume: Resume; onDismiss?: () => void }) {
   const router = useRouter()
   const { isBookmarked, bookmarkJob, toggleBookmark } = useAppStore()
 
@@ -71,12 +71,19 @@ export function JobPreview({ resume }: { resume: Resume }) {
   // ── Loading ──
   if (loading) {
     return (
-      <div className="border-b border-border/50 bg-card px-4 py-3 md:px-8">
-        <div className="mx-auto flex max-w-[680px] items-center gap-2 text-muted-foreground">
-          <Loader2 size={12} className="animate-spin text-primary" />
-          <span className="font-mono text-[10px]">
-            Searching real jobs across 9 sources…
-          </span>
+      <div className="shrink-0 border-b border-border/50 bg-card px-4 py-2 md:px-8">
+        <div className="mx-auto flex max-w-[680px] items-center justify-between">
+          <div className="flex items-center gap-2 text-muted-foreground">
+            <Loader2 size={11} className="animate-spin text-primary" />
+            <span className="font-mono text-[10px]">
+              Searching real jobs across 9 sources…
+            </span>
+          </div>
+          {onDismiss && (
+            <button onClick={onDismiss} className="cursor-pointer text-muted-foreground hover:text-foreground">
+              <X size={12} />
+            </button>
+          )}
         </div>
       </div>
     )
@@ -89,7 +96,7 @@ export function JobPreview({ resume }: { resume: Resume }) {
 
   // ── Results ──
   return (
-    <div className="border-b border-border/50 bg-card px-4 py-3 md:px-8">
+    <div className="shrink-0 max-h-[45vh] overflow-y-auto border-b border-border/50 bg-card px-4 py-2.5 md:px-8">
       <div className="mx-auto max-w-[680px]">
         {/* Header */}
         <div className="mb-2 flex items-center justify-between">
@@ -98,15 +105,22 @@ export function JobPreview({ resume }: { resume: Resume }) {
               {total > jobs.length ? `${total} real jobs` : `${jobs.length} real job${jobs.length !== 1 ? 's' : ''}`}
             </span>
             <span className="text-[11px] text-muted-foreground">
-              found for &ldquo;{resume.name}&rdquo;
+              for &ldquo;{resume.name}&rdquo;
             </span>
           </div>
-          <button
-            onClick={() => router.push(`/resume/${resume.id}`)}
-            className="flex cursor-pointer items-center gap-0.5 text-[11px] font-medium text-primary hover:underline"
-          >
-            View all jobs <ChevronRight size={12} />
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => router.push(`/resume/${resume.id}`)}
+              className="flex cursor-pointer items-center gap-0.5 text-[11px] font-medium text-primary hover:underline"
+            >
+              View all <ChevronRight size={12} />
+            </button>
+            {onDismiss && (
+              <button onClick={onDismiss} className="cursor-pointer text-muted-foreground hover:text-foreground">
+                <X size={13} />
+              </button>
+            )}
+          </div>
         </div>
 
         {/* Job cards (top 5) */}
