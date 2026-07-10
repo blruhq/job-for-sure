@@ -16,10 +16,19 @@ export async function POST(req: NextRequest) {
     const user = await getSessionUser()
     if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-    const { resume, jdText } = await req.json()
+    const { resume, jdText, company, role, focus } = await req.json()
 
     let prompt = `Resume:\n${JSON.stringify(resume)}\n\n`
-    if (jdText) {
+    
+    if (company && role) {
+      prompt += `Target Role: ${role} at ${company}.\n`
+      if (focus) {
+        prompt += `Focus/Highlight Areas: ${focus}\n`
+      }
+      if (jdText) {
+        prompt += `Job Description Context:\n${jdText}`
+      }
+    } else if (jdText) {
       prompt += `Job Description:\n${jdText}`
     } else {
       const topCompany = resume.companies?.[0]

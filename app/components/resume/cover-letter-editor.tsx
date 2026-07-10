@@ -15,6 +15,12 @@ export function CoverLetterEditor({ resume, updateResume }: CoverLetterEditorPro
   const [letterText, setLetterText] = useState(resume.coverLetter || '')
   const [generating, setGenerating] = useState(false)
 
+  // Mode & Quick fill states
+  const [mode, setMode] = useState<'quick' | 'jd'>('quick')
+  const [company, setCompany] = useState('')
+  const [role, setRole] = useState('')
+  const [focus, setFocus] = useState('')
+
   // Sync letterText when resume changes
   useEffect(() => {
     if (resume.coverLetter !== undefined) {
@@ -35,7 +41,13 @@ export function CoverLetterEditor({ resume, updateResume }: CoverLetterEditorPro
       const res = await fetch('/api/ai/cover-letter', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ resume, jdText }),
+        body: JSON.stringify({
+          resume,
+          jdText: mode === 'jd' ? jdText : '',
+          company: mode === 'quick' ? company : '',
+          role: mode === 'quick' ? role : '',
+          focus: mode === 'quick' ? focus : '',
+        }),
       })
       if (!res.ok) {
         throw new Error('Failed to generate cover letter')
@@ -43,7 +55,10 @@ export function CoverLetterEditor({ resume, updateResume }: CoverLetterEditorPro
       const data = await res.json()
       if (data.letter) {
         setLetterText(data.letter)
-        updateResume(resume.id, { coverLetter: data.letter, coverLetterJD: jdText })
+        updateResume(resume.id, {
+          coverLetter: data.letter,
+          coverLetterJD: mode === 'jd' ? jdText : `Company: ${company}, Role: ${role}${focus ? `, Focus: ${focus}` : ''}`,
+        })
         notify({ message: 'Cover letter generated successfully!', type: 'success' })
       } else {
         throw new Error('No letter content returned')
@@ -57,7 +72,10 @@ export function CoverLetterEditor({ resume, updateResume }: CoverLetterEditorPro
   }
 
   const handleSave = () => {
-    updateResume(resume.id, { coverLetter: letterText, coverLetterJD: jdText })
+    updateResume(resume.id, {
+      coverLetter: letterText,
+      coverLetterJD: mode === 'jd' ? jdText : `Company: ${company}, Role: ${role}${focus ? `, Focus: ${focus}` : ''}`,
+    })
     notify({ message: 'Cover letter saved successfully!', type: 'success' })
   }
 
@@ -72,23 +90,78 @@ export function CoverLetterEditor({ resume, updateResume }: CoverLetterEditorPro
 
   return (
     <div className="flex w-full flex-col lg:flex-row overflow-hidden h-full">
-      {/* Configuration & JD input Panel */}
+      {/* Configuration & Input Panel */}
       <div className="w-full lg:w-[320px] shrink-0 border-b lg:border-b-0 lg:border-r border-border bg-card p-5 flex flex-col gap-4 overflow-y-auto">
-        <div>
-          <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-1">Tailor to Job Description</h3>
-          <p className="text-[11px] text-muted-foreground mb-3 leading-relaxed">
-            Paste the job description below to customize your cover letter. If left blank, we will write a letter based on the match from your profile.
-          </p>
-          <textarea
-            value={jdText}
-            onChange={(e) => setJdText(e.target.value)}
-            placeholder="Paste Job Description here..."
-            className="w-full h-48 rounded-xs border border-border bg-background px-2.5 py-1.5 text-[11px] outline-none focus:border-primary resize-none font-sans"
-          />
+        <div className="flex gap-1.5 rounded-sm bg-border/30 p-0.5 mb-1 shrink-0">
+          <button
+            onClick={() => setMode('quick')}
+            className={`flex-1 rounded-xs py-1 text-[10px] font-semibold transition-all cursor-pointer text-center ${
+              mode === 'quick' ? 'bg-card text-foreground shadow-sm font-semibold' : 'text-muted-foreground hover:text-foreground'
+            }`}
+          >
+            Quick Fill
+          </button>
+          <button
+            onClick={() => setMode('jd')}
+            className={`flex-1 rounded-xs py-1 text-[10px] font-semibold transition-all cursor-pointer text-center ${
+              mode === 'jd' ? 'bg-card text-foreground shadow-sm font-semibold' : 'text-muted-foreground hover:text-foreground'
+            }`}
+          >
+            Job Description
+          </button>
         </div>
+
+        {mode === 'quick' ? (
+          <div className="space-y-3">
+            <div>
+              <label className="label-mono mb-1 block">Company Name</label>
+              <input
+                type="text"
+                value={company}
+                onChange={(e) => setCompany(e.target.value)}
+                placeholder="e.g. Google"
+                className="w-full rounded-xs border border-border bg-background px-2.5 py-1.5 text-[11px] outline-none focus:border-primary"
+              />
+            </div>
+            <div>
+              <label className="label-mono mb-1 block">Job Title</label>
+              <input
+                type="text"
+                value={role}
+                onChange={(e) => setRole(e.target.value)}
+                placeholder="e.g. Frontend Engineer"
+                className="w-full rounded-xs border border-border bg-background px-2.5 py-1.5 text-[11px] outline-none focus:border-primary"
+              />
+            </div>
+            <div>
+              <label className="label-mono mb-1 block">Wording / Focus (Optional)</label>
+              <textarea
+                value={focus}
+                onChange={(e) => setFocus(e.target.value)}
+                placeholder="e.g. Highlight my React and leadership experience..."
+                rows={4}
+                className="w-full resize-none rounded-xs border border-border bg-background px-2.5 py-1.5 text-[11px] outline-none focus:border-primary font-sans"
+              />
+            </div>
+          </div>
+        ) : (
+          <div>
+            <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-1">Tailor to Job Description</h3>
+            <p className="text-[10px] text-muted-foreground mb-3 leading-relaxed">
+              Paste the job description below to customize your cover letter.
+            </p>
+            <textarea
+              value={jdText}
+              onChange={(e) => setJdText(e.target.value)}
+              placeholder="Paste Job Description here..."
+              className="w-full h-56 rounded-xs border border-border bg-background px-2.5 py-1.5 text-[11px] outline-none focus:border-primary resize-none font-sans"
+            />
+          </div>
+        )}
+
         <button
           onClick={handleGenerate}
-          disabled={generating}
+          disabled={generating || (mode === 'quick' && (!company || !role)) || (mode === 'jd' && !jdText)}
           className="flex cursor-pointer items-center justify-center gap-1.5 rounded-sm bg-primary py-2 text-xs font-semibold text-primary-foreground transition-opacity hover:opacity-90 disabled:opacity-50"
         >
           <Wand2 size={13} className={generating ? "animate-pulse" : ""} />
