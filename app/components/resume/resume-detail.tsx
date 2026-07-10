@@ -7,6 +7,7 @@ import { cn } from '~/lib/utils'
 import { useAppStore } from '~/lib/store'
 import { notify } from '~/lib/toast'
 import { ResumeCopilot } from '~/components/resume/resume-copilot'
+import { CoverLetterEditor } from '~/components/resume/cover-letter-editor'
 import type { Company } from '~/types/resume'
 
 function companyKey(c: Company) {
@@ -16,7 +17,7 @@ function companyKey(c: Company) {
 export function ResumeDetail({ resumeId }: { resumeId: string }) {
   const router = useRouter()
   const { getResume, resumes, addResume, setActiveResumeId, isBookmarked, bookmarkJob, activeResume, toggleBookmark, updateResume } = useAppStore()
-  const [tab, setTab] = useState<'jobs' | 'view' | 'editor'>('jobs')
+  const [tab, setTab] = useState<'jobs' | 'view' | 'editor' | 'cover-letter'>('jobs')
   const [policyFilter, setPolicyFilter] = useState('all')
   const [scoreFilter, setScoreFilter] = useState(0)
   const [searchFilter, setSearchFilter] = useState('')
@@ -115,7 +116,7 @@ export function ResumeDetail({ resumeId }: { resumeId: string }) {
             <ArrowLeft size={12} /> Back
           </button>
           <div className="ml-3 flex gap-1 rounded-sm bg-border/30 p-0.5">
-            {(['jobs', 'view', 'editor'] as const).map((t) => (
+            {(['jobs', 'view', 'editor', 'cover-letter'] as const).map((t) => (
               <button
                 key={t}
                 onClick={() => setTab(t)}
@@ -124,7 +125,7 @@ export function ResumeDetail({ resumeId }: { resumeId: string }) {
                   tab === t ? 'bg-card text-foreground shadow-sm font-semibold' : 'text-muted-foreground hover:text-foreground',
                 )}
               >
-                {t === 'jobs' ? 'Recommended Jobs' : t === 'view' ? 'View Resume' : 'Resume Editor'}
+                {t === 'jobs' ? 'Recommended Jobs' : t === 'view' ? 'View Resume' : t === 'editor' ? 'Resume Editor' : 'Cover Letter'}
               </button>
             ))}
           </div>
@@ -417,6 +418,11 @@ export function ResumeDetail({ resumeId }: { resumeId: string }) {
             {/* AI Co-Pilot sidebar */}
             <ResumeCopilot resume={resume} />
           </div>
+        )}
+
+        {/* ── Tab 4: Cover Letter ── */}
+        {tab === 'cover-letter' && (
+          <CoverLetterEditor resume={resume} updateResume={updateResume} />
         )}
       </div>
     </div>
