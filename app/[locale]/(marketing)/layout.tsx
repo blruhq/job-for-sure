@@ -15,10 +15,22 @@ export default function MarketingLayout({ children }: { children: React.ReactNod
           {/* Nav links — anchor scroll only */}
           <nav className="flex gap-6 max-md:hidden">
             <a
+              href="#how-it-works"
+              className="cursor-pointer text-[13px] text-muted-foreground transition-colors hover:text-foreground"
+            >
+              How It Works
+            </a>
+            <a
               href="#features"
               className="cursor-pointer text-[13px] text-muted-foreground transition-colors hover:text-foreground"
             >
               Features
+            </a>
+            <a
+              href="#interview"
+              className="cursor-pointer text-[13px] text-muted-foreground transition-colors hover:text-foreground"
+            >
+              Interview
             </a>
           </nav>
 

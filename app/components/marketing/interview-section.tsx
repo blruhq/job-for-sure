@@ -3,7 +3,7 @@ import Link from 'next/link'
 
 export function InterviewSection() {
   return (
-    <section className="border-t border-border py-24 md:py-32">
+    <section id="interview" className="border-t border-border py-24 md:py-32">
       <div className="mx-auto max-w-[1120px] px-6">
         <div className="grid items-center gap-12 md:grid-cols-[1fr_1.2fr] md:gap-16">
           {/* ── Left: Copy ── */}
