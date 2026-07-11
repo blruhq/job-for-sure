@@ -1,10 +1,10 @@
 // ═══════════════════════════════════════════════════════════════
-// JSEARCH ADAPTER (RapidAPI — Google for Jobs aggregator)
-// Free tier: 200 requests/month.
-// Register: https://rapidapi.com/letscrape-6pRBpxxU8V/api/jsearch
+// JSEARCH ADAPTER (OpenWeb Ninja — Google for Jobs aggregator)
+// Free tier: included. No credit card required.
+// Register: https://app.openwebninja.com
 //
 // Requires env var:
-//   RAPIDAPI_KEY=xxx
+//   OPENWEBNINJA_API_KEY=xxx
 //
 // Strengths: RICHEST data of any source.
 //   - Salary (min/max/currency/period)
@@ -54,10 +54,10 @@ interface JSearchJob {
   job_id?: string
 }
 
-interface JSearchResponse {
-  data: JSearchJob[]
-  status?: string
-  message?: string
+interface OpenWebNinjaResponse {
+  jobs?: JSearchJob[]
+  data?: { jobs?: JSearchJob[] }
+  request_id?: string
 }
 
 export async function fetchJSearch(
@@ -65,10 +65,10 @@ export async function fetchJSearch(
   location?: string,
   opts?: { signal?: AbortSignal },
 ): Promise<{ jobs: JobResult[]; error?: string }> {
-  const apiKey = process.env.RAPIDAPI_KEY
+  const apiKey = process.env.OPENWEBNINJA_API_KEY
 
   if (!apiKey) {
-    return { jobs: [], error: 'No API key — register at rapidapi.com (search JSearch)' }
+    return { jobs: [], error: 'No API key — register at app.openwebninja.com' }
   }
 
   try {
@@ -76,21 +76,21 @@ export async function fetchJSearch(
       ? `${query} in ${location}`
       : query
 
-    const url = `https://jsearch.p.rapidapi.com/search?query=${encodeURIComponent(searchQuery)}&num_pages=1&date_posted=week`
+    const url = `https://api.openwebninja.com/v1/job-search?query=${encodeURIComponent(searchQuery)}&num_pages=1&date_posted=week`
 
     const res = await fetch(url, {
       signal: opts?.signal,
       headers: {
-        'X-RapidAPI-Key': apiKey,
-        'X-RapidAPI-Host': 'jsearch.p.rapidapi.com',
+        'x-api-key': apiKey,
         Accept: 'application/json',
       },
     })
 
     if (!res.ok) throw new Error(`JSearch: HTTP ${res.status}`)
-    const data: JSearchResponse = await res.json()
+    const body: OpenWebNinjaResponse = await res.json()
 
-    const jobs: JobResult[] = (data.data || []).map((job) => {
+    const rawJobs = body.jobs || body.data?.jobs || []
+    const jobs: JobResult[] = rawJobs.map((job) => {
       // Build description from highlights + description
       const parts: string[] = []
       if (job.job_description) parts.push(job.job_description)
@@ -129,6 +129,7 @@ export async function fetchJSearch(
 
     return { jobs }
   } catch (err) {
+    console.error('[jsearch] Fetch error:', err instanceof Error ? err.message : err)
     return { jobs: [], error: err instanceof Error ? err.message : 'JSearch failed' }
   }
 }

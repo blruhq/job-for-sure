@@ -76,6 +76,7 @@ export async function fetchHimalayas(
 
     return { jobs }
   } catch (err) {
+    console.error('[himalayas] Fetch error:', err instanceof Error ? err.message : err)
     return { jobs: [], error: err instanceof Error ? err.message : 'Himalayas failed' }
   }
 }

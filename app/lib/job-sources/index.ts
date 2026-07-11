@@ -9,7 +9,7 @@
 //     Greenhouse, Ashby, RemoteOK, Himalayas, Remotive, The Muse, Arbeitnow, JobbKK
 //   Key-gated (auto-activate when env vars are present):
 //     Adzuna (ADZUNA_APP_ID + ADZUNA_APP_KEY)
-//     JSearch (RAPIDAPI_KEY)
+//     JSearch (OPENWEBNINJA_API_KEY)
 // ═══════════════════════════════════════════════════════════════
 
 import type { JobResult, ScoredJob, SearchParams, SearchResult, JobSource } from './types'
