@@ -5,7 +5,6 @@ import { GridPattern } from '~/components/marketing/grid-pattern'
 import { HowItWorks } from '~/components/marketing/how-it-works'
 import { FeaturesBento } from '~/components/marketing/features-bento'
 import { InterviewSection } from '~/components/marketing/interview-section'
-import { Testimonials } from '~/components/marketing/testimonials'
 
 export const metadata: Metadata = {
   title: { absolute: 'Job For Sure' },
@@ -151,9 +150,6 @@ export default function LandingPage() {
 
       {/* ── INTERVIEW PREP ── */}
       <InterviewSection />
-
-      {/* ── TESTIMONIALS ── */}
-      <Testimonials />
 
       {/* ── CTA ── */}
       <section className="bg-primary">
