@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import {
   Search, Bookmark, ExternalLink, MapPin, Loader2, AlertCircle,
   RefreshCw, Filter, X, Globe, Clock, Star, Plane, MessageSquare,
-  ChevronDown, Briefcase,
+  ChevronDown, Briefcase, Brain,
 } from 'lucide-react'
 import { cn } from '~/lib/utils'
 import { useAppStore } from '~/lib/store'
@@ -278,12 +278,13 @@ export function JobSearchPanel({ resume }: { resume: Resume }) {
     }
   }
 
-  const handleTailor = (job: ScoredJob) => {
-    const tailored = { ...resume, id: String(Date.now()), name: `${resume.name} → ${job.company}`, updated: 'just now' }
-    addResume(tailored)
-    setActiveResumeId(tailored.id)
-    router.push(`/resume/${tailored.id}`)
-    notify({ message: `Cloned resume for ${job.company}.`, type: 'success' })
+  const handleAts = (job: ScoredJob) => {
+    if (typeof window !== 'undefined') {
+      sessionStorage.setItem('jfs_pending_ats_jd', job.description)
+      sessionStorage.setItem('jfs_pending_ats_company', job.company)
+      sessionStorage.setItem('jfs_pending_ats_role', job.title)
+    }
+    router.push('/ats')
   }
 
   const handleInterview = (job: ScoredJob) => {
@@ -546,7 +547,7 @@ export function JobSearchPanel({ resume }: { resume: Resume }) {
                   job={job}
                   bookmarked={isBookmarked(job.id)}
                   onBookmark={() => handleBookmark(job)}
-                  onTailor={() => handleTailor(job)}
+                  onAts={() => handleAts(job)}
                   onInterview={() => handleInterview(job)}
                 />
               ))}
@@ -602,11 +603,11 @@ export function JobSearchPanel({ resume }: { resume: Resume }) {
 // SUB-COMPONENTS
 // ═══════════════════════════════════════════════════════════════
 
-function JobCard({ job, bookmarked, onBookmark, onTailor, onInterview }: {
+function JobCard({ job, bookmarked, onBookmark, onAts, onInterview }: {
   job: ScoredJob
   bookmarked: boolean
   onBookmark: () => void
-  onTailor: () => void
+  onAts: () => void
   onInterview: () => void
 }) {
   return (
@@ -680,16 +681,16 @@ function JobCard({ job, bookmarked, onBookmark, onTailor, onInterview }: {
           {bookmarked ? 'Bookmarked' : 'Bookmark'}
         </button>
         <button
-          onClick={onTailor}
-          className="cursor-pointer rounded-xs border border-border bg-card px-2 py-1 text-[11px] transition-colors hover:border-primary hover:text-primary"
+          onClick={onAts}
+          className="flex cursor-pointer items-center gap-1 rounded-xs border border-border bg-card px-2 py-1 text-[11px] transition-colors hover:border-primary hover:text-primary"
         >
-          Tailor Resume
+          <span>🎯 ATS Fit</span>
         </button>
         <button
           onClick={onInterview}
           className="flex cursor-pointer items-center gap-1 rounded-xs border border-border bg-card px-2 py-1 text-[11px] transition-colors hover:border-primary hover:text-primary"
         >
-          <MessageSquare size={10} /> Interview
+          <Brain size={11} /> Interview
         </button>
         <a
           href={job.url}

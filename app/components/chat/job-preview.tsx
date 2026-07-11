@@ -252,6 +252,19 @@ export function JobPreview({ resume, onDismiss }: { resume: Resume; onDismiss?: 
                   </button>
                   <button
                     onClick={() => {
+                      if (typeof window !== 'undefined') {
+                        sessionStorage.setItem('jfs_pending_ats_jd', job.description)
+                        sessionStorage.setItem('jfs_pending_ats_company', job.company)
+                        sessionStorage.setItem('jfs_pending_ats_role', job.title)
+                      }
+                      router.push('/ats')
+                    }}
+                    className="flex cursor-pointer items-center gap-0.5 rounded-xs border border-border bg-card px-1.5 py-0.5 text-[10px] transition-colors hover:border-primary hover:text-primary"
+                  >
+                    <span>🎯 ATS Fit</span>
+                  </button>
+                  <button
+                    onClick={() => {
                       router.push(`/interview?company=${encodeURIComponent(job.company)}&role=${encodeURIComponent(job.title)}`)
                     }}
                     className="flex cursor-pointer items-center gap-0.5 rounded-xs border border-border bg-card px-1.5 py-0.5 text-[10px] transition-colors hover:border-primary hover:text-primary"
