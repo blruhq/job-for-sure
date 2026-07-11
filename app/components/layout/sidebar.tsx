@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { usePathname } from 'next/navigation'
-import { MessageSquare, KanbanSquare, CheckSquare, Settings, Plus, LogOut, Brain, LayoutDashboard, Mail } from 'lucide-react'
+import { MessageSquare, KanbanSquare, CheckSquare, Settings, Plus, Brain, LayoutDashboard, Mail } from 'lucide-react'
 import { cn } from '~/lib/utils'
 import { useAppStore } from '~/lib/store'
 import { notify } from '~/lib/toast'
@@ -131,33 +131,7 @@ export function Sidebar() {
         </Link>
       </div>
 
-      {/* ── Footer ── */}
-      <div className="mt-auto border-t border-border p-2">
-        <button
-          onClick={async () => {
-            try {
-              const { authClient } = await import('~/lib/auth-client')
-              await authClient.signOut()
-            } catch { /* ignore */ }
-            window.location.href = '/login'
-          }}
-          className={cn(
-            'flex w-full cursor-pointer items-center gap-2 rounded-sm p-1 transition-colors hover:bg-sidebar-hover',
-            c && 'justify-center',
-          )}
-          title="Sign out"
-        >
-          <div className="flex h-[26px] w-[26px] shrink-0 items-center justify-center rounded-full bg-primary text-[10px] font-semibold text-primary-foreground">
-            <LogOut size={13} />
-          </div>
-          {!c && (
-            <div className="min-w-0 flex-1 text-left">
-              <div className="text-xs font-semibold">Sign out</div>
-              <div className="font-mono text-[10px] text-muted-foreground">End session →</div>
-            </div>
-          )}
-        </button>
-      </div>
+
     </aside>
   )
 }

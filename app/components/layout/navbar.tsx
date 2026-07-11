@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import { PanelLeft, Sun, Moon } from 'lucide-react'
+import { UserMenu } from '~/components/layout/user-menu'
 import { cn } from '~/lib/utils'
 import { useTheme } from '~/components/layout/theme-provider'
 import { useAppStore } from '~/lib/store'
@@ -49,9 +50,7 @@ export function Topbar() {
         >
           {theme === 'dark' ? <Sun size={16} /> : <Moon size={16} />}
         </button>
-        <div className="mr-1 flex h-[26px] w-[26px] items-center justify-center rounded-full bg-primary text-[10px] font-semibold text-primary-foreground">
-          JD
-        </div>
+        <UserMenu />
       </div>
     </header>
   )
