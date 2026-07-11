@@ -1,40 +1,43 @@
 import { Upload, Search, FileCheck, LayoutDashboard } from 'lucide-react'
 import Link from 'next/link'
 import { ArrowRight } from 'lucide-react'
-
-const STEPS = [
-  {
-    icon: Upload,
-    title: 'Upload Resume',
-    desc: 'Drop your PDF or paste your experience. AI parses it into a structured profile in seconds.',
-  },
-  {
-    icon: Search,
-    title: 'Match with Jobs',
-    desc: 'Get an ATS match score against real job descriptions. See exactly where you stand.',
-  },
-  {
-    icon: FileCheck,
-    title: 'Tailor & Apply',
-    desc: 'Chat with AI to rewrite bullet points, inject missing keywords, and generate tailored applications.',
-  },
-  {
-    icon: LayoutDashboard,
-    title: 'Track Applications',
-    desc: 'Drag jobs through stages — saved, applied, interviewing, offer. Never lose track.',
-  },
-]
+import { useTranslations } from 'next-intl'
 
 export function HowItWorks() {
+  const t = useTranslations('landing')
+
+  const STEPS = [
+    {
+      icon: Upload,
+      title: t('step1Title'),
+      desc: t('step1Desc'),
+    },
+    {
+      icon: Search,
+      title: t('step2Title'),
+      desc: t('step2Desc'),
+    },
+    {
+      icon: FileCheck,
+      title: t('step3Title'),
+      desc: t('step3Desc'),
+    },
+    {
+      icon: LayoutDashboard,
+      title: t('step4Title'),
+      desc: t('step4Desc'),
+    },
+  ]
+
   return (
     <section id="how-it-works" className="border-t border-border bg-muted/30 py-24 md:py-32">
       <div className="mx-auto max-w-[1120px] px-6">
         <div className="max-w-xl">
           <h2 className="text-4xl font-semibold tracking-tight text-foreground md:text-5xl">
-            From upload to offer in four steps.
+            {t('howTitle')}
           </h2>
           <p className="mt-5 text-lg leading-relaxed text-muted-foreground">
-            No fluff. No spreadsheets. Just a clear path from resume to offer.
+            {t('howSubtitle')}
           </p>
         </div>
         <div className="mt-20 grid gap-10 md:grid-cols-4">
@@ -49,7 +52,7 @@ export function HowItWorks() {
                   <Icon size={24} />
                 </div>
                 <div className="mt-5 font-mono text-xs font-semibold uppercase tracking-widest text-muted-foreground">
-                  Step {i + 1}
+                  {t('stepLabel')} {i + 1}
                 </div>
                 <h3 className="mt-3 text-xl font-semibold text-foreground">{step.title}</h3>
                 <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{step.desc}</p>
@@ -62,7 +65,7 @@ export function HowItWorks() {
             href="/register"
             className="inline-flex cursor-pointer items-center gap-1.5 text-sm font-medium text-primary transition-colors hover:text-primary/80"
           >
-            Start now <ArrowRight size={14} />
+            {t('howCta')} <ArrowRight size={14} />
           </Link>
         </div>
       </div>

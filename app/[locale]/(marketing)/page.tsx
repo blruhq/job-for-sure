@@ -13,92 +13,15 @@ export const metadata: Metadata = {
     'Upload your resume once. Get AI-matched jobs, ATS-optimized resumes, mock interview practice, and a full application tracker.',
 }
 
-function AnimatedMockup() {
-  return (
-    <div className="relative w-full max-w-lg">
-      <div className="relative overflow-hidden rounded-2xl border border-border bg-card shadow-paper">
-        <div className="flex items-center gap-1.5 border-b border-border px-4 py-2.5">
-          <span className="h-2.5 w-2.5 rounded-full bg-[#FF5F57]" />
-          <span className="h-2.5 w-2.5 rounded-full bg-[#FFBD2E]" />
-          <span className="h-2.5 w-2.5 rounded-full bg-[#27C93F]" />
-          <span className="ml-2 text-xs font-medium text-muted-foreground">jobforsure.app</span>
-        </div>
-        <div className="space-y-4 p-5">
-          <div className="flex items-center justify-between animate-fade-up [animation-delay:200ms] [animation-fill-mode:backwards]">
-            <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-              ATS Match Score
-            </span>
-            <span className="font-mono text-2xl font-bold text-primary tabular-nums animate-scale-in [animation-delay:800ms] [animation-fill-mode:backwards]">
-              89
-              <span className="text-sm font-normal text-muted-foreground">%</span>
-            </span>
-          </div>
-          <div className="h-2 overflow-hidden rounded-full bg-muted">
-            <div
-              className="h-full w-[89%] rounded-full bg-primary animate-[scale-in_0.6s_var(--ease)_1.2s_both]"
-              style={{ transformOrigin: 'left' }}
-            />
-          </div>
-          <div className="grid grid-cols-2 gap-3 pt-1">
-            {[
-              { label: 'Keywords Matched', value: '14/18', color: 'text-success' },
-              { label: 'Experience', value: '4.2 yrs', color: 'text-primary' },
-              { label: 'Education', value: 'B.S. CS', color: 'text-warn' },
-              { label: 'Skills Gap', value: '2 items', color: 'text-muted-foreground' },
-            ].map((stat) => (
-              <div
-                key={stat.label}
-                className="rounded-lg border border-border/60 bg-muted/30 p-2.5"
-              >
-                <span className="text-[11px] text-muted-foreground">{stat.label}</span>
-                <div className="mt-0.5 flex items-baseline gap-1">
-                  <span className={'text-sm font-semibold ' + stat.color}>{stat.value}</span>
-                </div>
-              </div>
-            ))}
-          </div>
-          <div className="animate-fade-up rounded-xl border border-border/60 bg-muted/20 p-3 [animation-delay:2s] [animation-fill-mode:backwards]">
-            <div className="flex items-start gap-2.5">
-              <div className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-primary/10 text-[11px] font-bold text-primary">
-                AI
-              </div>
-              <div className="min-w-0 flex-1">
-                <div className="flex items-baseline gap-2">
-                  <span className="text-[11px] font-semibold text-foreground">Career Coach</span>
-                  <span className="text-[10px] text-muted-foreground">just now</span>
-                </div>
-                <div className="mt-1 animate-fade-up overflow-hidden whitespace-nowrap [animation-delay:2.2s] [animation-fill-mode:backwards]">
-                  <span className="inline-block text-[13px] leading-relaxed text-muted-foreground">
-                    Your resume matches <strong className="text-foreground">3 of 5</strong> key
-                    requirements. Let&apos;s tailor the missing skills.
-                  </span>
-                </div>
-                <span className="-mt-1 ml-0.5 inline-block h-3.5 w-[2px] animate-pulse bg-primary" />
-              </div>
-            </div>
-          </div>
-          <div className="flex items-center gap-3 text-[11px] text-muted-foreground animate-fade-up [animation-delay:2.8s] [animation-fill-mode:backwards]">
-            <span className="flex items-center gap-1">
-              <span className="h-1.5 w-1.5 rounded-full bg-success" />
-              Saved (4)
-            </span>
-            <span className="flex items-center gap-1">
-              <span className="h-1.5 w-1.5 rounded-full bg-warn" />
-              Applied (2)
-            </span>
-            <span className="flex items-center gap-1">
-              <span className="h-1.5 w-1.5 rounded-full bg-primary" />
-              Interview (1)
-            </span>
-          </div>
-        </div>
-      </div>
-    </div>
-  )
-}
-
 export default function LandingPage() {
   const t = useTranslations('landing')
+
+  const statItems = [
+    { label: t('mockupKeywords'), value: '14/18', color: 'text-success' },
+    { label: t('mockupExperience'), value: '4.2 yrs', color: 'text-primary' },
+    { label: t('mockupEducation'), value: 'B.S. CS', color: 'text-warn' },
+    { label: t('mockupSkillsGap'), value: '2 items', color: 'text-muted-foreground' },
+  ]
 
   return (
     <div className="flex min-h-screen flex-col bg-background">
@@ -136,7 +59,84 @@ export default function LandingPage() {
               </div>
             </div>
             <div className="flex justify-center md:justify-end">
-              <AnimatedMockup />
+              <div className="relative w-full max-w-lg">
+                <div className="relative overflow-hidden rounded-2xl border border-border bg-card shadow-paper">
+                  <div className="flex items-center gap-1.5 border-b border-border px-4 py-2.5">
+                    <span className="h-2.5 w-2.5 rounded-full bg-[#FF5F57]" />
+                    <span className="h-2.5 w-2.5 rounded-full bg-[#FFBD2E]" />
+                    <span className="h-2.5 w-2.5 rounded-full bg-[#27C93F]" />
+                    <span className="ml-2 text-xs font-medium text-muted-foreground">jobforsure.app</span>
+                  </div>
+                  <div className="space-y-4 p-5">
+                    <div className="flex items-center justify-between animate-fade-up [animation-delay:200ms] [animation-fill-mode:backwards]">
+                      <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                        {t('mockupAtsScore')}
+                      </span>
+                      <span className="font-mono text-2xl font-bold text-primary tabular-nums animate-scale-in [animation-delay:800ms] [animation-fill-mode:backwards]">
+                        89
+                        <span className="text-sm font-normal text-muted-foreground">%</span>
+                      </span>
+                    </div>
+                    <div className="h-2 overflow-hidden rounded-full bg-muted">
+                      <div
+                        className="h-full w-[89%] rounded-full bg-primary animate-[scale-in_0.6s_var(--ease)_1.2s_both]"
+                        style={{ transformOrigin: 'left' }}
+                      />
+                    </div>
+                    <div className="grid grid-cols-2 gap-3 pt-1">
+                      {statItems.map((stat) => (
+                        <div
+                          key={stat.label}
+                          className="rounded-lg border border-border/60 bg-muted/30 p-2.5"
+                        >
+                          <span className="text-[11px] text-muted-foreground">{stat.label}</span>
+                          <div className="mt-0.5 flex items-baseline gap-1">
+                            <span className={'text-sm font-semibold ' + stat.color}>{stat.value}</span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                    <div className="animate-fade-up rounded-xl border border-border/60 bg-muted/20 p-3 [animation-delay:2s] [animation-fill-mode:backwards]">
+                      <div className="flex items-start gap-2.5">
+                        <div className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-primary/10 text-[11px] font-bold text-primary">
+                          AI
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <div className="flex items-baseline gap-2">
+                            <span className="text-[11px] font-semibold text-foreground">
+                              {t('mockupCareerCoach')}
+                            </span>
+                            <span className="text-[10px] text-muted-foreground">
+                              {t('mockupJustNow')}
+                            </span>
+                          </div>
+                          <div className="mt-1 animate-fade-up overflow-hidden whitespace-nowrap [animation-delay:2.2s] [animation-fill-mode:backwards]">
+                            <span
+                              className="inline-block text-[13px] leading-relaxed text-muted-foreground"
+                              dangerouslySetInnerHTML={{ __html: t.raw('mockupResumeMatch') }}
+                            />
+                          </div>
+                          <span className="-mt-1 ml-0.5 inline-block h-3.5 w-[2px] animate-pulse bg-primary" />
+                        </div>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3 text-[11px] text-muted-foreground animate-fade-up [animation-delay:2.8s] [animation-fill-mode:backwards]">
+                      <span className="flex items-center gap-1">
+                        <span className="h-1.5 w-1.5 rounded-full bg-success" />
+                        {t('mockupSaved')} (4)
+                      </span>
+                      <span className="flex items-center gap-1">
+                        <span className="h-1.5 w-1.5 rounded-full bg-warn" />
+                        {t('mockupApplied')} (2)
+                      </span>
+                      <span className="flex items-center gap-1">
+                        <span className="h-1.5 w-1.5 rounded-full bg-primary" />
+                        {t('mockupInterviewing')} (1)
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </section>
@@ -174,13 +174,13 @@ export default function LandingPage() {
       {/* ── FOOTER ── */}
       <footer className="border-t border-primary-foreground/10 bg-primary px-6 py-8">
         <div className="mx-auto flex max-w-[1120px] items-center justify-between">
-          <span className="text-sm text-primary-foreground/60">&copy; 2026 Job For Sure</span>
+          <span className="text-sm text-primary-foreground/60">{t('footerCopyright')}</span>
           <div className="flex gap-6 text-sm text-primary-foreground/60">
             <Link href="/login" className="cursor-pointer transition-colors hover:text-primary-foreground">
-              Sign In
+              {t('footerSignIn')}
             </Link>
             <Link href="/register" className="cursor-pointer transition-colors hover:text-primary-foreground">
-              Get Started
+              {t('footerGetStarted')}
             </Link>
           </div>
         </div>
