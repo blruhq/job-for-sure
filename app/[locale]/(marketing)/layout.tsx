@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { LanguageSwitcher } from '~/components/layout/navbar'
 
 export default function MarketingLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -36,6 +37,7 @@ export default function MarketingLayout({ children }: { children: React.ReactNod
 
           {/* Auth buttons */}
           <div className="flex items-center gap-2">
+            <LanguageSwitcher />
             <Link
               href="/login"
               className="cursor-pointer rounded-md px-3 py-1.5 text-[13px] font-medium text-muted-foreground transition-colors hover:text-foreground"
