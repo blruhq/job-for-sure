@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server'
 import { db } from '~/lib/db'
 import { coverLetters } from '~/lib/schema'
 import { auth } from '~/lib/auth'
-import { eq, desc } from 'drizzle-orm'
+import { eq, and, desc, isNull } from 'drizzle-orm'
 import { headers } from 'next/headers'
 
 async function getSessionUser() {
@@ -27,7 +27,7 @@ export async function GET() {
       updatedAt: coverLetters.updatedAt,
     })
     .from(coverLetters)
-    .where(eq(coverLetters.userId, user.id))
+    .where(and(eq(coverLetters.userId, user.id), isNull(coverLetters.deletedAt)))
     .orderBy(desc(coverLetters.createdAt))
 
   return NextResponse.json(list)

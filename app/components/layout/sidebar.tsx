@@ -4,10 +4,11 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { usePathname } from 'next/navigation'
-import { MessageSquare, KanbanSquare, CheckSquare, Settings, Plus, Brain, LayoutDashboard, Mail, Shield } from 'lucide-react'
+import { MessageSquare, KanbanSquare, CheckSquare, Settings, Plus, Brain, LayoutDashboard, Mail, Shield, Trash2 } from 'lucide-react'
 import { cn } from '~/lib/utils'
 import { useAppStore } from '~/lib/store'
 import { notify } from '~/lib/toast'
+import { ConfirmDialog } from '~/components/ui/confirm-dialog'
 
 const NAV_ITEMS = [
   { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
@@ -21,8 +22,10 @@ const NAV_ITEMS = [
 export function Sidebar() {
   const pathname = usePathname()
   const router = useRouter()
-  const { resumes, activeResumeId, setActiveResumeId, applications, sidebarCollapsed } = useAppStore()
+  const { resumes, activeResumeId, setActiveResumeId, deleteResume, applications, sidebarCollapsed } = useAppStore()
   const [isAdmin, setIsAdmin] = useState(false)
+  const [deleteTarget, setDeleteTarget] = useState<{ id: string; name: string } | null>(null)
+  const [deleting, setDeleting] = useState(false)
 
   useEffect(() => {
     async function checkAdmin() {
@@ -91,28 +94,47 @@ export function Sidebar() {
         </div>
         {/* Resume items — always rendered, just hide text when collapsed */}
         {resumes.map((r) => (
-          <button
+          <div
             key={r.id}
-            onClick={() => {
-              setActiveResumeId(r.id)
-              router.push(`/resume/${r.id}`)
-            }}
-            title={c ? r.name : undefined}
             className={cn(
-              'flex cursor-pointer items-center gap-2 rounded-sm px-2 py-1.5 text-xs transition-colors',
+              'group flex items-center gap-1 rounded-sm transition-colors',
               r.id === activeResumeId ? 'bg-sidebar-active' : 'hover:bg-sidebar-hover',
-              c && 'justify-center px-0 mx-2',
+              c ? 'justify-center px-0 mx-2' : 'px-2 py-1',
             )}
           >
-            <span
+            <button
+              onClick={() => {
+                setActiveResumeId(r.id)
+                router.push(`/resume/${r.id}`)
+              }}
+              title={c ? r.name : undefined}
               className={cn(
-                'h-2 w-2 shrink-0 rounded-full border-2 transition-all',
-                r.id === activeResumeId ? 'border-primary bg-primary' : 'border-muted-foreground',
+                'flex cursor-pointer items-center gap-2 text-xs flex-1 min-w-0',
+                c && 'justify-center py-1.5',
               )}
-            />
-            {!c && <span className="flex-1 truncate text-left font-medium">{r.name}</span>}
-            {!c && <span className="font-mono text-[10px] font-semibold text-success">{r.score}%</span>}
-          </button>
+            >
+              <span
+                className={cn(
+                  'h-2 w-2 shrink-0 rounded-full border-2 transition-all',
+                  r.id === activeResumeId ? 'border-primary bg-primary' : 'border-muted-foreground',
+                )}
+              />
+              {!c && <span className="flex-1 truncate text-left font-medium">{r.name}</span>}
+              {!c && <span className="font-mono text-[10px] font-semibold text-success">{r.score}%</span>}
+            </button>
+            {!c && (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation()
+                  setDeleteTarget({ id: r.id, name: r.name })
+                }}
+                className="shrink-0 opacity-0 group-hover:opacity-100 cursor-pointer rounded-xs p-1 text-muted-foreground hover:text-red-500 hover:bg-red-500/10 transition-all"
+                title="Delete resume"
+              >
+                <Trash2 size={12} />
+              </button>
+            )}
+          </div>
         ))}
         {/* Add resume — always rendered, icon stays when collapsed */}
         <button
@@ -165,6 +187,29 @@ export function Sidebar() {
         )}
       </div>
 
+      {/* Delete confirmation */}
+      <ConfirmDialog
+        open={deleteTarget !== null}
+        onClose={() => { if (!deleting) setDeleteTarget(null) }}
+        onConfirm={async () => {
+          if (!deleteTarget) return
+          setDeleting(true)
+          try {
+            await deleteResume(deleteTarget.id)
+            notify({ message: `"${deleteTarget.name}" deleted`, type: 'success' })
+            setDeleteTarget(null)
+          } catch {
+            notify({ message: 'Failed to delete resume', type: 'error' })
+          } finally {
+            setDeleting(false)
+          }
+        }}
+        title="Delete Resume?"
+        description={`Remove "${deleteTarget?.name}" from your list? You can re-upload it anytime.`}
+        confirmLabel="Delete Resume"
+        variant="danger"
+        loading={deleting}
+      />
     </aside>
   )
 }

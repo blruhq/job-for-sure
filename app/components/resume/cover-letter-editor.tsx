@@ -1,8 +1,9 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Wand2, Download, Copy, Save } from 'lucide-react'
+import { Wand2, Download, Copy, Save, Trash2 } from 'lucide-react'
 import { notify } from '~/lib/toast'
+import { ConfirmDialog } from '~/components/ui/confirm-dialog'
 import type { Resume } from '~/types/resume'
 
 interface CoverLetterEditorProps {
@@ -14,6 +15,7 @@ export function CoverLetterEditor({ resume, updateResume }: CoverLetterEditorPro
   const [jdText, setJdText] = useState(resume.coverLetterJD || '')
   const [letterText, setLetterText] = useState(resume.coverLetter || '')
   const [generating, setGenerating] = useState(false)
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false)
 
   // Mode & Quick fill states
   const [mode, setMode] = useState<'quick' | 'jd'>('quick')
@@ -192,6 +194,13 @@ export function CoverLetterEditor({ resume, updateResume }: CoverLetterEditorPro
               <Copy size={11} /> Copy Text
             </button>
             <button
+              onClick={() => setShowDeleteDialog(true)}
+              disabled={!letterText}
+              className="flex cursor-pointer items-center gap-1 rounded-sm border border-border bg-card px-2.5 py-1 text-[11px] hover:text-red-500 hover:border-red-500/30 disabled:opacity-50 transition-all"
+            >
+              <Trash2 size={11} /> Delete
+            </button>
+            <button
               onClick={() => window.open(`/api/export/pdf?id=${resume.id}&type=cover-letter`, '_blank')}
               disabled={!letterText}
               className="flex cursor-pointer items-center gap-1 rounded-sm bg-primary px-2.5 py-1 text-[11px] font-medium text-primary-foreground hover:opacity-90 disabled:opacity-50"
@@ -228,6 +237,21 @@ export function CoverLetterEditor({ resume, updateResume }: CoverLetterEditorPro
           </div>
         </div>
       </div>
+      {/* Delete confirmation */}
+      <ConfirmDialog
+        open={showDeleteDialog}
+        onClose={() => setShowDeleteDialog(false)}
+        onConfirm={() => {
+          setLetterText('')
+          updateResume(resume.id, { coverLetter: '', coverLetterJD: '' })
+          setShowDeleteDialog(false)
+          notify({ message: 'Cover letter cleared', type: 'success' })
+        }}
+        title="Delete Cover Letter?"
+        description="Remove the current cover letter from this resume? You can generate a new one anytime."
+        confirmLabel="Clear Letter"
+        variant="danger"
+      />
     </div>
   )
 }

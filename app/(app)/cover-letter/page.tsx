@@ -6,7 +6,8 @@ import { useAppStore } from '~/lib/store'
 import { createResume } from '~/lib/company-data'
 import { extractPdfText } from '~/lib/pdf-parse'
 import { notify } from '~/lib/toast'
-import { Wand2, Download, Copy, Save, Upload, FileText, Loader2 } from 'lucide-react'
+import { Wand2, Download, Copy, Save, Upload, FileText, Loader2, Trash2 } from 'lucide-react'
+import { ConfirmDialog } from '~/components/ui/confirm-dialog'
 
 export default function StandaloneCoverLetterPage() {
   const router = useRouter()
@@ -33,6 +34,8 @@ export default function StandaloneCoverLetterPage() {
     createdAt: string
   }>>([])
   const [activeLetterId, setActiveLetterId] = useState<string | null>(null)
+  const [deleteTarget, setDeleteTarget] = useState<string | null>(null)
+  const [deleting, setDeleting] = useState(false)
 
   const selectedResume = resumes.find((r) => r.id === selectedResumeId)
 
@@ -412,12 +415,12 @@ export default function StandaloneCoverLetterPage() {
                 <button
                   onClick={(e) => {
                     e.stopPropagation()
-                    handleDeleteSaved(letter.id)
+                    setDeleteTarget(letter.id)
                   }}
                   className="shrink-0 opacity-0 group-hover:opacity-100 text-muted-foreground hover:text-destructive transition-opacity cursor-pointer"
                   title="Delete"
                 >
-                  <span className="text-xs">✕</span>
+                  <Trash2 size={12} />
                 </button>
               </div>
             ))}
@@ -518,6 +521,34 @@ export default function StandaloneCoverLetterPage() {
           )}
         </div>
       </div>
+      {/* Delete confirmation */}
+      <ConfirmDialog
+        open={deleteTarget !== null}
+        onClose={() => { if (!deleting) setDeleteTarget(null) }}
+        onConfirm={async () => {
+          if (!deleteTarget) return
+          setDeleting(true)
+          try {
+            await fetch(`/api/cover-letters/${deleteTarget}`, { method: 'DELETE' })
+            setSavedLetters(prev => prev.filter(l => l.id !== deleteTarget))
+            if (activeLetterId === deleteTarget) {
+              setActiveLetterId(null)
+              setLetterText('')
+            }
+            setDeleteTarget(null)
+            notify({ message: 'Cover letter deleted', type: 'success' })
+          } catch {
+            notify({ message: 'Failed to delete', type: 'error' })
+          } finally {
+            setDeleting(false)
+          }
+        }}
+        title="Delete Cover Letter?"
+        description="Remove this cover letter from your saved list?"
+        confirmLabel="Delete Letter"
+        variant="danger"
+        loading={deleting}
+      />
     </div>
   )
 }

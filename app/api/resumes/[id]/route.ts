@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server'
 import { db } from '~/lib/db'
 import { resumes } from '~/lib/schema'
 import { auth } from '~/lib/auth'
-import { eq, and } from 'drizzle-orm'
+import { eq, and, isNull } from 'drizzle-orm'
 import { headers } from 'next/headers'
 
 async function getSessionUser() {
@@ -23,7 +23,7 @@ export async function GET(
   const [resume] = await db
     .select()
     .from(resumes)
-    .where(and(eq(resumes.id, id), eq(resumes.userId, user.id)))
+    .where(and(eq(resumes.id, id), eq(resumes.userId, user.id), isNull(resumes.deletedAt)))
     .limit(1)
 
   if (!resume) return NextResponse.json({ error: 'Not found' }, { status: 404 })
@@ -57,7 +57,7 @@ export async function PATCH(
   return NextResponse.json(updated)
 }
 
-// DELETE /api/resumes/[id] — delete a resume
+// DELETE /api/resumes/[id] — soft delete a resume
 export async function DELETE(
   _request: Request,
   { params }: { params: Promise<{ id: string }> },
@@ -66,11 +66,12 @@ export async function DELETE(
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const { id } = await params
-  const [deleted] = await db
-    .delete(resumes)
+  const [updated] = await db
+    .update(resumes)
+    .set({ deletedAt: new Date() })
     .where(and(eq(resumes.id, id), eq(resumes.userId, user.id)))
     .returning()
 
-  if (!deleted) return NextResponse.json({ error: 'Not found' }, { status: 404 })
+  if (!updated) return NextResponse.json({ error: 'Not found' }, { status: 404 })
   return NextResponse.json({ success: true })
 }

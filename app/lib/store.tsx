@@ -14,6 +14,7 @@ interface AppStore {
   setActiveResumeId: (id: string) => void
   addResume: (resume: Resume) => void
   updateResume: (id: string, updates: Partial<Resume>) => void
+  deleteResume: (id: string) => Promise<void>
   getResume: (id: string) => Resume | undefined
 
   // Applications
@@ -148,6 +149,20 @@ export function AppStoreProvider({ children }: { children: ReactNode }) {
     })
   }, [])
 
+  const deleteResume = useCallback(async (id: string) => {
+    await apiDelete(`/api/resumes/${id}`)
+    setResumes(prev => {
+      const next = prev.filter(r => r.id !== id)
+      // If we removed the active resume, switch to the first remaining
+      if (activeResumeId === id && next.length > 0) {
+        setActiveResumeIdState(next[0].id)
+      } else if (next.length === 0) {
+        setActiveResumeIdState(null)
+      }
+      return next
+    })
+  }, [activeResumeId])
+
   const getResume = useCallback((id: string) => resumes.find(r => r.id === id), [resumes])
 
   const activeResume = resumes.find(r => r.id === activeResumeId) ?? null
@@ -219,6 +234,7 @@ export function AppStoreProvider({ children }: { children: ReactNode }) {
     setActiveResumeId,
     addResume,
     updateResume,
+    deleteResume,
     getResume,
     applications,
     bookmarkJob,

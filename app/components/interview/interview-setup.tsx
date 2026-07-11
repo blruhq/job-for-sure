@@ -2,8 +2,10 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { Brain, FileText, ArrowRight, Loader2, Sparkles, Clock } from 'lucide-react'
+import { Brain, FileText, ArrowRight, Loader2, Sparkles, Clock, Trash2 } from 'lucide-react'
 import { useAppStore } from '~/lib/store'
+import { ConfirmDialog } from '~/components/ui/confirm-dialog'
+import { notify } from '~/lib/toast'
 import type { InterviewConfig } from '~/types/interview'
 
 interface InterviewSetupProps {
@@ -11,9 +13,12 @@ interface InterviewSetupProps {
   history: any[]
   loadingHistory: boolean
   onViewSession: (session: any) => void
+  onDeleteSession?: () => void
 }
 
-export function InterviewSetup({ onStart, history, loadingHistory, onViewSession }: InterviewSetupProps) {
+export function InterviewSetup({ onStart, history, loadingHistory, onViewSession, onDeleteSession }: InterviewSetupProps) {
+  const [deleteTarget, setDeleteTarget] = useState<string | null>(null)
+  const [deleting, setDeleting] = useState(false)
   const router = useRouter()
   const searchParams = useSearchParams()
   const { resumes, activeResumeId, setActiveResumeId, applications } = useAppStore()
@@ -297,10 +302,12 @@ export function InterviewSetup({ onStart, history, loadingHistory, onViewSession
                 history.map((session) => (
                   <div
                     key={session.id}
-                    onClick={() => onViewSession(session)}
-                    className="flex items-center justify-between border border-border/80 bg-background/50 hover:bg-muted/30 hover:border-primary/25 rounded-md p-3.5 transition-all cursor-pointer group"
+                    className="group flex items-center justify-between border border-border/80 bg-background/50 hover:bg-muted/30 hover:border-primary/25 rounded-md p-3.5 transition-all cursor-pointer"
                   >
-                    <div className="min-w-0 flex-1">
+                    <div
+                      className="min-w-0 flex-1"
+                      onClick={() => onViewSession(session)}
+                    >
                       <div className="flex items-center gap-1.5">
                         <span className="text-xs font-semibold text-foreground group-hover:text-primary transition-colors truncate">
                           {session.company}
@@ -326,6 +333,16 @@ export function InterviewSetup({ onStart, history, loadingHistory, onViewSession
                           {session.exchanges ? `${session.exchanges.length} Qs` : ''}
                         </span>
                       </div>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          setDeleteTarget(session.id)
+                        }}
+                        className="shrink-0 opacity-0 group-hover:opacity-100 cursor-pointer rounded-xs p-1 text-muted-foreground hover:text-red-500 hover:bg-red-500/10 transition-all"
+                        title="Delete session"
+                      >
+                        <Trash2 size={12} />
+                      </button>
                       <ArrowRight size={13} className="text-muted-foreground opacity-0 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all" />
                     </div>
                   </div>
@@ -335,6 +352,33 @@ export function InterviewSetup({ onStart, history, loadingHistory, onViewSession
           </div>
         )}
       </div>
+
+      {/* Delete confirmation */}
+      <ConfirmDialog
+        open={deleteTarget !== null}
+        onClose={() => { if (!deleting) setDeleteTarget(null) }}
+        onConfirm={async () => {
+          if (!deleteTarget) return
+          setDeleting(true)
+          try {
+            await fetch(`/api/ai/interview/${deleteTarget}`, { method: 'DELETE' })
+            // Remove from local history state — we need to call back to parent
+            // The parent InterviewView has fetchHistory(), so we just close dialog
+            onDeleteSession?.()
+            setDeleteTarget(null)
+            notify({ message: 'Interview session deleted', type: 'success' })
+          } catch {
+            notify({ message: 'Failed to delete session', type: 'error' })
+          } finally {
+            setDeleting(false)
+          }
+        }}
+        title="Delete Interview Session?"
+        description="Remove this mock interview from your history?"
+        confirmLabel="Delete Session"
+        variant="danger"
+        loading={deleting}
+      />
     </div>
   )
 }

@@ -39,7 +39,7 @@ export async function PATCH(
   return NextResponse.json(updated)
 }
 
-// DELETE /api/cover-letters/[id] — delete a cover letter
+// DELETE /api/cover-letters/[id] — soft delete a cover letter
 export async function DELETE(
   _request: Request,
   { params }: { params: Promise<{ id: string }> },
@@ -48,11 +48,12 @@ export async function DELETE(
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const { id } = await params
-  const [deleted] = await db
-    .delete(coverLetters)
+  const [updated] = await db
+    .update(coverLetters)
+    .set({ deletedAt: new Date() })
     .where(and(eq(coverLetters.id, id), eq(coverLetters.userId, user.id)))
     .returning()
 
-  if (!deleted) return NextResponse.json({ error: 'Not found' }, { status: 404 })
+  if (!updated) return NextResponse.json({ error: 'Not found' }, { status: 404 })
   return NextResponse.json({ success: true })
 }

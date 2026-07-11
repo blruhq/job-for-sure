@@ -5,7 +5,7 @@ import { generateObjectWithFailover } from '~/lib/ai-providers'
 import { captureServerEvent } from '~/lib/posthog-server'
 import { db } from '~/lib/db'
 import { interviewSessions } from '~/lib/schema'
-import { eq, desc, and } from 'drizzle-orm'
+import { eq, desc, and, isNull } from 'drizzle-orm'
 import { z } from 'zod'
 
 export const maxDuration = 60
@@ -40,7 +40,7 @@ export async function GET(req: NextRequest) {
     const history = await db
       .select()
       .from(interviewSessions)
-      .where(eq(interviewSessions.userId, user.id))
+      .where(and(eq(interviewSessions.userId, user.id), isNull(interviewSessions.deletedAt)))
       .orderBy(desc(interviewSessions.createdAt))
 
     return NextResponse.json(history)

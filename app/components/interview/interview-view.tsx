@@ -99,6 +99,7 @@ export function InterviewView() {
             history={history}
             loadingHistory={loadingHistory}
             onViewSession={setSelectedPastSession}
+            onDeleteSession={fetchHistory}
           />
         </Suspense>
       )}

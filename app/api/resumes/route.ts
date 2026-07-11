@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server'
 import { db } from '~/lib/db'
 import { resumes } from '~/lib/schema'
 import { auth } from '~/lib/auth'
-import { eq } from 'drizzle-orm'
+import { eq, and, isNull } from 'drizzle-orm'
 import { headers } from 'next/headers'
 
 async function getSessionUser() {
@@ -19,7 +19,7 @@ export async function GET() {
   const list = await db
     .select()
     .from(resumes)
-    .where(eq(resumes.userId, user.id))
+    .where(and(eq(resumes.userId, user.id), isNull(resumes.deletedAt)))
     .orderBy(resumes.createdAt)
 
   return NextResponse.json(list)

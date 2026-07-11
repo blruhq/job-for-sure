@@ -113,6 +113,7 @@ export const resumes = pgTable("resumes", {
   isBase: boolean("is_base").default(true),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
+  deletedAt: timestamp("deleted_at"),
 });
 
 export const tailoredResumes = pgTable("tailored_resumes", {
@@ -185,6 +186,7 @@ export const interviewSessions = pgTable("interview_sessions", {
   score: text("score").notNull(), // average score, e.g. "8.2"
   exchanges: jsonb("exchanges").notNull(), // JSON array of InterviewExchange
   createdAt: timestamp("created_at").defaultNow().notNull(),
+  deletedAt: timestamp("deleted_at"),
 });
 
 export const interviewSessionsRelations = relations(interviewSessions, ({ one }) => ({
@@ -214,6 +216,7 @@ export const coverLetters = pgTable("cover_letters", {
   jdText: text("jd_text"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow(),
+  deletedAt: timestamp("deleted_at"),
 });
 
 export const coverLettersRelations = relations(coverLetters, ({ one }) => ({

@@ -2,18 +2,21 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { ArrowLeft, Wand2, Download } from 'lucide-react'
+import { ArrowLeft, Wand2, Download, Trash2 } from 'lucide-react'
 import { cn } from '~/lib/utils'
 import { useAppStore } from '~/lib/store'
 import { notify } from '~/lib/toast'
+import { ConfirmDialog } from '~/components/ui/confirm-dialog'
 import { ResumeCopilot } from '~/components/resume/resume-copilot'
 import { CoverLetterEditor } from '~/components/resume/cover-letter-editor'
 import { JobSearchPanel } from '~/components/resume/job-search-panel'
 
 export function ResumeDetail({ resumeId }: { resumeId: string }) {
   const router = useRouter()
-  const { getResume, resumes, addResume, setActiveResumeId, isBookmarked, bookmarkJob, activeResume, toggleBookmark, updateResume } = useAppStore()
+  const { getResume, resumes, addResume, setActiveResumeId, deleteResume, isBookmarked, bookmarkJob, activeResume, toggleBookmark, updateResume } = useAppStore()
   const [tab, setTab] = useState<'jobs' | 'view' | 'editor' | 'cover-letter'>('jobs')
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false)
+  const [deleting, setDeleting] = useState(false)
 
   const resume = getResume(resumeId)
 
@@ -116,6 +119,13 @@ export function ResumeDetail({ resumeId }: { resumeId: string }) {
         <div className="flex shrink-0 items-center gap-3">
           <h1 className="truncate text-sm font-semibold max-w-[150px] sm:max-w-xs">{resume.name}</h1>
           <span className="rounded-xs bg-success-soft px-1.5 py-0.5 font-mono text-[11px] font-semibold text-success">{resume.score}% Match</span>
+          <button
+            onClick={() => setShowDeleteDialog(true)}
+            className="flex cursor-pointer items-center gap-1 rounded-sm border border-border bg-card px-2 py-1 text-[11px] text-muted-foreground hover:text-red-500 hover:border-red-500/30 transition-all"
+            title="Delete resume"
+          >
+            <Trash2 size={11} /> Delete
+          </button>
         </div>
       </div>
 
@@ -295,6 +305,29 @@ export function ResumeDetail({ resumeId }: { resumeId: string }) {
           <CoverLetterEditor resume={resume} updateResume={updateResume} />
         )}
       </div>
+
+      {/* Delete confirmation */}
+      <ConfirmDialog
+        open={showDeleteDialog}
+        onClose={() => { if (!deleting) setShowDeleteDialog(false) }}
+        onConfirm={async () => {
+          setDeleting(true)
+          try {
+            await deleteResume(resume.id)
+            notify({ message: `"${resume.name}" deleted`, type: 'success' })
+            router.push('/chat')
+          } catch {
+            notify({ message: 'Failed to delete resume', type: 'error' })
+          } finally {
+            setDeleting(false)
+          }
+        }}
+        title="Delete Resume?"
+        description={`Remove "${resume.name}"? This action cannot be undone, but you can re-upload your resume anytime.`}
+        confirmLabel="Delete Resume"
+        variant="danger"
+        loading={deleting}
+      />
     </div>
   )
 }
