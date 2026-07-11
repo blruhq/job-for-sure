@@ -23,7 +23,7 @@ export function LanguageSwitcher() {
     <Menu.Root>
       <Menu.Trigger className="flex h-[30px] items-center gap-1 text-xs font-semibold text-muted-foreground transition-all duration-150 hover:bg-background hover:text-foreground active:scale-95 cursor-pointer rounded-sm px-1.5">
         <Globe size={14} />
-        <span className="uppercase">{locale}</span>
+        <span className="inline-block w-5 text-center uppercase tabular-nums">{locale}</span>
       </Menu.Trigger>
       <Menu.Portal>
         <Menu.Positioner side="bottom" align="end" className="z-50">

@@ -1,7 +1,11 @@
 import Link from 'next/link'
 import { LanguageSwitcher } from '~/components/layout/navbar'
+import { ThemeToggle } from '~/components/layout/theme-toggle'
+import { useTranslations } from 'next-intl'
 
 export default function MarketingLayout({ children }: { children: React.ReactNode }) {
+  const t = useTranslations('landing')
+
   return (
     <>
       {/* Topnav */}
@@ -19,36 +23,37 @@ export default function MarketingLayout({ children }: { children: React.ReactNod
               href="#how-it-works"
               className="cursor-pointer text-[13px] text-muted-foreground transition-colors hover:text-foreground"
             >
-              How It Works
+              {t('howTitle')}
             </a>
             <a
               href="#features"
               className="cursor-pointer text-[13px] text-muted-foreground transition-colors hover:text-foreground"
             >
-              Features
+              {t('featuresTitle')}
             </a>
             <a
               href="#interview"
               className="cursor-pointer text-[13px] text-muted-foreground transition-colors hover:text-foreground"
             >
-              Interview
+              {t('interviewBadge')}
             </a>
           </nav>
 
           {/* Auth buttons */}
           <div className="flex items-center gap-2">
+            <ThemeToggle />
             <LanguageSwitcher />
             <Link
               href="/login"
               className="cursor-pointer rounded-md px-3 py-1.5 text-[13px] font-medium text-muted-foreground transition-colors hover:text-foreground"
             >
-              Sign In
+              {t('footerSignIn')}
             </Link>
             <Link
               href="/register"
               className="cursor-pointer rounded-md bg-primary px-4 py-1.5 text-[13px] font-medium text-primary-foreground transition-opacity hover:opacity-90"
             >
-              Get Started
+              {t('footerGetStarted')}
             </Link>
           </div>
         </div>
