@@ -29,19 +29,21 @@ const SOURCE_NAMES: Record<JobSource, string> = {
   arbeitnow: 'Arbeitnow',
   adzuna: 'Adzuna',
   jsearch: 'JSearch',
+  jobbkk: 'JobbKK',
   linkedin: 'LinkedIn (Apify)',
   indeed: 'Indeed (Apify)',
+  jobsdb: 'JobsDB (Apify)',
 }
 
 // Source tiers used by the search flow (see plan)
 const FAST_FREE_SOURCES: JobSource[] = [
   'remoteok', 'himalayas', 'remotive',
-  'themuse', 'arbeitnow', 'adzuna',
+  'themuse', 'arbeitnow', 'adzuna', 'jsearch', 'jobbkk',
 ]
 const FULL_FREE_SOURCES: JobSource[] = [
-  'greenhouse', 'ashby', 'jsearch',
+  'greenhouse', 'ashby',
 ]
-const PAID_SOURCES: JobSource[] = ['linkedin', 'indeed']
+const PAID_SOURCES: JobSource[] = ['linkedin', 'indeed', 'jobsdb']
 
 interface SourceMeta { source: JobSource; count: number; error?: string }
 
@@ -322,10 +324,10 @@ export function JobSearchPanel({ resume }: { resume: Resume }) {
       const data: SearchResult = await res.json()
       setResults(prev => mergeResults(prev, data.jobs))
       setPaidLoaded(true)
-      notify({ message: `Added ${data.jobs.length} jobs from LinkedIn & Indeed`, type: 'success' })
+      notify({ message: `Added ${data.jobs.length} jobs from LinkedIn, Indeed & JobsDB`, type: 'success' })
     } catch (err) {
       console.error('[job-search-paid] Error:', err)
-      notify({ message: 'LinkedIn/Indeed search failed. They may be rate-limited.', type: 'error' })
+      notify({ message: 'Paid source search failed. They may be rate-limited.', type: 'error' })
     } finally {
       setPaidLoading(false)
     }
@@ -593,7 +595,7 @@ export function JobSearchPanel({ resume }: { resume: Resume }) {
             {!hasMore && !paidLoaded && (
               <div className="mt-4 flex flex-col items-center gap-2 border-t border-border pt-4">
                 <p className="text-[11px] text-muted-foreground">
-                  No more free results. Want jobs from LinkedIn & Indeed?
+                  No more free results. Want jobs from LinkedIn, Indeed &amp; JobsDB?
                 </p>
                 <button
                   onClick={handleLoadPaid}
@@ -605,7 +607,7 @@ export function JobSearchPanel({ resume }: { resume: Resume }) {
                   ) : (
                     <Briefcase size={12} />
                   )}
-                  {paidLoading ? 'Loading…' : `Load jobs from LinkedIn & Indeed (uses Apify credit)`}
+                  {paidLoading ? 'Loading…' : `Load jobs from LinkedIn, Indeed & JobsDB (uses Apify credit)`}
                 </button>
               </div>
             )}
@@ -614,7 +616,7 @@ export function JobSearchPanel({ resume }: { resume: Resume }) {
             {paidLoaded && (
               <div className="mt-4 flex items-center justify-center gap-1.5 rounded-sm border border-border bg-card px-3 py-2 text-[11px] text-muted-foreground">
                 <Briefcase size={12} className="text-primary" />
-                LinkedIn & Indeed jobs loaded
+                LinkedIn, Indeed &amp; JobsDB jobs loaded
               </div>
             )}
           </>

@@ -4,9 +4,9 @@
 // Fetches from ALL enabled sources in parallel, merges, deduplicates,
 // scores against user skills, and caches the result.
 //
-// Sources (9-11 depending on which API keys are configured):
+// Sources (11-13 depending on which API keys are configured):
 //   No-key (always active):
-//     Greenhouse, Ashby, RemoteOK, Himalayas, Remotive, The Muse, Arbeitnow
+//     Greenhouse, Ashby, RemoteOK, Himalayas, Remotive, The Muse, Arbeitnow, JobbKK
 //   Key-gated (auto-activate when env vars are present):
 //     Adzuna (ADZUNA_APP_ID + ADZUNA_APP_KEY)
 //     JSearch (RAPIDAPI_KEY)
@@ -22,8 +22,10 @@ import { fetchTheMuse } from './themuse'
 import { fetchArbeitnow } from './arbeitnow'
 import { fetchAdzuna } from './adzuna'
 import { fetchJSearch } from './jsearch'
+import { fetchJobbKK } from './jobbkk'
 import { fetchApifyLinkedIn } from './apify-linkedin'
 import { fetchApifyIndeed } from './apify-indeed'
+import { fetchApifyJobsDB } from './apify-jobsdb'
 import { rankJobs, inferExperienceLevel } from './scoring'
 import { getCached, setCached, cacheKey } from './cache'
 import {
@@ -39,14 +41,14 @@ const SEARCH_TIMEOUT_MS = 15_000 // per-source timeout
 //   FAST_FREE — single API calls, 1-3s
 //   SLOW_FREE — multi-company ATS, 3-10s
 //   BUDGET    — free tier with monthly limit (200/mo)
-//   PAID      — Apify credits (LinkedIn, Indeed)
+//   PAID      — Apify credits (LinkedIn, Indeed, JobsDB)
 const FAST_FREE_SOURCES: JobSource[] = [
   'remoteok', 'himalayas', 'remotive',
-  'themuse', 'arbeitnow', 'adzuna',
+  'themuse', 'arbeitnow', 'adzuna', 'jsearch', 'jobbkk',
 ]
 const SLOW_FREE_SOURCES: JobSource[] = ['greenhouse', 'ashby']
-const BUDGET_SOURCES: JobSource[] = ['jsearch']
-const PAID_SOURCES: JobSource[] = ['linkedin', 'indeed']
+const BUDGET_SOURCES: JobSource[] = []
+const PAID_SOURCES: JobSource[] = ['linkedin', 'indeed', 'jobsdb']
 const FREE_SOURCES: JobSource[] = [
   ...FAST_FREE_SOURCES, ...SLOW_FREE_SOURCES, ...BUDGET_SOURCES,
 ]
@@ -122,6 +124,10 @@ export async function searchJobs(params: SearchParams): Promise<SearchResult> {
     fetchers.push(wrapSource('jsearch', () => fetchJSearch(query, location)))
     fetcherSources.push('jsearch')
   }
+  if (sources.includes('jobbkk')) {
+    fetchers.push(wrapSource('jobbkk', () => fetchJobbKK(query, location)))
+    fetcherSources.push('jobbkk')
+  }
   if (sources.includes('linkedin')) {
     fetchers.push(wrapSource('linkedin', () => fetchApifyLinkedIn(query, location)))
     fetcherSources.push('linkedin')
@@ -129,6 +135,10 @@ export async function searchJobs(params: SearchParams): Promise<SearchResult> {
   if (sources.includes('indeed')) {
     fetchers.push(wrapSource('indeed', () => fetchApifyIndeed(query, location)))
     fetcherSources.push('indeed')
+  }
+  if (sources.includes('jobsdb')) {
+    fetchers.push(wrapSource('jobsdb', () => fetchApifyJobsDB(query, location)))
+    fetcherSources.push('jobsdb')
   }
 
   const results = await Promise.allSettled(fetchers)

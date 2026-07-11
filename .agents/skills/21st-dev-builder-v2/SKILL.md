@@ -1,6 +1,6 @@
 ---
 name: 21st-dev-builder-v2
-description: Build websites and web apps using 21st.dev — the largest marketplace of shadcn/ui-based React Tailwind components with 1400+ components. Use when user mentions "21st.dev", "21st", "ใช้ 21st", "จาก 21st", "build with 21st", "21st component", or references the 21st.dev component registry in any language. Covers building complete sites (landing pages, dashboards, portfolios, e-commerce storefronts, auth pages), browsing and installing individual 21st.dev components into existing projects. Also trigger when user wants premium UI components specifically from the 21st.dev registry. Do NOT trigger for general web development, standard shadcn/ui, plain Tailwind CSS, React Native, API development, testing, deployment, or any task that doesn't explicitly reference 21st or 21st.dev.
+description: Build websites and web apps using 21st.dev — the largest marketplace of shadcn/ui-based React Tailwind components with 1400+ components. Use when user mentions "21st.dev", "21st", "ใช้ 21st", "จาก 21st", "build with 21st", "21st component", or references the 21st.dev component registry in any language. Covers building complete sites (landing pages, dashboards, portfolios, e-commerce storefronts, auth pages), browsing and installing individual 21st.dev components into existing projects, and replicating premium paid templates using free components. Also trigger when user wants premium UI components specifically from the 21st.dev registry or wants to build a site "like template X". Do NOT trigger for general web development, standard shadcn/ui, plain Tailwind CSS, React Native, API development, testing, deployment, or any task that doesn't explicitly reference 21st or 21st.dev.
 ---
 
 # 21st.dev Web Builder v2
@@ -608,6 +608,92 @@ Test at 3 breakpoints using preview_resize or browser devtools:
 No errors in browser console. Warnings about missing images or unused vars are acceptable.
 
 **If any visual issue is found in Steps 2-3, fix it immediately before presenting to the user.** The most common fixes are: adjusting container width, fixing CSS variable colors, and reducing hero height.
+
+## Premium Template Replication (Paid Templates)
+
+21st.dev has **two** different kinds of "templates" — don't confuse them:
+
+| Type | What it is | Price | URL Pattern | Install Method |
+|------|-----------|-------|-------------|----------------|
+| **Components** | Individual .tsx files you own | **Free** | `/@{author}/components/{name}` | `npx shadcn add "https://21st.dev/r/{author}/{name}"` |
+| **Templates** | Full Next.js projects (entire site) | **Paid** ($29-$49) | `/@{author}/templates/{name}` | Buy → download full project |
+
+**Templates are NOT downloadable via `npx shadcn add`.** They're full project repositories sold through the marketplace (authors like Ruixen UI). A typical template is a complete Next.js 15 app with 10-15 sections + inner pages.
+
+### When to use this workflow
+
+Use this when the user points at a specific premium template and says "build this." Otherwise, the standard 8-phase workflow above is faster.
+
+### Template Replication Workflow
+
+```
+Step 1: LOOK at template → https://21st.dev/@{author}/templates/{name}
+          → Check if FREE or PAID (look for "Buy $XX" button)
+
+Step 2: If FREE → clone/setup directly
+
+Step 3: If PAID → replicate with free components:
+   a. List every section the template has
+   b. For each section → find free 21st.dev component OR build custom
+   c. Create new Next.js project
+   d. Install free components
+   e. Compose the page
+   f. Style to match the template's design language
+```
+
+### How to Analyze a Premium Template
+
+When replicating a premium template:
+
+1. **Open the template page** and look at its preview (in the iframe)
+2. **List every section** from top to bottom (hero, navbar, features, pricing, etc.)
+3. **Take a screenshot** of the preview for visual reference
+4. **Identify the design language**: colors, border-radius, shadow style, font treatment, spacing
+5. **Note interactive elements**: tabs, toggles, accordions, animations
+6. **Map each section** to a free component category or write custom
+
+#### Design Analysis Checklist
+- What color scheme? (dark/light, brand color)
+- What border radius? (rounded-sm/md/lg/full, sharp/square)
+- Typography style? (sans/serif/mono, letter-spacing)
+- Animation style? (framer-motion, scroll-triggered, hover effects)
+- Card style? (bordered, shadow, gradient background, glass)
+- Background style? (solid, gradient, mesh, grid pattern)
+
+#### Section Mapping (Premium Template → Free Components)
+
+| Template Section | Free 21st.dev Category | Typical Count |
+|-----------------|----------------------|---------------|
+| Hero | `hero` | 73 free components |
+| Features / Bento | `features` | 36 free components |
+| Testimonials | `testimonials` | 15 free components |
+| Pricing | `pricing-section` | 17 free components |
+| FAQ | `accordions` | many free |
+| CTA | `call-to-action` | 34 free components |
+| Footer | `footer` | 14 free components |
+| Navigation | `navbar-navigation` | 11 free components |
+| Clients / Logo Cloud | `clients` | 16 free components |
+| Backgrounds | `background` | 33 free components |
+| Announcement bar | `announcement` | 10 free components |
+| Text sections | `text` | 58 free components |
+| Images | `image` | 26 free components |
+
+### Style Matching
+
+Match the target template's design after composing:
+
+1. Update `globals.css` with the brand color
+2. Set consistent border-radius
+3. Apply consistent shadows
+4. Match typography (font families, sizes, weights)
+5. Adjust hero height: `min-h-[80vh]` (not `min-h-screen`)
+
+### Build Custom Sections
+
+For sections where no free component fits:
+- Write custom code matching the template's design language
+- Use shadcn base components (Button, Card, Badge, etc.)
+- Follow the same spacing and color tokens
 
 ## Advanced Patterns
 

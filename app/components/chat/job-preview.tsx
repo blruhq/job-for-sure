@@ -22,8 +22,10 @@ const SOURCE_SHORT: Record<JobSource, string> = {
   arbeitnow: 'Arbeitnow',
   adzuna: 'Adzuna',
   jsearch: 'JSearch',
+  jobbkk: 'JobbKK',
   linkedin: 'LinkedIn',
   indeed: 'Indeed',
+  jobsdb: 'JobsDB',
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -84,7 +86,7 @@ export function JobPreview({ resume, onDismiss }: { resume: Resume; onDismiss?: 
           location: resume.location || undefined,
           skills: resume.skills,
           role: resume.name,
-          sources: ['linkedin' as const, 'indeed' as const],
+          sources: ['linkedin' as const, 'indeed' as const, 'jobsdb' as const],
           includePaid: true,
           limit: 20,
         }),
@@ -292,7 +294,7 @@ export function JobPreview({ resume, onDismiss }: { resume: Resume; onDismiss?: 
             ) : (
               <Briefcase size={11} />
             )}
-            {paidLoading ? 'Loading…' : 'Load more from LinkedIn & Indeed'}
+            {paidLoading ? 'Loading…' : 'Load more from LinkedIn, Indeed & JobsDB'}
           </button>
         )}
       </div>

@@ -13,8 +13,10 @@ export type JobSource =
   | 'arbeitnow'
   | 'adzuna'
   | 'jsearch'
+  | 'jobbkk'
   | 'linkedin'
   | 'indeed'
+  | 'jobsdb'
 
 export interface JobResult {
   id: string               // unique: `{source}:{nativeId}`
