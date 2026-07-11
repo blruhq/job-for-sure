@@ -68,7 +68,6 @@ export function SourceHealth() {
         </button>
       </div>
 
-      {/* Summary bar */}
       {data && (
         <div className="mb-3 flex items-center gap-2 text-[10px] text-muted-foreground">
           <span className={totalOk === totalSources ? 'text-success' : 'text-warn'}>
@@ -81,7 +80,6 @@ export function SourceHealth() {
         </div>
       )}
 
-      {/* Source rows */}
       {loading && !data && (
         <div className="flex items-center justify-center py-8 gap-2 text-muted-foreground">
           <Loader2 size={14} className="animate-spin" />
@@ -138,7 +136,6 @@ export function SourceHealth() {
         </div>
       )}
 
-      {/* Env var status */}
       {data && (
         <div className="mt-3 flex flex-wrap gap-2">
           {Object.entries(data.envChecks).map(([key, ok]) => (

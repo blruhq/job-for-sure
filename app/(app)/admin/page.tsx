@@ -167,6 +167,9 @@ export default async function AdminPage() {
             </table>
           </div>
         </div>
+
+        {/* ── Source Health ── */}
+        <SourceHealth />
       </div>
     </div>
   )

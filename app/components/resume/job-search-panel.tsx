@@ -45,8 +45,6 @@ const FULL_FREE_SOURCES: JobSource[] = [
 ]
 const PAID_SOURCES: JobSource[] = ['linkedin', 'indeed', 'jobsdb']
 
-interface SourceMeta { source: JobSource; count: number; error?: string }
-
 // ── Filter state ──
 interface Filters {
   remoteOnly: boolean
@@ -80,7 +78,7 @@ export function JobSearchPanel({ resume }: { resume: Resume }) {
   const [results, setResults] = useState<ScoredJob[]>([])
   const [loading, setLoading] = useState(false)
   const [searched, setSearched] = useState(false)
-  const [sources, setSources] = useState<SourceMeta[]>([])
+  const [sourceCount, setSourceCount] = useState(0)
   const [cached, setCached] = useState(false)
   const [showFilters, setShowFilters] = useState(false)
   const [filters, setFilters] = useState<Filters>({ ...DEFAULT_FILTERS })
@@ -111,9 +109,7 @@ export function JobSearchPanel({ resume }: { resume: Resume }) {
     setPaidLoaded(false)
     setPaidLoading(false)
     setDisplayLimit(25)
-    setSources([])
-
-    let combinedSources: typeof sources = []
+    setSourceCount(0)
 
     try {
       // ── Phase 1: Fast free sources (1-3s) ──
@@ -135,8 +131,7 @@ export function JobSearchPanel({ resume }: { resume: Resume }) {
       if (!fastRes.ok) throw new Error('Fast search failed')
       const fastData: SearchResult = await fastRes.json()
       setResults(fastData.jobs)
-      combinedSources = [...combinedSources, ...fastData.sources]
-      setSources(combinedSources)
+      setSourceCount(fastData.sources.length)
       setCached(fastData.cached)
       setLoading(false) // release loading — user sees 25 jobs now
 
@@ -159,8 +154,6 @@ export function JobSearchPanel({ resume }: { resume: Resume }) {
         if (fullRes.ok) {
           const fullData: SearchResult = await fullRes.json()
           setResults(prev => mergeResults(prev, fullData.jobs))
-          combinedSources = [...combinedSources, ...fullData.sources]
-          setSources(combinedSources)
         }
       } catch {
         // Silent fail — fast results are already showing

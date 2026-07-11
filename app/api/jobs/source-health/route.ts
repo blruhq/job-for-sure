@@ -16,10 +16,6 @@ import { headers } from 'next/headers'
 export const dynamic = 'force-dynamic'
 export const maxDuration = 30
 
-// ── Test all job sources with a simple query ──
-// Each source runs independently; one failure doesn't block others.
-// Only accessible by admin.
-
 const TEST_QUERY = 'software engineer'
 const TIMEOUT_MS = 10_000
 
@@ -76,7 +72,6 @@ async function testSource(
 }
 
 export async function GET() {
-  // ── Admin auth gate ──
   const h = await headers()
   const session = await auth.api.getSession({ headers: h })
   if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
@@ -85,7 +80,6 @@ export async function GET() {
   }
 
   const tests = await Promise.allSettled([
-    // Fast single-call sources
     testSource('remoteok', async () => {
       const jobs = await fetchRemoteOK()
       return { jobs }
@@ -97,8 +91,6 @@ export async function GET() {
     testSource('adzuna', () => fetchAdzuna(TEST_QUERY)),
     testSource('jsearch', () => fetchJSearch(TEST_QUERY)),
     testSource('jobbkk', () => fetchJobbKK(TEST_QUERY)),
-
-    // Multi-company ATS sources (test single company each)
     testSource('greenhouse', async () => {
       const slug = GREENHOUSE_COMPANIES[0]?.slug
       if (!slug) return { jobs: [], error: 'No companies configured' }
@@ -130,7 +122,6 @@ export async function GET() {
     }
   })
 
-  // Also check env vars for key-gated sources
   const envChecks = {
     adzuna: !!(process.env.ADZUNA_APP_ID && process.env.ADZUNA_APP_KEY),
     jsearch: !!process.env.OPENWEBNINJA_API_KEY,
