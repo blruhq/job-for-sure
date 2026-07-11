@@ -147,7 +147,11 @@ Evaluation criteria:
 3. Quantification of results (e.g., "reduced latency by 20%", "led a team of 4").
 4. Relevance to the role of ${role} at ${company}.
 
-Return your response in structured JSON format. Provide a fair, constructive evaluation.`
+Return your evaluation as a raw JSON object with exactly these fields:
+- "score": a number from 1 to 10
+- "strengths": an array of strings, listing what the candidate did well
+- "improvements": an array of strings, listing specific areas to improve
+- "modelAnswer": a string containing an ideal answer the candidate could have given`
 
       const result = await generateObjectWithFailover<z.infer<typeof InterviewEvaluateSchema>>({
         system: systemPrompt,
