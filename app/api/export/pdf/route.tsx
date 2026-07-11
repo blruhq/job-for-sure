@@ -4,17 +4,10 @@ import { ResumePDF } from '~/components/resume/resume-pdf'
 import { CoverLetterPDF } from '~/components/resume/cover-letter-pdf'
 import { db } from '~/lib/db'
 import { resumes } from '~/lib/schema'
-import { auth } from '~/lib/auth'
+import { getSessionUser } from '~/lib/auth-helpers'
 import { eq, and } from 'drizzle-orm'
-import { headers } from 'next/headers'
 
 export const runtime = 'nodejs'
-
-async function getSessionUser() {
-  const h = await headers()
-  const session = await auth.api.getSession({ headers: h })
-  return session?.user ?? null
-}
 
 // GET /api/export/pdf?id=xxx&type=resume|cover-letter
 export async function GET(request: Request) {

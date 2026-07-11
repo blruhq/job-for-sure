@@ -1,50 +1,45 @@
+import { Redis } from '@upstash/redis'
+
 // ═══════════════════════════════════════════════════════════════
-// SEARCH CACHE — in-memory with TTL
+// SEARCH CACHE — Upstash Redis with TTL
 //
-// Key: hash(query + location)
+// Key: hash(query + location + sources)
 // TTL: 6 hours (jobs don't change that fast)
 //
-// Note: This works for persistent Node servers (next start).
-// For serverless (Vercel), swap this for a Postgres cache table
-// or Redis/Upstash. The interface stays the same.
+// Upstash Redis is serverless-friendly (HTTP-based, pay-per-request).
+// Works on Vercel edge and Node.js runtimes.
 // ═══════════════════════════════════════════════════════════════
 
-interface CacheEntry<T> {
-  data: T
-  expiresAt: number
-}
+const TTL_SECONDS = 6 * 60 * 60 // 6 hours
 
-const TTL_MS = 6 * 60 * 60 * 1000 // 6 hours
-const cache = new Map<string, CacheEntry<unknown>>()
+let _redis: Redis | null = null
 
-// Cleanup expired entries every 30 minutes (lazy)
-let lastCleanup = Date.now()
-function maybeCleanup() {
-  const now = Date.now()
-  if (now - lastCleanup > 30 * 60 * 1000) {
-    for (const [key, entry] of cache) {
-      if (entry.expiresAt < now) cache.delete(key)
-    }
-    lastCleanup = now
+function getRedis(): Redis {
+  if (!_redis) {
+    _redis = new Redis({
+      url: process.env.UPSTASH_REDIS_REST_URL!,
+      token: process.env.UPSTASH_REDIS_REST_TOKEN!,
+    })
   }
+  return _redis
 }
 
-export function getCached<T>(key: string): T | null {
-  maybeCleanup()
-  const entry = cache.get(key)
-  if (!entry) return null
-  if (entry.expiresAt < Date.now()) {
-    cache.delete(key)
+export async function getCached<T>(key: string): Promise<T | null> {
+  try {
+    const data = await getRedis().get<T>(`jfs:cache:${key}`)
+    return data
+  } catch {
+    // Redis down → cache miss, don't break the app
     return null
   }
-  return entry.data as T
 }
 
-export function setCached<T>(key: string, data: T): void {
-  cache.set(key, {
-    data,
-    expiresAt: Date.now() + TTL_MS,
-  })
+export async function setCached<T>(key: string, data: T): Promise<void> {
+  try {
+    await getRedis().set(`jfs:cache:${key}`, data, { ex: TTL_SECONDS })
+  } catch {
+    // Redis down → skip caching, don't break the app
+  }
 }
 
 export function cacheKey(query: string, location?: string, sources?: string[]): string {

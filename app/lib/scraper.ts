@@ -8,11 +8,81 @@ export interface ScrapeResult {
   source: 'linkedin' | 'indeed' | 'greenhouse' | 'jobdb' | 'manual'
 }
 
+// ─── SSRF Protection ─────────────────────────────────────────
+// Block requests to private networks, loopback, link-local, etc.
+// Prevents attackers from using the scraper as a proxy to reach
+// internal services or cloud metadata endpoints.
+
+const BLOCKED_HOSTS = [
+  'localhost',
+  '0.0.0.0',
+  '169.254.169.254', // AWS/GCP/Azure metadata
+  'metadata.google.internal',
+]
+
+/**
+ * Validate that a URL is safe to fetch server-side.
+ * Rejects non-HTTPS, private IPs, localhost, and link-local addresses.
+ */
+function validateUrl(url: string): void {
+  let parsed: URL
+  try {
+    parsed = new URL(url)
+  } catch {
+    throw new Error('Invalid URL')
+  }
+
+  // Only allow http(s) — block file://, data://, etc.
+  if (parsed.protocol !== 'https:' && parsed.protocol !== 'http:') {
+    throw new Error(`Blocked protocol: ${parsed.protocol}`)
+  }
+
+  const hostname = parsed.hostname.toLowerCase()
+
+  // Block known metadata/loopback hosts
+  if (BLOCKED_HOSTS.includes(hostname)) {
+    throw new Error('Blocked host')
+  }
+
+  // Block IP literals in private/loopback/link-local ranges
+  if (hostname.match(/^\d{1,3}(\.\d{1,3}){3}$/)) {
+    const parts = hostname.split('.').map(Number)
+    const [a, b] = parts
+    if (
+      a === 10 || // private 10.0.0.0/8
+      (a === 172 && b >= 16 && b <= 31) || // private 172.16.0.0/12
+      (a === 192 && b === 168) || // private 192.168.0.0/16
+      a === 127 || // loopback 127.0.0.0/8
+      a === 0 || // 0.0.0.0/8
+      (a === 169 && b === 254) || // link-local 169.254.0.0/16
+      a >= 224 // multicast/reserved 224.0.0.0/4
+    ) {
+      throw new Error('Blocked private/reserved IP')
+    }
+  }
+
+  // Block IPv6 loopback and link-local
+  if (hostname === '[::1]' || hostname.startsWith('[fe80:') || hostname.startsWith('[fc') || hostname.startsWith('[fd')) {
+    throw new Error('Blocked IPv6 address')
+  }
+}
+
 /**
  * Scrape a job posting from a URL.
  * Strategy: try provider-specific parser first, fall back to generic.
  */
 export async function scrapeJob(url: string): Promise<ScrapeResult> {
+  // SSRF: validate URL before any network call
+  try {
+    validateUrl(url)
+  } catch (err) {
+    return {
+      success: false,
+      error: err instanceof Error ? err.message : 'Invalid URL',
+      source: 'manual',
+    }
+  }
+
   const domain = extractDomain(url)
 
   try {
@@ -226,7 +296,7 @@ function extractRequirements(text: string): string[] {
     }
 
     // Collect bullet points
-    if (inRequirements && line.startsWith('-') || line.startsWith('•') || line.startsWith('*')) {
+    if (inRequirements && (line.startsWith('-') || line.startsWith('•') || line.startsWith('*'))) {
       bullets.push(line.replace(/^[-•*\s]+/, '').trim())
     } else if (inRequirements && /^\d+[.)]/.test(line)) {
       bullets.push(line.replace(/^\d+[.)]\s*/, '').trim())

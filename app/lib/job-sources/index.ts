@@ -74,7 +74,7 @@ export async function searchJobs(params: SearchParams): Promise<SearchResult> {
   // 1. Check cache (unless fresh=true)
   const key = cacheKey(query, location, sources)
   if (!fresh) {
-    const cached = getCached<SearchResult>(key)
+    const cached = await getCached<SearchResult>(key)
     if (cached) {
       const rescored = rankJobs(cached.jobs.map(stripScore), skills, role).slice(0, limit)
       return { ...cached, jobs: rescored, cached: true }

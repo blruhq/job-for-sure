@@ -2,17 +2,10 @@ import { NextResponse } from 'next/server'
 import { captureServerEvent } from '~/lib/posthog-server'
 import { db } from '~/lib/db'
 import { applicationsData } from '~/lib/schema'
-import { auth } from '~/lib/auth'
+import { getSessionUser } from '~/lib/auth-helpers'
 import { eq } from 'drizzle-orm'
-import { headers } from 'next/headers'
 
 const EMPTY_APPLICATIONS = { bookmark: [], applied: [], interviewing: [], offers: [] }
-
-async function getSessionUser() {
-  const h = await headers()
-  const session = await auth.api.getSession({ headers: h })
-  return session?.user ?? null
-}
 
 // GET /api/applications — get the user's application board
 export async function GET() {

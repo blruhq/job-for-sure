@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { auth } from '~/lib/auth'
-import { headers } from 'next/headers'
+import { getSessionUser } from '~/lib/auth-helpers'
+import { checkRateLimit } from '~/lib/ratelimit'
 import { generateObjectWithFailover } from '~/lib/ai-providers'
 import { captureServerEvent } from '~/lib/posthog-server'
 import { db } from '~/lib/db'
@@ -9,12 +9,6 @@ import { eq, desc, and, isNull } from 'drizzle-orm'
 import { z } from 'zod'
 
 export const maxDuration = 60
-
-async function getSessionUser() {
-  const h = await headers()
-  const session = await auth.api.getSession({ headers: h })
-  return session?.user ?? null
-}
 
 const InterviewQuestionSchema = z.object({
   question: z.string(),
@@ -59,6 +53,9 @@ export async function POST(req: NextRequest) {
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
+
+    const limited = await checkRateLimit(user.id)
+    if (limited) return limited
 
     const body = await req.json()
     const { action } = body

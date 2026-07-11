@@ -1,17 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { searchJobs } from '~/lib/job-sources'
 import type { JobSource } from '~/lib/job-sources'
-import { auth } from '~/lib/auth'
-import { headers } from 'next/headers'
+import { getSessionUser } from '~/lib/auth-helpers'
 import { captureServerEvent } from '~/lib/posthog-server'
 
 export const maxDuration = 30 // Greenhouse/Ashby fetch takes time
-
-async function getSessionUser() {
-  const h = await headers()
-  const session = await auth.api.getSession({ headers: h })
-  return session?.user ?? null
-}
 
 // POST /api/jobs/search
 // Body: { query, location?, skills?, role?, sources?, limit? }

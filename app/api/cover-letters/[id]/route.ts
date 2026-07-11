@@ -1,15 +1,8 @@
 import { NextResponse } from 'next/server'
 import { db } from '~/lib/db'
 import { coverLetters } from '~/lib/schema'
-import { auth } from '~/lib/auth'
+import { getSessionUser } from '~/lib/auth-helpers'
 import { eq, and } from 'drizzle-orm'
-import { headers } from 'next/headers'
-
-async function getSessionUser() {
-  const h = await headers()
-  const session = await auth.api.getSession({ headers: h })
-  return session?.user ?? null
-}
 
 // PATCH /api/cover-letters/[id] — update a cover letter
 export async function PATCH(

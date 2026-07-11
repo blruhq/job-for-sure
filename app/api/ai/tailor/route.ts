@@ -1,16 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { generateObjectWithFailover } from '~/lib/ai-providers'
-import { auth } from '~/lib/auth'
-import { headers } from 'next/headers'
+import { getSessionUser } from '~/lib/auth-helpers'
+import { checkRateLimit } from '~/lib/ratelimit'
 import { z } from 'zod'
 
 export const maxDuration = 60
-
-async function getSessionUser() {
-  const h = await headers()
-  const session = await auth.api.getSession({ headers: h })
-  return session?.user ?? null
-}
 
 const TailorSchema = z.object({
   optimized: z.object({
@@ -40,6 +34,9 @@ export async function POST(req: NextRequest) {
   try {
     const user = await getSessionUser()
     if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+
+    const limited = await checkRateLimit(user.id)
+    if (limited) return limited
 
     const { resume, job } = await req.json()
 

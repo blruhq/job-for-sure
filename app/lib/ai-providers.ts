@@ -1,4 +1,4 @@
-import { streamText, convertToModelMessages, generateText, type LanguageModel } from 'ai'
+import { streamText, convertToModelMessages, generateText, generateObject, type LanguageModel } from 'ai'
 import { createOpenAI } from '@ai-sdk/openai'
 import type { z } from 'zod'
 
@@ -119,10 +119,19 @@ export async function streamWithFailover(
 
       // Peek at the first chunk to verify the provider is responding
       const reader = body.getReader()
+      let timer: ReturnType<typeof setTimeout> | undefined
       const firstChunk = await Promise.race([
         reader.read(),
-        timeoutPromise(provider.timeout, provider.name),
+        new Promise<{ done: true; value: undefined }>((_, reject) => {
+          timer = setTimeout(
+            () => reject(new Error(`${provider.name}: timed out after ${provider.timeout}ms`)),
+            provider.timeout,
+          )
+        }),
       ])
+
+      // Clear the timeout — the race is over, don't leak the timer
+      if (timer) clearTimeout(timer)
 
       if (firstChunk.done) {
         throw new Error(`${provider.name}: stream ended before any data`)
@@ -236,8 +245,10 @@ export async function generateTextWithFailover(
 }
 
 // ═══════════════════════════════════════════════════════════════
-// GENERATE OBJECT WITH FAILOVER (new — for all JSON routes)
-// Native JSON mode + Zod schema. No more regex extraction.
+// GENERATE OBJECT WITH FAILOVER
+// Uses the Vercel AI SDK's native generateObject with Zod schema.
+// The noThinkingProvider wrapper converts json_schema → json_object
+// for DeepSeek compatibility, and we use 'json' output format.
 // ═══════════════════════════════════════════════════════════════
 
 interface GenerateObjectParams {
@@ -253,51 +264,24 @@ export async function generateObjectWithFailover<T>(
 ): Promise<T> {
   const { system, prompt, schema, temperature = 0.4, maxOutputTokens = 2048 } = params
 
-  // Build a system prompt that instructs the model to output clean JSON
-  const jsonSystem = system + `\n\nYou MUST return ONLY valid JSON. No markdown fences, no code blocks, no prefixes — raw JSON only.`
-
   let lastError: Error | null = null
 
   for (const provider of providers) {
     const controller = new AbortController()
     const timer = setTimeout(() => controller.abort(), provider.timeout)
     try {
-      // Use generateText instead of generateObject — DeepSeek V4 Flash
-      // doesn't support OpenAI's json_schema response_format, and json_object
-      // mode alone can't guarantee schema compliance. We handle parsing
-      // ourselves with explicit JSON instruction in the prompt.
-      const result = await generateText({
+      const result = await generateObject({
         model: provider.model,
-        system: jsonSystem,
+        system,
         prompt,
+        schema,
         temperature,
         maxOutputTokens,
         abortSignal: controller.signal,
+        output: 'object',
       })
 
-      // Clean up the response — strip markdown fences if the model ignores instructions
-      let raw = result.text.trim()
-      if (raw.startsWith('```')) {
-        raw = raw.replace(/^```(?:json)?\s*\n?/, '').replace(/\n?```$/, '')
-      }
-
-      // Try to parse as JSON
-      let parsed: unknown
-      try {
-        parsed = JSON.parse(raw)
-      } catch {
-        // Try to find JSON object in the text (model sometimes wraps in explanation)
-        const jsonMatch = raw.match(/\{[\s\S]*\}/)
-        if (jsonMatch) {
-          parsed = JSON.parse(jsonMatch[0])
-        } else {
-          throw new Error(`Model returned non-JSON: ${raw.slice(0, 300)}`)
-        }
-      }
-
-      // Validate against the provided Zod schema
-      const validated = schema.parse(parsed)
-      return validated as T
+      return result.object as T
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err)
       console.warn(`⚠️  [AI] ${provider.name} failed: ${msg}`)
@@ -309,17 +293,4 @@ export async function generateObjectWithFailover<T>(
   }
 
   throw lastError || new Error('All AI providers failed')
-}
-
-// ═══════════════════════════════════════════════════════════════
-// HELPERS
-// ═══════════════════════════════════════════════════════════════
-
-function timeoutPromise(ms: number, providerName: string): Promise<never> {
-  return new Promise((_, reject) =>
-    setTimeout(
-      () => reject(new Error(`${providerName}: timed out after ${ms}ms`)),
-      ms,
-    ),
-  )
 }

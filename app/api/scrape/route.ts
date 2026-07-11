@@ -1,14 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { scrapeJob } from '~/lib/scraper'
-import { auth } from '~/lib/auth'
-import { headers } from 'next/headers'
+import { getSessionUser } from '~/lib/auth-helpers'
 import { captureServerEvent } from '~/lib/posthog-server'
-
-async function getSessionUser() {
-  const h = await headers()
-  const session = await auth.api.getSession({ headers: h })
-  return session?.user ?? null
-}
 
 export async function POST(req: NextRequest) {
   try {

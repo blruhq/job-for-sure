@@ -1,15 +1,8 @@
 import { NextResponse } from 'next/server'
 import { db } from '~/lib/db'
 import { userPreferences } from '~/lib/schema'
-import { auth } from '~/lib/auth'
+import { getSessionUser } from '~/lib/auth-helpers'
 import { eq } from 'drizzle-orm'
-import { headers } from 'next/headers'
-
-async function getSessionUser() {
-  const h = await headers()
-  const session = await auth.api.getSession({ headers: h })
-  return session?.user ?? null
-}
 
 // GET /api/user/preferences
 export async function GET() {
