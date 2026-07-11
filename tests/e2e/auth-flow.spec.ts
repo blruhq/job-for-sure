@@ -56,4 +56,39 @@ test.describe('Authentication flows', () => {
     await page.waitForTimeout(3000)
     expect(page.url()).not.toMatch(/\/dashboard/)
   })
+
+  test('forgot-password page renders and accepts email', async ({ page }) => {
+    await page.goto('/en/forgot-password')
+
+    await expect(page.locator('h1')).toContainText('Forgot password?')
+    await expect(page.locator('input[type="email"]')).toBeVisible()
+
+    await page.locator('input[type="email"]').fill('test@example.com')
+    await page.getByRole('button', { name: /send reset link/i }).click()
+
+    // Should show success screen (email service may not be configured in test,
+    // but Better Auth returns success to prevent email enumeration)
+    await page.waitForSelector('text=Check your email', { timeout: 15_000 })
+    await expect(page.locator('body')).toContainText('test@example.com')
+  })
+
+  test('reset-password page shows error for invalid token', async ({ page }) => {
+    await page.goto('/en/reset-password?error=invalid_token')
+
+    await expect(page.locator('h1')).toContainText('Invalid or expired')
+  })
+
+  test('reset-password page shows error for missing token', async ({ page }) => {
+    await page.goto('/en/reset-password')
+
+    await expect(page.locator('h1')).toContainText('Invalid or expired')
+  })
+
+  test('login page has forgot password link', async ({ page }) => {
+    await page.goto('/en/login')
+    const forgotLink = page.getByRole('link', { name: /forgot password/i })
+    await expect(forgotLink).toBeVisible()
+    await forgotLink.click()
+    await page.waitForURL(/\/forgot-password/)
+  })
 })
