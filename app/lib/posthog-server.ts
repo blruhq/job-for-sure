@@ -34,3 +34,25 @@ export async function captureServerEvent(
     // Silently fail — analytics should never break the app
   }
 }
+
+/**
+ * Capture a server-side exception (like Sentry).
+ * Use this in API route catch blocks.
+ *
+ * @example
+ * } catch (error) {
+ *   await captureServerError(user?.id ?? 'anonymous', error, { route: '/api/chat' })
+ *   return NextResponse.json({ error: 'Failed' }, { status: 500 })
+ * }
+ */
+export async function captureServerError(
+  distinctId: string,
+  error: unknown,
+  properties?: Record<string, unknown>,
+) {
+  try {
+    getPostHog().captureException(error, distinctId, properties)
+  } catch {
+    // Silently fail — error tracking should never break the app
+  }
+}

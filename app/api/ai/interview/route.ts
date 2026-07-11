@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getSessionUser } from '~/lib/auth-helpers'
 import { checkRateLimit } from '~/lib/ratelimit'
 import { generateObjectWithFailover } from '~/lib/ai-providers'
-import { captureServerEvent } from '~/lib/posthog-server'
+import { captureServerEvent, captureServerError } from '~/lib/posthog-server'
 import { db } from '~/lib/db'
 import { interviewSessions } from '~/lib/schema'
 import { eq, desc, and, isNull } from 'drizzle-orm'
@@ -40,6 +40,7 @@ export async function GET(req: NextRequest) {
     return NextResponse.json(history)
   } catch (error) {
     console.error('Interview history fetch error:', error)
+    await captureServerError('anonymous', error, { route: '/api/ai/interview' })
     return NextResponse.json(
       { error: error instanceof Error ? error.message : 'Failed to fetch interview history' },
       { status: 500 },
@@ -185,6 +186,7 @@ Language rules: Evaluate the candidate's answer and return strengths, improvemen
     return NextResponse.json({ error: 'Invalid action' }, { status: 400 })
   } catch (error) {
     console.error('Interview API error:', error)
+    await captureServerError('anonymous', error, { route: '/api/ai/interview' })
     return NextResponse.json(
       { error: error instanceof Error ? error.message : 'Interview operation failed' },
       { status: 500 },

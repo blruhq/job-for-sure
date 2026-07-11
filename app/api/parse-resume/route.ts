@@ -3,7 +3,7 @@ import { generateObjectWithFailover } from '~/lib/ai-providers'
 import { getSessionUser } from '~/lib/auth-helpers'
 import { checkRateLimit } from '~/lib/ratelimit'
 import { z } from 'zod'
-import { captureServerEvent } from '~/lib/posthog-server'
+import { captureServerEvent, captureServerError } from '~/lib/posthog-server'
 
 export const maxDuration = 60
 
@@ -92,6 +92,7 @@ Rules:
     return NextResponse.json(parsed)
   } catch (error) {
     console.error('[parse-resume] Error:', error)
+    await captureServerError('anonymous', error, { route: '/api/parse-resume' })
     return NextResponse.json(
       { error: error instanceof Error ? error.message : 'Failed to parse resume' },
       { status: 500 },

@@ -4,7 +4,7 @@ import { getSessionUser } from '~/lib/auth-helpers'
 import { checkRateLimit } from '~/lib/ratelimit'
 import { db } from '~/lib/db'
 import { coverLetters } from '~/lib/schema'
-import { captureServerEvent } from '~/lib/posthog-server'
+import { captureServerEvent, captureServerError } from '~/lib/posthog-server'
 
 export const maxDuration = 60
 
@@ -103,6 +103,7 @@ Rules:
     return NextResponse.json({ letter: text.trim(), id: letterId })
   } catch (error) {
     console.error('[cover-letter] Error:', error)
+    await captureServerError('anonymous', error, { route: '/api/ai/cover-letter' })
     return NextResponse.json(
       { error: error instanceof Error ? error.message : 'Cover letter generation failed' },
       { status: 500 },

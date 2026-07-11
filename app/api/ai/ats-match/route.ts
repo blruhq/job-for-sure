@@ -3,6 +3,7 @@ import { generateObjectWithFailover } from '~/lib/ai-providers'
 import { getSessionUser } from '~/lib/auth-helpers'
 import { checkRateLimit } from '~/lib/ratelimit'
 import { z } from 'zod'
+import { captureServerError } from '~/lib/posthog-server'
 
 export const maxDuration = 60
 
@@ -38,6 +39,7 @@ Group related terms (e.g., "React" and "React.js" should match).`,
     return NextResponse.json(result)
   } catch (error) {
     console.error('[ats-match] Error:', error)
+    await captureServerError('anonymous', error, { route: '/api/ai/ats-match' })
     return NextResponse.json(
       { error: error instanceof Error ? error.message : 'ATS analysis failed' },
       { status: 500 },

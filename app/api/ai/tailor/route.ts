@@ -3,6 +3,7 @@ import { generateObjectWithFailover } from '~/lib/ai-providers'
 import { getSessionUser } from '~/lib/auth-helpers'
 import { checkRateLimit } from '~/lib/ratelimit'
 import { z } from 'zod'
+import { captureServerError } from '~/lib/posthog-server'
 
 export const maxDuration = 60
 
@@ -64,6 +65,7 @@ Rules:
     return NextResponse.json(result)
   } catch (error) {
     console.error('[tailor] Error:', error)
+    await captureServerError('anonymous', error, { route: '/api/ai/tailor' })
     return NextResponse.json(
       { error: error instanceof Error ? error.message : 'Failed to tailor resume' },
       { status: 500 },
