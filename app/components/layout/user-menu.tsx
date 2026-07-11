@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { Menu } from '@base-ui-components/react/menu'
+import { Menu } from '@base-ui/react/menu'
 import { Settings, LogOut } from 'lucide-react'
 import { authClient } from '~/lib/auth-client'
 

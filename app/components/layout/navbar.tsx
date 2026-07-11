@@ -6,7 +6,7 @@ import { UserMenu } from '~/components/layout/user-menu'
 import { cn } from '~/lib/utils'
 import { useTheme } from '~/components/layout/theme-provider'
 import { useAppStore } from '~/lib/store'
-import { Menu } from '@base-ui-components/react/menu'
+import { Menu } from '@base-ui/react/menu'
 import { useLocale } from 'next-intl'
 import { useRouter, usePathname } from '~/i18n/routing'
 
