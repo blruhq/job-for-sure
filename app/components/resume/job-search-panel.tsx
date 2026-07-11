@@ -419,11 +419,6 @@ export function JobSearchPanel({ resume }: { resume: Resume }) {
             label="Visa Sponsor"
           />
 
-          {cached && (
-            <span className="rounded-xs bg-accent-soft px-1.5 py-0.5 font-mono text-[10px] text-primary">
-              cached
-            </span>
-          )}
         </div>
 
         {/* Expanded filter panel */}
@@ -542,7 +537,6 @@ export function JobSearchPanel({ resume }: { resume: Resume }) {
               {filtered.length} real job{filtered.length !== 1 ? 's' : ''}
               {displayedJobs.length < filtered.length && ` · showing ${displayedJobs.length}`}
               {' · '}scored against your {resume.skills.length} skills
-              {cached && ' · cached results'}
             </div>
 
             <div className="flex flex-col gap-3">
