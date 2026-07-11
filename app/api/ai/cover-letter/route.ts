@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { generateTextWithFailover } from '~/lib/ai-providers'
 import { auth } from '~/lib/auth'
 import { headers } from 'next/headers'
+import { captureServerEvent } from '~/lib/posthog-server'
 
 export const maxDuration = 60
 
@@ -60,6 +61,7 @@ Rules:
       maxOutputTokens: 1024,
     })
 
+    await captureServerEvent(user.id, 'cover_letter_created', { company, role })
     return NextResponse.json({ letter: text.trim() })
   } catch (error) {
     console.error('[cover-letter] Error:', error)

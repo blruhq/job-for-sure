@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '~/lib/auth'
 import { headers } from 'next/headers'
 import { generateObjectWithFailover } from '~/lib/ai-providers'
+import { captureServerEvent } from '~/lib/posthog-server'
 import { db } from '~/lib/db'
 import { interviewSessions } from '~/lib/schema'
 import { eq, desc, and } from 'drizzle-orm'
@@ -127,6 +128,7 @@ Instructions:
         maxOutputTokens: 800,
       })
 
+      await captureServerEvent(user.id, 'interview_started', { company, role, type, difficulty })
       return NextResponse.json(result)
 
     } else if (action === 'evaluate') {

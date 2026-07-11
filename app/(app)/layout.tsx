@@ -20,6 +20,16 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
         const { data: session } = await authClient.getSession()
         if (!cancelled) {
           if (session) {
+            // Identify user in PostHog
+            try {
+              const posthog = (await import('posthog-js')).default
+              posthog.identify(session.user.id, {
+                email: session.user.email,
+                name: session.user.name,
+              })
+            } catch {
+              // PostHog not loaded yet — skip
+            }
             setChecked(true)
             return
           }

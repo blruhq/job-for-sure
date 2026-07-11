@@ -2,6 +2,7 @@ import { streamWithFailover } from '~/lib/ai-providers'
 import { auth } from '~/lib/auth'
 import { headers } from 'next/headers'
 import { NextResponse } from 'next/server'
+import { captureServerEvent } from '~/lib/posthog-server'
 
 export const maxDuration = 30
 
@@ -42,6 +43,8 @@ Rules:
 - For interview prep, give specific questions based on their skills.
 - If the user shares their resume details, remember them for the conversation.
 - Keep responses under 200 words unless the user asks for detail.`
+
+  await captureServerEvent(user.id, 'chat_message_sent')
 
   return streamWithFailover({
     system: systemPrompt,

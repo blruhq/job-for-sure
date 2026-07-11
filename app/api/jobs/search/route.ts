@@ -3,6 +3,7 @@ import { searchJobs } from '~/lib/job-sources'
 import type { JobSource } from '~/lib/job-sources'
 import { auth } from '~/lib/auth'
 import { headers } from 'next/headers'
+import { captureServerEvent } from '~/lib/posthog-server'
 
 export const maxDuration = 30 // Greenhouse/Ashby fetch takes time
 
@@ -40,6 +41,7 @@ export async function POST(req: NextRequest) {
       includePaid: Boolean(includePaid),
     })
 
+    await captureServerEvent(user.id, 'job_searched', { query, location })
     return NextResponse.json(result)
   } catch (error) {
     console.error('[jobs/search] Error:', error)

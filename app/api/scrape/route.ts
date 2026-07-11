@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { scrapeJob } from '~/lib/scraper'
 import { auth } from '~/lib/auth'
 import { headers } from 'next/headers'
+import { captureServerEvent } from '~/lib/posthog-server'
 
 async function getSessionUser() {
   const h = await headers()
@@ -21,6 +22,7 @@ export async function POST(req: NextRequest) {
     }
 
     const result = await scrapeJob(url)
+    await captureServerEvent(user.id, 'job_scraped')
     return NextResponse.json(result)
   } catch (error) {
     return NextResponse.json(

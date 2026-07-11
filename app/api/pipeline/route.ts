@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import { captureServerEvent } from '~/lib/posthog-server'
 import { db } from '~/lib/db'
 import { pipelineData } from '~/lib/schema'
 import { auth } from '~/lib/auth'
@@ -43,5 +44,6 @@ export async function POST(request: Request) {
       set: { data: JSON.stringify(data), updatedAt: new Date() },
     })
 
+  await captureServerEvent(user.id, 'pipeline_updated')
   return NextResponse.json({ success: true })
 }

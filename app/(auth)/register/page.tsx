@@ -23,6 +23,13 @@ export default function RegisterPage() {
       if (authError) {
         setError(authError.message || 'Registration failed')
       } else if (data) {
+        try {
+          const posthog = (await import('posthog-js')).default
+          posthog.identify(data.user.id, { email, name })
+          posthog.capture('user_signed_up', { method: 'email' })
+        } catch {
+          // PostHog not loaded — skip
+        }
         router.push('/dashboard')
       }
     } catch (err) {

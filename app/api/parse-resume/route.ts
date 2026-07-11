@@ -3,6 +3,7 @@ import { generateObjectWithFailover } from '~/lib/ai-providers'
 import { auth } from '~/lib/auth'
 import { headers } from 'next/headers'
 import { z } from 'zod'
+import { captureServerEvent } from '~/lib/posthog-server'
 
 export const maxDuration = 60
 
@@ -89,6 +90,7 @@ Rules:
       maxOutputTokens: 3000,
     })
 
+    await captureServerEvent(user.id, 'resume_uploaded')
     return NextResponse.json(parsed)
   } catch (error) {
     console.error('[parse-resume] Error:', error)
