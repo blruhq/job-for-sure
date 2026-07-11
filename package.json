@@ -50,10 +50,5 @@
     "@types/react-dom": "^19.1.0",
     "drizzle-kit": "^0.30.0",
     "typescript": "^5.8.0"
-  },
-  "pnpm": {
-    "onlyBuiltDependencies": [
-      "core-js"
-    ]
   }
 }
