@@ -1,19 +1,13 @@
 import { NextResponse } from 'next/server'
 import { db } from '~/lib/db'
 import { resumes } from '~/lib/schema'
-import { getSessionUser } from '~/lib/auth-helpers'
+import { withAuth } from '~/lib/with-auth'
 import { eq, and, isNull } from 'drizzle-orm'
 import { z } from 'zod'
 
 // GET /api/resumes/[id] — get a single resume
-export async function GET(
-  _request: Request,
-  { params }: { params: Promise<{ id: string }> },
-) {
-  const user = await getSessionUser()
-  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-
-  const { id } = await params
+export const GET = withAuth(async (req, { user, params }) => {
+  const { id } = params
   const [resume] = await db
     .select()
     .from(resumes)
@@ -22,7 +16,7 @@ export async function GET(
 
   if (!resume) return NextResponse.json({ error: 'Not found' }, { status: 404 })
   return NextResponse.json(resume)
-}
+})
 
 const PatchResumeBody = z.object({
   data: z.record(z.unknown()).optional(),
@@ -30,15 +24,9 @@ const PatchResumeBody = z.object({
 })
 
 // PATCH /api/resumes/[id] — update a resume
-export async function PATCH(
-  request: Request,
-  { params }: { params: Promise<{ id: string }> },
-) {
-  const user = await getSessionUser()
-  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-
-  const { id } = await params
-  const body = PatchResumeBody.safeParse(await request.json())
+export const PATCH = withAuth(async (req, { user, params }) => {
+  const { id } = params
+  const body = PatchResumeBody.safeParse(await req.json())
   if (!body.success) {
     return NextResponse.json({ error: 'Invalid update data' }, { status: 400 })
   }
@@ -57,17 +45,11 @@ export async function PATCH(
 
   if (!updated) return NextResponse.json({ error: 'Not found' }, { status: 404 })
   return NextResponse.json(updated)
-}
+})
 
 // DELETE /api/resumes/[id] — soft delete a resume
-export async function DELETE(
-  _request: Request,
-  { params }: { params: Promise<{ id: string }> },
-) {
-  const user = await getSessionUser()
-  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-
-  const { id } = await params
+export const DELETE = withAuth(async (req, { user, params }) => {
+  const { id } = params
   const [updated] = await db
     .update(resumes)
     .set({ deletedAt: new Date() })
@@ -76,4 +58,4 @@ export async function DELETE(
 
   if (!updated) return NextResponse.json({ error: 'Not found' }, { status: 404 })
   return NextResponse.json({ success: true })
-}
+})

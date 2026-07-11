@@ -470,9 +470,9 @@ function LegacySettings() {
           </div>
           <div className="text-[11px] text-muted-foreground">Free tier · upgrade for unlimited</div>
         </div>
-        <button className="cursor-pointer rounded-sm bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground transition-opacity hover:opacity-90">
-          Upgrade to Pro
-        </button>
+        <span className="rounded-sm bg-accent-soft px-2.5 py-1 text-[11px] font-medium text-primary">
+          Free Tier (Active)
+        </span>
       </div>
     </div>
   )

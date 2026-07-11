@@ -2,6 +2,7 @@
 
 import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from 'react'
 import type { ApplicationBoard, PipelineJob, Resume } from '~/types/resume'
+import { notify } from '~/lib/toast'
 
 // ═══════════════════════════════════════════════════════════════
 // CONTEXT TYPE
@@ -133,27 +134,36 @@ export function AppStoreProvider({ children }: { children: ReactNode }) {
   }, [])
 
   const addResume = useCallback((resume: Resume) => {
-    apiPost('/api/resumes', { id: resume.id, data: resume }).catch(console.error)
     setResumes(prev => [...prev, resume])
     setActiveResumeIdState(resume.id)
+    apiPost('/api/resumes', { id: resume.id, data: resume }).catch((err) => {
+      console.error(err)
+      setResumes(curr => curr.filter(r => r.id !== resume.id))
+      notify({ message: 'Failed to save resume. Changes rolled back.', type: 'error' })
+    })
   }, [])
 
   const updateResume = useCallback((id: string, updates: Partial<Resume>) => {
     setResumes(prev => {
-      const next = prev.map(r => r.id === id ? { ...r, ...updates } as Resume : r)
-      const updated = next.find(r => r.id === id)
-      if (updated) {
-        apiPatch(`/api/resumes/${id}`, { data: updated }).catch(console.error)
-      }
-      return next
+      const match = prev.find(r => r.id === id)
+      if (!match) return prev
+      const updated = { ...match, ...updates } as Resume
+      apiPatch(`/api/resumes/${id}`, { data: updated }).catch((err) => {
+        console.error(err)
+        setResumes(curr => curr.map(r => r.id === id ? match : r))
+        notify({ message: 'Failed to update resume. Changes rolled back.', type: 'error' })
+      })
+      return prev.map(r => r.id === id ? updated : r)
     })
   }, [])
 
   const deleteResume = useCallback(async (id: string) => {
-    await apiDelete(`/api/resumes/${id}`)
+    let oldResumes: Resume[] | null = null
+    let oldActiveId: string | null = null
     setResumes(prev => {
+      oldResumes = prev
+      oldActiveId = activeResumeId
       const next = prev.filter(r => r.id !== id)
-      // If we removed the active resume, switch to the first remaining
       if (activeResumeId === id && next.length > 0) {
         setActiveResumeIdState(next[0].id)
       } else if (next.length === 0) {
@@ -161,43 +171,58 @@ export function AppStoreProvider({ children }: { children: ReactNode }) {
       }
       return next
     })
+
+    try {
+      await apiDelete(`/api/resumes/${id}`)
+    } catch (err) {
+      console.error(err)
+      if (oldResumes) setResumes(oldResumes)
+      if (oldActiveId !== null) setActiveResumeIdState(oldActiveId)
+      notify({ message: 'Failed to delete resume. Changes rolled back.', type: 'error' })
+    }
   }, [activeResumeId])
 
   const getResume = useCallback((id: string) => resumes.find(r => r.id === id), [resumes])
 
   const activeResume = resumes.find(r => r.id === activeResumeId) ?? null
 
-  // ── Applications actions ──
-  const persistApplications = useCallback((next: ApplicationBoard) => {
-    apiPost('/api/applications', next).catch(console.error)
+  // ── Applications actions with Rollback ──
+  const updateApplicationsAndPersist = useCallback((updater: (prev: ApplicationBoard) => ApplicationBoard) => {
+    let oldVal: ApplicationBoard | null = null
+    setApplications(prev => {
+      oldVal = prev
+      const next = updater(prev)
+      apiPost('/api/applications', next).catch((err) => {
+        console.error(err)
+        if (oldVal) setApplications(oldVal)
+        notify({ message: 'Failed to update application board. Changes rolled back.', type: 'error' })
+      })
+      return next
+    })
   }, [])
 
   const bookmarkJob = useCallback((job: PipelineJob) => {
-    setApplications(prev => {
+    updateApplicationsAndPersist(prev => {
       if (prev.bookmark.some(j => j.key === job.key)) return prev
-      const next = { ...prev, bookmark: [...prev.bookmark, job] }
-      persistApplications(next)
-      return next
+      return { ...prev, bookmark: [...prev.bookmark, job] }
     })
-  }, [persistApplications])
+  }, [updateApplicationsAndPersist])
 
   const toggleBookmark = useCallback((key: string) => {
-    setApplications(prev => {
+    updateApplicationsAndPersist(prev => {
       const exists = prev.bookmark.some(j => j.key === key)
-      const next = exists
+      return exists
         ? { ...prev, bookmark: prev.bookmark.filter(j => j.key !== key) }
         : prev
-      persistApplications(next)
-      return next
     })
-  }, [persistApplications])
+  }, [updateApplicationsAndPersist])
 
   const isBookmarked = useCallback((key: string) => {
     return applications.bookmark.some(j => j.key === key)
   }, [applications])
 
   const moveJob = useCallback((jobKey: string, fromCol: keyof ApplicationBoard, toCol: keyof ApplicationBoard) => {
-    setApplications(prev => {
+    updateApplicationsAndPersist(prev => {
       const from = [...prev[fromCol]]
       const to = [...prev[toCol]]
       const idx = from.findIndex(j => j.key === jobKey)
@@ -205,25 +230,20 @@ export function AppStoreProvider({ children }: { children: ReactNode }) {
       const [job] = from.splice(idx, 1)
       job.time = toCol === 'applied' ? 'just now' : toCol === 'interviewing' ? 'scheduled' : toCol === 'offers' ? 'received' : 'saved'
       to.push(job)
-      const next = { ...prev, [fromCol]: from, [toCol]: to }
-      persistApplications(next)
-      return next
+      return { ...prev, [fromCol]: from, [toCol]: to }
     })
-  }, [persistApplications])
+  }, [updateApplicationsAndPersist])
 
   const removeJob = useCallback((jobKey: string, fromCol: keyof ApplicationBoard) => {
-    setApplications(prev => {
+    updateApplicationsAndPersist(prev => {
       const arr = prev[fromCol].filter(j => j.key !== jobKey)
-      const next = { ...prev, [fromCol]: arr }
-      persistApplications(next)
-      return next
+      return { ...prev, [fromCol]: arr }
     })
-  }, [persistApplications])
+  }, [updateApplicationsAndPersist])
 
   const clearApplications = useCallback(() => {
-    setApplications(EMPTY_APPLICATIONS)
-    persistApplications(EMPTY_APPLICATIONS)
-  }, [persistApplications])
+    updateApplicationsAndPersist(() => EMPTY_APPLICATIONS)
+  }, [updateApplicationsAndPersist])
 
   const toggleSidebar = useCallback(() => setSidebarCollapsed(prev => !prev), [])
 
