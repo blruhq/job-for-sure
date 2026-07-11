@@ -1,9 +1,10 @@
 'use client'
 
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { usePathname } from 'next/navigation'
-import { MessageSquare, KanbanSquare, CheckSquare, Settings, Plus, Brain, LayoutDashboard, Mail } from 'lucide-react'
+import { MessageSquare, KanbanSquare, CheckSquare, Settings, Plus, Brain, LayoutDashboard, Mail, Shield } from 'lucide-react'
 import { cn } from '~/lib/utils'
 import { useAppStore } from '~/lib/store'
 import { notify } from '~/lib/toast'
@@ -21,6 +22,23 @@ export function Sidebar() {
   const pathname = usePathname()
   const router = useRouter()
   const { resumes, activeResumeId, setActiveResumeId, pipeline, sidebarCollapsed } = useAppStore()
+  const [isAdmin, setIsAdmin] = useState(false)
+
+  useEffect(() => {
+    async function checkAdmin() {
+      try {
+        const { authClient } = await import('~/lib/auth-client')
+        const { data: session } = await authClient.getSession()
+        if (session?.user?.email) {
+          setIsAdmin(true)
+        }
+      } catch {
+        // not logged in
+      }
+    }
+    checkAdmin()
+  }, [])
+
   const c = sidebarCollapsed
 
   const totalPipeline = pipeline.bookmark.length + pipeline.applied.length + pipeline.interviewing.length + pipeline.offers.length
@@ -129,8 +147,23 @@ export function Sidebar() {
           <Settings size={15} className="shrink-0 opacity-70" />
           {!c && <span>Settings</span>}
         </Link>
+        {isAdmin && (
+          <Link
+            href="/admin"
+            title={c ? 'Admin' : undefined}
+            className={cn(
+              'flex items-center gap-2 rounded-sm px-2.5 py-1.5 text-xs font-medium transition-colors',
+              pathname === '/admin'
+                ? 'bg-sidebar-active text-foreground font-semibold'
+                : 'text-muted-foreground hover:bg-sidebar-hover hover:text-foreground',
+              c && 'justify-center px-0 mx-2',
+            )}
+          >
+            <Shield size={15} className="shrink-0 opacity-70" />
+            {!c && <span>Admin</span>}
+          </Link>
+        )}
       </div>
-
 
     </aside>
   )

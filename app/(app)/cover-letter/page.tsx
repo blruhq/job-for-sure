@@ -25,6 +25,14 @@ export default function StandaloneCoverLetterPage() {
   const [jdText, setJdText] = useState('')
   const [letterText, setLetterText] = useState('')
   const [generating, setGenerating] = useState(false)
+  const [savedLetters, setSavedLetters] = useState<Array<{
+    id: string
+    company: string | null
+    role: string | null
+    content: string
+    createdAt: string
+  }>>([])
+  const [activeLetterId, setActiveLetterId] = useState<string | null>(null)
 
   const selectedResume = resumes.find((r) => r.id === selectedResumeId)
 
@@ -34,6 +42,21 @@ export default function StandaloneCoverLetterPage() {
       setSelectedResumeId(activeResumeId)
     }
   }, [activeResumeId, selectedResumeId])
+
+  // Fetch saved cover letters
+  useEffect(() => {
+    async function loadLetters() {
+      try {
+        const res = await fetch('/api/cover-letters')
+        if (!res.ok) return
+        const data = await res.json()
+        setSavedLetters(data)
+      } catch {
+        // ignore
+      }
+    }
+    loadLetters()
+  }, [])
 
   // Sync letter text from selected resume if it has one already saved
   useEffect(() => {
@@ -168,13 +191,26 @@ export default function StandaloneCoverLetterPage() {
       const data = await res.json()
       if (data.letter) {
         setLetterText(data.letter)
-        // Update resume data in store & DB
         const jdVal = mode === 'jd' ? jdText : `Company: ${company}, Role: ${role}${focus ? `, Focus: ${focus}` : ''}`
         updateResume(selectedResume.id, {
           coverLetter: data.letter,
           coverLetterJD: jdVal,
         })
-        notify({ message: 'Cover letter generated!', type: 'success' })
+        // Add to saved letters list
+        if (data.id) {
+          setActiveLetterId(data.id)
+          setSavedLetters(prev => [
+            {
+              id: data.id,
+              company: mode === 'quick' ? company : null,
+              role: mode === 'quick' ? role : null,
+              content: data.letter,
+              createdAt: new Date().toISOString(),
+            },
+            ...prev,
+          ])
+        }
+        notify({ message: 'Cover letter generated & saved!', type: 'success' })
       } else {
         throw new Error('No letter content returned')
       }
@@ -194,6 +230,27 @@ export default function StandaloneCoverLetterPage() {
       coverLetterJD: jdVal,
     })
     notify({ message: 'Cover letter saved successfully!', type: 'success' })
+  }
+
+  const handleLoadSaved = (letter: { id: string; content: string; company: string | null; role: string | null }) => {
+    setActiveLetterId(letter.id)
+    setLetterText(letter.content)
+    if (letter.company) setCompany(letter.company)
+    if (letter.role) setRole(letter.role)
+  }
+
+  const handleDeleteSaved = async (id: string) => {
+    try {
+      await fetch(`/api/cover-letters/${id}`, { method: 'DELETE' })
+      setSavedLetters(prev => prev.filter(l => l.id !== id))
+      if (activeLetterId === id) {
+        setActiveLetterId(null)
+        setLetterText('')
+      }
+      notify({ message: 'Cover letter deleted', type: 'success' })
+    } catch {
+      notify({ message: 'Failed to delete', type: 'error' })
+    }
   }
 
   const handleCopy = async () => {
@@ -329,6 +386,43 @@ export default function StandaloneCoverLetterPage() {
             </div>
           )}
         </div>
+
+        {/* Saved Letters */}
+        {savedLetters.length > 0 && (
+          <div className="space-y-1.5 pt-2 border-t border-border/50">
+            <label className="label-mono block">Saved Letters ({savedLetters.length})</label>
+            {savedLetters.map((letter) => (
+              <div
+                key={letter.id}
+                className={`group flex items-center gap-1.5 rounded-xs border px-2 py-1.5 cursor-pointer transition-colors ${
+                  activeLetterId === letter.id
+                    ? 'border-primary bg-primary/5'
+                    : 'border-border hover:bg-muted/30'
+                }`}
+                onClick={() => handleLoadSaved(letter)}
+              >
+                <div className="flex-1 min-w-0">
+                  <div className="text-[11px] font-medium text-foreground truncate">
+                    {letter.company || letter.role || 'Untitled'}
+                  </div>
+                  <div className="font-mono text-[9px] text-muted-foreground">
+                    {new Date(letter.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                  </div>
+                </div>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    handleDeleteSaved(letter.id)
+                  }}
+                  className="shrink-0 opacity-0 group-hover:opacity-100 text-muted-foreground hover:text-destructive transition-opacity cursor-pointer"
+                  title="Delete"
+                >
+                  <span className="text-xs">✕</span>
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
 
         {/* Generate Trigger */}
         <button

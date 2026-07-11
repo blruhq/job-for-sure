@@ -197,3 +197,32 @@ export const interviewSessionsRelations = relations(interviewSessions, ({ one })
     references: [resumes.id],
   }),
 }));
+
+// ═══════════════════════════════════════════════════════════════
+// COVER LETTERS
+// ═══════════════════════════════════════════════════════════════
+
+export const coverLetters = pgTable("cover_letters", {
+  id: text("id").primaryKey(),
+  userId: text("user_id")
+    .notNull()
+    .references(() => user.id, { onDelete: "cascade" }),
+  resumeId: text("resume_id").references(() => resumes.id, { onDelete: "set null" }),
+  company: text("company"),
+  role: text("role"),
+  content: text("content").notNull(),
+  jdText: text("jd_text"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const coverLettersRelations = relations(coverLetters, ({ one }) => ({
+  user: one(user, {
+    fields: [coverLetters.userId],
+    references: [user.id],
+  }),
+  resume: one(resumes, {
+    fields: [coverLetters.resumeId],
+    references: [resumes.id],
+  }),
+}));

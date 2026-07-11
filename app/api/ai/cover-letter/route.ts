@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import { generateTextWithFailover } from '~/lib/ai-providers'
 import { auth } from '~/lib/auth'
 import { headers } from 'next/headers'
+import { db } from '~/lib/db'
+import { coverLetters } from '~/lib/schema'
 import { captureServerEvent } from '~/lib/posthog-server'
 
 export const maxDuration = 60
@@ -62,7 +64,26 @@ Rules:
     })
 
     await captureServerEvent(user.id, 'cover_letter_created', { company, role })
-    return NextResponse.json({ letter: text.trim() })
+
+    // Save to cover_letters table
+    const letterId = crypto.randomUUID()
+    try {
+      await db.insert(coverLetters).values({
+        id: letterId,
+        userId: user.id,
+        resumeId: null,
+        company: company || null,
+        role: role || null,
+        content: text.trim(),
+        jdText: jdText || null,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      })
+    } catch (err) {
+      console.error('[cover-letter] Failed to save to DB:', err)
+    }
+
+    return NextResponse.json({ letter: text.trim(), id: letterId })
   } catch (error) {
     console.error('[cover-letter] Error:', error)
     return NextResponse.json(
