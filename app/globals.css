@@ -104,7 +104,7 @@
   --accent-soft: rgba(91, 106, 191, 0.08);
 
   /* ── Typography ── */
-  --font-sans: 'Inter Variable', 'Inter', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-sans: var(--font-inter, 'Inter Variable'), 'Inter', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
   --font-display: 'Instrument Serif', Georgia, 'Times New Roman', serif;
   --font-mono: 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, Monaco, Consolas, monospace;
 
@@ -168,6 +168,11 @@
   --an-tool-border-color: var(--border);
   --an-tool-color: var(--foreground);
   --an-tool-color-muted: var(--muted-foreground);
+}
+
+/* ── Thai locale — use Kanit font ── */
+html[lang="th"] {
+  --font-sans: var(--font-kanit, 'Kanit'), var(--font-inter, 'Inter Variable'), 'Inter', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
 /* ── Dark mode ── */

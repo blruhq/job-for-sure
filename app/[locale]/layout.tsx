@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import { Inter, JetBrains_Mono, Instrument_Serif } from 'next/font/google'
+import { Inter, JetBrains_Mono, Instrument_Serif, Kanit } from 'next/font/google'
 import { ThemeProvider } from '~/components/layout/theme-provider'
 import '../globals.css'
 import { NextIntlClientProvider } from 'next-intl'
@@ -24,6 +24,13 @@ const instrumentSerif = Instrument_Serif({
   subsets: ['latin'],
   weight: ['400'],
   style: ['normal', 'italic'],
+  display: 'swap',
+})
+
+const kanit = Kanit({
+  variable: '--font-kanit',
+  subsets: ['thai', 'latin-ext'],
+  weight: ['300', '400', '500', '600'],
   display: 'swap',
 })
 
@@ -75,7 +82,7 @@ export default async function LocaleLayout({
   return (
     <html
       lang={locale}
-      className={`${inter.variable} ${jetbrainsMono.variable} ${instrumentSerif.variable}`}
+      className={`${inter.variable} ${jetbrainsMono.variable} ${instrumentSerif.variable}${locale === 'th' ? ` ${kanit.variable}` : ''}`}
       suppressHydrationWarning
     >
       <body className="min-h-screen bg-background text-foreground antialiased">
