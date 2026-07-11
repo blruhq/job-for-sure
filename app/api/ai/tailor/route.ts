@@ -7,6 +7,11 @@ import { captureServerError } from '~/lib/posthog-server'
 
 export const maxDuration = 60
 
+const TailorInputBody = z.object({
+  resume: z.record(z.unknown()),
+  job: z.record(z.unknown()),
+})
+
 const TailorSchema = z.object({
   optimized: z.object({
     name: z.string(),
@@ -39,7 +44,11 @@ export async function POST(req: NextRequest) {
     const limited = await checkRateLimit(user.id)
     if (limited) return limited
 
-    const { resume, job } = await req.json()
+    const body = TailorInputBody.safeParse(await req.json())
+    if (!body.success) {
+      return NextResponse.json({ error: 'Invalid request' }, { status: 400 })
+    }
+    const { resume, job } = body.data
 
     const result = await generateObjectWithFailover<z.infer<typeof TailorSchema>>({
       system: `You are a professional resume optimization expert. 

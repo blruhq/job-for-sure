@@ -23,6 +23,39 @@ const InterviewEvaluateSchema = z.object({
   modelAnswer: z.string(),
 })
 
+// Input validation schemas
+const QuestionInput = z.object({
+  action: z.literal('question'),
+  resume: z.any().optional(),
+  target: z.object({ company: z.string(), role: z.string() }),
+  config: z.object({
+    type: z.string(),
+    difficulty: z.string(),
+    missingSkills: z.array(z.string()).optional(),
+    transferableSkills: z.array(z.string()).optional(),
+    matchScore: z.number().optional(),
+  }),
+  previousQuestions: z.array(z.string()).optional(),
+})
+
+const EvaluateInput = z.object({
+  action: z.literal('evaluate'),
+  target: z.object({ company: z.string(), role: z.string() }),
+  question: z.string(),
+  answer: z.string(),
+})
+
+const SaveInput = z.object({
+  action: z.literal('save'),
+  resumeId: z.string().nullable().optional(),
+  company: z.string(),
+  role: z.string(),
+  type: z.string(),
+  difficulty: z.string(),
+  score: z.union([z.string(), z.number()]),
+  exchanges: z.array(z.any()),
+})
+
 // GET /api/ai/interview - Retrieve past interview history for the logged-in user
 export async function GET(req: NextRequest) {
   try {
@@ -62,7 +95,11 @@ export async function POST(req: NextRequest) {
     const { action } = body
 
     if (action === 'question') {
-      const { resume, target, config, previousQuestions = [] } = body
+      const parsed = QuestionInput.safeParse(body)
+      if (!parsed.success) {
+        return NextResponse.json({ error: 'Invalid question request' }, { status: 400 })
+      }
+      const { resume, target, config, previousQuestions = [] } = parsed.data
       const { company, role } = target
       const { type, difficulty, missingSkills = [], transferableSkills = [], matchScore } = config
 
@@ -131,7 +168,11 @@ Instructions:
       return NextResponse.json(result)
 
     } else if (action === 'evaluate') {
-      const { target, question, answer } = body
+      const parsed = EvaluateInput.safeParse(body)
+      if (!parsed.success) {
+        return NextResponse.json({ error: 'Invalid evaluate request' }, { status: 400 })
+      }
+      const { target, question, answer } = parsed.data
       const { company, role } = target
 
       const systemPrompt = `You are an expert interview evaluator.
@@ -164,10 +205,11 @@ Language rules: Evaluate the candidate's answer and return strengths, improvemen
 
       return NextResponse.json(result)
     } else if (action === 'save') {
-      const { resumeId, company, role, type, difficulty, score, exchanges } = body
-      if (!company || !role || !score || !exchanges) {
+      const parsed = SaveInput.safeParse(body)
+      if (!parsed.success) {
         return NextResponse.json({ error: 'Missing required session parameters' }, { status: 400 })
       }
+      const { resumeId, company, role, type, difficulty, score, exchanges } = parsed.data
       const id = 'int_' + Date.now() + '_' + Math.random().toString(36).substring(7)
       await db.insert(interviewSessions).values({
         id,

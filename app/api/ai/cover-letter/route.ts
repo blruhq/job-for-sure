@@ -5,8 +5,18 @@ import { checkRateLimit } from '~/lib/ratelimit'
 import { db } from '~/lib/db'
 import { coverLetters } from '~/lib/schema'
 import { captureServerEvent, captureServerError } from '~/lib/posthog-server'
+import { z } from 'zod'
 
 export const maxDuration = 60
+
+const CoverLetterInputBody = z.object({
+  resume: z.any(),
+  jdText: z.string().max(20000).optional(),
+  company: z.string().max(200).optional(),
+  role: z.string().max(200).optional(),
+  focus: z.string().max(1000).optional(),
+  language: z.string().max(10).optional(),
+})
 
 export async function POST(req: NextRequest) {
   try {
@@ -16,7 +26,11 @@ export async function POST(req: NextRequest) {
     const limited = await checkRateLimit(user.id)
     if (limited) return limited
 
-    const { resume, jdText, company, role, focus, language } = await req.json()
+    const body = CoverLetterInputBody.safeParse(await req.json())
+    if (!body.success) {
+      return NextResponse.json({ error: 'Invalid request' }, { status: 400 })
+    }
+    const { resume, jdText, company, role, focus, language } = body.data
     const isThai = language === 'th'
 
     let prompt = `Resume:\n${JSON.stringify(resume)}\n\n`

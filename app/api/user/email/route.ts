@@ -2,20 +2,30 @@ import { NextResponse } from 'next/server'
 import { db } from '~/lib/db'
 import { user } from '~/lib/schema'
 import { getSessionUser } from '~/lib/auth-helpers'
+import { checkGeneralRateLimit } from '~/lib/ratelimit'
 import { eq } from 'drizzle-orm'
 import { auth } from '~/lib/auth'
 import { headers } from 'next/headers'
+import { z } from 'zod'
+
+const EmailBody = z.object({
+  email: z.string().email().max(254),
+})
 
 // PUT /api/user/email
 export async function PUT(request: Request) {
   const sessionUser = await getSessionUser()
   if (!sessionUser) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-  const { email } = await request.json()
+  const limited = await checkGeneralRateLimit(sessionUser.id)
+  if (limited) return limited
 
-  if (!email || typeof email !== 'string' || !email.includes('@')) {
-    return NextResponse.json({ error: 'Invalid email address' }, { status: 400 })
+  const body = EmailBody.safeParse(await request.json())
+  if (!body.success) {
+    return NextResponse.json({ error: 'Valid email address required' }, { status: 400 })
   }
+
+  const { email } = body.data
 
   // Check if email already taken
   const existing = await db

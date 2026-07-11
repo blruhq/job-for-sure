@@ -3,6 +3,13 @@ import { db } from '~/lib/db'
 import { coverLetters } from '~/lib/schema'
 import { getSessionUser } from '~/lib/auth-helpers'
 import { eq, and } from 'drizzle-orm'
+import { z } from 'zod'
+
+const PatchCoverLetterBody = z.object({
+  content: z.string().max(20000).optional(),
+  company: z.string().max(200).nullable().optional(),
+  role: z.string().max(200).nullable().optional(),
+})
 
 // PATCH /api/cover-letters/[id] — update a cover letter
 export async function PATCH(
@@ -13,14 +20,17 @@ export async function PATCH(
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const { id } = await params
-  const body = await request.json()
+  const body = PatchCoverLetterBody.safeParse(await request.json())
+  if (!body.success) {
+    return NextResponse.json({ error: 'Invalid update data' }, { status: 400 })
+  }
 
   const updates: Record<string, unknown> = {
     updatedAt: new Date(),
   }
-  if (body.content !== undefined) updates.content = body.content
-  if (body.company !== undefined) updates.company = body.company
-  if (body.role !== undefined) updates.role = body.role
+  if (body.data.content !== undefined) updates.content = body.data.content
+  if (body.data.company !== undefined) updates.company = body.data.company
+  if (body.data.role !== undefined) updates.role = body.data.role
 
   const [updated] = await db
     .update(coverLetters)

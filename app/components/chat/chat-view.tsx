@@ -51,6 +51,13 @@ export function ChatView() {
     if (!file) return
     e.target.value = ''
 
+    // Size limit: 5MB
+    const MAX_FILE_SIZE = 5 * 1024 * 1024
+    if (file.size > MAX_FILE_SIZE) {
+      notify({ message: 'File too large. Maximum size is 5MB.', type: 'error' })
+      return
+    }
+
     setProcessing(true)
     try {
       let text: string

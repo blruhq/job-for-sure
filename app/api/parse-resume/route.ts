@@ -55,6 +55,10 @@ const ParseResumeSchema = z.object({
   role: z.string().default(''),
 })
 
+const ParseResumeInputBody = z.object({
+  text: z.string().min(20).max(50000),
+})
+
 export async function POST(req: NextRequest) {
   try {
     const user = await getSessionUser()
@@ -63,14 +67,15 @@ export async function POST(req: NextRequest) {
     const limited = await checkRateLimit(user.id)
     if (limited) return limited
 
-    const { text } = await req.json()
-
-    if (!text || text.trim().length < 20) {
+    const body = ParseResumeInputBody.safeParse(await req.json())
+    if (!body.success) {
       return NextResponse.json(
-        { error: 'Resume text is too short. Please paste more content.' },
+        { error: 'Resume text is too short or too long.' },
         { status: 400 },
       )
     }
+
+    const { text } = body.data
 
     const parsed = await generateObjectWithFailover<z.infer<typeof ParseResumeSchema>>({
       system: `You are a resume parser. Extract ALL structured information from resume text.

@@ -2,7 +2,9 @@ import { NextResponse } from 'next/server'
 import { db } from '~/lib/db'
 import { coverLetters } from '~/lib/schema'
 import { getSessionUser } from '~/lib/auth-helpers'
+import { checkGeneralRateLimit } from '~/lib/ratelimit'
 import { eq, and, desc, isNull } from 'drizzle-orm'
+import { z } from 'zod'
 
 // GET /api/cover-letters — list all cover letters for the current user
 export async function GET() {
@@ -26,17 +28,29 @@ export async function GET() {
   return NextResponse.json(list)
 }
 
+const CreateCoverLetterBody = z.object({
+  id: z.string().max(100).optional(),
+  resumeId: z.string().max(100).nullable().optional(),
+  company: z.string().max(200).nullable().optional(),
+  role: z.string().max(200).nullable().optional(),
+  content: z.string().min(1).max(20000),
+  jdText: z.string().max(20000).nullable().optional(),
+})
+
 // POST /api/cover-letters — create a new cover letter
 export async function POST(request: Request) {
   const user = await getSessionUser()
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-  const body = await request.json()
-  const { id, resumeId, company, role, content, jdText } = body
+  const limited = await checkGeneralRateLimit(user.id)
+  if (limited) return limited
 
-  if (!content || typeof content !== 'string') {
-    return NextResponse.json({ error: 'Content is required' }, { status: 400 })
+  const body = CreateCoverLetterBody.safeParse(await request.json())
+  if (!body.success) {
+    return NextResponse.json({ error: 'Valid content is required' }, { status: 400 })
   }
+
+  const { id, resumeId, company, role, content, jdText } = body.data
 
   const letter = {
     id: id || crypto.randomUUID(),

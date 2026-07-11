@@ -11,6 +11,7 @@ export default function RegisterPage() {
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [emailSent, setEmailSent] = useState(false)
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -30,7 +31,8 @@ export default function RegisterPage() {
         } catch {
           // PostHog not loaded — skip
         }
-        router.push('/dashboard')
+        // Show "check your email" screen instead of redirecting
+        setEmailSent(true)
       }
     } catch (err) {
       console.error(err)
@@ -60,6 +62,30 @@ export default function RegisterPage() {
           </Link>
         </div>
 
+        {emailSent ? (
+          <div className="rounded-lg border border-border bg-card p-8 shadow-sm text-center">
+            <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-primary">
+                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+                <polyline points="22,6 12,13 2,6" />
+              </svg>
+            </div>
+            <h1 className="text-lg font-semibold text-foreground">Check your email</h1>
+            <p className="mt-2 text-xs text-muted-foreground">
+              We sent a verification link to <span className="font-medium text-foreground">{email}</span>.
+              Click the link to activate your account.
+            </p>
+            <p className="mt-4 text-[11px] text-muted-foreground/60">
+              Didn&apos;t get an email? Check your spam folder.
+            </p>
+            <Link
+              href="/login"
+              className="mt-6 inline-block cursor-pointer text-xs font-medium text-primary hover:opacity-80"
+            >
+              ← Back to sign in
+            </Link>
+          </div>
+        ) : (
         <div className="rounded-lg border border-border bg-card p-8 shadow-sm">
           <div className="text-center">
             <h1
@@ -164,6 +190,7 @@ export default function RegisterPage() {
             </Link>
           </p>
         </div>
+        )}
 
         <p className="mt-4 text-center font-mono text-[10px] text-muted-foreground/40">
           Create an account to sync your data across devices.

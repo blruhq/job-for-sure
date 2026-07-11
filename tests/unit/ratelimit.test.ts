@@ -1,9 +1,10 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
-// Mock @upstash/ratelimit
+// Mock @upstash/ratelimit — Ratelimit must be a constructor (used with `new`)
 vi.mock('@upstash/ratelimit', () => ({
-  Ratelimit: {
-    slidingWindow: vi.fn(),
+  Ratelimit: class {
+    static slidingWindow = vi.fn()
+    limit = vi.fn().mockRejectedValue(new Error('Redis not available'))
   },
 }))
 
@@ -12,7 +13,7 @@ vi.mock('@upstash/redis', () => ({
   Redis: vi.fn(),
 }))
 
-import { checkRateLimit } from '~/lib/ratelimit'
+import { checkRateLimit, checkGeneralRateLimit } from '~/lib/ratelimit'
 
 describe('rate limiter', () => {
   beforeEach(() => {
@@ -35,5 +36,10 @@ describe('rate limiter', () => {
     // This is the critical security property: rate limiter failure
     // should NEVER break the application
     await expect(checkRateLimit('')).resolves.not.toThrow()
+  })
+
+  it('general rate limiter also fails open', async () => {
+    const result = await checkGeneralRateLimit('user-789')
+    expect(result).toBeNull()
   })
 })

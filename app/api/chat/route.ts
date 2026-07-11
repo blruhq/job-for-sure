@@ -2,18 +2,30 @@ import { streamWithFailover } from '~/lib/ai-providers'
 import { getSessionUser } from '~/lib/auth-helpers'
 import { checkRateLimit } from '~/lib/ratelimit'
 import { NextResponse } from 'next/server'
-import { captureServerEvent } from '~/lib/posthog-server'
+import { captureServerEvent, captureServerError } from '~/lib/posthog-server'
+import { z } from 'zod'
 
 export const maxDuration = 30
 
+const ChatBody = z.object({
+  messages: z.array(z.any()),
+  context: z.any().optional(),
+})
+
 export async function POST(req: Request) {
-  const user = await getSessionUser()
-  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  try {
+    const user = await getSessionUser()
+    if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-  const limited = await checkRateLimit(user.id)
-  if (limited) return limited
+    const limited = await checkRateLimit(user.id)
+    if (limited) return limited
 
-  const { messages, context } = await req.json()
+    const body = ChatBody.safeParse(await req.json())
+    if (!body.success) {
+      return NextResponse.json({ error: 'Invalid request body' }, { status: 400 })
+    }
+
+    const { messages, context } = body.data
 
   const systemPrompt = `You are Job For Sure — an AI career coach embedded in a job search app.
 
@@ -50,4 +62,11 @@ Rules:
     temperature: 0.7,
     maxOutputTokens: 1024,
   })
+  } catch (error) {
+    await captureServerError('anonymous', error, { route: '/api/chat' })
+    return NextResponse.json(
+      { error: 'Chat failed. Please try again.' },
+      { status: 500 },
+    )
+  }
 }

@@ -2,7 +2,9 @@ import { NextResponse } from 'next/server'
 import { db } from '~/lib/db'
 import { userPreferences } from '~/lib/schema'
 import { getSessionUser } from '~/lib/auth-helpers'
+import { checkGeneralRateLimit } from '~/lib/ratelimit'
 import { eq } from 'drizzle-orm'
+import { z } from 'zod'
 
 // GET /api/user/preferences
 export async function GET() {
@@ -31,24 +33,34 @@ export async function GET() {
   return NextResponse.json(prefs)
 }
 
+const PrefsBody = z.object({
+  emailNotifications: z.boolean().optional(),
+  weeklyDigest: z.boolean().optional(),
+  marketingEmails: z.boolean().optional(),
+})
+
 // PUT /api/user/preferences
 export async function PUT(request: Request) {
   const user = await getSessionUser()
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-  const body = await request.json()
-  const { emailNotifications, weeklyDigest, marketingEmails } = body
+  const limited = await checkGeneralRateLimit(user.id)
+  if (limited) return limited
 
-  const update: Record<string, boolean | Date> = {}
-  if (typeof emailNotifications === 'boolean') update.emailNotifications = emailNotifications
-  if (typeof weeklyDigest === 'boolean') update.weeklyDigest = weeklyDigest
-  if (typeof marketingEmails === 'boolean') update.marketingEmails = marketingEmails
-  update.updatedAt = new Date()
+  const body = PrefsBody.safeParse(await request.json())
+  if (!body.success) {
+    return NextResponse.json({ error: 'Invalid preferences data' }, { status: 400 })
+  }
+
+  const update: Record<string, boolean | Date> = { updatedAt: new Date() }
+  if (body.data.emailNotifications !== undefined) update.emailNotifications = body.data.emailNotifications
+  if (body.data.weeklyDigest !== undefined) update.weeklyDigest = body.data.weeklyDigest
+  if (body.data.marketingEmails !== undefined) update.marketingEmails = body.data.marketingEmails
 
   await db
     .insert(userPreferences)
-    .values({ userId: user.id, ...update } as any)
-    .onConflictDoUpdate({ target: userPreferences.userId, set: update as any })
+    .values({ userId: user.id, ...body.data })
+    .onConflictDoUpdate({ target: userPreferences.userId, set: update })
 
   const prefs = await db
     .select()

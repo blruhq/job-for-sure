@@ -5,6 +5,7 @@ import { CoverLetterPDF } from '~/components/resume/cover-letter-pdf'
 import { db } from '~/lib/db'
 import { resumes } from '~/lib/schema'
 import { getSessionUser } from '~/lib/auth-helpers'
+import { checkGeneralRateLimit } from '~/lib/ratelimit'
 import { eq, and } from 'drizzle-orm'
 
 export const runtime = 'nodejs'
@@ -14,11 +15,20 @@ export async function GET(request: Request) {
   const user = await getSessionUser()
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
+  const limited = await checkGeneralRateLimit(user.id)
+  if (limited) return limited
+
   const { searchParams } = new URL(request.url)
   const id = searchParams.get('id')
   const type = searchParams.get('type') || 'resume'
 
-  if (!id) return NextResponse.json({ error: 'Missing resume id' }, { status: 400 })
+  if (!id || id.length > 100) {
+    return NextResponse.json({ error: 'Missing or invalid resume id' }, { status: 400 })
+  }
+
+  if (type !== 'resume' && type !== 'cover-letter') {
+    return NextResponse.json({ error: 'Invalid export type' }, { status: 400 })
+  }
 
   const [row] = await db
     .select()

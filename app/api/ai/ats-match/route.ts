@@ -7,6 +7,11 @@ import { captureServerError } from '~/lib/posthog-server'
 
 export const maxDuration = 60
 
+const AtsInputBody = z.object({
+  resume: z.record(z.unknown()),
+  jdText: z.string().min(10).max(20000),
+})
+
 const AtsSchema = z.object({
   score: z.number().min(0).max(100),
   matched: z.array(z.string()),
@@ -22,7 +27,11 @@ export async function POST(req: NextRequest) {
     const limited = await checkRateLimit(user.id)
     if (limited) return limited
 
-    const { resume, jdText } = await req.json()
+    const body = AtsInputBody.safeParse(await req.json())
+    if (!body.success) {
+      return NextResponse.json({ error: 'Invalid request' }, { status: 400 })
+    }
+    const { resume, jdText } = body.data
 
     const result = await generateObjectWithFailover<z.infer<typeof AtsSchema>>({
       system: `You are an ATS (Applicant Tracking System) expert.
