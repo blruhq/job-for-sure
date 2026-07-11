@@ -327,7 +327,7 @@ export function JobSearchPanel({ resume }: { resume: Resume }) {
       notify({ message: `Added ${data.jobs.length} jobs from LinkedIn, Indeed & JobsDB`, type: 'success' })
     } catch (err) {
       console.error('[job-search-paid] Error:', err)
-      notify({ message: 'Paid source search failed. They may be rate-limited.', type: 'error' })
+      notify({ message: 'LinkedIn/Indeed/JobsDB search failed. They may be rate-limited.', type: 'error' })
     } finally {
       setPaidLoading(false)
     }
@@ -595,7 +595,7 @@ export function JobSearchPanel({ resume }: { resume: Resume }) {
             {!hasMore && !paidLoaded && (
               <div className="mt-4 flex flex-col items-center gap-2 border-t border-border pt-4">
                 <p className="text-[11px] text-muted-foreground">
-                  No more free results. Want jobs from LinkedIn, Indeed &amp; JobsDB?
+                  Want jobs from more sources?
                 </p>
                 <button
                   onClick={handleLoadPaid}
@@ -607,7 +607,7 @@ export function JobSearchPanel({ resume }: { resume: Resume }) {
                   ) : (
                     <Briefcase size={12} />
                   )}
-                  {paidLoading ? 'Loading…' : `Load jobs from LinkedIn, Indeed & JobsDB (uses Apify credit)`}
+                  {paidLoading ? 'Loading…' : 'Search LinkedIn, Indeed & JobsDB'}
                 </button>
               </div>
             )}

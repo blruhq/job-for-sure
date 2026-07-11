@@ -294,7 +294,7 @@ export function JobPreview({ resume, onDismiss }: { resume: Resume; onDismiss?: 
             ) : (
               <Briefcase size={11} />
             )}
-            {paidLoading ? 'Loading…' : 'Load more from LinkedIn, Indeed & JobsDB'}
+            {paidLoading ? 'Loading…' : 'Search LinkedIn, Indeed & JobsDB'}
           </button>
         )}
       </div>
