@@ -1,0 +1,14 @@
+{
+  "instructions": [
+    "docs/tech-stack.md",
+    "docs/architecture.md",
+    "docs/adr/001-better-auth.md",
+    "docs/adr/002-react-pdf.md",
+    "docs/adr/003-ai-failover.md",
+    "docs/adr/004-tech-job-search.md",
+    "docs/flow/resume-builder.md",
+    "docs/flow/job-search.md",
+    "docs/flow/ats-match.md",
+    "docs/flow/cover-letter.md"
+  ]
+}
