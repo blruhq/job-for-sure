@@ -55,8 +55,8 @@ interface JSearchJob {
 }
 
 interface OpenWebNinjaResponse {
-  jobs?: JSearchJob[]
-  data?: { jobs?: JSearchJob[] }
+  status?: string
+  data?: JSearchJob[]
   request_id?: string
 }
 
@@ -76,7 +76,7 @@ export async function fetchJSearch(
       ? `${query} in ${location}`
       : query
 
-    const url = `https://api.openwebninja.com/v1/job-search?query=${encodeURIComponent(searchQuery)}&num_pages=1&date_posted=week`
+    const url = `https://api.openwebninja.com/jsearch/search?query=${encodeURIComponent(searchQuery)}&num_pages=1&date_posted=week`
 
     const res = await fetch(url, {
       signal: opts?.signal,
@@ -89,7 +89,7 @@ export async function fetchJSearch(
     if (!res.ok) throw new Error(`JSearch: HTTP ${res.status}`)
     const body: OpenWebNinjaResponse = await res.json()
 
-    const rawJobs = body.jobs || body.data?.jobs || []
+    const rawJobs: JSearchJob[] = body.data || []
     const jobs: JobResult[] = rawJobs.map((job) => {
       // Build description from highlights + description
       const parts: string[] = []
