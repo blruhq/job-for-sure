@@ -1,10 +1,11 @@
 import type { Metadata } from 'next'
-import Link from 'next/link'
+import { Link } from '~/i18n/routing'
 import { ArrowRight } from 'lucide-react'
 import { GridPattern } from '~/components/marketing/grid-pattern'
 import { HowItWorks } from '~/components/marketing/how-it-works'
 import { FeaturesBento } from '~/components/marketing/features-bento'
 import { InterviewSection } from '~/components/marketing/interview-section'
+import { useTranslations } from 'next-intl'
 
 export const metadata: Metadata = {
   title: { absolute: 'Job For Sure' },
@@ -97,6 +98,8 @@ function AnimatedMockup() {
 }
 
 export default function LandingPage() {
+  const t = useTranslations('landing')
+
   return (
     <div className="flex min-h-screen flex-col bg-background">
       <GridPattern>
@@ -112,26 +115,23 @@ export default function LandingPage() {
           <div className="relative mx-auto grid w-full max-w-[1120px] items-center gap-12 md:grid-cols-[1fr_1.2fr] md:gap-16">
             <div className="max-w-lg">
               <h1 className="text-4xl font-semibold leading-[1.08] tracking-tight text-foreground sm:text-5xl md:text-[3.5rem] md:leading-[1.05]">
-                Know your chances
-                <br />
-                before you apply.
+                {t('title')}
               </h1>
               <p className="mt-5 max-w-md text-base leading-relaxed text-muted-foreground md:text-lg">
-                Upload your resume. Get instant match scores against real jobs, ATS-tailored
-                applications, and track every step — from saved to offer.
+                {t('subtitle')}
               </p>
               <div className="mt-8 flex items-center gap-3">
                 <Link
                   href="/chat"
                   className="inline-flex cursor-pointer items-center gap-1.5 rounded-lg bg-primary px-6 py-3 text-sm font-medium text-primary-foreground shadow-lg shadow-primary/20 transition-all hover:bg-primary/90 hover:-translate-y-0.5 active:scale-[0.98]"
                 >
-                  Start Chat <ArrowRight size={14} />
+                  {t('startChat')} <ArrowRight size={14} />
                 </Link>
                 <Link
                   href="/register"
                   className="inline-flex cursor-pointer items-center rounded-lg border border-border px-6 py-3 text-sm font-medium text-foreground transition-colors hover:bg-muted active:scale-[0.98]"
                 >
-                  Create Account
+                  {t('createAccount')}
                 </Link>
               </div>
             </div>
@@ -156,16 +156,16 @@ export default function LandingPage() {
         <div className="mx-auto max-w-[1120px] px-6 py-20 md:py-28">
           <div className="max-w-2xl">
             <h2 className="text-3xl font-semibold tracking-tight text-primary-foreground md:text-4xl">
-              Your next role is closer than you think.
+              {t('tagline')}
             </h2>
             <p className="mt-4 text-lg leading-relaxed text-primary-foreground/80">
-              Upload your resume and get matched in 30 seconds.
+              {t('subtagline')}
             </p>
             <Link
               href="/register"
               className="mt-8 inline-flex cursor-pointer items-center gap-1.5 rounded-lg bg-primary-foreground px-6 py-3 text-sm font-medium text-primary shadow-lg shadow-black/10 transition-all hover:bg-primary-foreground/90 hover:-translate-y-0.5 active:scale-[0.98]"
             >
-              Get Started Free <ArrowRight size={14} />
+              {t('getStarted')} <ArrowRight size={14} />
             </Link>
           </div>
         </div>

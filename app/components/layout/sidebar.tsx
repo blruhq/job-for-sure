@@ -1,27 +1,27 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import Link from 'next/link'
-import { useRouter } from 'next/navigation'
-import { usePathname } from 'next/navigation'
+import { Link, useRouter, usePathname } from '~/i18n/routing'
 import { MessageSquare, KanbanSquare, CheckSquare, Settings, Plus, Brain, LayoutDashboard, Mail, Shield, Trash2 } from 'lucide-react'
 import { cn } from '~/lib/utils'
 import { useAppStore } from '~/lib/store'
 import { notify } from '~/lib/toast'
 import { ConfirmDialog } from '~/components/ui/confirm-dialog'
+import { useTranslations } from 'next-intl'
 
 const NAV_ITEMS = [
-  { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-  { href: '/chat', label: 'Chat', icon: MessageSquare },
-  { href: '/interview', label: 'Interview Prep', icon: Brain },
-  { href: '/cover-letter', label: 'Cover Letter', icon: Mail },
-  { href: '/applications', label: 'Applications', icon: KanbanSquare, badge: true },
-  { href: '/ats', label: 'ATS Optimizer', icon: CheckSquare },
-]
+  { href: '/dashboard', labelKey: 'dashboard', icon: LayoutDashboard },
+  { href: '/chat', labelKey: 'chat', icon: MessageSquare },
+  { href: '/interview', labelKey: 'interviewPrep', icon: Brain },
+  { href: '/cover-letter', labelKey: 'coverLetter', icon: Mail },
+  { href: '/applications', labelKey: 'applications', icon: KanbanSquare, badge: true },
+  { href: '/ats', labelKey: 'atsOptimizer', icon: CheckSquare },
+] as const
 
 export function Sidebar() {
   const pathname = usePathname()
   const router = useRouter()
+  const t = useTranslations('common')
   const { resumes, activeResumeId, setActiveResumeId, deleteResume, applications, sidebarCollapsed } = useAppStore()
   const [isAdmin, setIsAdmin] = useState(false)
   const [deleteTarget, setDeleteTarget] = useState<{ id: string; name: string } | null>(null)
@@ -57,16 +57,17 @@ export function Sidebar() {
       <div className="flex flex-col gap-0.5 p-1">
         {/* Label: hide visually but keep height stable when collapsed */}
         <div className={cn('label-mono px-2.5 pt-3 pb-1', c && 'opacity-0')}>
-          Navigate
+          {t('navigate')}
         </div>
         {NAV_ITEMS.map((item) => {
           const isActive = pathname === item.href
           const Icon = item.icon
+          const label = t(item.labelKey)
           return (
             <Link
               key={item.href}
               href={item.href}
-              title={c ? item.label : undefined}
+              title={c ? label : undefined}
               className={cn(
                 'flex items-center gap-2 rounded-sm px-2.5 py-1.5 text-xs font-medium transition-colors',
                 isActive
@@ -76,8 +77,8 @@ export function Sidebar() {
               )}
             >
               <Icon size={15} className={cn('shrink-0', isActive ? 'text-primary' : 'opacity-70')} />
-              {!c && <span>{item.label}</span>}
-              {!c && item.badge && totalPipeline > 0 && (
+              {!c && <span>{label}</span>}
+              {!c && 'badge' in item && item.badge && totalPipeline > 0 && (
                 <span className="ml-auto rounded-xs bg-accent-soft px-1.5 py-px font-mono text-[10px] font-semibold text-primary">
                   {totalPipeline}
                 </span>
@@ -90,7 +91,7 @@ export function Sidebar() {
       {/* ── RESUMES ── */}
       <div className="flex flex-col gap-0.5 p-1">
         <div className={cn('label-mono px-2.5 pt-3 pb-1', c && 'opacity-0')}>
-          Resumes
+          {t('resumes')}
         </div>
         {/* Resume items — always rendered, just hide text when collapsed */}
         {resumes.map((r) => (
@@ -139,14 +140,14 @@ export function Sidebar() {
         {/* Add resume — always rendered, icon stays when collapsed */}
         <button
           onClick={() => { router.push('/chat'); notify({ message: 'Upload a resume in chat to add one!', type: 'info' }); }}
-          title={c ? 'Add Resume' : undefined}
+          title={c ? t('newResume') : undefined}
           className={cn(
             'flex items-center gap-1.5 rounded-sm px-2 py-1.5 text-xs text-primary transition-colors hover:bg-accent-soft',
             c && 'justify-center px-0 mx-2',
           )}
         >
           <Plus size={13} className="shrink-0" strokeWidth={2.5} />
-          {!c && <span>Add Resume</span>}
+          {!c && <span>{t('newResume')}</span>}
         </button>
       </div>
 
@@ -157,7 +158,7 @@ export function Sidebar() {
         </div>
         <Link
           href="/settings"
-          title={c ? 'Settings' : undefined}
+          title={c ? t('settings') : undefined}
           className={cn(
             'flex items-center gap-2 rounded-sm px-2.5 py-1.5 text-xs font-medium transition-colors',
             pathname === '/settings'
@@ -167,7 +168,7 @@ export function Sidebar() {
           )}
         >
           <Settings size={15} className="shrink-0 opacity-70" />
-          {!c && <span>Settings</span>}
+          {!c && <span>{t('settings')}</span>}
         </Link>
         {isAdmin && (
           <Link

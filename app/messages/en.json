@@ -1,0 +1,28 @@
+{
+  "common": {
+    "dashboard": "Dashboard",
+    "chat": "Chat",
+    "interviewPrep": "Interview Prep",
+    "coverLetter": "Cover Letter",
+    "applications": "Applications",
+    "atsOptimizer": "ATS Optimizer",
+    "settings": "Settings",
+    "signOut": "Sign Out",
+    "theme": "Toggle theme",
+    "navigate": "Navigate",
+    "resumes": "Resumes",
+    "noResumes": "No resumes yet",
+    "newResume": "New Resume",
+    "language": "Language"
+  },
+  "landing": {
+    "title": "Know your chances before you apply.",
+    "subtitle": "Upload your resume once. Get AI-matched jobs, ATS-optimized resumes, mock interview practice, and a full application tracker.",
+    "startChat": "Start Chat",
+    "createAccount": "Create Account",
+    "howItWorks": "How It Works",
+    "getStarted": "Get Started Free",
+    "tagline": "Your next role is closer than you think.",
+    "subtagline": "Upload your resume and get matched in 30 seconds."
+  }
+}
