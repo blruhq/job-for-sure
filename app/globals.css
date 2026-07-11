@@ -249,7 +249,7 @@ html[lang="th"] {
    BASE LAYER
    ═══════════════════════════════════════════════════════════════ */
 @layer base {
-  html {
+  body {
     scrollbar-gutter: stable;
   }
 
