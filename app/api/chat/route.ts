@@ -42,7 +42,8 @@ Rules:
 - For salary advice, give specific bands and negotiation tips.
 - For interview prep, give specific questions based on their skills.
 - If the user shares their resume details, remember them for the conversation.
-- Keep responses under 200 words unless the user asks for detail.`
+- Keep responses under 200 words unless the user asks for detail.
+- Respond in the same language the user uses to chat with you (e.g., if they write in Thai, reply in Thai. If they write in English, reply in English). Never switch languages mid-conversation unless the user explicitly asks you to translate something.`
 
   await captureServerEvent(user.id, 'chat_message_sent')
 

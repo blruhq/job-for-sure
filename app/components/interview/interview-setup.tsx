@@ -1,11 +1,13 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useRouter } from '~/i18n/routing'
+import { useSearchParams } from 'next/navigation'
 import { Brain, FileText, ArrowRight, Loader2, Sparkles, Clock, Trash2 } from 'lucide-react'
 import { useAppStore } from '~/lib/store'
 import { ConfirmDialog } from '~/components/ui/confirm-dialog'
 import { notify } from '~/lib/toast'
+import { useTranslations } from 'next-intl'
 import type { InterviewConfig } from '~/types/interview'
 
 interface InterviewSetupProps {
@@ -17,6 +19,7 @@ interface InterviewSetupProps {
 }
 
 export function InterviewSetup({ onStart, history, loadingHistory, onViewSession, onDeleteSession }: InterviewSetupProps) {
+  const t = useTranslations('interview')
   const [deleteTarget, setDeleteTarget] = useState<string | null>(null)
   const [deleting, setDeleting] = useState(false)
   const router = useRouter()
@@ -144,7 +147,7 @@ export function InterviewSetup({ onStart, history, loadingHistory, onViewSession
             <div className="space-y-4">
               {/* Resume Selection */}
               <div>
-                <label className="label-mono mb-1.5 block">1. Select Resume Profile</label>
+                <label className="label-mono mb-1.5 block">{t('selectResume')}</label>
                 <select
                   value={selectedResumeId}
                   onChange={(e) => handleResumeChange(e.target.value)}
@@ -160,7 +163,7 @@ export function InterviewSetup({ onStart, history, loadingHistory, onViewSession
 
               {/* Target Company/Position Selection */}
               <div>
-                <label className="label-mono mb-1.5 block">2. Target Position & Company</label>
+                <label className="label-mono mb-1.5 block">{t('targetPosition')}</label>
                 {applications.bookmark.length > 0 ? (
                   <div className="space-y-2">
                     <select
@@ -209,7 +212,7 @@ export function InterviewSetup({ onStart, history, loadingHistory, onViewSession
 
               {/* Interview Type Selector */}
               <div>
-                <label className="label-mono mb-1.5 block">3. Interview Focus</label>
+                <label className="label-mono mb-1.5 block">{t('interviewFocus')}</label>
                 <div className="grid grid-cols-3 gap-2">
                   {(['behavioral', 'technical', 'mixed'] as const).map((t) => (
                     <button
@@ -230,7 +233,7 @@ export function InterviewSetup({ onStart, history, loadingHistory, onViewSession
 
               {/* Difficulty Selector */}
               <div>
-                <label className="label-mono mb-1.5 block">4. Difficulty Level</label>
+                <label className="label-mono mb-1.5 block">{t('difficultyLevel')}</label>
                 <div className="grid grid-cols-3 gap-2">
                   {(['entry', 'mid', 'senior'] as const).map((d) => (
                     <button
@@ -251,7 +254,7 @@ export function InterviewSetup({ onStart, history, loadingHistory, onViewSession
 
               {/* Length Selector */}
               <div>
-                <label className="label-mono mb-1.5 block">5. Interview Length</label>
+                <label className="label-mono mb-1.5 block">{t('interviewLength')}</label>
                 <div className="grid grid-cols-3 gap-2">
                   {([
                     { value: 5, label: '5 Questions' },

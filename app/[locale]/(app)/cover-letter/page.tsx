@@ -8,9 +8,11 @@ import { extractPdfText } from '~/lib/pdf-parse'
 import { notify } from '~/lib/toast'
 import { Wand2, Download, Copy, Save, Upload, FileText, Loader2, Trash2 } from 'lucide-react'
 import { ConfirmDialog } from '~/components/ui/confirm-dialog'
+import { useTranslations } from 'next-intl'
 
 export default function StandaloneCoverLetterPage() {
   const router = useRouter()
+  const t = useTranslations('coverLetter')
   const { resumes, activeResumeId, setActiveResumeId, addResume, updateResume } = useAppStore()
 
   // Select first resume by default if activeResumeId is not set
@@ -26,6 +28,7 @@ export default function StandaloneCoverLetterPage() {
   const [jdText, setJdText] = useState('')
   const [letterText, setLetterText] = useState('')
   const [generating, setGenerating] = useState(false)
+  const [outputLanguage, setOutputLanguage] = useState<'en' | 'th'>('en')
   const [savedLetters, setSavedLetters] = useState<Array<{
     id: string
     company: string | null
@@ -184,6 +187,7 @@ export default function StandaloneCoverLetterPage() {
           company: mode === 'quick' ? company : '',
           role: mode === 'quick' ? role : '',
           focus: mode === 'quick' ? focus : '',
+          language: outputLanguage,
         }),
       })
 
@@ -266,13 +270,13 @@ export default function StandaloneCoverLetterPage() {
       <div className="w-full lg:w-[350px] shrink-0 border-b lg:border-b-0 lg:border-r border-border bg-card p-5 flex flex-col gap-4 overflow-y-auto justify-between">
         <div className="space-y-4">
           <div className="text-center pb-2 border-b border-border/50">
-            <h1 className="text-sm font-semibold tracking-tight text-foreground">Cover Letter Generator</h1>
-            <p className="text-[11px] text-muted-foreground mt-0.5">Quickly generate tailored cover letters for any position</p>
+            <h1 className="text-sm font-semibold tracking-tight text-foreground">{t('generatorTitle')}</h1>
+            <p className="text-[11px] text-muted-foreground mt-0.5">{t('generatorSubtitle')}</p>
           </div>
 
           {/* 1. Resume selection */}
           <div className="space-y-2">
-            <label className="label-mono block">1. Select Resume Profile</label>
+            <label className="label-mono block">{t('selectProfile')}</label>
             <div className="flex gap-2">
               <select
                 value={selectedResumeId}
@@ -282,7 +286,7 @@ export default function StandaloneCoverLetterPage() {
                 }}
                 className="flex-1 cursor-pointer rounded-xs border border-border bg-background px-2.5 py-1.5 text-[11px] outline-none focus:border-primary"
               >
-                <option value="none">-- Select Profile --</option>
+                <option value="none">{t('selectProfilePlaceholder')}</option>
                 {resumes.map((r) => (
                   <option key={r.id} value={r.id}>
                     {r.name} ({r.persona || 'No Name'})
@@ -298,7 +302,7 @@ export default function StandaloneCoverLetterPage() {
                   <Loader2 size={12} className="animate-spin text-primary" />
                 ) : (
                   <>
-                    <Upload size={12} /> Upload PDF
+                    <Upload size={12} /> {t('uploadPdf')}
                   </>
                 )}
               </button>
@@ -307,7 +311,7 @@ export default function StandaloneCoverLetterPage() {
 
           {/* 2. Generation Mode Selector */}
           <div className="space-y-2 pt-2 border-t border-border/50">
-            <label className="label-mono block">2. Input Details Mode</label>
+            <label className="label-mono block">{t('detailsMode')}</label>
             <div className="flex gap-1.5 rounded-sm bg-border/30 p-0.5 shrink-0">
               <button
                 onClick={() => setMode('quick')}
@@ -315,7 +319,7 @@ export default function StandaloneCoverLetterPage() {
                   mode === 'quick' ? 'bg-card text-foreground shadow-sm font-semibold' : 'text-muted-foreground hover:text-foreground'
                 }`}
               >
-                Quick Fields
+                {t('quickFields')}
               </button>
               <button
                 onClick={() => setMode('jd')}
@@ -323,7 +327,30 @@ export default function StandaloneCoverLetterPage() {
                   mode === 'jd' ? 'bg-card text-foreground shadow-sm font-semibold' : 'text-muted-foreground hover:text-foreground'
                 }`}
               >
-                Full Job Description
+                {t('fullJobDescription')}
+              </button>
+            </div>
+          </div>
+
+          {/* 2.5 Language Selector */}
+          <div className="space-y-2 pt-2 border-t border-border/50">
+            <label className="label-mono block">{t('outputLanguage')}</label>
+            <div className="flex gap-1.5 rounded-sm bg-border/30 p-0.5 shrink-0">
+              <button
+                onClick={() => setOutputLanguage('en')}
+                className={`flex-1 rounded-xs py-1 text-[10px] font-semibold transition-all cursor-pointer text-center ${
+                  outputLanguage === 'en' ? 'bg-card text-foreground shadow-sm font-semibold' : 'text-muted-foreground hover:text-foreground'
+                }`}
+              >
+                English
+              </button>
+              <button
+                onClick={() => setOutputLanguage('th')}
+                className={`flex-1 rounded-xs py-1 text-[10px] font-semibold transition-all cursor-pointer text-center ${
+                  outputLanguage === 'th' ? 'bg-card text-foreground shadow-sm font-semibold' : 'text-muted-foreground hover:text-foreground'
+                }`}
+              >
+                ภาษาไทย
               </button>
             </div>
           </div>
@@ -332,12 +359,12 @@ export default function StandaloneCoverLetterPage() {
           {mode === 'quick' ? (
             <div className="space-y-3">
               <div>
-                <label className="label-mono mb-1 block">Company Name</label>
+                <label className="label-mono mb-1 block">{t('companyName')}</label>
                 <input
                   type="text"
                   value={company}
                   onChange={(e) => setCompany(e.target.value)}
-                  placeholder="e.g. Stripe"
+                  placeholder={t('placeholderCompany')}
                   className="w-full rounded-xs border border-border bg-background px-2.5 py-1.5 text-[11px] outline-none focus:border-primary"
                 />
               </div>

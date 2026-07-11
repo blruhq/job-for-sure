@@ -1,22 +1,24 @@
 'use client'
 
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter } from '~/i18n/routing'
 import { Trash2, Plus, Link2, MessageSquare, KanbanSquare } from 'lucide-react'
 import { cn } from '~/lib/utils'
 import { useAppStore } from '~/lib/store'
 import { notify } from '~/lib/toast'
+import { useTranslations } from 'next-intl'
 import type { ApplicationBoard, ApplicationColumnId, PipelineJob } from '~/types/resume'
 
-const COLUMNS: { id: ApplicationColumnId; label: string; dot: string; next: ApplicationColumnId | null }[] = [
-  { id: 'bookmark', label: 'Bookmark', dot: '#9F9E98', next: 'applied' },
-  { id: 'applied', label: 'Applied', dot: '#5B6ABF', next: 'interviewing' },
-  { id: 'interviewing', label: 'Interviewing', dot: '#D4A316', next: 'offers' },
-  { id: 'offers', label: 'Offers', dot: '#2B5F45', next: null },
+const COLUMNS: { id: ApplicationColumnId; labelKey: string; dot: string; next: ApplicationColumnId | null }[] = [
+  { id: 'bookmark', labelKey: 'bookmark', dot: '#9F9E98', next: 'applied' },
+  { id: 'applied', labelKey: 'applied', dot: '#5B6ABF', next: 'interviewing' },
+  { id: 'interviewing', labelKey: 'interviewing', dot: '#D4A316', next: 'offers' },
+  { id: 'offers', labelKey: 'offers', dot: '#2B5F45', next: null },
 ]
 
 export function ApplicationsView() {
   const router = useRouter()
+  const t = useTranslations('applications')
   const { applications, resumes, moveJob, removeJob, clearApplications } = useAppStore()
   const [filter, setFilter] = useState('all')
   const [draggedKey, setDraggedKey] = useState<string | null>(null)
@@ -50,191 +52,142 @@ export function ApplicationsView() {
   }
   const onDrop = (e: React.DragEvent, toCol: ApplicationColumnId) => {
     e.preventDefault()
-    setDragOverCol(null)
     if (draggedKey && draggedFrom && draggedFrom !== toCol) {
       moveJob(draggedKey, draggedFrom, toCol)
+      notify({ message: `Moved to ${toCol}`, type: 'success' })
     }
+    onDragEnd()
   }
 
   return (
-    <div className="flex-1 overflow-y-auto p-4 md:p-6">
-      {/* Header */}
-      <div className="mb-5 flex items-center justify-between">
-        <div>
-          <h1 className="text-lg font-semibold">Applications</h1>
-          <div className="text-xs text-muted-foreground">Track your job applications</div>
-        </div>
-        <div className="flex gap-2">
-          <button
-            onClick={() => { if (confirm('Remove all jobs from your applications?')) clearApplications() }}
-            className="flex items-center gap-1.5 rounded-sm border border-border bg-card px-3 py-1.5 text-xs font-medium text-muted-foreground transition-all hover:bg-background hover:text-foreground"
-          >
-            <Trash2 size={13} /> Clear All
-          </button>
-          <button
-            onClick={() => {
-              const url = window.prompt('Paste a job URL to import:')
-              if (url && url.trim()) {
-                notify({ message: `Job import from "${url.slice(0, 40)}..." coming soon!`, type: 'info' })
-              }
-            }}
-            className="flex cursor-pointer items-center gap-1.5 rounded-sm bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground transition-opacity hover:opacity-90"
-          >
-            <Link2 size={13} /> Import Job
-          </button>
-        </div>
-      </div>
-
-      {/* Stats */}
-      <div className="mb-5 grid grid-cols-2 gap-2 sm:flex sm:gap-4">
-        {[
-          { value: total, label: 'Total Applications' },
-          { value: `${avgScore}%`, label: 'Avg Match Score', color: 'text-success' },
-          { value: applications.interviewing.length, label: 'Interviews', color: 'text-[var(--warn)]' },
-          { value: applications.offers.length, label: 'Offers', color: 'text-primary' },
-        ].map((stat) => (
-          <div key={stat.label} className="flex-1 rounded-sm border border-border bg-card p-3">
-            <div className={cn('font-mono text-lg font-semibold', stat.color)}>{stat.value}</div>
-            <div className="text-[11px] text-muted-foreground">{stat.label}</div>
-          </div>
-        ))}
-      </div>
-
-      {/* Filter */}
-      <div className="mb-4 flex items-center gap-2">
-        <span className="label-mono">Resume:</span>
-        <select
-          value={filter}
-          onChange={(e) => setFilter(e.target.value)}
-          className="rounded-sm border border-border bg-card py-1 pl-2.5 pr-8 text-xs text-foreground outline-none focus:border-primary"
-        >
-          {resumeNames.map((r) => (
-            <option key={r} value={r}>{r === 'all' ? 'All Resumes' : r}</option>
-          ))}
-        </select>
-      </div>
-
-      {/* Empty state — no jobs at all */}
-      {total === 0 && (
-        <div className="flex flex-col items-center justify-center py-16 text-center">
-          <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-xl border border-border bg-card">
-            <KanbanSquare size={24} className="text-muted-foreground/50" />
-          </div>
-          <h3 className="mb-1 text-sm font-semibold text-foreground">No applications yet</h3>
-          <p className="mb-4 max-w-xs text-xs text-muted-foreground">
-            Bookmark matching jobs from the chat or import a job URL to start tracking.
-          </p>
-        <div className="flex flex-wrap gap-2">
-            <button
-              onClick={() => router.push('/chat')}
-              className="flex cursor-pointer items-center gap-1.5 rounded-sm bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground transition-opacity hover:opacity-90"
+    <div className="flex h-full w-full flex-col bg-background">
+      {/* ── Header ── */}
+      <div className="flex items-center justify-between border-b border-border px-4 py-2.5 shrink-0">
+        <div className="flex items-center gap-3">
+          <h1 className="text-sm font-semibold text-foreground">
+            {total} {t('bookmark').toLowerCase() === 'bookmark' ? 'Jobs' : 'งาน'}
+          </h1>
+          <div className="flex items-center gap-1.5">
+            <span className="text-[10px] text-muted-foreground font-mono">
+              {t('resume')}
+            </span>
+            <select
+              value={filter}
+              onChange={(e) => setFilter(e.target.value)}
+              className="cursor-pointer rounded-xs border border-border bg-background px-2 py-1 text-[11px] outline-none focus:border-primary"
             >
-              <MessageSquare size={12} /> Go to Chat
-            </button>
-            <button
-              onClick={() => {
-                const url = window.prompt('Paste a job URL to import:')
-                if (url && url.trim()) {
-                  notify({ message: `Job import from "${url.slice(0, 40)}..." coming soon!`, type: 'info' })
-                }
-              }}
-              className="flex cursor-pointer items-center gap-1.5 rounded-sm border border-border bg-card px-3 py-1.5 text-xs text-muted-foreground transition-colors hover:bg-background hover:text-foreground"
-            >
-              <Link2 size={12} /> Import Job
-            </button>
+              {resumeNames.map((name) => (
+                <option key={name} value={name}>
+                  {name === 'all' ? t('all') : name}
+                </option>
+              ))}
+            </select>
           </div>
         </div>
-      )}
+      </div>
 
-      {/* Kanban board */}
-      {total > 0 && (
-      <div className="grid grid-cols-4 gap-2.5 items-start max-[1100px]:grid-cols-2 max-[768px]:grid-cols-1">
+      {/* ── Kanban Board ── */}
+      <div className="flex flex-1 gap-3 overflow-x-auto p-4">
         {COLUMNS.map((col) => {
           const jobs = filterJobs(applications[col.id])
-          const nextCol = COLUMNS.find((c) => c.id === col.next)
+          const isOver = dragOverCol === col.id
+
           return (
             <div
               key={col.id}
-              onDragOver={(e) => onDragOver(e, col.id)}
-              onDragLeave={() => setDragOverCol(null)}
-              onDrop={(e) => onDrop(e, col.id)}
               className={cn(
-                'min-h-[200px] rounded-sm border border-border bg-card p-2.5 transition-all',
-                dragOverCol === col.id && 'border-primary bg-accent-soft',
+                'flex w-72 shrink-0 flex-col rounded-sm border border-border transition-colors',
+                isOver && 'border-primary bg-accent-soft/30'
               )}
+              onDragOver={(e) => onDragOver(e, col.id)}
+              onDrop={(e) => onDrop(e, col.id)}
             >
-              {/* Column header */}
-              <div className="mb-2 flex items-center justify-between border-b border-border/50 pb-2">
-                <span className="flex items-center gap-1.5 font-mono text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
-                  <span className="h-1.5 w-1.5 rounded-full" style={{ background: col.dot }} />
-                  {col.label}
-                </span>
-                <span className="rounded-xs bg-background px-1.5 py-px font-mono text-[10px] text-muted-foreground">{jobs.length}</span>
+              {/* Column Header */}
+              <div className="flex items-center justify-between border-b border-border px-3 py-2">
+                <div className="flex items-center gap-2">
+                  <span className="h-2 w-2 rounded-full" style={{ backgroundColor: col.dot }} />
+                  <span className="text-xs font-semibold text-foreground">{t(col.labelKey)}</span>
+                  <span className="text-[10px] font-mono text-muted-foreground">{jobs.length}</span>
+                </div>
+                <button
+                  onClick={() => clearApplications()}
+                  className="text-[10px] text-muted-foreground hover:text-destructive transition-colors cursor-pointer"
+                  title="Clear"
+                >
+                  ×
+                </button>
               </div>
 
-              {/* Empty state */}
-              {jobs.length === 0 && (
-                <div className="py-6 text-center font-mono text-[11px] text-muted-foreground">
-                  <div className="mb-1.5 opacity-40">
-                    {col.id === 'bookmark' ? '☆' : col.id === 'applied' ? '→' : col.id === 'interviewing' ? '◆' : '★'}
+              {/* Job Cards */}
+              <div className="flex flex-col gap-1.5 p-2 overflow-y-auto">
+                {jobs.length === 0 && (
+                  <div className="px-2 py-4 text-center">
+                    <p className="text-[11px] text-muted-foreground">{t('noApplications')}</p>
+                    <button
+                      onClick={() => router.push('/chat')}
+                      className="mt-2 text-[10px] text-primary hover:underline cursor-pointer"
+                    >
+                      {t('addJobs')}
+                    </button>
                   </div>
-                  Drag jobs here
-                </div>
-              )}
+                )}
 
-              {/* Cards */}
-              {jobs.map((job) => (
-                <div
-                  key={job.key}
-                  draggable
-                  onDragStart={(e) => onDragStart(e, job.key, col.id)}
-                  onDragEnd={onDragEnd}
-                  className={cn(
-                    'mb-1.5 cursor-grab rounded-xs border border-border bg-card p-2.5 transition-all hover:border-primary active:cursor-grabbing',
-                    draggedKey === job.key && 'rotate-2 opacity-40',
-                  )}
-                >
-                  <div className="mb-1.5 flex items-center gap-1.5">
-                    <div className="flex h-5 w-5 items-center justify-center rounded-xs font-mono text-[8px] font-bold text-white" style={{ background: job.color }}>
-                      {job.logo}
+                {jobs.map((job) => (
+                  <div
+                    key={job.key}
+                    draggable
+                    onDragStart={(e) => onDragStart(e, job.key, col.id)}
+                    onDragEnd={onDragEnd}
+                    className={cn(
+                      'group cursor-grab rounded-sm border border-border/60 bg-card p-2.5 transition-all active:cursor-grabbing hover:border-primary/50',
+                      draggedKey === job.key && 'opacity-50'
+                    )}
+                  >
+                    <div className="flex items-start justify-between gap-1">
+                      <div className="min-w-0 flex-1">
+                      <div className="text-[11px] font-semibold text-foreground truncate">{job.title}</div>
+                      <div className="text-[10px] text-muted-foreground truncate">{job.company}</div>
+                      </div>
+                      {job.score > 0 && (
+                        <span className={cn(
+                          'shrink-0 rounded-xs px-1 py-px text-[9px] font-mono font-semibold',
+                          job.score >= 85 ? 'bg-success/10 text-success' : job.score >= 70 ? 'bg-primary/10 text-primary' : 'bg-warn/10 text-warn'
+                        )}>
+                          {job.score}%
+                        </span>
+                      )}
                     </div>
-                    <span className="text-[11px] font-semibold">{job.company}</span>
-                    <span className={cn(
-                      'ml-auto rounded-xs px-1 py-px font-mono text-[10px] font-semibold',
-                      job.level === 'high' ? 'bg-success-soft text-success' : 'bg-warn-soft text-[var(--warn)]',
-                    )}>{job.score}%</span>
-                  </div>
-                  <div className="mb-1 text-xs font-medium">{job.title}</div>
-                  <div className="mb-1.5 text-[11px] text-muted-foreground">{job.loc}</div>
-                  {job.resume && (
-                    <span className="mb-1.5 inline-block rounded-xs bg-background px-1.5 py-px font-mono text-[9px] text-muted-foreground">{job.resume}</span>
-                  )}
-                  <div className="flex items-center justify-between border-t border-border/50 pt-1.5">
-                    <span className="font-mono text-[10px] text-muted-foreground">{job.time}</span>
-                    <div className="flex gap-1">
-                      {nextCol && (
-                        <button
-                          onClick={() => moveJob(job.key, col.id, nextCol.id)}
-                          className="text-[11px] font-medium text-primary hover:text-primary/80"
+                    <div className="mt-1.5 flex items-center gap-2 text-[9px] text-muted-foreground">
+                      {job.loc && <span className="truncate">{job.loc}</span>}
+                    </div>
+                    <div className="mt-1.5 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                      {job.url && (
+                        <a
+                          href={job.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex items-center gap-0.5 rounded-xs px-1.5 py-0.5 text-[9px] text-muted-foreground hover:text-primary transition-colors"
                         >
-                          Move to {nextCol.label} →
-                        </button>
+                          <Link2 size={10} /> Open
+                        </a>
                       )}
                       <button
-                        onClick={() => removeJob(job.key, col.id)}
-                        className="text-[11px] text-muted-foreground hover:text-destructive"
+                        onClick={() => {
+                          removeJob(job.key, col.id)
+                          notify({ message: 'Removed from board', type: 'info' })
+                        }}
+                        className="flex items-center gap-0.5 rounded-xs px-1.5 py-0.5 text-[9px] text-muted-foreground hover:text-destructive transition-colors cursor-pointer"
                       >
-                        Remove
+                        <Trash2 size={10} /> Remove
                       </button>
                     </div>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
           )
         })}
       </div>
-      )}
     </div>
   )
 }

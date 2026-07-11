@@ -19,7 +19,8 @@ export async function POST(req: NextRequest) {
     const user = await getSessionUser()
     if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-    const { resume, jdText, company, role, focus } = await req.json()
+    const { resume, jdText, company, role, focus, language } = await req.json()
+    const isThai = language === 'th'
 
     let prompt = `Resume:\n${JSON.stringify(resume)}\n\n`
     
@@ -42,8 +43,23 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    const text = await generateTextWithFailover({
-      system: `You are an expert career coach and professional writer.
+    const isThaiSystemPrompt = `คุณคือผู้เชี่ยวชาญด้านการเขียนจดหมายแนะนำตัวและโค้ชด้านอาชีพ
+เขียนจดหมายแนะนำตัวแบบทางการ ความยาว 3-4 ย่อหน้า (ประมาณ 300-400 คำ) ที่ปรับแต่งตามเรซูเม่และตำแหน่งงานที่กำหนด
+
+กฎ:
+- เขียนด้วยภาษาไทยทางการ สุภาพ เป็นมืออาชีพ และมีความมั่นใจ
+- หลีกเลี่ยงการใช้ภาษาซ้ำซากหรือคลิเช่
+- เน้นประสบการณ์และทักษะจากเรซูเม่ที่ตรงกับตำแหน่งงาน
+- รูปแบบจดหมายทางการ:
+  - คำขึ้นต้น: "เรียน ผู้จัดการฝ่ายบุคคล หรือผู้มีส่วนเกี่ยวข้อง,"
+  - ย่อหน้าเปิด: แนะนำตัวและระบุตำแหน่งที่สมัคร
+  - ย่อหน้าเนื้อหา: แสดงคุณค่าและความเหมาะสม อ้างอิงความสำเร็จ 1-2 ข้อจากประสบการณ์
+  - ย่อหน้าปิด: กล่าวถึงความตั้งใจและขอโอกาสในการสัมภาษณ์
+  - คำลงท้าย: "ขอแสดงความนับถือ" ตามด้วยชื่อผู้สมัคร (${resume.name})
+- แปลข้อมูลนำเข้าที่เป็นภาษาอื่น (เช่น อังกฤษ) เป็นภาษาไทยก่อนนำไปใช้ในจดหมาย
+- ส่งออกเฉพาะข้อความจดหมายเท่านั้น ไม่มีคำอธิบายเพิ่มเติมหรือ markdown`
+
+    const enSystemPrompt = `You are an expert career coach and professional writer.
 You write persuasive, polished, and natural-sounding cover letters.
 Write a 3-4 paragraph, 300-400 word cover letter tailored to the provided resume and target job description/role.
 
@@ -57,13 +73,17 @@ Rules:
   - Body paragraphs (demonstrating value, explaining fit, citing 1-2 major achievements from experience)
   - Closing paragraph (call to action, express enthusiasm, thank them for consideration)
   - Sign-off (e.g., "Sincerely,") followed by the candidate's name (which is ${resume.name}).
-- Return ONLY the cover letter text itself. No extra markdown explanation, conversational intro/outro, or styling.`,
+- Translate any input fields provided in a different language (like Thai) into English before incorporating them into the generated cover letter.
+- Return ONLY the cover letter text itself. No extra markdown explanation, conversational intro/outro, or styling.`
+
+    const text = await generateTextWithFailover({
+      system: isThai ? isThaiSystemPrompt : enSystemPrompt,
       prompt,
       temperature: 0.7,
       maxOutputTokens: 1024,
     })
 
-    await captureServerEvent(user.id, 'cover_letter_created', { company, role })
+    await captureServerEvent(user.id, 'cover_letter_created', { company, role, language })
 
     // Save to cover_letters table
     const letterId = crypto.randomUUID()

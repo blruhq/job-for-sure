@@ -1,16 +1,18 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter } from '~/i18n/routing'
 import Link from 'next/link'
 import { FileText, Brain, KanbanSquare, CheckSquare, MessageSquare, Plus, ArrowRight, Mail } from 'lucide-react'
 import { useAppStore } from '~/lib/store'
 import { Skeleton } from '~/components/ui/skeleton'
 import { cn } from '~/lib/utils'
 import { authClient } from '~/lib/auth-client'
+import { useTranslations } from 'next-intl'
 
 export function DashboardView() {
   const router = useRouter()
+  const t = useTranslations('dashboard')
   const { resumes, applications, loading, hydrated } = useAppStore()
   const [userName, setUserName] = useState('')
   const [lastInterviewScore, setLastInterviewScore] = useState<number | null>(null)
@@ -96,15 +98,15 @@ export function DashboardView() {
         <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-lg bg-accent-soft text-primary">
           <FileText size={24} />
         </div>
-        <h3 className="mb-1 text-sm font-semibold text-foreground">No resumes yet</h3>
+        <h3 className="mb-1 text-sm font-semibold text-foreground">{t('noResumesTitle')}</h3>
         <p className="mb-6 max-w-sm text-xs text-muted-foreground">
-          Upload a resume or build one from scratch to get matched with companies and start practicing interviews.
+          {t('noResumesDesc')}
         </p>
         <button
           onClick={() => router.push('/chat')}
           className="flex cursor-pointer items-center gap-1.5 rounded-sm bg-primary px-4 py-2 text-xs font-medium text-primary-foreground transition-opacity hover:opacity-90 active:scale-[0.98]"
         >
-          Get Started <ArrowRight size={13} />
+          {t('getStarted')} <ArrowRight size={13} />
         </button>
       </div>
     )
@@ -118,15 +120,15 @@ export function DashboardView() {
         <div className="mb-6 flex items-center justify-between">
           <div>
             <h1 className="text-lg font-semibold text-foreground">
-              {userName ? `Welcome back, ${userName}` : 'Dashboard'}
+              {userName ? `${t('welcomeBack')}, ${userName}` : t('title')}
             </h1>
-            <div className="text-xs text-muted-foreground">Your job search at a glance</div>
+            <div className="text-xs text-muted-foreground">{t('jobSearchGlance')}</div>
           </div>
           <button
             onClick={() => router.push('/chat')}
             className="flex items-center gap-1.5 rounded-sm bg-primary px-3 py-2 text-xs font-medium text-primary-foreground hover:opacity-90 transition-opacity active:scale-[0.98]"
           >
-            <Plus size={13} /> New Resume
+            <Plus size={13} /> {t('newResume')}
           </button>
         </div>
 
@@ -138,13 +140,13 @@ export function DashboardView() {
             className="rounded-sm border border-border bg-card p-4 transition-colors hover:border-primary flex flex-col justify-between h-24"
           >
             <div className="flex justify-between items-start">
-              <span className="text-[10px] font-mono uppercase text-muted-foreground tracking-wider">Resumes</span>
+              <span className="text-[10px] font-mono uppercase text-muted-foreground tracking-wider">{t('resumes')}</span>
               <FileText size={15} className="text-muted-foreground" />
             </div>
             <div>
               <div className="text-2xl font-bold text-foreground">{resumeCount}</div>
               <div className="text-[10px] text-muted-foreground truncate">
-                {resumeCount === 1 ? 'Resume' : 'Resumes'} · avg {avgScore}%
+                {resumeCount === 1 ? t('resume') : t('resumes')} · {t('avg')} {avgScore}%
               </div>
             </div>
           </Link>
@@ -155,13 +157,13 @@ export function DashboardView() {
             className="rounded-sm border border-border bg-card p-4 transition-colors hover:border-primary flex flex-col justify-between h-24"
           >
             <div className="flex justify-between items-start">
-              <span className="text-[10px] font-mono uppercase text-muted-foreground tracking-wider">Applications</span>
+              <span className="text-[10px] font-mono uppercase text-muted-foreground tracking-wider">{t('applications')}</span>
               <KanbanSquare size={15} className="text-muted-foreground" />
             </div>
             <div>
               <div className="text-2xl font-bold text-foreground">{applicationTotal}</div>
               <div className="text-[10px] text-muted-foreground truncate">
-                {applicationCounts.applied} applied · {applicationCounts.interviewing} interviewing
+                {applicationCounts.applied} {t('applied')} · {applicationCounts.interviewing} {t('interviewing')}
               </div>
             </div>
           </Link>
@@ -172,19 +174,19 @@ export function DashboardView() {
             className="rounded-sm border border-border bg-card p-4 transition-colors hover:border-primary flex flex-col justify-between h-24"
           >
             <div className="flex justify-between items-start">
-              <span className="text-[10px] font-mono uppercase text-muted-foreground tracking-wider">Interview</span>
+              <span className="text-[10px] font-mono uppercase text-muted-foreground tracking-wider">{t('interview')}</span>
               <Brain size={15} className="text-muted-foreground" />
             </div>
             <div>
               {lastInterviewScore !== null ? (
                 <>
                   <div className="text-2xl font-bold text-foreground">{Math.round(lastInterviewScore * 10)}%</div>
-                  <div className="text-[10px] text-muted-foreground truncate">Last interview score</div>
+                  <div className="text-[10px] text-muted-foreground truncate">{t('lastInterviewScore')}</div>
                 </>
               ) : (
                 <>
-                  <div className="text-sm font-semibold text-muted-foreground py-1">No sessions</div>
-                  <div className="text-[10px] text-muted-foreground truncate">Start practicing →</div>
+                  <div className="text-sm font-semibold text-muted-foreground py-1">{t('noSessions')}</div>
+                  <div className="text-[10px] text-muted-foreground truncate">{t('startPracticing')} →</div>
                 </>
               )}
             </div>
@@ -196,13 +198,13 @@ export function DashboardView() {
             className="rounded-sm border border-border bg-card p-4 transition-colors hover:border-primary flex flex-col justify-between h-24"
           >
             <div className="flex justify-between items-start">
-              <span className="text-[10px] font-mono uppercase text-muted-foreground tracking-wider">Letters</span>
+              <span className="text-[10px] font-mono uppercase text-muted-foreground tracking-wider">{t('letters')}</span>
               <Mail size={15} className="text-muted-foreground" />
             </div>
             <div>
               <div className="text-2xl font-bold text-foreground">{coverLetterCount}</div>
               <div className="text-[10px] text-muted-foreground truncate">
-                Cover {coverLetterCount === 1 ? 'letter' : 'letters'}
+                {coverLetterCount === 1 ? t('coverLetter') : t('coverLetters')}
               </div>
             </div>
           </Link>
@@ -212,7 +214,7 @@ export function DashboardView() {
         <div className="mb-5 grid grid-cols-1 lg:grid-cols-2 gap-4">
           {/* Left card: Top Resumes */}
           <div className="rounded-sm border border-border bg-card p-4">
-            <div className="label-mono mb-3 text-foreground font-semibold">Top Resumes</div>
+            <div className="label-mono mb-3 text-foreground font-semibold">{t('topResumes')}</div>
             <div className="space-y-2">
               {topResumes.map((r) => (
                 <Link
@@ -235,13 +237,13 @@ export function DashboardView() {
 
           {/* Right card: Applications Snapshot */}
           <div className="rounded-sm border border-border bg-card p-4">
-            <div className="label-mono mb-3 text-foreground font-semibold">Applications</div>
+            <div className="label-mono mb-3 text-foreground font-semibold">{t('applications')}</div>
             <div className="space-y-2">
               {[
-                { label: 'Bookmarked', count: applicationCounts.bookmark, color: 'bg-muted-foreground' },
-                { label: 'Applied', count: applicationCounts.applied, color: 'bg-primary' },
-                { label: 'Interviewing', count: applicationCounts.interviewing, color: 'bg-[var(--warn)]' },
-                { label: 'Offers', count: applicationCounts.offers, color: 'bg-success' },
+                { label: t('bookmarked'), count: applicationCounts.bookmark, color: 'bg-muted-foreground' },
+                { label: t('applied'), count: applicationCounts.applied, color: 'bg-primary' },
+                { label: t('interviewing'), count: applicationCounts.interviewing, color: 'bg-[var(--warn)]' },
+                { label: t('offers'), count: applicationCounts.offers, color: 'bg-success' },
               ].map((stage) => (
                 <Link
                   key={stage.label}
@@ -264,7 +266,7 @@ export function DashboardView() {
             className="flex flex-col items-center gap-2 rounded-sm border border-border bg-card p-4 text-center transition-colors hover:border-primary"
           >
             <MessageSquare size={18} className="text-primary" />
-            <span className="text-xs font-medium text-foreground">Chat with Coach</span>
+            <span className="text-xs font-medium text-foreground">{t('chatWithCoach')}</span>
           </Link>
 
           <Link
@@ -272,7 +274,7 @@ export function DashboardView() {
             className="flex flex-col items-center gap-2 rounded-sm border border-border bg-card p-4 text-center transition-colors hover:border-primary"
           >
             <Brain size={18} className="text-primary" />
-            <span className="text-xs font-medium text-foreground">Practice Interview</span>
+            <span className="text-xs font-medium text-foreground">{t('practiceInterview')}</span>
           </Link>
 
           <Link
@@ -280,7 +282,7 @@ export function DashboardView() {
             className="flex flex-col items-center gap-2 rounded-sm border border-border bg-card p-4 text-center transition-colors hover:border-primary"
           >
             <CheckSquare size={18} className="text-primary" />
-            <span className="text-xs font-medium text-foreground">ATS Optimizer</span>
+            <span className="text-xs font-medium text-foreground">{t('atsOptimizer')}</span>
           </Link>
 
           <Link
@@ -288,7 +290,7 @@ export function DashboardView() {
             className="flex flex-col items-center gap-2 rounded-sm border border-border bg-card p-4 text-center transition-colors hover:border-primary"
           >
             <KanbanSquare size={18} className="text-primary" />
-            <span className="text-xs font-medium text-foreground">View Applications</span>
+            <span className="text-xs font-medium text-foreground">{t('viewApplications')}</span>
           </Link>
         </div>
       </div>

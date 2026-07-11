@@ -2,15 +2,17 @@
 
 import { useState, useMemo } from 'react'
 import { Wand2, Upload, FileText, ArrowRight } from 'lucide-react'
-import { useRouter } from 'next/navigation'
+import { useRouter } from '~/i18n/routing'
 import { cn } from '~/lib/utils'
 import { useAppStore } from '~/lib/store'
 import { notify } from '~/lib/toast'
+import { useTranslations } from 'next-intl'
 
 const ALL_KEYWORDS = ['React', 'TypeScript', 'Node.js', 'PostgreSQL', 'Cloudflare Workers', 'Durable Objects', 'WebSockets', 'Figma', 'Git', 'HTML5', 'CSS3']
 
 export function AtsView() {
   const router = useRouter()
+  const t = useTranslations('ats')
   const { resumes, activeResumeId, setActiveResumeId, updateResume } = useAppStore()
   const [jdText, setJdText] = useState('')
 
@@ -31,32 +33,34 @@ export function AtsView() {
         }
       }
     })
-    const total = m.length + miss.length
-    const s = total > 0 ? Math.round((m.length / total) * 35) + 60 : 60
-    return { matched: m, missing: miss, score: s }
+    return { matched: m, missing: miss, score: m.length + miss.length > 0 ? Math.round((m.length / (m.length + miss.length)) * 100) : 0 }
   }, [jdText, resume])
 
-  const gaugeOffset = 220 - (score / 100) * 220
-  const gaugeColor = score >= 85 ? 'var(--success)' : score >= 75 ? 'var(--warn)' : 'var(--destructive)'
-  const gaugeHeading = score >= 85 ? 'Excellent Match' : score >= 75 ? 'Good Match' : jdText ? 'Poor Match' : 'Scan Pending'
-  const gaugeDesc = score >= 85
-    ? 'High probability of clearing recruiter ATS screening.'
-    : score >= 75
-    ? 'Inject missing keywords to reach 85%+ recommended score.'
-    : jdText
-    ? 'Missing critical technical keyword matches.'
-    : 'Paste a job description to trigger ATS analysis.'
+  const gaugeColor = jdText.trim() && resume
+    ? score >= 75 ? 'var(--success)' : score >= 50 ? 'var(--warn)' : 'var(--destructive)'
+    : 'var(--border)'
+
+  const gaugeOffset = jdText.trim() && resume ? 220 - (220 * score) / 100 : 220
+
+  const gaugeHeading = jdText.trim() && resume
+    ? score >= 75 ? 'Strong Match' : score >= 50 ? 'Partial Match' : 'Weak Match'
+    : 'No Data'
+
+  const gaugeDesc = jdText.trim() && resume
+    ? score >= 75 ? 'Your resume strongly aligns with this job.' : score >= 50 ? 'Some keywords are missing.' : 'Significant gap — tailor your resume.'
+    : 'Paste a job description to see your match score.'
 
   const injectKeywords = () => {
-    if (!resume || !jdText.trim()) return
-    const jdLower = jdText.toLowerCase()
-    const toAdd = ALL_KEYWORDS.filter((k) =>
-      jdLower.includes(k.toLowerCase()) &&
-      !resume.skills.some((s) => s.toLowerCase().includes(k.toLowerCase()))
-    )
-    if (toAdd.length > 0) {
-      updateResume(resume.id, { skills: [...resume.skills, ...toAdd] })
+    if (!resume) {
+      notify({ message: 'Select a resume first', type: 'warning' })
+      return
     }
+    missing.forEach((k) => {
+      if (!resume.skills.some((s) => s.toLowerCase().includes(k.toLowerCase()))) {
+        updateResume(resume.id, { skills: [...resume.skills, k] })
+      }
+    })
+    notify({ message: `Injected ${missing.length} missing keyword${missing.length !== 1 ? 's' : ''}`, type: 'success' })
   }
 
   return (
@@ -65,24 +69,24 @@ export function AtsView() {
       <div className="flex w-full md:w-[45%] flex-col gap-5 overflow-y-auto border-b md:border-b-0 md:border-r border-border bg-card p-4 md:p-6">
         <div>
           <h1 className="text-lg font-semibold">ATS Optimizer</h1>
-          <div className="text-xs text-muted-foreground">Evaluate and score your resume matches</div>
+          <div className="text-xs text-muted-foreground">{t('matchScore')}</div>
         </div>
 
         {/* JD input */}
         <div>
-          <label className="label-mono mb-1.5 block">1. Job Description</label>
+          <label className="label-mono mb-1.5 block">{t('jobDescription')}</label>
           <textarea
             value={jdText}
             onChange={(e) => setJdText(e.target.value)}
             rows={6}
-            placeholder="Paste target job description here..."
+            placeholder={t('uploadJD')}
             className="w-full resize-y rounded-sm border border-border bg-background p-2.5 text-xs outline-none focus:border-primary"
           />
         </div>
 
         {/* Resume select */}
         <div>
-          <label className="label-mono mb-1.5 block">2. Target Resume Profile</label>
+          <label className="label-mono mb-1.5 block">{t('targetResume')}</label>
           <select
             value={activeResumeId ?? 'none'}
             onChange={(e) => e.target.value !== 'none' && setActiveResumeId(e.target.value)}
@@ -124,10 +128,10 @@ export function AtsView() {
 
         {/* Keyword analysis */}
         <div>
-          <div className="label-mono mb-2">Keyword Analysis</div>
+          <div className="label-mono mb-2">{t('keywordAnalysis')}</div>
           <div className="flex flex-col gap-3">
             <div>
-              <div className="label-mono mb-1.5 text-[8px]">Missing Keywords (click to add)</div>
+              <div className="label-mono mb-1.5 text-[8px]">{t('missingKeywords')}</div>
               <div className="flex flex-wrap gap-1.5">
                 {missing.length > 0 ? missing.map((k) => (
                   <button
@@ -147,7 +151,7 @@ export function AtsView() {
               </div>
             </div>
             <div>
-              <div className="label-mono mb-1.5 text-[8px]">Matched Keywords</div>
+              <div className="label-mono mb-1.5 text-[8px]">{t('matchedKeywords')}</div>
               <div className="flex flex-wrap gap-1.5">
                 {matched.length > 0 ? matched.map((k) => (
                   <span key={k} className="rounded-full border px-2 py-0.5 text-[11px]" style={{ background: 'var(--success-soft)', color: 'var(--success)', borderColor: 'rgba(43,95,69,0.2)' }}>{k}</span>
@@ -161,7 +165,7 @@ export function AtsView() {
           onClick={injectKeywords}
           className="flex w-full cursor-pointer items-center justify-center gap-1.5 rounded-sm bg-primary py-2 text-xs font-medium text-primary-foreground transition-opacity hover:opacity-90"
         >
-          <Wand2 size={13} /> Auto-Inject Missing Keywords
+          <Wand2 size={13} /> {t('analyze')}
         </button>
       </div>
 

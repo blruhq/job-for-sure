@@ -56,7 +56,8 @@ Rules:
 - Reorder skills so the most relevant ones appear first
 - Adjust the professional summary to reflect the target role
 - Keep the same length or shorter than original
-- Preserve all dates, company names, and factual data`,
+- Preserve all dates, company names, and factual data
+- Always output the optimized resume fields (summary, experience bullets, skills, persona) in the same language as the INPUT resume. Do not translate the resume content to another language. If the input resume is in Thai, output in Thai. If in English, output in English.`,
       prompt: JSON.stringify({ resume, job }),
       schema: TailorSchema,
       temperature: 0.4,

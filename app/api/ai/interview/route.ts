@@ -118,7 +118,8 @@ Instructions:
 1. Generate ONE realistic interview question appropriate for ${company} and ${role}.
 2. Ensure the question matches the requested difficulty (${difficulty}) and type (${type}).
 3. If type is technical, ask a programming, architecture, or domain-specific problem. If behavioral, ask a scenario-based or past-experience question. If mixed, choose one.
-4. Identify a category ('behavioral' or 'technical') and 1-3 tags (e.g. "system-design", "leadership", "react", "conflict-resolution").`
+4. Identify a category ('behavioral' or 'technical') and 1-3 tags (e.g. "system-design", "leadership", "react", "conflict-resolution").
+5. Generate the interview question in the language that matches the target company and job details. If the candidate's resume or previous interactions are in Thai, you may also generate questions in Thai.`
 
       const result = await generateObjectWithFailover<z.infer<typeof InterviewQuestionSchema>>({
         system: systemPrompt,
@@ -151,7 +152,9 @@ Return your evaluation as a raw JSON object with exactly these fields:
 - "score": a number from 1 to 10
 - "strengths": an array of strings, listing what the candidate did well
 - "improvements": an array of strings, listing specific areas to improve
-- "modelAnswer": a string containing an ideal answer the candidate could have given`
+- "modelAnswer": a string containing an ideal answer the candidate could have given
+
+Language rules: Evaluate the candidate's answer and return strengths, improvements, and model answer in the same language the candidate used in their answer.`
 
       const result = await generateObjectWithFailover<z.infer<typeof InterviewEvaluateSchema>>({
         system: systemPrompt,

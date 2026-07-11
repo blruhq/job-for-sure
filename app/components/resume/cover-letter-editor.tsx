@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { Wand2, Download, Copy, Save, Trash2 } from 'lucide-react'
 import { notify } from '~/lib/toast'
 import { ConfirmDialog } from '~/components/ui/confirm-dialog'
+import { useTranslations } from 'next-intl'
 import type { Resume } from '~/types/resume'
 
 interface CoverLetterEditorProps {
@@ -12,6 +13,7 @@ interface CoverLetterEditorProps {
 }
 
 export function CoverLetterEditor({ resume, updateResume }: CoverLetterEditorProps) {
+  const t = useTranslations('coverLetter')
   const [jdText, setJdText] = useState(resume.coverLetterJD || '')
   const [letterText, setLetterText] = useState(resume.coverLetter || '')
   const [generating, setGenerating] = useState(false)
@@ -22,6 +24,7 @@ export function CoverLetterEditor({ resume, updateResume }: CoverLetterEditorPro
   const [company, setCompany] = useState('')
   const [role, setRole] = useState('')
   const [focus, setFocus] = useState('')
+  const [outputLanguage, setOutputLanguage] = useState<'en' | 'th'>('en')
 
   // Sync letterText when resume changes
   useEffect(() => {
@@ -49,6 +52,7 @@ export function CoverLetterEditor({ resume, updateResume }: CoverLetterEditorPro
           company: mode === 'quick' ? company : '',
           role: mode === 'quick' ? role : '',
           focus: mode === 'quick' ? focus : '',
+          language: outputLanguage,
         }),
       })
       if (!res.ok) {
@@ -61,13 +65,13 @@ export function CoverLetterEditor({ resume, updateResume }: CoverLetterEditorPro
           coverLetter: data.letter,
           coverLetterJD: mode === 'jd' ? jdText : `Company: ${company}, Role: ${role}${focus ? `, Focus: ${focus}` : ''}`,
         })
-        notify({ message: 'Cover letter generated successfully!', type: 'success' })
+        notify({ message: t('generatedSuccess'), type: 'success' })
       } else {
         throw new Error('No letter content returned')
       }
     } catch (error) {
       console.error(error)
-      notify({ message: 'Failed to generate cover letter. Please try again.', type: 'error' })
+      notify({ message: t('generateFailed'), type: 'error' })
     } finally {
       setGenerating(false)
     }
@@ -78,15 +82,15 @@ export function CoverLetterEditor({ resume, updateResume }: CoverLetterEditorPro
       coverLetter: letterText,
       coverLetterJD: mode === 'jd' ? jdText : `Company: ${company}, Role: ${role}${focus ? `, Focus: ${focus}` : ''}`,
     })
-    notify({ message: 'Cover letter saved successfully!', type: 'success' })
+    notify({ message: t('savedSuccess'), type: 'success' })
   }
 
   const handleCopy = async () => {
     try {
       await navigator.clipboard.writeText(letterText)
-      notify({ message: 'Copied to clipboard!', type: 'success' })
+      notify({ message: t('copiedClipboard'), type: 'success' })
     } catch {
-      notify({ message: 'Failed to copy to clipboard.', type: 'error' })
+      notify({ message: t('copy') + ' failed', type: 'error' })
     }
   }
 
@@ -101,7 +105,7 @@ export function CoverLetterEditor({ resume, updateResume }: CoverLetterEditorPro
               mode === 'quick' ? 'bg-card text-foreground shadow-sm font-semibold' : 'text-muted-foreground hover:text-foreground'
             }`}
           >
-            Quick Fill
+            {t('quickFill')}
           </button>
           <button
             onClick={() => setMode('jd')}
@@ -109,38 +113,61 @@ export function CoverLetterEditor({ resume, updateResume }: CoverLetterEditorPro
               mode === 'jd' ? 'bg-card text-foreground shadow-sm font-semibold' : 'text-muted-foreground hover:text-foreground'
             }`}
           >
-            Job Description
+            {t('jobDescription')}
           </button>
+        </div>
+
+        {/* Language Selector */}
+        <div className="space-y-1">
+          <label className="label-mono mb-1 block text-[10px]">{t('outputLanguage')}</label>
+          <div className="flex gap-1.5 rounded-sm bg-border/30 p-0.5 shrink-0">
+            <button
+              onClick={() => setOutputLanguage('en')}
+              className={`flex-1 rounded-xs py-1 text-[10px] font-semibold transition-all cursor-pointer text-center ${
+                outputLanguage === 'en' ? 'bg-card text-foreground shadow-sm font-semibold' : 'text-muted-foreground hover:text-foreground'
+              }`}
+            >
+              English
+            </button>
+            <button
+              onClick={() => setOutputLanguage('th')}
+              className={`flex-1 rounded-xs py-1 text-[10px] font-semibold transition-all cursor-pointer text-center ${
+                outputLanguage === 'th' ? 'bg-card text-foreground shadow-sm font-semibold' : 'text-muted-foreground hover:text-foreground'
+              }`}
+            >
+              ภาษาไทย
+            </button>
+          </div>
         </div>
 
         {mode === 'quick' ? (
           <div className="space-y-3">
             <div>
-              <label className="label-mono mb-1 block">Company Name</label>
+              <label className="label-mono mb-1 block">{t('companyName')}</label>
               <input
                 type="text"
                 value={company}
                 onChange={(e) => setCompany(e.target.value)}
-                placeholder="e.g. Google"
+                placeholder={t('placeholderCompany')}
                 className="w-full rounded-xs border border-border bg-background px-2.5 py-1.5 text-[11px] outline-none focus:border-primary"
               />
             </div>
             <div>
-              <label className="label-mono mb-1 block">Job Title</label>
+              <label className="label-mono mb-1 block">{t('roleTitle')}</label>
               <input
                 type="text"
                 value={role}
                 onChange={(e) => setRole(e.target.value)}
-                placeholder="e.g. Frontend Engineer"
+                placeholder={t('placeholderRole')}
                 className="w-full rounded-xs border border-border bg-background px-2.5 py-1.5 text-[11px] outline-none focus:border-primary"
               />
             </div>
             <div>
-              <label className="label-mono mb-1 block">Wording / Focus (Optional)</label>
+              <label className="label-mono mb-1 block">{t('wordingFocus')}</label>
               <textarea
                 value={focus}
                 onChange={(e) => setFocus(e.target.value)}
-                placeholder="e.g. Highlight my React and leadership experience..."
+                placeholder={t('placeholderFocus')}
                 rows={4}
                 className="w-full resize-none rounded-xs border border-border bg-background px-2.5 py-1.5 text-[11px] outline-none focus:border-primary font-sans"
               />
@@ -148,7 +175,7 @@ export function CoverLetterEditor({ resume, updateResume }: CoverLetterEditorPro
           </div>
         ) : (
           <div>
-            <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-1">Tailor to Job Description</h3>
+            <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-1">{t('jobDescription')}</h3>
             <p className="text-[10px] text-muted-foreground mb-3 leading-relaxed">
               Paste the job description below to customize your cover letter.
             </p>
@@ -167,7 +194,7 @@ export function CoverLetterEditor({ resume, updateResume }: CoverLetterEditorPro
           className="flex cursor-pointer items-center justify-center gap-1.5 rounded-sm bg-primary py-2 text-xs font-semibold text-primary-foreground transition-opacity hover:opacity-90 disabled:opacity-50"
         >
           <Wand2 size={13} className={generating ? "animate-pulse" : ""} />
-          {generating ? 'Generating Letter...' : 'Generate Cover Letter'}
+          {generating ? `${t('generate')}...` : t('generate')}
         </button>
       </div>
 
@@ -176,7 +203,7 @@ export function CoverLetterEditor({ resume, updateResume }: CoverLetterEditorPro
         {/* Actions bar */}
         <div className="flex shrink-0 items-center justify-between border-b border-border bg-card px-4 md:px-6 py-2.5">
           <div className="flex items-center gap-2">
-            <span className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">Letter Editor</span>
+            <span className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">{t('generatedLetter')}</span>
           </div>
           <div className="flex gap-2">
             <button
@@ -184,28 +211,28 @@ export function CoverLetterEditor({ resume, updateResume }: CoverLetterEditorPro
               disabled={!letterText}
               className="flex cursor-pointer items-center gap-1 rounded-sm border border-border bg-card px-2.5 py-1 text-[11px] hover:bg-muted disabled:opacity-50"
             >
-              <Save size={11} /> Save Letter
+              <Save size={11} /> {t('save')}
             </button>
             <button
               onClick={handleCopy}
               disabled={!letterText}
               className="flex cursor-pointer items-center gap-1 rounded-sm border border-border bg-card px-2.5 py-1 text-[11px] hover:bg-muted disabled:opacity-50"
             >
-              <Copy size={11} /> Copy Text
+              <Copy size={11} /> {t('copy')}
             </button>
             <button
               onClick={() => setShowDeleteDialog(true)}
               disabled={!letterText}
               className="flex cursor-pointer items-center gap-1 rounded-sm border border-border bg-card px-2.5 py-1 text-[11px] hover:text-red-500 hover:border-red-500/30 disabled:opacity-50 transition-all"
             >
-              <Trash2 size={11} /> Delete
+              <Trash2 size={11} /> {t('delete') || 'Delete'}
             </button>
             <button
               onClick={() => window.open(`/api/export/pdf?id=${resume.id}&type=cover-letter`, '_blank')}
               disabled={!letterText}
               className="flex cursor-pointer items-center gap-1 rounded-sm bg-primary px-2.5 py-1 text-[11px] font-medium text-primary-foreground hover:opacity-90 disabled:opacity-50"
             >
-              <Download size={11} /> Export PDF
+              <Download size={11} /> {t('download') || 'Export PDF'}
             </button>
           </div>
         </div>
