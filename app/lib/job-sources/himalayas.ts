@@ -42,7 +42,7 @@ export async function fetchHimalayas(
   opts?: { signal?: AbortSignal },
 ): Promise<{ jobs: JobResult[]; error?: string }> {
   try {
-    const url = `https://himalayas.app/jobs/api/search?q=${encodeURIComponent(query)}&sort=relevance&limit=30`
+    const url = `https://himalayas.app/jobs/api/search?q=${encodeURIComponent(query)}&limit=30`
     const res = await fetch(url, {
       signal: opts?.signal,
       headers: { Accept: 'application/json' },
