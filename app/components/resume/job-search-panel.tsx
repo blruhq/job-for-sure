@@ -426,21 +426,6 @@ export function JobSearchPanel({ resume }: { resume: Resume }) {
             label="Visa Sponsor"
           />
 
-          {/* Source badges */}
-          {sources.map((s) => (
-            <span
-              key={s.source}
-              className={cn(
-                'rounded-xs border px-1.5 py-0.5 font-mono text-[10px]',
-                s.error
-                  ? 'border-destructive/30 bg-destructive/5 text-destructive'
-                  : 'border-border bg-background text-muted-foreground',
-              )}
-              title={s.error || `${s.count} jobs from ${SOURCE_NAMES[s.source] || s.source}`}
-            >
-              {(SOURCE_NAMES[s.source] || s.source).slice(0, 6)}: {s.error ? '⚠' : s.count}
-            </span>
-          ))}
           {cached && (
             <span className="rounded-xs bg-accent-soft px-1.5 py-0.5 font-mono text-[10px] text-primary">
               cached
@@ -533,7 +518,7 @@ export function JobSearchPanel({ resume }: { resume: Resume }) {
           <div className="flex flex-col items-center justify-center py-16 gap-3">
             <Loader2 size={20} className="animate-spin text-primary" />
             <div className="font-mono text-[11px] text-muted-foreground">
-              Fetching real jobs from {sources.length || 9} sources…
+              Fetching jobs from multiple sources…
             </div>
           </div>
         )}

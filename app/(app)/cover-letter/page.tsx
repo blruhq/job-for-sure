@@ -242,20 +242,6 @@ export default function StandaloneCoverLetterPage() {
     if (letter.role) setRole(letter.role)
   }
 
-  const handleDeleteSaved = async (id: string) => {
-    try {
-      await fetch(`/api/cover-letters/${id}`, { method: 'DELETE' })
-      setSavedLetters(prev => prev.filter(l => l.id !== id))
-      if (activeLetterId === id) {
-        setActiveLetterId(null)
-        setLetterText('')
-      }
-      notify({ message: 'Cover letter deleted', type: 'success' })
-    } catch {
-      notify({ message: 'Failed to delete', type: 'error' })
-    }
-  }
-
   const handleCopy = async () => {
     try {
       await navigator.clipboard.writeText(letterText)
