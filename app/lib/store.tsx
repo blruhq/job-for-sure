@@ -1,7 +1,7 @@
 'use client'
 
 import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from 'react'
-import type { Pipeline, PipelineJob, Resume } from '~/types/resume'
+import type { ApplicationBoard, PipelineJob, Resume } from '~/types/resume'
 
 // ═══════════════════════════════════════════════════════════════
 // CONTEXT TYPE
@@ -16,14 +16,14 @@ interface AppStore {
   updateResume: (id: string, updates: Partial<Resume>) => void
   getResume: (id: string) => Resume | undefined
 
-  // Pipeline
-  pipeline: Pipeline
+  // Applications
+  applications: ApplicationBoard
   bookmarkJob: (job: PipelineJob) => void
   toggleBookmark: (key: string) => void
   isBookmarked: (key: string) => boolean
-  moveJob: (jobKey: string, fromCol: keyof Pipeline, toCol: keyof Pipeline) => void
-  removeJob: (jobKey: string, fromCol: keyof Pipeline) => void
-  clearPipeline: () => void
+  moveJob: (jobKey: string, fromCol: keyof ApplicationBoard, toCol: keyof ApplicationBoard) => void
+  removeJob: (jobKey: string, fromCol: keyof ApplicationBoard) => void
+  clearApplications: () => void
 
   // Target company
   targetCompanyKey: string
@@ -40,7 +40,7 @@ interface AppStore {
 
 const AppCtx = createContext<AppStore | null>(null)
 
-const EMPTY_PIPELINE: Pipeline = { bookmark: [], applied: [], interviewing: [], offers: [] }
+const EMPTY_APPLICATIONS: ApplicationBoard = { bookmark: [], applied: [], interviewing: [], offers: [] }
 
 // ═══════════════════════════════════════════════════════════════
 // API HELPERS
@@ -86,7 +86,7 @@ export function AppStoreProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true)
   const [resumes, setResumes] = useState<Resume[]>([])
   const [activeResumeId, setActiveResumeIdState] = useState<string | null>(null)
-  const [pipeline, setPipeline] = useState<Pipeline>(EMPTY_PIPELINE)
+  const [applications, setApplications] = useState<ApplicationBoard>(EMPTY_APPLICATIONS)
   const [targetCompanyKey, setTargetCompanyKey] = useState<string>('none')
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
 
@@ -100,9 +100,9 @@ export function AppStoreProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     async function load() {
       try {
-        const [resumeList, pipelineData] = await Promise.all([
+        const [resumeList, boardData] = await Promise.all([
           apiGet<Array<{ id: string; data: string }>>('/api/resumes'),
-          apiGet<Pipeline>('/api/pipeline').catch(() => EMPTY_PIPELINE),
+          apiGet<ApplicationBoard>('/api/applications').catch(() => EMPTY_APPLICATIONS),
         ])
 
         const parsed = resumeList.map((r) => {
@@ -115,7 +115,7 @@ export function AppStoreProvider({ children }: { children: ReactNode }) {
 
         setResumes(parsed)
         if (parsed.length > 0) setActiveResumeIdState(parsed[0].id)
-        setPipeline(pipelineData)
+        setApplications(boardData)
       } catch {
         // Not authenticated or no data — start empty
       } finally {
@@ -152,37 +152,37 @@ export function AppStoreProvider({ children }: { children: ReactNode }) {
 
   const activeResume = resumes.find(r => r.id === activeResumeId) ?? null
 
-  // ── Pipeline actions ──
-  const persistPipeline = useCallback((next: Pipeline) => {
-    apiPost('/api/pipeline', next).catch(console.error)
+  // ── Applications actions ──
+  const persistApplications = useCallback((next: ApplicationBoard) => {
+    apiPost('/api/applications', next).catch(console.error)
   }, [])
 
   const bookmarkJob = useCallback((job: PipelineJob) => {
-    setPipeline(prev => {
+    setApplications(prev => {
       if (prev.bookmark.some(j => j.key === job.key)) return prev
       const next = { ...prev, bookmark: [...prev.bookmark, job] }
-      persistPipeline(next)
+      persistApplications(next)
       return next
     })
-  }, [persistPipeline])
+  }, [persistApplications])
 
   const toggleBookmark = useCallback((key: string) => {
-    setPipeline(prev => {
+    setApplications(prev => {
       const exists = prev.bookmark.some(j => j.key === key)
       const next = exists
         ? { ...prev, bookmark: prev.bookmark.filter(j => j.key !== key) }
         : prev
-      persistPipeline(next)
+      persistApplications(next)
       return next
     })
-  }, [persistPipeline])
+  }, [persistApplications])
 
   const isBookmarked = useCallback((key: string) => {
-    return pipeline.bookmark.some(j => j.key === key)
-  }, [pipeline])
+    return applications.bookmark.some(j => j.key === key)
+  }, [applications])
 
-  const moveJob = useCallback((jobKey: string, fromCol: keyof Pipeline, toCol: keyof Pipeline) => {
-    setPipeline(prev => {
+  const moveJob = useCallback((jobKey: string, fromCol: keyof ApplicationBoard, toCol: keyof ApplicationBoard) => {
+    setApplications(prev => {
       const from = [...prev[fromCol]]
       const to = [...prev[toCol]]
       const idx = from.findIndex(j => j.key === jobKey)
@@ -191,24 +191,24 @@ export function AppStoreProvider({ children }: { children: ReactNode }) {
       job.time = toCol === 'applied' ? 'just now' : toCol === 'interviewing' ? 'scheduled' : toCol === 'offers' ? 'received' : 'saved'
       to.push(job)
       const next = { ...prev, [fromCol]: from, [toCol]: to }
-      persistPipeline(next)
+      persistApplications(next)
       return next
     })
-  }, [persistPipeline])
+  }, [persistApplications])
 
-  const removeJob = useCallback((jobKey: string, fromCol: keyof Pipeline) => {
-    setPipeline(prev => {
+  const removeJob = useCallback((jobKey: string, fromCol: keyof ApplicationBoard) => {
+    setApplications(prev => {
       const arr = prev[fromCol].filter(j => j.key !== jobKey)
       const next = { ...prev, [fromCol]: arr }
-      persistPipeline(next)
+      persistApplications(next)
       return next
     })
-  }, [persistPipeline])
+  }, [persistApplications])
 
-  const clearPipeline = useCallback(() => {
-    setPipeline(EMPTY_PIPELINE)
-    persistPipeline(EMPTY_PIPELINE)
-  }, [persistPipeline])
+  const clearApplications = useCallback(() => {
+    setApplications(EMPTY_APPLICATIONS)
+    persistApplications(EMPTY_APPLICATIONS)
+  }, [persistApplications])
 
   const toggleSidebar = useCallback(() => setSidebarCollapsed(prev => !prev), [])
 
@@ -220,13 +220,13 @@ export function AppStoreProvider({ children }: { children: ReactNode }) {
     addResume,
     updateResume,
     getResume,
-    pipeline,
+    applications,
     bookmarkJob,
     toggleBookmark,
     isBookmarked,
     moveJob,
     removeJob,
-    clearPipeline,
+    clearApplications,
     targetCompanyKey,
     setTargetCompanyKey,
     sidebarCollapsed,

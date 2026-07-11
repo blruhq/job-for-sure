@@ -11,7 +11,7 @@ import { authClient } from '~/lib/auth-client'
 
 export function DashboardView() {
   const router = useRouter()
-  const { resumes, pipeline, loading, hydrated } = useAppStore()
+  const { resumes, applications, loading, hydrated } = useAppStore()
   const [userName, setUserName] = useState('')
   const [lastInterviewScore, setLastInterviewScore] = useState<number | null>(null)
 
@@ -50,14 +50,14 @@ export function DashboardView() {
     ? Math.round(resumes.reduce((sum, r) => sum + r.score, 0) / resumeCount)
     : 0
 
-  const pipelineCounts = {
-    bookmark: pipeline.bookmark.length,
-    applied: pipeline.applied.length,
-    interviewing: pipeline.interviewing.length,
-    offers: pipeline.offers.length,
+  const applicationCounts = {
+    bookmark: applications.bookmark.length,
+    applied: applications.applied.length,
+    interviewing: applications.interviewing.length,
+    offers: applications.offers.length,
   }
 
-  const pipelineTotal = pipelineCounts.bookmark + pipelineCounts.applied + pipelineCounts.interviewing + pipelineCounts.offers
+  const applicationTotal = applicationCounts.bookmark + applicationCounts.applied + applicationCounts.interviewing + applicationCounts.offers
   const coverLetterCount = resumes.filter((r) => r.coverLetter).length
   const topResumes = [...resumes].sort((a, b) => b.score - a.score).slice(0, 3)
   const firstResumeWithCoverLetter = resumes.find((r) => r.coverLetter)
@@ -149,19 +149,19 @@ export function DashboardView() {
             </div>
           </Link>
 
-          {/* Card 2: Pipeline */}
+          {/* Card 2: Applications */}
           <Link
-            href="/pipeline"
+            href="/applications"
             className="rounded-sm border border-border bg-card p-4 transition-colors hover:border-primary flex flex-col justify-between h-24"
           >
             <div className="flex justify-between items-start">
-              <span className="text-[10px] font-mono uppercase text-muted-foreground tracking-wider">Pipeline</span>
+              <span className="text-[10px] font-mono uppercase text-muted-foreground tracking-wider">Applications</span>
               <KanbanSquare size={15} className="text-muted-foreground" />
             </div>
             <div>
-              <div className="text-2xl font-bold text-foreground">{pipelineTotal}</div>
+              <div className="text-2xl font-bold text-foreground">{applicationTotal}</div>
               <div className="text-[10px] text-muted-foreground truncate">
-                {pipelineCounts.applied} applied · {pipelineCounts.interviewing} interviewing
+                {applicationCounts.applied} applied · {applicationCounts.interviewing} interviewing
               </div>
             </div>
           </Link>
@@ -233,19 +233,19 @@ export function DashboardView() {
             </div>
           </div>
 
-          {/* Right card: Pipeline Snapshot */}
+          {/* Right card: Applications Snapshot */}
           <div className="rounded-sm border border-border bg-card p-4">
-            <div className="label-mono mb-3 text-foreground font-semibold">Pipeline</div>
+            <div className="label-mono mb-3 text-foreground font-semibold">Applications</div>
             <div className="space-y-2">
               {[
-                { label: 'Bookmarked', count: pipelineCounts.bookmark, color: 'bg-muted-foreground' },
-                { label: 'Applied', count: pipelineCounts.applied, color: 'bg-primary' },
-                { label: 'Interviewing', count: pipelineCounts.interviewing, color: 'bg-[var(--warn)]' },
-                { label: 'Offers', count: pipelineCounts.offers, color: 'bg-success' },
+                { label: 'Bookmarked', count: applicationCounts.bookmark, color: 'bg-muted-foreground' },
+                { label: 'Applied', count: applicationCounts.applied, color: 'bg-primary' },
+                { label: 'Interviewing', count: applicationCounts.interviewing, color: 'bg-[var(--warn)]' },
+                { label: 'Offers', count: applicationCounts.offers, color: 'bg-success' },
               ].map((stage) => (
                 <Link
                   key={stage.label}
-                  href="/pipeline"
+                  href="/applications"
                   className="flex items-center gap-2.5 rounded-sm px-2 py-1.5 hover:bg-background transition-colors"
                 >
                   <span className={cn('h-2 w-2 shrink-0 rounded-full', stage.color)} />
@@ -284,11 +284,11 @@ export function DashboardView() {
           </Link>
 
           <Link
-            href="/pipeline"
+            href="/applications"
             className="flex flex-col items-center gap-2 rounded-sm border border-border bg-card p-4 text-center transition-colors hover:border-primary"
           >
             <KanbanSquare size={18} className="text-primary" />
-            <span className="text-xs font-medium text-foreground">View Pipeline</span>
+            <span className="text-xs font-medium text-foreground">View Applications</span>
           </Link>
         </div>
       </div>

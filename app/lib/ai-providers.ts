@@ -1,4 +1,4 @@
-import { streamText, convertToModelMessages, generateText, generateObject, type LanguageModel } from 'ai'
+import { streamText, convertToModelMessages, generateText, type LanguageModel } from 'ai'
 import { createOpenAI } from '@ai-sdk/openai'
 import type { z } from 'zod'
 
@@ -21,9 +21,12 @@ function createNoThinkingProvider(opts: { baseURL: string; apiKey?: string }) {
         try {
           const body = JSON.parse(init.body)
           body.thinking = { type: 'disabled' }
-          // DeepSeek doesn't support response_format (json_schema) —
-          // strip it so generateObject falls back to prompt-based JSON
-          delete body.response_format
+          // DeepSeek doesn't support response_format: json_schema.
+          // Replace with json_object so the model still knows to emit JSON,
+          // and rely on the system prompt to guide the schema shape.
+          if (body.response_format?.type === 'json_schema') {
+            body.response_format = { type: 'json_object' }
+          }
           init = { ...init, body: JSON.stringify(body) }
         } catch {
           // non-JSON body — leave untouched
@@ -250,23 +253,51 @@ export async function generateObjectWithFailover<T>(
 ): Promise<T> {
   const { system, prompt, schema, temperature = 0.4, maxOutputTokens = 2048 } = params
 
+  // Build a system prompt that instructs the model to output clean JSON
+  const jsonSystem = system + `\n\nYou MUST return ONLY valid JSON. No markdown fences, no code blocks, no prefixes — raw JSON only.`
+
   let lastError: Error | null = null
 
   for (const provider of providers) {
     const controller = new AbortController()
     const timer = setTimeout(() => controller.abort(), provider.timeout)
     try {
-      const { object } = await generateObject({
+      // Use generateText instead of generateObject — DeepSeek V4 Flash
+      // doesn't support OpenAI's json_schema response_format, and json_object
+      // mode alone can't guarantee schema compliance. We handle parsing
+      // ourselves with explicit JSON instruction in the prompt.
+      const result = await generateText({
         model: provider.model,
-        system,
+        system: jsonSystem,
         prompt,
-        schema,
         temperature,
         maxOutputTokens,
         abortSignal: controller.signal,
       })
 
-      return object as T
+      // Clean up the response — strip markdown fences if the model ignores instructions
+      let raw = result.text.trim()
+      if (raw.startsWith('```')) {
+        raw = raw.replace(/^```(?:json)?\s*\n?/, '').replace(/\n?```$/, '')
+      }
+
+      // Try to parse as JSON
+      let parsed: unknown
+      try {
+        parsed = JSON.parse(raw)
+      } catch {
+        // Try to find JSON object in the text (model sometimes wraps in explanation)
+        const jsonMatch = raw.match(/\{[\s\S]*\}/)
+        if (jsonMatch) {
+          parsed = JSON.parse(jsonMatch[0])
+        } else {
+          throw new Error(`Model returned non-JSON: ${raw.slice(0, 300)}`)
+        }
+      }
+
+      // Validate against the provided Zod schema
+      const validated = schema.parse(parsed)
+      return validated as T
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err)
       console.warn(`⚠️  [AI] ${provider.name} failed: ${msg}`)

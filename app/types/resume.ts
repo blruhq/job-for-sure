@@ -90,14 +90,14 @@ export interface PipelineJob {
   resume: string
 }
 
-export interface Pipeline {
+export interface ApplicationBoard {
   bookmark: PipelineJob[]
   applied: PipelineJob[]
   interviewing: PipelineJob[]
   offers: PipelineJob[]
 }
 
-export type PipelineColumnId = keyof Pipeline
+export type ApplicationColumnId = keyof ApplicationBoard
 
 export interface ChatMessage {
   id: string

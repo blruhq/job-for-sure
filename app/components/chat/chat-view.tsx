@@ -16,7 +16,7 @@ import { JobPreview } from '~/components/chat/job-preview'
 
 export function ChatView() {
   const router = useRouter()
-  const { activeResume, addResume, updateResume, targetCompanyKey, setTargetCompanyKey, resumes, activeResumeId, setActiveResumeId, pipeline } = useAppStore()
+  const { activeResume, addResume, updateResume, targetCompanyKey, setTargetCompanyKey, resumes, activeResumeId, setActiveResumeId, applications } = useAppStore()
   const fileRef = useRef<HTMLInputElement>(null)
   const [wizardOpen, setWizardOpen] = useState(false)
   const [pasteOpen, setPasteOpen] = useState(false)
@@ -37,7 +37,7 @@ export function ChatView() {
   const handleSend = (message: { role: 'user'; content: string }) => {
     let content = message.content
     if (targetCompanyKey !== 'none') {
-      const job = pipeline.bookmark.find((j) => j.key === targetCompanyKey)
+      const job = applications.bookmark.find((j) => j.key === targetCompanyKey)
       if (job) {
         content += `\n\n*(Context: I am asking this in the context of my application for the ${job.title} role at ${job.company} (Match Score: ${job.score}%). Please tailor your response for this role.)*`
       }
@@ -210,11 +210,11 @@ export function ChatView() {
           <select
             value={targetCompanyKey}
             onChange={(e) => setTargetCompanyKey(e.target.value)}
-            disabled={pipeline.bookmark.length === 0}
+            disabled={applications.bookmark.length === 0}
             className="rounded-xs border border-border bg-background px-1.5 py-0.5 text-[11px] text-foreground outline-none focus:border-primary"
           >
             <option value="none">General Career Coach</option>
-            {pipeline.bookmark.map((job) => (
+            {applications.bookmark.map((job) => (
               <option key={job.key} value={job.key}>{job.company} ({job.title})</option>
             ))}
           </select>

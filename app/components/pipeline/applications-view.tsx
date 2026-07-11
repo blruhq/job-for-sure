@@ -6,9 +6,9 @@ import { Trash2, Plus, Link2, MessageSquare, KanbanSquare } from 'lucide-react'
 import { cn } from '~/lib/utils'
 import { useAppStore } from '~/lib/store'
 import { notify } from '~/lib/toast'
-import type { Pipeline, PipelineColumnId, PipelineJob } from '~/types/resume'
+import type { ApplicationBoard, ApplicationColumnId, PipelineJob } from '~/types/resume'
 
-const COLUMNS: { id: PipelineColumnId; label: string; dot: string; next: PipelineColumnId | null }[] = [
+const COLUMNS: { id: ApplicationColumnId; label: string; dot: string; next: ApplicationColumnId | null }[] = [
   { id: 'bookmark', label: 'Bookmark', dot: '#9F9E98', next: 'applied' },
   { id: 'applied', label: 'Applied', dot: '#5B6ABF', next: 'interviewing' },
   { id: 'interviewing', label: 'Interviewing', dot: '#D4A316', next: 'offers' },
@@ -17,14 +17,14 @@ const COLUMNS: { id: PipelineColumnId; label: string; dot: string; next: Pipelin
 
 export function ApplicationsView() {
   const router = useRouter()
-  const { pipeline, resumes, moveJob, removeJob, clearPipeline } = useAppStore()
+  const { applications, resumes, moveJob, removeJob, clearApplications } = useAppStore()
   const [filter, setFilter] = useState('all')
   const [draggedKey, setDraggedKey] = useState<string | null>(null)
-  const [draggedFrom, setDraggedFrom] = useState<PipelineColumnId | null>(null)
-  const [dragOverCol, setDragOverCol] = useState<PipelineColumnId | null>(null)
+  const [draggedFrom, setDraggedFrom] = useState<ApplicationColumnId | null>(null)
+  const [dragOverCol, setDragOverCol] = useState<ApplicationColumnId | null>(null)
 
   // ── All jobs for filter ──
-  const allJobs = [...pipeline.bookmark, ...pipeline.applied, ...pipeline.interviewing, ...pipeline.offers]
+  const allJobs = [...applications.bookmark, ...applications.applied, ...applications.interviewing, ...applications.offers]
   const resumeNames = ['all', ...new Set(allJobs.map((j) => j.resume).filter(Boolean))]
 
   const filterJobs = (jobs: PipelineJob[]) => filter === 'all' ? jobs : jobs.filter((j) => j.resume === filter)
@@ -34,7 +34,7 @@ export function ApplicationsView() {
   const avgScore = total > 0 ? Math.round(allJobs.reduce((s, j) => s + j.score, 0) / total) : 0
 
   // ── Drag handlers ──
-  const onDragStart = (e: React.DragEvent, jobKey: string, fromCol: PipelineColumnId) => {
+  const onDragStart = (e: React.DragEvent, jobKey: string, fromCol: ApplicationColumnId) => {
     setDraggedKey(jobKey)
     setDraggedFrom(fromCol)
     e.dataTransfer.effectAllowed = 'move'
@@ -44,11 +44,11 @@ export function ApplicationsView() {
     setDraggedFrom(null)
     setDragOverCol(null)
   }
-  const onDragOver = (e: React.DragEvent, col: PipelineColumnId) => {
+  const onDragOver = (e: React.DragEvent, col: ApplicationColumnId) => {
     e.preventDefault()
     setDragOverCol(col)
   }
-  const onDrop = (e: React.DragEvent, toCol: PipelineColumnId) => {
+  const onDrop = (e: React.DragEvent, toCol: ApplicationColumnId) => {
     e.preventDefault()
     setDragOverCol(null)
     if (draggedKey && draggedFrom && draggedFrom !== toCol) {
@@ -66,7 +66,7 @@ export function ApplicationsView() {
         </div>
         <div className="flex gap-2">
           <button
-            onClick={() => { if (confirm('Remove all jobs from your applications?')) clearPipeline() }}
+            onClick={() => { if (confirm('Remove all jobs from your applications?')) clearApplications() }}
             className="flex items-center gap-1.5 rounded-sm border border-border bg-card px-3 py-1.5 text-xs font-medium text-muted-foreground transition-all hover:bg-background hover:text-foreground"
           >
             <Trash2 size={13} /> Clear All
@@ -90,8 +90,8 @@ export function ApplicationsView() {
         {[
           { value: total, label: 'Total Applications' },
           { value: `${avgScore}%`, label: 'Avg Match Score', color: 'text-success' },
-          { value: pipeline.interviewing.length, label: 'Interviews', color: 'text-[var(--warn)]' },
-          { value: pipeline.offers.length, label: 'Offers', color: 'text-primary' },
+          { value: applications.interviewing.length, label: 'Interviews', color: 'text-[var(--warn)]' },
+          { value: applications.offers.length, label: 'Offers', color: 'text-primary' },
         ].map((stat) => (
           <div key={stat.label} className="flex-1 rounded-sm border border-border bg-card p-3">
             <div className={cn('font-mono text-lg font-semibold', stat.color)}>{stat.value}</div>
@@ -150,7 +150,7 @@ export function ApplicationsView() {
       {total > 0 && (
       <div className="grid grid-cols-4 gap-2.5 items-start max-[1100px]:grid-cols-2 max-[768px]:grid-cols-1">
         {COLUMNS.map((col) => {
-          const jobs = filterJobs(pipeline[col.id])
+          const jobs = filterJobs(applications[col.id])
           const nextCol = COLUMNS.find((c) => c.id === col.next)
           return (
             <div

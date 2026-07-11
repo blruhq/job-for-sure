@@ -157,7 +157,7 @@ export const userPreferences = pgTable("user_preferences", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
-export const pipelineData = pgTable("pipeline_data", {
+export const applicationsData = pgTable("applications_data", {
   userId: text("user_id")
     .primaryKey()
     .references(() => user.id, { onDelete: "cascade" }),

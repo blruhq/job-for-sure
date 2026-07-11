@@ -1,7 +1,7 @@
 import { NextResponse, type NextRequest } from 'next/server'
 import { getSessionCookie } from 'better-auth/cookies'
 
-const protectedRoutes = ['/chat', '/ats', '/pipeline', '/resume', '/settings', '/interview', '/dashboard']
+const protectedRoutes = ['/chat', '/ats', '/applications', '/resume', '/settings', '/interview', '/dashboard']
 const publicRoutes = ['/', '/login', '/register']
 
 function isProtected(pathname: string) {
@@ -38,7 +38,7 @@ export const config = {
     '/register',
     '/chat/:path*',
     '/ats/:path*',
-    '/pipeline/:path*',
+    '/applications/:path*',
     '/resume/:path*',
     '/settings/:path*',
     '/interview/:path*',

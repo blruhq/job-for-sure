@@ -14,51 +14,51 @@ async function getSessionUser() {
 }
 
 const ParseResumeSchema = z.object({
-  name: z.string(),
-  email: z.string(),
-  phone: z.string(),
-  location: z.string(),
-  github: z.string(),
-  summary: z.string(),
-  skills: z.array(z.string()),
+  name: z.string().default(''),
+  email: z.string().default(''),
+  phone: z.string().default(''),
+  location: z.string().default(''),
+  github: z.string().default(''),
+  summary: z.string().default(''),
+  skills: z.array(z.string()).default([]),
   experience: z.array(
     z.object({
-      company: z.string(),
-      role: z.string(),
-      dates: z.string(),
-      bullets: z.array(z.string()),
+      company: z.string().default(''),
+      role: z.string().default(''),
+      dates: z.string().default(''),
+      bullets: z.array(z.string()).default([]),
     })
-  ),
+  ).default([]),
   education: z.array(
     z.object({
-      institution: z.string(),
-      degree: z.string(),
-      field: z.string(),
-      dates: z.string(),
+      institution: z.string().default(''),
+      degree: z.string().default(''),
+      field: z.string().default(''),
+      dates: z.string().default(''),
     })
-  ),
+  ).default([]),
   projects: z.array(
     z.object({
-      name: z.string(),
-      description: z.string(),
-      techStack: z.array(z.string()),
-      link: z.string(),
+      name: z.string().default(''),
+      description: z.string().default(''),
+      techStack: z.array(z.string()).default([]),
+      link: z.string().default(''),
     })
-  ),
+  ).default([]),
   certifications: z.array(
     z.object({
-      name: z.string(),
-      issuer: z.string(),
-      date: z.string(),
+      name: z.string().default(''),
+      issuer: z.string().default(''),
+      date: z.string().default(''),
     })
-  ),
+  ).default([]),
   languages: z.array(
     z.object({
-      name: z.string(),
-      proficiency: z.string(),
+      name: z.string().default(''),
+      proficiency: z.string().default(''),
     })
-  ),
-  role: z.string(),
+  ).default([]),
+  role: z.string().default(''),
 })
 
 export async function POST(req: NextRequest) {
@@ -83,7 +83,8 @@ Rules:
 - Extract ONLY what's in the text. Don't fabricate.
 - If a field isn't present, use empty string or empty array.
 - Skills should be individual technologies/tools (e.g. "React", not "Frontend Development")
-- Keep bullet points concise (one line each)`,
+- Keep bullet points concise (one line each)
+- Return VALID JSON matching the provided schema.`,
       prompt: text.slice(0, 12000), // Cap at 12K chars
       schema: ParseResumeSchema,
       temperature: 0.2,

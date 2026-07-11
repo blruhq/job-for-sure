@@ -1,12 +1,12 @@
 import { NextResponse } from 'next/server'
 import { captureServerEvent } from '~/lib/posthog-server'
 import { db } from '~/lib/db'
-import { pipelineData } from '~/lib/schema'
+import { applicationsData } from '~/lib/schema'
 import { auth } from '~/lib/auth'
 import { eq } from 'drizzle-orm'
 import { headers } from 'next/headers'
 
-const EMPTY_PIPELINE = { bookmark: [], applied: [], interviewing: [], offers: [] }
+const EMPTY_APPLICATIONS = { bookmark: [], applied: [], interviewing: [], offers: [] }
 
 async function getSessionUser() {
   const h = await headers()
@@ -14,21 +14,21 @@ async function getSessionUser() {
   return session?.user ?? null
 }
 
-// GET /api/pipeline — get the user's pipeline
+// GET /api/applications — get the user's application board
 export async function GET() {
   const user = await getSessionUser()
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const [row] = await db
     .select()
-    .from(pipelineData)
-    .where(eq(pipelineData.userId, user.id))
+    .from(applicationsData)
+    .where(eq(applicationsData.userId, user.id))
     .limit(1)
 
-  return NextResponse.json(row?.data ?? EMPTY_PIPELINE)
+  return NextResponse.json(row?.data ?? EMPTY_APPLICATIONS)
 }
 
-// POST /api/pipeline — save the user's entire pipeline
+// POST /api/applications — save the user's entire application board
 export async function POST(request: Request) {
   const user = await getSessionUser()
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
@@ -37,13 +37,13 @@ export async function POST(request: Request) {
   const data = body.data ?? body
 
   await db
-    .insert(pipelineData)
+    .insert(applicationsData)
     .values({ userId: user.id, data: JSON.stringify(data), updatedAt: new Date() })
     .onConflictDoUpdate({
-      target: pipelineData.userId,
+      target: applicationsData.userId,
       set: { data: JSON.stringify(data), updatedAt: new Date() },
     })
 
-  await captureServerEvent(user.id, 'pipeline_updated')
+  await captureServerEvent(user.id, 'applications_updated')
   return NextResponse.json({ success: true })
 }

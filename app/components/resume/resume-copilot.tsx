@@ -8,7 +8,7 @@ import type { Resume } from '~/types/resume'
 
 export function ResumeCopilot({ resume }: { resume: Resume }) {
   const scrollRef = useRef<HTMLDivElement>(null)
-  const { pipeline } = useAppStore()
+  const { applications } = useAppStore()
 
   const transport = useMemo(() => new DefaultChatTransport({
     api: '/api/copilot',
@@ -21,14 +21,14 @@ export function ResumeCopilot({ resume }: { resume: Resume }) {
         summary: resume.summary,
         skills: resume.skills,
         experience: resume.experience,
-        companies: pipeline.bookmark.map((b) => ({
+        companies: applications.bookmark.map((b) => ({
           name: b.company,
           role: b.title,
           score: b.score,
         })),
       },
     },
-  }), [resume, pipeline.bookmark])
+  }), [resume, applications.bookmark])
 
   const { messages, status, sendMessage, stop, error } = useChat({ transport })
 
@@ -46,7 +46,7 @@ export function ResumeCopilot({ resume }: { resume: Resume }) {
     sendMessage({ text })
   }
 
-  const topBookmark = pipeline.bookmark[0]
+  const topBookmark = applications.bookmark[0]
 
   const suggestions = [
     { label: 'Rewrite summary', prompt: `Rewrite my professional summary to be more impactful. Current: "${resume.summary || 'None'}"` },

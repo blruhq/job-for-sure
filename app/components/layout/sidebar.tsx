@@ -14,14 +14,14 @@ const NAV_ITEMS = [
   { href: '/chat', label: 'Chat', icon: MessageSquare },
   { href: '/interview', label: 'Interview Prep', icon: Brain },
   { href: '/cover-letter', label: 'Cover Letter', icon: Mail },
-  { href: '/pipeline', label: 'Applications', icon: KanbanSquare, badge: true },
+  { href: '/applications', label: 'Applications', icon: KanbanSquare, badge: true },
   { href: '/ats', label: 'ATS Optimizer', icon: CheckSquare },
 ]
 
 export function Sidebar() {
   const pathname = usePathname()
   const router = useRouter()
-  const { resumes, activeResumeId, setActiveResumeId, pipeline, sidebarCollapsed } = useAppStore()
+  const { resumes, activeResumeId, setActiveResumeId, applications, sidebarCollapsed } = useAppStore()
   const [isAdmin, setIsAdmin] = useState(false)
 
   useEffect(() => {
@@ -41,7 +41,7 @@ export function Sidebar() {
 
   const c = sidebarCollapsed
 
-  const totalPipeline = pipeline.bookmark.length + pipeline.applied.length + pipeline.interviewing.length + pipeline.offers.length
+  const totalPipeline = applications.bookmark.length + applications.applied.length + applications.interviewing.length + applications.offers.length
 
   return (
     <aside

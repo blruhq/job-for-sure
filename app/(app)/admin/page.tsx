@@ -1,5 +1,5 @@
 import { db } from '~/lib/db'
-import { user, resumes, tailoredResumes, pipelineData, interviewSessions } from '~/lib/schema'
+import { user, resumes, tailoredResumes, applicationsData, interviewSessions } from '~/lib/schema'
 import { coverLetters } from '~/lib/schema'
 import { auth } from '~/lib/auth'
 import { headers } from 'next/headers'
@@ -19,7 +19,7 @@ export default async function AdminPage() {
   const [userCount] = await db.select({ total: count() }).from(user)
   const [resumeCount] = await db.select({ total: count() }).from(resumes)
   const [tailoredCount] = await db.select({ total: count() }).from(tailoredResumes)
-  const [pipelineCount] = await db.select({ total: count() }).from(pipelineData)
+  const [applicationCount] = await db.select({ total: count() }).from(applicationsData)
   const [interviewCount] = await db.select({ total: count() }).from(interviewSessions)
   let coverLetterCount = { total: 0 }
   try {
@@ -77,7 +77,7 @@ export default async function AdminPage() {
           <StatCard label="New This Week" value={weekCount.total} />
           <StatCard label="Resumes" value={resumeCount.total} />
           <StatCard label="Tailored" value={tailoredCount.total} />
-          <StatCard label="Pipelines" value={pipelineCount.total} />
+          <StatCard label="Applications" value={applicationCount.total} />
           <StatCard label="Interviews" value={interviewCount.total} />
           <StatCard label="Cover Letters" value={coverLetterCount.total} />
         </div>
