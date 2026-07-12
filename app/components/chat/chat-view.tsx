@@ -12,7 +12,6 @@ import { notify } from '~/lib/toast'
 import { BuildWizard, type WizardData } from '~/components/chat/build-wizard'
 import { PasteJDModal } from '~/components/chat/paste-jd-modal'
 import { SkeletonChatMessage, SkeletonCard } from '~/components/ui/skeleton'
-import { extractPdfText } from '~/lib/pdf-parse'
 import { Upload, FileText, ClipboardList, Loader2, Paperclip } from 'lucide-react'
 import { JobPreview } from '~/components/chat/job-preview'
 
@@ -62,29 +61,19 @@ export function ChatView() {
 
     setProcessing(true)
     try {
-      let text: string
+      // Send file to server — server handles text extraction + AI parsing
+      const formData = new FormData()
+      formData.append('file', file)
 
-      // Read file based on type
-      if (file.type === 'application/pdf' || file.name.endsWith('.pdf')) {
-        text = await extractPdfText(file)
-      } else {
-        text = await readFileAsText(file)
-      }
-
-      if (text.trim().length < 20) {
-        notify({ message: 'Could not extract enough text from this file. Try the Build from Template option.', type: 'error' })
-        setProcessing(false)
-        return
-      }
-
-      // Send to AI for structured parsing
       const res = await fetch('/api/parse-resume', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text }),
+        body: formData,
       })
 
-      if (!res.ok) throw new Error('Failed to parse resume')
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}))
+        throw new Error(errData.error || 'Failed to parse resume')
+      }
       const parsed = await res.json()
 
       // Create resume from parsed data
@@ -131,7 +120,7 @@ export function ChatView() {
       setJobPreviewResumeId(resume.id)
     } catch (err) {
       console.error(err)
-      notify({ message: 'Failed to process resume. Try Build from Template instead.', type: 'error' })
+      notify({ message: err instanceof Error ? err.message : 'Failed to process resume. Try Build from Template instead.', type: 'error' })
     } finally {
       setProcessing(false)
     }
@@ -175,16 +164,6 @@ export function ChatView() {
       return
     }
     sendMessage({ text: `Analyze this job posting against my resume (${activeResume.name}). Here's the JD:\n\n${jdText.slice(0, 2000)}` })
-  }
-
-  // Helper to read file as text
-  const readFileAsText = (file: File): Promise<string> => {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader()
-      reader.onload = () => resolve(reader.result as string)
-      reader.onerror = reject
-      reader.readAsText(file)
-    })
   }
 
   // ── PILL BAR — persistent actions above input when chat has messages ──
@@ -392,7 +371,7 @@ export function ChatView() {
       <input
         ref={fileRef}
         type="file"
-        accept=".txt,.md,.text,.pdf"
+        accept=".txt,.md,.text,.pdf,.docx"
         className="hidden"
         onChange={handleFileChange}
       />

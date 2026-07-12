@@ -4,7 +4,6 @@ import { useState, useRef, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAppStore } from '~/lib/store'
 import { createResume } from '~/lib/company-data'
-import { extractPdfText } from '~/lib/pdf-parse'
 import { notify } from '~/lib/toast'
 import { Wand2, Download, Copy, Save, Upload, FileText, Loader2, Trash2 } from 'lucide-react'
 import { ConfirmDialog } from '~/components/ui/confirm-dialog'
@@ -100,26 +99,19 @@ export default function StandaloneCoverLetterPage() {
 
     setParsing(true)
     try {
-      let text: string
-      if (file.type === 'application/pdf' || file.name.endsWith('.pdf')) {
-        text = await extractPdfText(file)
-      } else {
-        text = await file.text()
-      }
+      // Send file to server — server handles text extraction + AI parsing
+      const formData = new FormData()
+      formData.append('file', file)
 
-      if (text.trim().length < 20) {
-        notify({ message: 'Could not extract enough text from this file. Try another file.', type: 'error' })
-        return
-      }
-
-      // Call parse-resume API
       const res = await fetch('/api/parse-resume', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text }),
+        body: formData,
       })
 
-      if (!res.ok) throw new Error('Failed to parse resume')
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}))
+        throw new Error(errData.error || 'Failed to parse resume')
+      }
       const parsed = await res.json()
 
       const resume = createResume({
@@ -164,7 +156,7 @@ export default function StandaloneCoverLetterPage() {
       notify({ message: 'Resume uploaded and processed successfully!', type: 'success' })
     } catch (err) {
       console.error(err)
-      notify({ message: 'Failed to process resume. Please try again.', type: 'error' })
+      notify({ message: err instanceof Error ? err.message : 'Failed to process resume. Please try again.', type: 'error' })
     } finally {
       setParsing(false)
     }
@@ -261,7 +253,7 @@ export default function StandaloneCoverLetterPage() {
       <input
         ref={fileInputRef}
         type="file"
-        accept=".pdf,.txt,.text,.md"
+        accept=".pdf,.txt,.text,.md,.docx"
         className="hidden"
         onChange={handleFileChange}
       />

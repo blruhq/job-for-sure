@@ -1,19 +1,21 @@
 import React from 'react'
 import { Document, Page, View, Text, StyleSheet, Font } from '@react-pdf/renderer'
 import type { Resume } from '~/types/resume'
+import path from 'node:path'
 
 Font.register({
   family: 'Inter',
   fonts: [
-    { src: 'https://fonts.gstatic.com/s/inter/v18/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa2JL7W0I5nvw.woff2', fontWeight: 400 },
-    { src: 'https://fonts.gstatic.com/s/inter/v18/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa2ZL7W0I5nvw.woff2', fontWeight: 600 },
-    { src: 'https://fonts.gstatic.com/s/inter/v18/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa2pL7W0I5nvw.woff2', fontWeight: 700 },
+    { src: path.join(process.cwd(), 'public', 'fonts', 'inter-regular.ttf'), fontWeight: 400 },
+    { src: path.join(process.cwd(), 'public', 'fonts', 'inter-medium.ttf'), fontWeight: 500 },
+    { src: path.join(process.cwd(), 'public', 'fonts', 'inter-semibold.ttf'), fontWeight: 600 },
+    { src: path.join(process.cwd(), 'public', 'fonts', 'inter-bold.ttf'), fontWeight: 700 },
   ],
 })
 
 Font.register({
   family: 'JetBrains Mono',
-  src: 'https://fonts.gstatic.com/s/jetbrainsmono/v18/tDbY2o-flEEny0FZhsfKu5WU4zr3E_BX0PnT8RD8yKwBNntkaTxj.woff2',
+  src: path.join(process.cwd(), 'public', 'fonts', 'jetbrains-mono-regular.ttf'),
 })
 
 const styles = StyleSheet.create({

@@ -29,7 +29,7 @@ const SOURCE_SHORT: Record<JobSource, string> = {
 }
 
 // ═══════════════════════════════════════════════════════════════
-// JobPreview — shows 5-10 real job cards inline in the chat
+// JobPreview — shows up to 10 real job cards inline in the chat
 // after the user uploads/builds a resume. Has "View All →" button
 // that navigates to the full Find Jobs search panel.
 // ═══════════════════════════════════════════════════════════════
@@ -163,9 +163,9 @@ export function JobPreview({ resume, onDismiss }: { resume: Resume; onDismiss?: 
           </div>
         </div>
 
-        {/* Job cards (top 5) */}
+        {/* Job cards (top 10) */}
         <div className="grid grid-cols-1 gap-2">
-          {jobs.slice(0, 5).map((job) => {
+          {jobs.slice(0, 10).map((job) => {
             const key = job.id
             const bm = isBookmarked(key)
             return (
@@ -286,12 +286,12 @@ export function JobPreview({ resume, onDismiss }: { resume: Resume; onDismiss?: 
         </div>
 
         {/* View more */}
-        {jobs.length > 5 && (
+        {jobs.length > 10 && (
           <button
             onClick={() => router.push(`/resume/${resume.id}`)}
             className="mt-2 flex w-full cursor-pointer items-center justify-center gap-1 rounded-sm border border-dashed border-border py-1.5 text-[11px] text-muted-foreground transition-colors hover:border-primary hover:text-primary"
           >
-            +{jobs.length - 5} more jobs · View all <ChevronRight size={11} />
+            +{jobs.length - 10} more jobs · View all <ChevronRight size={11} />
           </button>
         )}
 
