@@ -1,10 +1,9 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextResponse } from 'next/server'
 import { generateObjectWithFailover } from '~/lib/ai-providers'
-import { getSessionUser } from '~/lib/auth-helpers'
-import { checkRateLimit } from '~/lib/ratelimit'
+import { withAuth } from '~/lib/with-auth'
 import { extractTextFromFile, UnsupportedFileError } from '~/lib/resume-extract'
+import { captureServerEvent } from '~/lib/posthog-server'
 import { z } from 'zod'
-import { captureServerEvent, captureServerError } from '~/lib/posthog-server'
 
 export const maxDuration = 60
 
@@ -62,67 +61,49 @@ const ParseResumeSchema = z.object({
   role: z.string().default(''),
 })
 
-/**
- * POST /api/parse-resume
- *
- * Accepts TWO content types:
- * 1. multipart/form-data with "file" field → server extracts text
- * 2. application/json with { text: string } → use text directly (backward compat)
- */
-export async function POST(req: NextRequest) {
-  try {
-    const user = await getSessionUser()
-    if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+export const POST = withAuth(async (req, { user }) => {
+  // ── Determine input mode ──
+  const contentType = req.headers.get('content-type') || ''
+  let text: string
 
-    const limited = await checkRateLimit(user.id)
-    if (limited) return limited
+  if (contentType.includes('multipart/form-data')) {
+    const formData = await req.formData()
+    const file = formData.get('file')
 
-    // ── Determine input mode ──
-    const contentType = req.headers.get('content-type') || ''
-    let text: string
-
-    if (contentType.includes('multipart/form-data')) {
-      // File upload mode — server extracts text
-      const formData = await req.formData()
-      const file = formData.get('file')
-
-      if (!file || !(file instanceof File)) {
-        return NextResponse.json(
-          { error: 'No file provided. Upload a .pdf, .docx, .txt, or .md file.' },
-          { status: 400 },
-        )
-      }
-
-      try {
-        text = await extractTextFromFile(file)
-      } catch (err) {
-        if (err instanceof UnsupportedFileError) {
-          return NextResponse.json({ error: err.message }, { status: 400 })
-        }
-        throw err
-      }
-    } else {
-      // JSON text mode (backward compat for paste-text paths)
-      const body = z.object({ text: z.string().min(20).max(50000) }).safeParse(await req.json())
-      if (!body.success) {
-        return NextResponse.json(
-          { error: 'Resume text is too short or too long.' },
-          { status: 400 },
-        )
-      }
-      text = body.data.text
+    if (!file || !(file instanceof File)) {
+      return NextResponse.json(
+        { error: 'No file provided. Upload a .pdf, .docx, .txt, or .md file.' },
+        { status: 400 },
+      )
     }
 
-    // ── Debug Logging ──
-    console.log('[parse-resume] Extracted text length:', text.length)
-    console.log('[parse-resume] Extracted text preview (first 500 chars):')
-    console.log('--------------------------------------------------')
-    console.log(text.slice(0, 500))
-    console.log('--------------------------------------------------')
+    try {
+      text = await extractTextFromFile(file)
+    } catch (err) {
+      if (err instanceof UnsupportedFileError) {
+        return NextResponse.json({ error: err.message }, { status: 400 })
+      }
+      throw err
+    }
+  } else {
+    const body = z.object({ text: z.string().min(20).max(50000) }).safeParse(await req.json())
+    if (!body.success) {
+      return NextResponse.json(
+        { error: 'Resume text is too short or too long.' },
+        { status: 400 },
+      )
+    }
+    text = body.data.text
+  }
 
-    // ── AI parse ──
-    const parsed = await generateObjectWithFailover<z.infer<typeof ParseResumeSchema>>({
-      system: `You are a professional resume parser. Extract ALL structured information from the provided resume text into a VALID JSON matching the schema.
+  // Log length only in development — never log raw text (PII)
+  if (process.env.NODE_ENV === 'development') {
+    console.log('[parse-resume] Extracted text length:', text.length)
+  }
+
+  // ── AI parse ──
+  const parsed = await generateObjectWithFailover<z.infer<typeof ParseResumeSchema>>({
+    system: `You are a professional resume parser. Extract ALL structured information from the provided resume text into a VALID JSON matching the schema.
 
 Guidelines:
 1. Contact Information:
@@ -159,23 +140,12 @@ Guidelines:
    - If a field isn't present, use empty string or empty array.
    - Skills should be individual technologies/tools (e.g. "React", not "Frontend Development").
    - Return VALID JSON matching the provided schema.`,
-      prompt: text.slice(0, 20000), // Cap at 20K chars
-      schema: ParseResumeSchema,
-      temperature: 0.2,
-      maxOutputTokens: 4000,
-    })
+    prompt: text.slice(0, 20000),
+    schema: ParseResumeSchema,
+    temperature: 0.2,
+    maxOutputTokens: 4000,
+  })
 
-    // Role is now extract-only — no fabrication.
-    // If empty, leave empty. Job search will prompt the user for a target role.
-
-    await captureServerEvent(user.id, 'resume_uploaded')
-    return NextResponse.json(parsed)
-  } catch (error) {
-    console.error('[parse-resume] Error:', error)
-    await captureServerError('anonymous', error, { route: '/api/parse-resume' })
-    return NextResponse.json(
-      { error: error instanceof Error ? error.message : 'Failed to parse resume' },
-      { status: 500 },
-    )
-  }
-}
+  await captureServerEvent(user.id, 'resume_uploaded')
+  return NextResponse.json(parsed)
+}, { rateLimitType: 'ai', route: '/api/parse-resume' })

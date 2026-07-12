@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { Inter, JetBrains_Mono, Instrument_Serif, Kanit } from 'next/font/google'
 import { ThemeProvider } from '~/components/layout/theme-provider'
 import '../globals.css'
+import { Toaster } from 'sonner'
 import { NextIntlClientProvider } from 'next-intl'
 import { getMessages } from 'next-intl/server'
 import { notFound } from 'next/navigation'
@@ -89,6 +90,7 @@ export default async function LocaleLayout({
         <NextIntlClientProvider messages={messages}>
           <ThemeProvider>
             {children}
+            <Toaster position="bottom-center" richColors />
           </ThemeProvider>
         </NextIntlClientProvider>
       </body>

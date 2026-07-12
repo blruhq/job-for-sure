@@ -1,9 +1,8 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextResponse } from 'next/server'
 import { searchJobs } from '~/lib/job-sources'
 import type { JobSource } from '~/lib/job-sources'
-import { getSessionUser } from '~/lib/auth-helpers'
-import { checkGeneralRateLimit } from '~/lib/ratelimit'
-import { captureServerEvent, captureServerError } from '~/lib/posthog-server'
+import { withAuth } from '~/lib/with-auth'
+import { captureServerEvent } from '~/lib/posthog-server'
 import { z } from 'zod'
 
 export const maxDuration = 30
@@ -19,43 +18,28 @@ const SearchBody = z.object({
   includePaid: z.boolean().optional(),
 })
 
-export async function POST(req: NextRequest) {
-  try {
-    const user = await getSessionUser()
-    if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-
-    const limited = await checkGeneralRateLimit(user.id)
-    if (limited) return limited
-
-    const body = SearchBody.safeParse(await req.json())
-    if (!body.success) {
-      return NextResponse.json(
-        { error: 'Invalid search parameters', details: body.error.flatten() },
-        { status: 400 },
-      )
-    }
-
-    const { query, location, skills, role, sources, limit, fresh, includePaid } = body.data
-
-    const result = await searchJobs({
-      query: query.trim(),
-      location: location?.trim() || undefined,
-      skills: skills || [],
-      role: role || undefined,
-      sources: sources as JobSource[] | undefined,
-      limit: limit || 30,
-      fresh: fresh || false,
-      includePaid: includePaid || false,
-    })
-
-    await captureServerEvent(user.id, 'job_searched', { query, location })
-    return NextResponse.json(result)
-  } catch (error) {
-    console.error('[jobs/search] Error:', error)
-    await captureServerError('anonymous', error, { route: '/api/jobs/search' })
+export const POST = withAuth(async (req, { user }) => {
+  const body = SearchBody.safeParse(await req.json())
+  if (!body.success) {
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : 'Job search failed' },
-      { status: 500 },
+      { error: 'Invalid search parameters', details: body.error.flatten() },
+      { status: 400 },
     )
   }
-}
+
+  const { query, location, skills, role, sources, limit, fresh, includePaid } = body.data
+
+  const result = await searchJobs({
+    query: query.trim(),
+    location: location?.trim() || undefined,
+    skills: skills || [],
+    role: role || undefined,
+    sources: sources as JobSource[] | undefined,
+    limit: limit || 30,
+    fresh: fresh || false,
+    includePaid: includePaid || false,
+  })
+
+  await captureServerEvent(user.id, 'job_searched', { query, location })
+  return NextResponse.json(result)
+}, { rateLimitType: 'general', route: '/api/jobs/search' })

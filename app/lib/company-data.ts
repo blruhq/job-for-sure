@@ -6,8 +6,6 @@ import type { Resume } from '~/types/resume'
 // Company matching is handled by /api/match-companies (AI-powered).
 // ═══════════════════════════════════════════════════════════════
 
-let resumeCounter = 0
-
 export function createResume(data: {
   name: string
   role: string
@@ -25,9 +23,8 @@ export function createResume(data: {
   languages?: Resume['languages']
   customSections?: Resume['customSections']
 }): Resume {
-  resumeCounter++
   return {
-    id: String(Date.now()) + '_' + resumeCounter,
+    id: crypto.randomUUID(),
     name: data.name,
     role: data.role,
     persona: data.persona,

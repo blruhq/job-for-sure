@@ -1,5 +1,14 @@
 import { Resend } from 'resend'
 
+function escapeHtml(str: string): string {
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;')
+}
+
 const resend = new Resend(process.env.RESEND_API_KEY!)
 const FROM = 'Job For Sure <noreply@jobforsure.app>'
 
@@ -21,7 +30,7 @@ export async function sendVerificationEmail({
         <p style="color: #71706A; font-size: 13px; line-height: 1.5; margin: 0 0 24px;">
           Click the button below to verify your email address and start using Job For Sure.
         </p>
-        <a href="${url}" style="display: inline-block; background: #5B6ABF; color: white; font-size: 13px; font-weight: 500; padding: 10px 24px; border-radius: 6px; text-decoration: none;">
+        <a href="${escapeHtml(url)}" style="display: inline-block; background: #5B6ABF; color: white; font-size: 13px; font-weight: 500; padding: 10px 24px; border-radius: 6px; text-decoration: none;">
           Verify email
         </a>
         <p style="color: #9F9E98; font-size: 11px; margin-top: 32px;">
@@ -51,7 +60,7 @@ export async function sendPasswordResetEmail({
         <p style="color: #71706A; font-size: 13px; line-height: 1.5; margin: 0 0 24px;">
           Click the button below to reset your password. This link expires in 1 hour.
         </p>
-        <a href="${url}" style="display: inline-block; background: #5B6ABF; color: white; font-size: 13px; font-weight: 500; padding: 10px 24px; border-radius: 6px; text-decoration: none;">
+        <a href="${escapeHtml(url)}" style="display: inline-block; background: #5B6ABF; color: white; font-size: 13px; font-weight: 500; padding: 10px 24px; border-radius: 6px; text-decoration: none;">
           Reset password
         </a>
         <p style="color: #9F9E98; font-size: 11px; margin-top: 32px;">

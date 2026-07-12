@@ -111,20 +111,51 @@ function extractDomain(url: string): string {
   }
 }
 
+const MAX_SCRAPE_BYTES = 2 * 1024 * 1024 // 2MB — prevent OOM from huge pages
+
 async function fetchHTML(url: string): Promise<string> {
   const response = await fetch(url, {
     headers: {
-      'User-Agent':
-        'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+      'User-Agent': 'JobForSure-Bot/1.0 (+https://jobforsure.app)',
       Accept: 'text/html,application/xhtml+xml',
     },
+    signal: AbortSignal.timeout(10_000), // 10s hard timeout
   })
 
   if (!response.ok) {
     throw new Error(`HTTP ${response.status}: ${response.statusText}`)
   }
 
-  return response.text()
+  // Stream-read with size limit to prevent memory exhaustion
+  const reader = response.body?.getReader()
+  if (!reader) return response.text()
+
+  const chunks: Uint8Array[] = []
+  let totalBytes = 0
+
+  while (true) {
+    const { done, value } = await reader.read()
+    if (done) break
+    totalBytes += value.byteLength
+    if (totalBytes > MAX_SCRAPE_BYTES) {
+      reader.cancel()
+      throw new Error('Response too large (max 2MB)')
+    }
+    chunks.push(value)
+  }
+
+  return new TextDecoder().decode(concatUint8Arrays(chunks))
+}
+
+function concatUint8Arrays(arrays: Uint8Array[]): Uint8Array {
+  const totalLength = arrays.reduce((acc, arr) => acc + arr.byteLength, 0)
+  const result = new Uint8Array(totalLength)
+  let offset = 0
+  for (const arr of arrays) {
+    result.set(arr, offset)
+    offset += arr.byteLength
+  }
+  return result
 }
 
 async function scrapeIndeed(url: string): Promise<ScrapeResult> {

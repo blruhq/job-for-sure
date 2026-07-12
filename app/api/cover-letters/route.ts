@@ -1,16 +1,11 @@
 import { NextResponse } from 'next/server'
 import { db } from '~/lib/db'
 import { coverLetters } from '~/lib/schema'
-import { getSessionUser } from '~/lib/auth-helpers'
-import { checkGeneralRateLimit } from '~/lib/ratelimit'
+import { withAuth } from '~/lib/with-auth'
 import { eq, and, desc, isNull } from 'drizzle-orm'
 import { z } from 'zod'
 
-// GET /api/cover-letters — list all cover letters for the current user
-export async function GET() {
-  const user = await getSessionUser()
-  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-
+export const GET = withAuth(async (_req, { user }) => {
   const list = await db
     .select({
       id: coverLetters.id,
@@ -26,7 +21,7 @@ export async function GET() {
     .orderBy(desc(coverLetters.createdAt))
 
   return NextResponse.json(list)
-}
+}, { route: '/api/cover-letters' })
 
 const CreateCoverLetterBody = z.object({
   id: z.string().max(100).optional(),
@@ -37,15 +32,8 @@ const CreateCoverLetterBody = z.object({
   jdText: z.string().max(20000).nullable().optional(),
 })
 
-// POST /api/cover-letters — create a new cover letter
-export async function POST(request: Request) {
-  const user = await getSessionUser()
-  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-
-  const limited = await checkGeneralRateLimit(user.id)
-  if (limited) return limited
-
-  const body = CreateCoverLetterBody.safeParse(await request.json())
+export const POST = withAuth(async (req, { user }) => {
+  const body = CreateCoverLetterBody.safeParse(await req.json())
   if (!body.success) {
     return NextResponse.json({ error: 'Valid content is required' }, { status: 400 })
   }
@@ -66,4 +54,4 @@ export async function POST(request: Request) {
 
   await db.insert(coverLetters).values(letter)
   return NextResponse.json(letter)
-}
+}, { rateLimitType: 'general', route: '/api/cover-letters' })

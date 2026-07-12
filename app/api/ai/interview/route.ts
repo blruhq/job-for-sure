@@ -1,8 +1,7 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { getSessionUser } from '~/lib/auth-helpers'
-import { checkRateLimit } from '~/lib/ratelimit'
+import { NextResponse } from 'next/server'
+import { withAuth } from '~/lib/with-auth'
 import { generateObjectWithFailover } from '~/lib/ai-providers'
-import { captureServerEvent, captureServerError } from '~/lib/posthog-server'
+import { captureServerEvent } from '~/lib/posthog-server'
 import { db } from '~/lib/db'
 import { interviewSessions } from '~/lib/schema'
 import { eq, desc, and, isNull } from 'drizzle-orm'
@@ -23,7 +22,6 @@ const InterviewEvaluateSchema = z.object({
   modelAnswer: z.string(),
 })
 
-// Input validation schemas
 const QuestionInput = z.object({
   action: z.literal('question'),
   resume: z.any().optional(),
@@ -56,82 +54,57 @@ const SaveInput = z.object({
   exchanges: z.array(z.any()),
 })
 
-// GET /api/ai/interview - Retrieve past interview history for the logged-in user
-export async function GET(req: NextRequest) {
-  try {
-    const user = await getSessionUser()
-    if (!user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+export const GET = withAuth(async (_req, { user }) => {
+  const history = await db
+    .select()
+    .from(interviewSessions)
+    .where(and(eq(interviewSessions.userId, user.id), isNull(interviewSessions.deletedAt)))
+    .orderBy(desc(interviewSessions.createdAt))
+
+  return NextResponse.json(history)
+}, { route: '/api/ai/interview' })
+
+export const POST = withAuth(async (req, { user }) => {
+  const body = await req.json()
+  const { action } = body
+
+  if (action === 'question') {
+    const parsed = QuestionInput.safeParse(body)
+    if (!parsed.success) {
+      return NextResponse.json({ error: 'Invalid question request' }, { status: 400 })
     }
+    const { resume, target, config, previousQuestions = [] } = parsed.data
+    const { company, role } = target
+    const { type, difficulty, missingSkills = [], transferableSkills = [], matchScore } = config
 
-    const history = await db
-      .select()
-      .from(interviewSessions)
-      .where(and(eq(interviewSessions.userId, user.id), isNull(interviewSessions.deletedAt)))
-      .orderBy(desc(interviewSessions.createdAt))
-
-    return NextResponse.json(history)
-  } catch (error) {
-    console.error('Interview history fetch error:', error)
-    await captureServerError('anonymous', error, { route: '/api/ai/interview' })
-    return NextResponse.json(
-      { error: error instanceof Error ? error.message : 'Failed to fetch interview history' },
-      { status: 500 },
-    )
-  }
-}
-
-export async function POST(req: NextRequest) {
-  try {
-    const user = await getSessionUser()
-    if (!user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
-
-    const limited = await checkRateLimit(user.id)
-    if (limited) return limited
-
-    const body = await req.json()
-    const { action } = body
-
-    if (action === 'question') {
-      const parsed = QuestionInput.safeParse(body)
-      if (!parsed.success) {
-        return NextResponse.json({ error: 'Invalid question request' }, { status: 400 })
-      }
-      const { resume, target, config, previousQuestions = [] } = parsed.data
-      const { company, role } = target
-      const { type, difficulty, missingSkills = [], transferableSkills = [], matchScore } = config
-
-      // Base resume information (summary + list of skills + basic experience description)
-      const resumeContext = resume
-        ? `Resume Summary: ${resume.summary || 'None'}
+    const resumeContext = resume
+      ? `Resume Summary: ${resume.summary || 'None'}
 Skills: ${(resume.skills || []).join(', ')}
 Experience: ${(resume.experience || []).map((exp: any) => `${exp.role} at ${exp.company} (${exp.dates || ''}): ${exp.bullets ? exp.bullets.join('; ') : ''}`).join('\n')}`
-        : 'No resume provided.'
+      : 'No resume provided.'
 
-      const missingSection = missingSkills.length > 0
-        ? `Here are the candidate's skill gaps (missing from their profile but highly relevant for this role):
+    const missingSection = missingSkills.length > 0
+      ? `Here are the candidate's skill gaps (missing from their profile but highly relevant for this role):
 ${missingSkills.map((s: string) => `- ${s}`).join('\n')}
 Please weight the generated question toward testing or probing these missing skills, particularly system design, if relevant for technical interviews.`
-        : ''
+      : ''
 
-      const transferableSection = transferableSkills.length > 0
-        ? `Here are some transferable skills the candidate possesses:
+    const transferableSection = transferableSkills.length > 0
+      ? `Here are some transferable skills the candidate possesses:
 ${transferableSkills.map((s: string) => `- ${s}`).join('\n')}
 You may choose to validate these skills and see how they apply to the target role.`
-        : ''
+      : ''
 
-      const matchScoreSection = matchScore !== undefined
-        ? `The candidate's overall ATS match score for this role is ${matchScore}/100.`
-        : ''
+    const matchScoreSection = matchScore !== undefined
+      ? `The candidate's overall ATS match score for this role is ${matchScore}/100.`
+      : ''
 
-      const avoidSection = previousQuestions.length > 0
-        ? `DO NOT repeat or generate any of the following questions that were already asked:
+    const avoidSection = previousQuestions.length > 0
+      ? `DO NOT repeat or generate any of the following questions that were already asked:
 ${previousQuestions.map((q: string) => `- ${q}`).join('\n')}`
-        : ''
+      : ''
 
-      const systemPrompt = `You are an expert interviewer at ${company} interviewing for the ${role} position.
+    const systemPrompt = `You are an expert interviewer at ${company} interviewing for the ${role} position.
 Your goal is to conduct a realistic, high-quality interview.
 Generate exactly ONE interview question.
 
@@ -156,26 +129,27 @@ Instructions:
 4. Identify a category ('behavioral' or 'technical') and 1-3 tags (e.g. "system-design", "leadership", "react", "conflict-resolution").
 5. Generate the interview question in the language that matches the target company and job details. If the candidate's resume or previous interactions are in Thai, you may also generate questions in Thai.`
 
-      const result = await generateObjectWithFailover<z.infer<typeof InterviewQuestionSchema>>({
-        system: systemPrompt,
-        prompt: 'Generate the next targeted interview question.',
-        schema: InterviewQuestionSchema,
-        temperature: 0.7,
-        maxOutputTokens: 800,
-      })
+    const result = await generateObjectWithFailover<z.infer<typeof InterviewQuestionSchema>>({
+      system: systemPrompt,
+      prompt: 'Generate the next targeted interview question.',
+      schema: InterviewQuestionSchema,
+      temperature: 0.7,
+      maxOutputTokens: 800,
+    })
 
-      await captureServerEvent(user.id, 'interview_started', { company, role, type, difficulty })
-      return NextResponse.json(result)
+    await captureServerEvent(user.id, 'interview_started', { company, role, type, difficulty })
+    return NextResponse.json(result)
+  }
 
-    } else if (action === 'evaluate') {
-      const parsed = EvaluateInput.safeParse(body)
-      if (!parsed.success) {
-        return NextResponse.json({ error: 'Invalid evaluate request' }, { status: 400 })
-      }
-      const { target, question, answer } = parsed.data
-      const { company, role } = target
+  if (action === 'evaluate') {
+    const parsed = EvaluateInput.safeParse(body)
+    if (!parsed.success) {
+      return NextResponse.json({ error: 'Invalid evaluate request' }, { status: 400 })
+    }
+    const { target, question, answer } = parsed.data
+    const { company, role } = target
 
-      const systemPrompt = `You are an expert interview evaluator.
+    const systemPrompt = `You are an expert interview evaluator.
 Your job is to evaluate a candidate's answer to an interview question for the role of ${role} at ${company}.
 
 Question: ${question}
@@ -195,43 +169,37 @@ Return your evaluation as a raw JSON object with exactly these fields:
 
 Language rules: Evaluate the candidate's answer and return strengths, improvements, and model answer in the same language the candidate used in their answer.`
 
-      const result = await generateObjectWithFailover<z.infer<typeof InterviewEvaluateSchema>>({
-        system: systemPrompt,
-        prompt: 'Evaluate the candidate answer.',
-        schema: InterviewEvaluateSchema,
-        temperature: 0.3,
-        maxOutputTokens: 800,
-      })
+    const result = await generateObjectWithFailover<z.infer<typeof InterviewEvaluateSchema>>({
+      system: systemPrompt,
+      prompt: 'Evaluate the candidate answer.',
+      schema: InterviewEvaluateSchema,
+      temperature: 0.3,
+      maxOutputTokens: 800,
+    })
 
-      return NextResponse.json(result)
-    } else if (action === 'save') {
-      const parsed = SaveInput.safeParse(body)
-      if (!parsed.success) {
-        return NextResponse.json({ error: 'Missing required session parameters' }, { status: 400 })
-      }
-      const { resumeId, company, role, type, difficulty, score, exchanges } = parsed.data
-      const id = 'int_' + Date.now() + '_' + Math.random().toString(36).substring(7)
-      await db.insert(interviewSessions).values({
-        id,
-        userId: user.id,
-        resumeId: resumeId || null,
-        company,
-        role,
-        type,
-        difficulty,
-        score: String(score),
-        exchanges,
-      })
-      return NextResponse.json({ success: true, id })
-    }
-
-    return NextResponse.json({ error: 'Invalid action' }, { status: 400 })
-  } catch (error) {
-    console.error('Interview API error:', error)
-    await captureServerError('anonymous', error, { route: '/api/ai/interview' })
-    return NextResponse.json(
-      { error: error instanceof Error ? error.message : 'Interview operation failed' },
-      { status: 500 },
-    )
+    return NextResponse.json(result)
   }
-}
+
+  if (action === 'save') {
+    const parsed = SaveInput.safeParse(body)
+    if (!parsed.success) {
+      return NextResponse.json({ error: 'Missing required session parameters' }, { status: 400 })
+    }
+    const { resumeId, company, role, type, difficulty, score, exchanges } = parsed.data
+    const id = 'int_' + crypto.randomUUID()
+    await db.insert(interviewSessions).values({
+      id,
+      userId: user.id,
+      resumeId: resumeId || null,
+      company,
+      role,
+      type,
+      difficulty,
+      score: String(score),
+      exchanges,
+    })
+    return NextResponse.json({ success: true, id })
+  }
+
+  return NextResponse.json({ error: 'Invalid action' }, { status: 400 })
+}, { rateLimitType: 'ai', route: '/api/ai/interview' })

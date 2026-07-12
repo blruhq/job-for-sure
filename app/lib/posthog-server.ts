@@ -6,8 +6,8 @@ function getPostHog(): PostHog {
   if (!client) {
     client = new PostHog(process.env.NEXT_PUBLIC_POSTHOG_PROJECT_TOKEN!, {
       host: process.env.NEXT_PUBLIC_POSTHOG_HOST!,
-      flushAt: 1,
-      flushInterval: 0,
+      flushAt: 20,
+      flushInterval: 10_000,
     })
   }
   return client

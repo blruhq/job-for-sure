@@ -1,16 +1,17 @@
 import { NextResponse } from 'next/server'
 import { db } from '~/lib/db'
 import { userPreferences } from '~/lib/schema'
-import { getSessionUser } from '~/lib/auth-helpers'
-import { checkGeneralRateLimit } from '~/lib/ratelimit'
+import { withAuth } from '~/lib/with-auth'
 import { eq } from 'drizzle-orm'
 import { z } from 'zod'
 
-// GET /api/user/preferences
-export async function GET() {
-  const user = await getSessionUser()
-  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+const PrefsBody = z.object({
+  emailNotifications: z.boolean().optional(),
+  weeklyDigest: z.boolean().optional(),
+  marketingEmails: z.boolean().optional(),
+})
 
+export const GET = withAuth(async (_req, { user }) => {
   let prefs = await db
     .select()
     .from(userPreferences)
@@ -18,7 +19,6 @@ export async function GET() {
     .limit(1)
     .then(rows => rows[0])
 
-  // Create default preferences if none exist
   if (!prefs) {
     const defaults = {
       userId: user.id,
@@ -31,23 +31,10 @@ export async function GET() {
   }
 
   return NextResponse.json(prefs)
-}
+}, { route: '/api/user/preferences' })
 
-const PrefsBody = z.object({
-  emailNotifications: z.boolean().optional(),
-  weeklyDigest: z.boolean().optional(),
-  marketingEmails: z.boolean().optional(),
-})
-
-// PUT /api/user/preferences
-export async function PUT(request: Request) {
-  const user = await getSessionUser()
-  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-
-  const limited = await checkGeneralRateLimit(user.id)
-  if (limited) return limited
-
-  const body = PrefsBody.safeParse(await request.json())
+export const PUT = withAuth(async (req, { user }) => {
+  const body = PrefsBody.safeParse(await req.json())
   if (!body.success) {
     return NextResponse.json({ error: 'Invalid preferences data' }, { status: 400 })
   }
@@ -70,4 +57,4 @@ export async function PUT(request: Request) {
     .then(rows => rows[0])
 
   return NextResponse.json(prefs)
-}
+}, { rateLimitType: 'general', route: '/api/user/preferences' })

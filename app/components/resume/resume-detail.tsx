@@ -59,10 +59,6 @@ function detectSectionSuggestions(resume: { summary?: string; skills?: string[];
   ].join(' ').toLowerCase()
 
   const suggestions: SectionKey[] = []
-  if (!/(projects?|github|portfolio|app|built|developed|created)/i.test(text) || (text.match(/\b(react|python|typescript|node|docker|api|frontend|backend|full.stack|engineer|developer|software)\b/g)?.length ?? 0) > 2) {
-    // Only suggest Projects if tech keywords detected AND no project-like language already
-    // Simplified: just suggest if user doesn't have it
-  }
   if (/finance|accounting|banking|investment|cfa|cpa|pmp|aws\s+certified|google\s+certified|audit|compliance|risk/i.test(text))
     suggestions.push('certifications')
   if (/bilingual|multilingual|language|fluent|native|thai|chinese|japanese|korean|french|german|spanish/i.test(text) && !/language/i.test(text))

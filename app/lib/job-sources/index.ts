@@ -87,57 +87,57 @@ export async function searchJobs(params: SearchParams): Promise<SearchResult> {
 
   // No-key sources (always try)
   if (sources.includes('remoteok')) {
-    fetchers.push(wrapSource('remoteok', () => fetchRemoteOKJobs(query)))
+    fetchers.push(fetchRemoteOKJobs(query))
     fetcherSources.push('remoteok')
   }
   if (sources.includes('himalayas')) {
-    fetchers.push(wrapSource('himalayas', () => fetchHimalayas(query)))
+    fetchers.push(fetchHimalayas(query))
     fetcherSources.push('himalayas')
   }
   if (sources.includes('remotive')) {
-    fetchers.push(wrapSource('remotive', () => fetchRemotive(query)))
+    fetchers.push(fetchRemotive(query))
     fetcherSources.push('remotive')
   }
   if (sources.includes('themuse')) {
-    fetchers.push(wrapSource('themuse', () => fetchTheMuse(query)))
+    fetchers.push(fetchTheMuse(query))
     fetcherSources.push('themuse')
   }
   if (sources.includes('arbeitnow')) {
-    fetchers.push(wrapSource('arbeitnow', () => fetchArbeitnow(query)))
+    fetchers.push(fetchArbeitnow(query))
     fetcherSources.push('arbeitnow')
   }
   if (sources.includes('greenhouse')) {
-    fetchers.push(wrapSource('greenhouse', () => fetchGreenhouseJobs(query)))
+    fetchers.push(fetchGreenhouseJobs(query))
     fetcherSources.push('greenhouse')
   }
   if (sources.includes('ashby')) {
-    fetchers.push(wrapSource('ashby', () => fetchAshbyJobs(query)))
+    fetchers.push(fetchAshbyJobs(query))
     fetcherSources.push('ashby')
   }
 
   // Key-gated sources (auto-activate when env vars present)
   if (sources.includes('adzuna')) {
-    fetchers.push(wrapSource('adzuna', () => fetchAdzuna(query, location)))
+    fetchers.push(fetchAdzuna(query, location))
     fetcherSources.push('adzuna')
   }
   if (sources.includes('jsearch')) {
-    fetchers.push(wrapSource('jsearch', () => fetchJSearch(query, location)))
+    fetchers.push(fetchJSearch(query, location))
     fetcherSources.push('jsearch')
   }
   if (sources.includes('jobbkk')) {
-    fetchers.push(wrapSource('jobbkk', () => fetchJobbKK(query, location)))
+    fetchers.push(fetchJobbKK(query, location))
     fetcherSources.push('jobbkk')
   }
   if (sources.includes('linkedin')) {
-    fetchers.push(wrapSource('linkedin', () => fetchApifyLinkedIn(query, location)))
+    fetchers.push(fetchApifyLinkedIn(query, location))
     fetcherSources.push('linkedin')
   }
   if (sources.includes('indeed')) {
-    fetchers.push(wrapSource('indeed', () => fetchApifyIndeed(query, location)))
+    fetchers.push(fetchApifyIndeed(query, location))
     fetcherSources.push('indeed')
   }
   if (sources.includes('jobsdb')) {
-    fetchers.push(wrapSource('jobsdb', () => fetchApifyJobsDB(query, location)))
+    fetchers.push(fetchApifyJobsDB(query, location))
     fetcherSources.push('jobsdb')
   }
 
@@ -191,13 +191,6 @@ export async function searchJobs(params: SearchParams): Promise<SearchResult> {
 }
 
 // ── Source wrappers ──────────────────────────────────────────
-
-async function wrapSource(
-  _name: string,
-  fn: () => Promise<{ jobs: JobResult[]; error?: string }>,
-): Promise<{ jobs: JobResult[]; error?: string }> {
-  return fn()
-}
 
 async function fetchRemoteOKJobs(query: string): Promise<{ jobs: JobResult[]; error?: string }> {
   try {

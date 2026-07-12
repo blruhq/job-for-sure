@@ -1,7 +1,10 @@
 node_modules/
 dist/
 .next/
-.env.local
 *.tsbuildinfo
 test-results/
 playwright-report/
+
+# Env files — ignore everything except the example
+.env*
+!.env.example

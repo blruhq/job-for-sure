@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import { db } from '~/lib/db'
 import { coverLetters } from '~/lib/schema'
-import { getSessionUser } from '~/lib/auth-helpers'
+import { withAuth } from '~/lib/with-auth'
 import { eq, and } from 'drizzle-orm'
 import { z } from 'zod'
 
@@ -11,23 +11,14 @@ const PatchCoverLetterBody = z.object({
   role: z.string().max(200).nullable().optional(),
 })
 
-// PATCH /api/cover-letters/[id] — update a cover letter
-export async function PATCH(
-  request: Request,
-  { params }: { params: Promise<{ id: string }> },
-) {
-  const user = await getSessionUser()
-  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-
-  const { id } = await params
-  const body = PatchCoverLetterBody.safeParse(await request.json())
+export const PATCH = withAuth<{ id: string }>(async (req, { user, params }) => {
+  const { id } = params
+  const body = PatchCoverLetterBody.safeParse(await req.json())
   if (!body.success) {
     return NextResponse.json({ error: 'Invalid update data' }, { status: 400 })
   }
 
-  const updates: Record<string, unknown> = {
-    updatedAt: new Date(),
-  }
+  const updates: Record<string, unknown> = { updatedAt: new Date() }
   if (body.data.content !== undefined) updates.content = body.data.content
   if (body.data.company !== undefined) updates.company = body.data.company
   if (body.data.role !== undefined) updates.role = body.data.role
@@ -40,17 +31,10 @@ export async function PATCH(
 
   if (!updated) return NextResponse.json({ error: 'Not found' }, { status: 404 })
   return NextResponse.json(updated)
-}
+}, { route: '/api/cover-letters/[id]' })
 
-// DELETE /api/cover-letters/[id] — soft delete a cover letter
-export async function DELETE(
-  _request: Request,
-  { params }: { params: Promise<{ id: string }> },
-) {
-  const user = await getSessionUser()
-  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-
-  const { id } = await params
+export const DELETE = withAuth<{ id: string }>(async (_req, { user, params }) => {
+  const { id } = params
   const [updated] = await db
     .update(coverLetters)
     .set({ deletedAt: new Date() })
@@ -59,4 +43,4 @@ export async function DELETE(
 
   if (!updated) return NextResponse.json({ error: 'Not found' }, { status: 404 })
   return NextResponse.json({ success: true })
-}
+}, { route: '/api/cover-letters/[id]' })

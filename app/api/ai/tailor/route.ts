@@ -1,9 +1,7 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextResponse } from 'next/server'
 import { generateObjectWithFailover } from '~/lib/ai-providers'
-import { getSessionUser } from '~/lib/auth-helpers'
-import { checkRateLimit } from '~/lib/ratelimit'
+import { withAuth } from '~/lib/with-auth'
 import { z } from 'zod'
-import { captureServerError } from '~/lib/posthog-server'
 
 export const maxDuration = 60
 
@@ -36,22 +34,15 @@ const TailorSchema = z.object({
   ),
 })
 
-export async function POST(req: NextRequest) {
-  try {
-    const user = await getSessionUser()
-    if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+export const POST = withAuth(async (req, { user: _user }) => {
+  const body = TailorInputBody.safeParse(await req.json())
+  if (!body.success) {
+    return NextResponse.json({ error: 'Invalid request' }, { status: 400 })
+  }
+  const { resume, job } = body.data
 
-    const limited = await checkRateLimit(user.id)
-    if (limited) return limited
-
-    const body = TailorInputBody.safeParse(await req.json())
-    if (!body.success) {
-      return NextResponse.json({ error: 'Invalid request' }, { status: 400 })
-    }
-    const { resume, job } = body.data
-
-    const result = await generateObjectWithFailover<z.infer<typeof TailorSchema>>({
-      system: `You are a professional resume optimization expert. 
+  const result = await generateObjectWithFailover<z.infer<typeof TailorSchema>>({
+    system: `You are a professional resume optimization expert. 
 You receive a candidate's resume data and optimization instructions.
 You return a JSON object with:
 1. "optimized": the full resume object with rewritten content optimized for the target job instructions
@@ -65,19 +56,11 @@ Rules:
 - Keep the same length or shorter than original
 - Preserve all dates, company names, and factual data
 - Always output the optimized resume fields (summary, experience bullets, skills, persona) in the same language as the INPUT resume. Do not translate the resume content to another language. If the input resume is in Thai, output in Thai. If in English, output in English.`,
-      prompt: JSON.stringify({ resume, job }),
-      schema: TailorSchema,
-      temperature: 0.4,
-      maxOutputTokens: 2048,
-    })
+    prompt: JSON.stringify({ resume, job }),
+    schema: TailorSchema,
+    temperature: 0.4,
+    maxOutputTokens: 2048,
+  })
 
-    return NextResponse.json(result)
-  } catch (error) {
-    console.error('[tailor] Error:', error)
-    await captureServerError('anonymous', error, { route: '/api/ai/tailor' })
-    return NextResponse.json(
-      { error: error instanceof Error ? error.message : 'Failed to tailor resume' },
-      { status: 500 },
-    )
-  }
-}
+  return NextResponse.json(result)
+}, { rateLimitType: 'ai', route: '/api/ai/tailor' })

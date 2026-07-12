@@ -3,14 +3,14 @@ import { getSessionUser } from '~/lib/auth-helpers'
 import { checkRateLimit, checkGeneralRateLimit } from '~/lib/ratelimit'
 import { captureServerError } from '~/lib/posthog-server'
 
-export interface AuthContext {
+export interface AuthContext<P = Record<string, string>> {
   user: { id: string; email: string; name: string }
-  params: any
+  params: P
 }
 
-type AuthHandler = (
+type AuthHandler<P> = (
   req: NextRequest,
-  ctx: AuthContext,
+  ctx: AuthContext<P>,
 ) => Promise<Response> | Response
 
 /**
@@ -19,26 +19,31 @@ type AuthHandler = (
  *
  * @example
  * export const POST = withAuth(async (req, { user }) => { ... }, { rateLimitType: 'general' })
+ * export const GET = withAuth<{ id: string }>(async (req, { user, params }) => { ... })
  */
-export function withAuth(
-  handler: AuthHandler,
+export function withAuth<P = Record<string, string>>(
+  handler: AuthHandler<P>,
   opts?: {
     rateLimitType?: 'ai' | 'general'
     route?: string
   },
 ) {
-  return async (req: Request, { params }: { params?: any } = {}) => {
-    // NextRequest inherits from Request. Ensure it's treated as NextRequest.
+  return async (
+    req: Request,
+    { params }: { params?: P | Promise<P> } = {},
+  ): Promise<Response> => {
     const nextReq = req as NextRequest
     let userId = 'anonymous'
 
     try {
+      // 1. Auth check
       const user = await getSessionUser()
       if (!user) {
         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
       }
       userId = user.id
 
+      // 2. Rate limit (fail-open)
       if (opts?.rateLimitType === 'ai') {
         const limited = await checkRateLimit(user.id)
         if (limited) return limited
@@ -47,20 +52,31 @@ export function withAuth(
         if (limited) return limited
       }
 
-      // Unwrap params Promise if Next.js 15+ sends it as Promise
-      let resolvedParams = params
-      if (params && typeof params.then === 'function') {
-        resolvedParams = await params
+      // 3. Resolve Next.js 15+ async params
+      let resolvedParams: P
+      if (params && typeof (params as Promise<P>).then === 'function') {
+        resolvedParams = await (params as Promise<P>)
+      } else {
+        resolvedParams = (params ?? {} as P) as P
       }
 
+      // 4. Execute handler
       return await handler(nextReq, { user, params: resolvedParams })
     } catch (error) {
       console.error(`[API Error] ${opts?.route || nextReq.url}:`, error)
-      await captureServerError(userId, error, { route: opts?.route || nextReq.url })
-      return NextResponse.json(
-        { error: error instanceof Error ? error.message : 'Internal Server Error' },
-        { status: 500 },
-      )
+      await captureServerError(userId, error, {
+        route: opts?.route || nextReq.url,
+      })
+
+      // Never leak internal error details in production
+      const message =
+        process.env.NODE_ENV === 'production'
+          ? 'Internal Server Error'
+          : error instanceof Error
+            ? error.message
+            : 'Unknown error'
+
+      return NextResponse.json({ error: message }, { status: 500 })
     }
   }
 }

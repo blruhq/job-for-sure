@@ -1,6 +1,6 @@
 'use client'
 
-import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from 'react'
+import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react'
 import type { ApplicationBoard, PipelineJob, Resume } from '~/types/resume'
 import { notify } from '~/lib/toast'
 
@@ -158,29 +158,28 @@ export function AppStoreProvider({ children }: { children: ReactNode }) {
   }, [])
 
   const deleteResume = useCallback(async (id: string) => {
-    let oldResumes: Resume[] | null = null
-    let oldActiveId: string | null = null
-    setResumes(prev => {
-      oldResumes = prev
-      oldActiveId = activeResumeId
-      const next = prev.filter(r => r.id !== id)
-      if (activeResumeId === id && next.length > 0) {
-        setActiveResumeIdState(next[0].id)
-      } else if (next.length === 0) {
-        setActiveResumeIdState(null)
-      }
-      return next
-    })
+    // Capture current state BEFORE mutation (no side effects inside updater)
+    const oldResumes = resumes
+    const oldActiveId = activeResumeId
+
+    // Compute next state synchronously
+    const next = resumes.filter(r => r.id !== id)
+    setResumes(next)
+
+    // Update active ID based on computed state
+    if (activeResumeId === id) {
+      setActiveResumeIdState(next.length > 0 ? next[0].id : null)
+    }
 
     try {
       await apiDelete(`/api/resumes/${id}`)
     } catch (err) {
       console.error(err)
-      if (oldResumes) setResumes(oldResumes)
+      setResumes(oldResumes)
       if (oldActiveId !== null) setActiveResumeIdState(oldActiveId)
       notify({ message: 'Failed to delete resume. Changes rolled back.', type: 'error' })
     }
-  }, [activeResumeId])
+  }, [resumes, activeResumeId])
 
   const getResume = useCallback((id: string) => resumes.find(r => r.id === id), [resumes])
 
@@ -267,7 +266,7 @@ export function AppStoreProvider({ children }: { children: ReactNode }) {
 
   const toggleSidebar = useCallback(() => setSidebarCollapsed(prev => !prev), [])
 
-  const value: AppStore = {
+  const value = useMemo<AppStore>(() => ({
     resumes,
     activeResumeId,
     activeResume,
@@ -289,7 +288,14 @@ export function AppStoreProvider({ children }: { children: ReactNode }) {
     toggleSidebar,
     hydrated,
     loading,
-  }
+  }), [
+    resumes, activeResumeId, activeResume, applications,
+    hydrated, loading, targetCompanyKey, sidebarCollapsed,
+    setActiveResumeId, addResume, updateResume, deleteResume,
+    getResume, bookmarkJob, toggleBookmark, isBookmarked,
+    moveJob, removeJob, clearApplications, setTargetCompanyKey,
+    toggleSidebar,
+  ])
 
   return <AppCtx.Provider value={value}>{children}</AppCtx.Provider>
 }

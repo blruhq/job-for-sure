@@ -1,34 +1,25 @@
 import { streamWithFailover } from '~/lib/ai-providers'
-import { getSessionUser } from '~/lib/auth-helpers'
-import { checkRateLimit } from '~/lib/ratelimit'
+import { withAuth } from '~/lib/with-auth'
 import { NextResponse } from 'next/server'
-import { captureServerError } from '~/lib/posthog-server'
 import { z } from 'zod'
 
 export const maxDuration = 30
 
 const CopilotBody = z.object({
-  messages: z.array(z.any()),
+  messages: z.array(z.any()).max(50),
   resume: z.any().optional(),
 })
 
-export async function POST(req: Request) {
-  try {
-    const user = await getSessionUser()
-    if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+export const POST = withAuth(async (req, { user: _user }) => {
+  const body = CopilotBody.safeParse(await req.json())
+  if (!body.success) {
+    return NextResponse.json({ error: 'Invalid request body' }, { status: 400 })
+  }
 
-    const limited = await checkRateLimit(user.id)
-    if (limited) return limited
-
-    const body = CopilotBody.safeParse(await req.json())
-    if (!body.success) {
-      return NextResponse.json({ error: 'Invalid request body' }, { status: 400 })
-    }
-
-    const { messages, resume } = body.data
+  const { messages, resume } = body.data
 
   const systemPrompt = `You are an AI Resume Co-Pilot embedded in a resume editor. You help the user improve their resume in real-time.
- 
+
 The user is currently editing this resume:
 - Resume Title (Filename): ${resume?.name || 'Unknown'}
 - Target Role / Job Title: ${resume?.role || 'Not set'}
@@ -63,11 +54,4 @@ Rules:
     temperature: 0.7,
     maxOutputTokens: 800,
   })
-  } catch (error) {
-    await captureServerError('anonymous', error, { route: '/api/copilot' })
-    return NextResponse.json(
-      { error: 'Copilot failed. Please try again.' },
-      { status: 500 },
-    )
-  }
-}
+}, { rateLimitType: 'ai', route: '/api/copilot' })
