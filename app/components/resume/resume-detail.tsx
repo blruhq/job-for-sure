@@ -31,11 +31,7 @@ import { JobSearchPanel } from '~/components/resume/job-search-panel'
 import type { ResumeEducation, ResumeProject, ResumeExperience, ResumeCertification, ResumeLanguage, ResumeCustomSection } from '~/types/resume'
 import { TemplateGallery } from '~/components/resume/templates/template-gallery'
 import { DEFAULT_TEMPLATE } from '~/components/resume/templates/registry'
-import { MinimalistPreview } from '~/components/resume/templates/minimalist-preview'
-import { ModernPreview } from '~/components/resume/templates/modern-preview'
-import { ClassicPreview } from '~/components/resume/templates/classic-preview'
-import { ExecutivePreview } from '~/components/resume/templates/executive-preview'
-import { PhotoPreview } from '~/components/resume/templates/photo-preview'
+import { ResumePreview } from '~/components/resume/resume-preview'
 
 // ── Helpers ──
 
@@ -301,6 +297,41 @@ function SectionSuggestionBanner({
   )
 }
 
+// ═══════════════════════════════════════════════════════════════
+// EDITOR SECTION SORTING
+// ═══════════════════════════════════════════════════════════════
+
+type EditorSectionId = 'basic' | 'summary' | 'skills' | 'experience' | 'education' | 'projects' | 'certifications' | 'languages' | 'custom'
+
+const ALL_EDITOR_SECTIONS: EditorSectionId[] = ['basic', 'summary', 'skills', 'experience', 'education', 'projects', 'certifications', 'languages', 'custom']
+
+function SortableSection({ id, children }: { id: string; children: React.ReactNode }) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id })
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={{
+        transform: CSS.Transform.toString(transform),
+        transition,
+        opacity: isDragging ? 0.4 : 1,
+      }}
+      className="relative group/section"
+    >
+      <button
+        type="button"
+        {...attributes}
+        {...listeners}
+        className="absolute -left-0.5 top-1/2 -translate-y-1/2 cursor-grab text-muted-foreground/20 opacity-0 group-hover/section:opacity-100 transition-opacity hover:text-muted-foreground active:cursor-grabbing z-10"
+        title="Drag to reorder section"
+      >
+        <GripVertical size={14} />
+      </button>
+      {children}
+    </div>
+  )
+}
+
 // ── Main component ──
 
 export function ResumeDetail({ resumeId }: { resumeId: string }) {
@@ -332,6 +363,34 @@ export function ResumeDetail({ resumeId }: { resumeId: string }) {
   const [suggestionDismissed, setSuggestionDismissed] = useState(false)
   const [showAddSectionPicker, setShowAddSectionPicker] = useState(false)
   const suggestionAnalysed = useRef(false)
+  const [sectionOrder, setSectionOrder] = useState<EditorSectionId[]>([...ALL_EDITOR_SECTIONS])
+
+  const sectionSensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
+    useSensor(TouchSensor, { activationConstraint: { delay: 200, tolerance: 5 } }),
+  )
+
+  const handleSectionDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event
+    if (!over || active.id === over.id) return
+    const oldIndex = sectionOrder.indexOf(active.id as EditorSectionId)
+    const newIndex = sectionOrder.indexOf(over.id as EditorSectionId)
+    if (oldIndex === -1 || newIndex === -1) return
+    setSectionOrder(arrayMove(sectionOrder, oldIndex, newIndex))
+  }
+
+  // ── Editor sections: visible filtered by sectionOrder ──
+  const visibleEditorSections = sectionOrder.filter((id) => {
+    switch (id) {
+      case 'basic': case 'summary': case 'skills': case 'experience': case 'education':
+        return true
+      case 'projects': return editProjectsArr.length > 0
+      case 'certifications': return editCertifications.length > 0
+      case 'languages': return editLanguages.length > 0
+      case 'custom': return editCustomSections.length > 0
+      default: return false
+    }
+  })
 
   // Analyse resume for section suggestions (once per editor open)
   useEffect(() => {
@@ -359,6 +418,265 @@ export function ResumeDetail({ resumeId }: { resumeId: string }) {
     list.push('custom')
     return list
   })()
+
+  // ── Render each section by ID for the sortable editor ──
+  const renderEditorSection = useCallback((id: EditorSectionId): React.ReactNode => {
+    switch (id) {
+      case 'basic':
+        return (
+          <>
+            <div className="flex gap-3">
+              <div className="flex-1">
+                <label className="label-mono mb-1 block">Resume Name</label>
+                <input value={editName} onChange={(e) => setEditName(e.target.value)} className="w-full rounded-xs border border-border bg-background px-2.5 py-1.5 text-[11px] outline-none focus:border-primary" />
+              </div>
+              <div className="flex-1">
+                <label className="label-mono mb-1 block">Full Name</label>
+                <input value={editPersona} onChange={(e) => setEditPersona(e.target.value)} className="w-full rounded-xs border border-border bg-background px-2.5 py-1.5 text-[11px] outline-none focus:border-primary" />
+              </div>
+            </div>
+            <div className="flex gap-3 mt-3">
+              <div className="flex-1">
+                <label className="label-mono mb-1 block">Email</label>
+                <input value={editEmail} onChange={(e) => setEditEmail(e.target.value)} className="w-full rounded-xs border border-border bg-background px-2.5 py-1.5 text-[11px] outline-none focus:border-primary" />
+              </div>
+              <div className="flex-1">
+                <label className="label-mono mb-1 block">Phone</label>
+                <input value={editPhone} onChange={(e) => setEditPhone(e.target.value)} placeholder="+1 555-0123" className="w-full rounded-xs border border-border bg-background px-2.5 py-1.5 text-[11px] outline-none focus:border-primary" />
+              </div>
+            </div>
+            <div className="flex gap-3 mt-3">
+              <div className="flex-1">
+                <label className="label-mono mb-1 block">Location</label>
+                <input value={editLocation} onChange={(e) => setEditLocation(e.target.value)} className="w-full rounded-xs border border-border bg-background px-2.5 py-1.5 text-[11px] outline-none focus:border-primary" />
+              </div>
+              <div className="flex-1">
+                <label className="label-mono mb-1 block">GitHub / Portfolio</label>
+                <input value={editGithub} onChange={(e) => setEditGithub(e.target.value)} placeholder="https://github.com/..." className="w-full rounded-xs border border-border bg-background px-2.5 py-1.5 text-[11px] outline-none focus:border-primary" />
+              </div>
+            </div>
+          </>
+        )
+      case 'summary':
+        return (
+          <div>
+            <label className="label-mono mb-1 block">Professional Summary</label>
+            <textarea value={editSummary} onChange={(e) => setEditSummary(e.target.value)} rows={3} className="w-full resize-y rounded-xs border border-border bg-background px-2.5 py-1.5 text-[11px] outline-none focus:border-primary" />
+          </div>
+        )
+      case 'skills':
+        return (
+          <div>
+            <label className="label-mono mb-1 block">Skills</label>
+            <TagInput tags={editSkillsArr} onChange={setEditSkillsArr} placeholder="Type a skill and press Enter" />
+          </div>
+        )
+      case 'experience':
+        return (
+          <EditableList<ResumeExperience>
+            items={editExperiences}
+            onChange={setEditExperiences}
+            label="Work Experience"
+            createNew={() => ({ company: '', role: '', dates: '', bullets: [] })}
+            renderItem={(exp, _i, update) => (
+              <div className="flex flex-col gap-2">
+                <div className="flex gap-2">
+                  <div className="flex-1">
+                    <label className="label-mono mb-0.5 block text-[9px]">Company</label>
+                    <input value={exp.company} onChange={(e) => update({ ...exp, company: e.target.value })} className="w-full rounded-xs border border-border bg-background px-2 py-1 text-[11px] outline-none focus:border-primary" />
+                  </div>
+                  <div className="flex-1">
+                    <label className="label-mono mb-0.5 block text-[9px]">Role</label>
+                    <input value={exp.role} onChange={(e) => update({ ...exp, role: e.target.value })} className="w-full rounded-xs border border-border bg-background px-2 py-1 text-[11px] outline-none focus:border-primary" />
+                  </div>
+                </div>
+                <div>
+                  <label className="label-mono mb-0.5 block text-[9px]">Dates</label>
+                  <input value={exp.dates} onChange={(e) => update({ ...exp, dates: e.target.value })} placeholder="Jun 2020 — Present" className="w-full rounded-xs border border-border bg-background px-2 py-1 text-[11px] outline-none focus:border-primary" />
+                </div>
+                <div>
+                  <label className="label-mono mb-0.5 block text-[9px]">Highlights (one per line)</label>
+                  <textarea
+                    value={exp.bullets.join('\n')}
+                    onChange={(e) => update({ ...exp, bullets: e.target.value.split('\n').filter(Boolean) })}
+                    rows={3}
+                    className="w-full resize-y rounded-xs border border-border bg-background px-2 py-1 text-[11px] outline-none focus:border-primary"
+                  />
+                </div>
+              </div>
+            )}
+          />
+        )
+      case 'education':
+        return (
+          <EditableList<ResumeEducation>
+            items={editEducations}
+            onChange={setEditEducations}
+            label="Education"
+            createNew={() => ({ institution: '', degree: '', field: '', dates: '' })}
+            renderItem={(edu, _i, update) => (
+              <div className="flex flex-col gap-2">
+                <div className="flex gap-2">
+                  <div className="flex-1">
+                    <label className="label-mono mb-0.5 block text-[9px]">Institution</label>
+                    <input value={edu.institution} onChange={(e) => update({ ...edu, institution: e.target.value })} className="w-full rounded-xs border border-border bg-background px-2 py-1 text-[11px] outline-none focus:border-primary" />
+                  </div>
+                  <div className="flex-1">
+                    <label className="label-mono mb-0.5 block text-[9px]">Degree</label>
+                    <input value={edu.degree} onChange={(e) => update({ ...edu, degree: e.target.value })} placeholder="BS, MBA, PhD" className="w-full rounded-xs border border-border bg-background px-2 py-1 text-[11px] outline-none focus:border-primary" />
+                  </div>
+                </div>
+                <div className="flex gap-2">
+                  <div className="flex-1">
+                    <label className="label-mono mb-0.5 block text-[9px]">Field of Study</label>
+                    <input value={edu.field} onChange={(e) => update({ ...edu, field: e.target.value })} className="w-full rounded-xs border border-border bg-background px-2 py-1 text-[11px] outline-none focus:border-primary" />
+                  </div>
+                  <div className="flex-1">
+                    <label className="label-mono mb-0.5 block text-[9px]">Dates</label>
+                    <input value={edu.dates} onChange={(e) => update({ ...edu, dates: e.target.value })} placeholder="2018 — 2022" className="w-full rounded-xs border border-border bg-background px-2 py-1 text-[11px] outline-none focus:border-primary" />
+                  </div>
+                </div>
+              </div>
+            )}
+          />
+        )
+      case 'projects':
+        return (
+          <EditableList<ResumeProject>
+            items={editProjectsArr}
+            onChange={setEditProjectsArr}
+            label="Projects"
+            createNew={() => ({ name: '', description: '', techStack: [], link: '' })}
+            renderItem={(proj, _i, update) => (
+              <div className="flex flex-col gap-2">
+                <div>
+                  <label className="label-mono mb-0.5 block text-[9px]">Project Name</label>
+                  <input value={proj.name} onChange={(e) => update({ ...proj, name: e.target.value })} className="w-full rounded-xs border border-border bg-background px-2 py-1 text-[11px] outline-none focus:border-primary" />
+                </div>
+                <div>
+                  <label className="label-mono mb-0.5 block text-[9px]">Description</label>
+                  <textarea
+                    value={proj.description}
+                    onChange={(e) => update({ ...proj, description: e.target.value })}
+                    rows={2}
+                    className="w-full resize-y rounded-xs border border-border bg-background px-2 py-1 text-[11px] outline-none focus:border-primary"
+                  />
+                </div>
+                <div className="flex gap-2">
+                  <div className="flex-1">
+                    <label className="label-mono mb-0.5 block text-[9px]">Tech Stack</label>
+                    <TagInput
+                      tags={proj.techStack}
+                      onChange={(tags) => update({ ...proj, techStack: tags })}
+                      placeholder="React, Node..."
+                    />
+                  </div>
+                  <div className="flex-1">
+                    <label className="label-mono mb-0.5 block text-[9px]">Link</label>
+                    <input value={proj.link} onChange={(e) => update({ ...proj, link: e.target.value })} placeholder="https://..." className="w-full rounded-xs border border-border bg-background px-2 py-1 text-[11px] outline-none focus:border-primary" />
+                  </div>
+                </div>
+              </div>
+            )}
+          />
+        )
+      case 'certifications':
+        return (
+          <EditableList<ResumeCertification>
+            items={editCertifications}
+            onChange={setEditCertifications}
+            label="Certifications"
+            createNew={() => ({ name: '', issuer: '', date: '' })}
+            renderItem={(cert, _i, update) => (
+              <div className="flex flex-col gap-2">
+                <div className="flex gap-2">
+                  <div className="flex-1">
+                    <label className="label-mono mb-0.5 block text-[9px]">Name</label>
+                    <input value={cert.name} onChange={(e) => update({ ...cert, name: e.target.value })} placeholder="AWS Solutions Architect" className="w-full rounded-xs border border-border bg-background px-2 py-1 text-[11px] outline-none focus:border-primary" />
+                  </div>
+                  <div className="flex-1">
+                    <label className="label-mono mb-0.5 block text-[9px]">Issuer</label>
+                    <input value={cert.issuer} onChange={(e) => update({ ...cert, issuer: e.target.value })} placeholder="Amazon Web Services" className="w-full rounded-xs border border-border bg-background px-2 py-1 text-[11px] outline-none focus:border-primary" />
+                  </div>
+                </div>
+                <div>
+                  <label className="label-mono mb-0.5 block text-[9px]">Date</label>
+                  <input value={cert.date} onChange={(e) => update({ ...cert, date: e.target.value })} placeholder="2024" className="w-full rounded-xs border border-border bg-background px-2 py-1 text-[11px] outline-none focus:border-primary" />
+                </div>
+              </div>
+            )}
+          />
+        )
+      case 'languages':
+        return (
+          <EditableList<ResumeLanguage>
+            items={editLanguages}
+            onChange={setEditLanguages}
+            label="Languages"
+            createNew={() => ({ name: '', proficiency: '' })}
+            renderItem={(lang, _i, update) => (
+              <div className="flex gap-2">
+                <div className="flex-1">
+                  <label className="label-mono mb-0.5 block text-[9px]">Language</label>
+                  <input value={lang.name} onChange={(e) => update({ ...lang, name: e.target.value })} className="w-full rounded-xs border border-border bg-background px-2 py-1 text-[11px] outline-none focus:border-primary" />
+                </div>
+                <div className="flex-1">
+                  <label className="label-mono mb-0.5 block text-[9px]">Proficiency</label>
+                  <select
+                     value={lang.proficiency}
+                     onChange={(e) => update({ ...lang, proficiency: e.target.value })}
+                     className="w-full rounded-xs border border-border bg-background px-2 py-1 text-[11px] outline-none focus:border-primary"
+                  >
+                     <option value="">Select...</option>
+                     <option value="Basic">Basic</option>
+                     <option value="Conversational">Conversational</option>
+                     <option value="Professional">Professional</option>
+                     <option value="Fluent">Fluent</option>
+                     <option value="Native">Native</option>
+                  </select>
+                </div>
+              </div>
+            )}
+          />
+        )
+      case 'custom':
+        return (
+          <EditableList<ResumeCustomSection>
+            items={editCustomSections}
+            onChange={setEditCustomSections}
+            label="Custom Sections"
+            createNew={() => ({ title: 'New Section', bullets: [] })}
+            renderItem={(sec, _i, update) => (
+              <div className="flex flex-col gap-2">
+                <div>
+                  <label className="label-mono mb-0.5 block text-[9px]">Section Title</label>
+                  <input
+                    value={sec.title}
+                    onChange={(e) => update({ ...sec, title: e.target.value })}
+                    placeholder="e.g. Open Source Contributions"
+                    className="w-full rounded-xs border border-border bg-background px-2 py-1 text-[11px] outline-none focus:border-primary"
+                  />
+                </div>
+                <div>
+                  <label className="label-mono mb-0.5 block text-[9px]">Highlights (one per line)</label>
+                  <textarea
+                    value={sec.bullets.join('\n')}
+                    onChange={(e) => update({ ...sec, bullets: e.target.value.split('\n').filter(Boolean) })}
+                    rows={3}
+                    className="w-full resize-y rounded-xs border border-border bg-background px-2 py-1 text-[11px] outline-none focus:border-primary"
+                  />
+                </div>
+              </div>
+            )}
+          />
+        )
+    }
+  }, [
+    editName, editPersona, editEmail, editPhone, editLocation, editGithub,
+    editSummary, editSkillsArr,
+    editExperiences, editEducations, editProjectsArr, editCertifications,
+    editLanguages, editCustomSections,
+  ])
 
   const handleAddSection = useCallback((section: SectionKey) => {
     if (section === 'certifications') {
@@ -484,37 +802,26 @@ export function ResumeDetail({ resumeId }: { resumeId: string }) {
 
         {/* ── Tab 2: View Resume ── */}
         {tab === 'view' && (
-          <div className="flex w-full flex-col items-center overflow-y-auto p-6">
-            <div className="mb-4 w-full max-w-[600px] rounded-sm border border-border bg-card p-3">
-              <div className="mb-2 flex items-center justify-between">
-                <span className="label-mono">Choose a Template</span>
-                <div className="flex gap-1.5">
-                  <button onClick={() => window.open(`/api/export/pdf?id=${resume.id}`, '_blank')} className="rounded-sm px-2 py-1 text-[11px] text-muted-foreground hover:bg-background hover:text-foreground">Export PDF</button>
-                  <button onClick={() => notify({ message: 'DOCX export coming soon', type: 'info' })} className="rounded-sm px-2 py-1 text-[11px] text-muted-foreground hover:bg-background hover:text-foreground">Export DOCX</button>
+          <div className="flex w-full flex-col overflow-hidden">
+            {/* Template gallery bar */}
+            <div className="shrink-0 border-b border-border bg-card p-3">
+              <div className="mx-auto max-w-[794px]">
+                <div className="mb-2 flex items-center justify-between">
+                  <span className="label-mono">Choose a Template</span>
+                  <div className="flex gap-1.5">
+                    <button onClick={() => window.open(`/api/export/pdf?id=${resume.id}`, '_blank')} className="rounded-sm px-2 py-1 text-[11px] text-muted-foreground hover:bg-background hover:text-foreground">Export PDF</button>
+                    <button onClick={() => notify({ message: 'DOCX export coming soon', type: 'info' })} className="rounded-sm px-2 py-1 text-[11px] text-muted-foreground hover:bg-background hover:text-foreground">Export DOCX</button>
+                  </div>
                 </div>
+                <TemplateGallery
+                  value={resume.template || DEFAULT_TEMPLATE}
+                  onChange={(template) => updateResume(resume.id, { template })}
+                />
               </div>
-              <TemplateGallery
-                value={resume.template || DEFAULT_TEMPLATE}
-                onChange={(template) => updateResume(resume.id, { template })}
-              />
             </div>
-            <div className="w-full max-w-[600px] rounded-xs overflow-hidden">
-              {(() => {
-                const template = resume.template || DEFAULT_TEMPLATE
-                switch (template) {
-                  case 'modern':
-                    return <ModernPreview resume={resume} />
-                  case 'classic':
-                    return <ClassicPreview resume={resume} />
-                  case 'executive':
-                    return <ExecutivePreview resume={resume} />
-                  case 'photo':
-                    return <PhotoPreview resume={resume} />
-                  case 'minimalist':
-                  default:
-                    return <MinimalistPreview resume={resume} />
-                }
-              })()}
+            {/* PDF preview — fills remaining space */}
+            <div className="min-h-0 flex-1 bg-muted/30">
+              <ResumePreview resume={resume} />
             </div>
           </div>
         )}
@@ -557,250 +864,16 @@ export function ResumeDetail({ resumeId }: { resumeId: string }) {
                     />
                   )}
 
-                  {/* Basic Info */}
-                  <div className="flex gap-3">
-                    <div className="flex-1">
-                      <label className="label-mono mb-1 block">Resume Name</label>
-                      <input value={editName} onChange={(e) => setEditName(e.target.value)} className="w-full rounded-xs border border-border bg-background px-2.5 py-1.5 text-[11px] outline-none focus:border-primary" />
-                    </div>
-                    <div className="flex-1">
-                      <label className="label-mono mb-1 block">Full Name</label>
-                      <input value={editPersona} onChange={(e) => setEditPersona(e.target.value)} className="w-full rounded-xs border border-border bg-background px-2.5 py-1.5 text-[11px] outline-none focus:border-primary" />
-                    </div>
-                  </div>
-                  <div className="flex gap-3">
-                    <div className="flex-1">
-                      <label className="label-mono mb-1 block">Email</label>
-                      <input value={editEmail} onChange={(e) => setEditEmail(e.target.value)} className="w-full rounded-xs border border-border bg-background px-2.5 py-1.5 text-[11px] outline-none focus:border-primary" />
-                    </div>
-                    <div className="flex-1">
-                      <label className="label-mono mb-1 block">Phone</label>
-                      <input value={editPhone} onChange={(e) => setEditPhone(e.target.value)} placeholder="+1 555-0123" className="w-full rounded-xs border border-border bg-background px-2.5 py-1.5 text-[11px] outline-none focus:border-primary" />
-                    </div>
-                  </div>
-                  <div className="flex gap-3">
-                    <div className="flex-1">
-                      <label className="label-mono mb-1 block">Location</label>
-                      <input value={editLocation} onChange={(e) => setEditLocation(e.target.value)} className="w-full rounded-xs border border-border bg-background px-2.5 py-1.5 text-[11px] outline-none focus:border-primary" />
-                    </div>
-                    <div className="flex-1">
-                      <label className="label-mono mb-1 block">GitHub / Portfolio</label>
-                      <input value={editGithub} onChange={(e) => setEditGithub(e.target.value)} placeholder="https://github.com/..." className="w-full rounded-xs border border-border bg-background px-2.5 py-1.5 text-[11px] outline-none focus:border-primary" />
-                    </div>
-                  </div>
-
-                  {/* Summary */}
-                  <div>
-                    <label className="label-mono mb-1 block">Professional Summary</label>
-                    <textarea value={editSummary} onChange={(e) => setEditSummary(e.target.value)} rows={3} className="w-full resize-y rounded-xs border border-border bg-background px-2.5 py-1.5 text-[11px] outline-none focus:border-primary" />
-                  </div>
-
-                  {/* Skills — Tag Input */}
-                  <div>
-                    <label className="label-mono mb-1 block">Skills</label>
-                    <TagInput tags={editSkillsArr} onChange={setEditSkillsArr} placeholder="Type a skill and press Enter" />
-                  </div>
-
-                  {/* Work Experience — Dynamic List */}
-                  <EditableList<ResumeExperience>
-                    items={editExperiences}
-                    onChange={setEditExperiences}
-                    label="Work Experience"
-                    createNew={() => ({ company: '', role: '', dates: '', bullets: [] })}
-                    renderItem={(exp, _i, update) => (
-                      <div className="flex flex-col gap-2">
-                        <div className="flex gap-2">
-                          <div className="flex-1">
-                            <label className="label-mono mb-0.5 block text-[9px]">Company</label>
-                            <input value={exp.company} onChange={(e) => update({ ...exp, company: e.target.value })} className="w-full rounded-xs border border-border bg-background px-2 py-1 text-[11px] outline-none focus:border-primary" />
-                          </div>
-                          <div className="flex-1">
-                            <label className="label-mono mb-0.5 block text-[9px]">Role</label>
-                            <input value={exp.role} onChange={(e) => update({ ...exp, role: e.target.value })} className="w-full rounded-xs border border-border bg-background px-2 py-1 text-[11px] outline-none focus:border-primary" />
-                          </div>
-                        </div>
-                        <div>
-                          <label className="label-mono mb-0.5 block text-[9px]">Dates</label>
-                          <input value={exp.dates} onChange={(e) => update({ ...exp, dates: e.target.value })} placeholder="Jun 2020 — Present" className="w-full rounded-xs border border-border bg-background px-2 py-1 text-[11px] outline-none focus:border-primary" />
-                        </div>
-                        <div>
-                          <label className="label-mono mb-0.5 block text-[9px]">Highlights (one per line)</label>
-                          <textarea
-                            value={exp.bullets.join('\n')}
-                            onChange={(e) => update({ ...exp, bullets: e.target.value.split('\n').filter(Boolean) })}
-                            rows={3}
-                            className="w-full resize-y rounded-xs border border-border bg-background px-2 py-1 text-[11px] outline-none focus:border-primary"
-                          />
-                        </div>
-                      </div>
-                    )}
-                  />
-
-                  {/* Education — Dynamic List */}
-                  <EditableList<ResumeEducation>
-                    items={editEducations}
-                    onChange={setEditEducations}
-                    label="Education"
-                    createNew={() => ({ institution: '', degree: '', field: '', dates: '' })}
-                    renderItem={(edu, _i, update) => (
-                      <div className="flex flex-col gap-2">
-                        <div className="flex gap-2">
-                          <div className="flex-1">
-                            <label className="label-mono mb-0.5 block text-[9px]">Institution</label>
-                            <input value={edu.institution} onChange={(e) => update({ ...edu, institution: e.target.value })} className="w-full rounded-xs border border-border bg-background px-2 py-1 text-[11px] outline-none focus:border-primary" />
-                          </div>
-                          <div className="flex-1">
-                            <label className="label-mono mb-0.5 block text-[9px]">Degree</label>
-                            <input value={edu.degree} onChange={(e) => update({ ...edu, degree: e.target.value })} placeholder="BS, MBA, PhD" className="w-full rounded-xs border border-border bg-background px-2 py-1 text-[11px] outline-none focus:border-primary" />
-                          </div>
-                        </div>
-                        <div className="flex gap-2">
-                          <div className="flex-1">
-                            <label className="label-mono mb-0.5 block text-[9px]">Field of Study</label>
-                            <input value={edu.field} onChange={(e) => update({ ...edu, field: e.target.value })} className="w-full rounded-xs border border-border bg-background px-2 py-1 text-[11px] outline-none focus:border-primary" />
-                          </div>
-                          <div className="flex-1">
-                            <label className="label-mono mb-0.5 block text-[9px]">Dates</label>
-                            <input value={edu.dates} onChange={(e) => update({ ...edu, dates: e.target.value })} placeholder="2018 — 2022" className="w-full rounded-xs border border-border bg-background px-2 py-1 text-[11px] outline-none focus:border-primary" />
-                          </div>
-                        </div>
-                      </div>
-                    )}
-                  />
-
-                  {/* Projects — Dynamic List */}
-                  {editProjectsArr.length > 0 && (
-                    <EditableList<ResumeProject>
-                      items={editProjectsArr}
-                      onChange={setEditProjectsArr}
-                      label="Projects"
-                      createNew={() => ({ name: '', description: '', techStack: [], link: '' })}
-                      renderItem={(proj, _i, update) => (
-                        <div className="flex flex-col gap-2">
-                          <div>
-                            <label className="label-mono mb-0.5 block text-[9px]">Project Name</label>
-                            <input value={proj.name} onChange={(e) => update({ ...proj, name: e.target.value })} className="w-full rounded-xs border border-border bg-background px-2 py-1 text-[11px] outline-none focus:border-primary" />
-                          </div>
-                          <div>
-                            <label className="label-mono mb-0.5 block text-[9px]">Description</label>
-                            <textarea
-                              value={proj.description}
-                              onChange={(e) => update({ ...proj, description: e.target.value })}
-                              rows={2}
-                              className="w-full resize-y rounded-xs border border-border bg-background px-2 py-1 text-[11px] outline-none focus:border-primary"
-                            />
-                          </div>
-                          <div className="flex gap-2">
-                            <div className="flex-1">
-                              <label className="label-mono mb-0.5 block text-[9px]">Tech Stack</label>
-                              <TagInput
-                                tags={proj.techStack}
-                                onChange={(tags) => update({ ...proj, techStack: tags })}
-                                placeholder="React, Node..."
-                              />
-                            </div>
-                            <div className="flex-1">
-                              <label className="label-mono mb-0.5 block text-[9px]">Link</label>
-                              <input value={proj.link} onChange={(e) => update({ ...proj, link: e.target.value })} placeholder="https://..." className="w-full rounded-xs border border-border bg-background px-2 py-1 text-[11px] outline-none focus:border-primary" />
-                            </div>
-                          </div>
-                        </div>
-                      )}
-                    />
-                  )}
-
-                  {/* Certifications — Dynamic List */}
-                  {editCertifications.length > 0 && (
-                    <EditableList<ResumeCertification>
-                      items={editCertifications}
-                      onChange={setEditCertifications}
-                      label="Certifications"
-                      createNew={() => ({ name: '', issuer: '', date: '' })}
-                      renderItem={(cert, _i, update) => (
-                        <div className="flex flex-col gap-2">
-                          <div className="flex gap-2">
-                            <div className="flex-1">
-                              <label className="label-mono mb-0.5 block text-[9px]">Name</label>
-                              <input value={cert.name} onChange={(e) => update({ ...cert, name: e.target.value })} placeholder="AWS Solutions Architect" className="w-full rounded-xs border border-border bg-background px-2 py-1 text-[11px] outline-none focus:border-primary" />
-                            </div>
-                            <div className="flex-1">
-                              <label className="label-mono mb-0.5 block text-[9px]">Issuer</label>
-                              <input value={cert.issuer} onChange={(e) => update({ ...cert, issuer: e.target.value })} placeholder="Amazon Web Services" className="w-full rounded-xs border border-border bg-background px-2 py-1 text-[11px] outline-none focus:border-primary" />
-                            </div>
-                          </div>
-                          <div>
-                            <label className="label-mono mb-0.5 block text-[9px]">Date</label>
-                            <input value={cert.date} onChange={(e) => update({ ...cert, date: e.target.value })} placeholder="2024" className="w-full rounded-xs border border-border bg-background px-2 py-1 text-[11px] outline-none focus:border-primary" />
-                          </div>
-                        </div>
-                      )}
-                    />
-                  )}
-
-                  {/* Languages — Dynamic List */}
-                  {editLanguages.length > 0 && (
-                    <EditableList<ResumeLanguage>
-                      items={editLanguages}
-                      onChange={setEditLanguages}
-                      label="Languages"
-                      createNew={() => ({ name: '', proficiency: '' })}
-                      renderItem={(lang, _i, update) => (
-                        <div className="flex gap-2">
-                          <div className="flex-1">
-                            <label className="label-mono mb-0.5 block text-[9px]">Language</label>
-                            <input value={lang.name} onChange={(e) => update({ ...lang, name: e.target.value })} className="w-full rounded-xs border border-border bg-background px-2 py-1 text-[11px] outline-none focus:border-primary" />
-                          </div>
-                          <div className="flex-1">
-                            <label className="label-mono mb-0.5 block text-[9px]">Proficiency</label>
-                            <select
-                               value={lang.proficiency}
-                               onChange={(e) => update({ ...lang, proficiency: e.target.value })}
-                               className="w-full rounded-xs border border-border bg-background px-2 py-1 text-[11px] outline-none focus:border-primary"
-                            >
-                               <option value="">Select...</option>
-                               <option value="Basic">Basic</option>
-                               <option value="Conversational">Conversational</option>
-                               <option value="Professional">Professional</option>
-                               <option value="Fluent">Fluent</option>
-                               <option value="Native">Native</option>
-                            </select>
-                          </div>
-                        </div>
-                      )}
-                    />
-                  )}
-
-                  {/* Custom Sections — Dynamic List */}
-                  {editCustomSections.length > 0 && (
-                    <EditableList<ResumeCustomSection>
-                      items={editCustomSections}
-                      onChange={setEditCustomSections}
-                      label="Custom Sections"
-                      createNew={() => ({ title: 'New Section', bullets: [] })}
-                      renderItem={(sec, _i, update) => (
-                        <div className="flex flex-col gap-2">
-                          <div>
-                            <label className="label-mono mb-0.5 block text-[9px]">Section Title</label>
-                            <input
-                              value={sec.title}
-                              onChange={(e) => update({ ...sec, title: e.target.value })}
-                              placeholder="e.g. Open Source Contributions"
-                              className="w-full rounded-xs border border-border bg-background px-2 py-1 text-[11px] outline-none focus:border-primary"
-                            />
-                          </div>
-                          <div>
-                            <label className="label-mono mb-0.5 block text-[9px]">Highlights (one per line)</label>
-                            <textarea
-                              value={sec.bullets.join('\n')}
-                              onChange={(e) => update({ ...sec, bullets: e.target.value.split('\n').filter(Boolean) })}
-                              rows={3}
-                              className="w-full resize-y rounded-xs border border-border bg-background px-2 py-1 text-[11px] outline-none focus:border-primary"
-                            />
-                          </div>
-                        </div>
-                      )}
-                    />
-                  )}
+                  {/* ── Sortable sections ── */}
+                  <DndContext sensors={sectionSensors} collisionDetection={pointerWithin} onDragEnd={handleSectionDragEnd}>
+                    <SortableContext items={visibleEditorSections} strategy={verticalListSortingStrategy}>
+                      {visibleEditorSections.map((id) => (
+                        <SortableSection key={id} id={id}>
+                          {renderEditorSection(id)}
+                        </SortableSection>
+                      ))}
+                    </SortableContext>
+                  </DndContext>
 
                   {/* + Add Section button */}
                   {availableSections.length > 0 && (

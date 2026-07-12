@@ -1,7 +1,16 @@
 import { Font } from '@react-pdf/renderer'
-import path from 'node:path'
 
 let registered = false
+
+/**
+ * Returns the correct font URL for the current environment.
+ * - Browser: /fonts/{filename} (served by Next.js from /public/)
+ * - Server:  {process.cwd()}/public/fonts/{filename} (filesystem path)
+ */
+function fontSrc(filename: string): string {
+  if (typeof window !== 'undefined') return `/fonts/${filename}`
+  return `${process.cwd()}/public/fonts/${filename}`
+}
 
 export function registerFonts() {
   if (registered) return
@@ -10,27 +19,27 @@ export function registerFonts() {
   Font.register({
     family: 'Inter',
     fonts: [
-      { src: path.join(process.cwd(), 'public', 'fonts', 'inter-regular.ttf'), fontWeight: 400 },
-      { src: path.join(process.cwd(), 'public', 'fonts', 'inter-medium.ttf'), fontWeight: 500 },
-      { src: path.join(process.cwd(), 'public', 'fonts', 'inter-semibold.ttf'), fontWeight: 600 },
-      { src: path.join(process.cwd(), 'public', 'fonts', 'inter-bold.ttf'), fontWeight: 700 },
+      { src: fontSrc('inter-regular.ttf'), fontWeight: 400 },
+      { src: fontSrc('inter-medium.ttf'), fontWeight: 500 },
+      { src: fontSrc('inter-semibold.ttf'), fontWeight: 600 },
+      { src: fontSrc('inter-bold.ttf'), fontWeight: 700 },
     ],
   })
 
   Font.register({
     family: 'Lora',
     fonts: [
-      { src: path.join(process.cwd(), 'public', 'fonts', 'lora-regular.ttf'), fontWeight: 400 },
-      { src: path.join(process.cwd(), 'public', 'fonts', 'lora-medium.ttf'), fontWeight: 500 },
-      { src: path.join(process.cwd(), 'public', 'fonts', 'lora-semibold.ttf'), fontWeight: 600 },
-      { src: path.join(process.cwd(), 'public', 'fonts', 'lora-bold.ttf'), fontWeight: 700 },
-      { src: path.join(process.cwd(), 'public', 'fonts', 'lora-italic.ttf'), fontWeight: 400, fontStyle: 'italic' },
+      { src: fontSrc('lora-regular.ttf'), fontWeight: 400 },
+      { src: fontSrc('lora-medium.ttf'), fontWeight: 500 },
+      { src: fontSrc('lora-semibold.ttf'), fontWeight: 600 },
+      { src: fontSrc('lora-bold.ttf'), fontWeight: 700 },
+      { src: fontSrc('lora-italic.ttf'), fontWeight: 400, fontStyle: 'italic' },
     ],
   })
 
   Font.register({
     family: 'JetBrains Mono',
-    src: path.join(process.cwd(), 'public', 'fonts', 'jetbrains-mono-regular.ttf'),
+    src: fontSrc('jetbrains-mono-regular.ttf'),
   })
 }
 

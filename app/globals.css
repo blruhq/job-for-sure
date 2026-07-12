@@ -329,43 +329,6 @@ html[lang="th"] {
 ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
 ::-webkit-scrollbar-thumb:hover { background: var(--muted-foreground); }
 
-/* ── @font-face for Lora serif (Classic template) ── */
-@font-face {
-  font-family: 'Lora';
-  src: url('/fonts/lora-regular.ttf') format('truetype');
-  font-weight: 400;
-  font-style: normal;
-  font-display: swap;
-}
-@font-face {
-  font-family: 'Lora';
-  src: url('/fonts/lora-medium.ttf') format('truetype');
-  font-weight: 500;
-  font-style: normal;
-  font-display: swap;
-}
-@font-face {
-  font-family: 'Lora';
-  src: url('/fonts/lora-semibold.ttf') format('truetype');
-  font-weight: 600;
-  font-style: normal;
-  font-display: swap;
-}
-@font-face {
-  font-family: 'Lora';
-  src: url('/fonts/lora-bold.ttf') format('truetype');
-  font-weight: 700;
-  font-style: normal;
-  font-display: swap;
-}
-@font-face {
-  font-family: 'Lora';
-  src: url('/fonts/lora-italic.ttf') format('truetype');
-  font-weight: 400;
-  font-style: italic;
-  font-display: swap;
-}
-
 /* ── Resume paper base (all templates) ── */
 .resume-paper {
   background: #FFFFFF;
@@ -380,8 +343,4 @@ html[lang="th"] {
   color: #D5D4D0;
 }
 
-/* Per-template font overrides */
-.resume-paper[data-template="classic"] {
-  font-family: 'Lora', Georgia, 'Times New Roman', serif;
-  line-height: 1.7;
-}
+

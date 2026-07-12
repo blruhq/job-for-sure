@@ -1,9 +1,17 @@
-# ADR-002: Use @react-pdf/renderer for PDF Generation
+# ADR-002: Use @react-pdf/renderer for PDF Generation and Preview
 
-**Status:** Accepted
+**Status:** Updated
 
-**Context:** We need to generate resume PDFs server-side for download. Common approaches include Puppeteer/Playwright (headless browser renders HTML → PDF), print CSS (`@media print`), and `@react-pdf/renderer`.
+**Context:** We need to generate resume PDFs server-side for download AND show a real-time preview in the browser. Common approaches include Puppeteer/Playwright (headless browser), print CSS, and `@react-pdf/renderer`.
 
-**Decision:** Use `@react-pdf/renderer`. Unlike Puppeteer, it does not require a headless Chromium binary (saves ~300MB+ in serverless deployment). It supports embedded fonts, deterministic output, and runs in Edge/Node.js runtimes. The component model (`Document` → `Page` → `View` → `Text`) maps naturally to our React component patterns.
+**Decision:** Use `@react-pdf/renderer` for BOTH server-side PDF export AND client-side preview. The preview uses `@react-pdf/renderer`'s `<PDFViewer>` component, which renders the actual PDF in the browser via an iframe. This ensures the preview is always a 100% match to the exported PDF (true WYSIWYG).
 
-**Consequences:** We cannot use standard HTML/CSS for PDF layouts — all PDF styling uses `@react-pdf`'s StyleSheet API. Complex layouts (tables, multi-column) require more code than HTML-to-PDF approaches. PDF preview in the browser requires rendering separately (we use a separate HTML preview for the "View" tab).
+We previously maintained separate HTML/CSS preview components alongside the PDF components. This caused preview-to-PDF mismatches, required double the maintenance (5 templates × 2 renderers = 10 files), and made it impossible to guarantee WYSIWYG. We now use a single set of PDF components for both preview and export (5 files).
+
+**Consequences:**
+- Preview renders inside an iframe with a ~200-500ms initial load time (acceptable).
+- The iframe includes a built-in toolbar (zoom, page navigation, download, print).
+- Fonts are loaded via `Font.register()` in `shared-pdf.ts` using environment-aware paths (URL for browser, filesystem for server).
+- Dark mode does not affect the PDF preview (paper is always white — this is correct).
+- `next/dynamic` with `ssr: false` is used to prevent server-side rendering of `PDFViewer`.
+- This is the same approach used by Reactive Resume (39.5k stars) and OpenResume (8.7k stars).
