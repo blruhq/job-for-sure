@@ -2,7 +2,23 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
-import { ArrowLeft, Wand2, Download, Trash2, Plus, X, ChevronUp, ChevronDown, PlusCircle, Lightbulb } from 'lucide-react'
+import { ArrowLeft, Wand2, Download, Trash2, Plus, X, PlusCircle, Lightbulb, GripVertical } from 'lucide-react'
+import {
+  DndContext,
+  closestCenter,
+  PointerSensor,
+  TouchSensor,
+  useSensor,
+  useSensors,
+  type DragEndEvent,
+} from '@dnd-kit/core'
+import {
+  SortableContext,
+  useSortable,
+  verticalListSortingStrategy,
+  arrayMove,
+} from '@dnd-kit/sortable'
+import { CSS } from '@dnd-kit/utilities'
 import { cn } from '~/lib/utils'
 import { useAppStore } from '~/lib/store'
 import { notify } from '~/lib/toast'
@@ -11,6 +27,13 @@ import { ResumeCopilot } from '~/components/resume/resume-copilot'
 import { CoverLetterEditor } from '~/components/resume/cover-letter-editor'
 import { JobSearchPanel } from '~/components/resume/job-search-panel'
 import type { ResumeEducation, ResumeProject, ResumeExperience, ResumeCertification, ResumeLanguage, ResumeCustomSection } from '~/types/resume'
+import { TemplateGallery } from '~/components/resume/templates/template-gallery'
+import { DEFAULT_TEMPLATE } from '~/components/resume/templates/registry'
+import { MinimalistPreview } from '~/components/resume/templates/minimalist-preview'
+import { ModernPreview } from '~/components/resume/templates/modern-preview'
+import { ClassicPreview } from '~/components/resume/templates/classic-preview'
+import { ExecutivePreview } from '~/components/resume/templates/executive-preview'
+import { PhotoPreview } from '~/components/resume/templates/photo-preview'
 
 // ── Helpers ──
 
@@ -95,6 +118,41 @@ function TagInput({ tags, onChange, placeholder }: { tags: string[]; onChange: (
   )
 }
 
+function SortableItem({ id, children }: { id: string; children: React.ReactNode }) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id })
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={{
+        transform: CSS.Transform.toString(transform),
+        transition,
+        opacity: isDragging ? 0.5 : 1,
+        zIndex: isDragging ? 50 : 'auto',
+      }}
+      className="relative rounded-xs border border-border bg-background p-3"
+    >
+      {children}
+      <button
+        type="button"
+        {...attributes}
+        {...listeners}
+        className="absolute left-1.5 top-1/2 -translate-y-1/2 cursor-grab text-muted-foreground/40 hover:text-muted-foreground active:cursor-grabbing"
+        title="Drag to reorder"
+      >
+        <GripVertical size={14} />
+      </button>
+    </div>
+  )
+}
+
 function EditableList<T>({
   items,
   onChange,
@@ -108,20 +166,30 @@ function EditableList<T>({
   createNew: () => T
   label: string
 }) {
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
+    useSensor(TouchSensor, { activationConstraint: { delay: 150, tolerance: 5 } }),
+  )
+
+  // Generate stable IDs for sortable items
+  // Items may not have an `id` field, so we use index-based keys
+  const itemIds = items.map((_, i) => `item-${label}-${i}`)
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event
+    if (!over || active.id === over.id) return
+    const oldIndex = itemIds.indexOf(active.id as string)
+    const newIndex = itemIds.indexOf(over.id as string)
+    if (oldIndex === -1 || newIndex === -1) return
+    onChange(arrayMove(items, oldIndex, newIndex))
+  }
+
   const addItem = () => {
     onChange([...items, createNew()])
   }
 
   const removeItem = (index: number) => {
     onChange(items.filter((_, i) => i !== index))
-  }
-
-  const moveItem = (from: number, to: number) => {
-    if (to < 0 || to >= items.length) return
-    const copy = [...items]
-    const [moved] = copy.splice(from, 1)
-    copy.splice(to, 0, moved)
-    onChange(copy)
   }
 
   return (
@@ -139,28 +207,29 @@ function EditableList<T>({
       {items.length === 0 && (
         <p className="py-2 text-center text-[10px] text-muted-foreground/50 italic">No entries yet. Click "Add" to create one.</p>
       )}
-      <div className="flex flex-col gap-2">
-        {items.map((item, i) => (
-          <div key={(item as any).id || i} className="relative rounded-xs border border-border bg-background p-3">
-            <div className="absolute right-2 top-2 flex items-center gap-0.5">
-              <button type="button" onClick={() => moveItem(i, i - 1)} disabled={i === 0} className="cursor-pointer rounded-xs p-0.5 text-muted-foreground hover:text-foreground disabled:opacity-30">
-                <ChevronUp size={12} />
-              </button>
-              <button type="button" onClick={() => moveItem(i, i + 1)} disabled={i === items.length - 1} className="cursor-pointer rounded-xs p-0.5 text-muted-foreground hover:text-foreground disabled:opacity-30">
-                <ChevronDown size={12} />
-              </button>
-              <button type="button" onClick={() => removeItem(i)} className="cursor-pointer rounded-xs p-0.5 text-muted-foreground hover:text-red-500">
-                <X size={12} />
-              </button>
-            </div>
-            {renderItem(item, i, (updated) => {
-              const copy = [...items]
-              copy[i] = updated
-              onChange(copy)
-            })}
+      <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+        <SortableContext items={itemIds} strategy={verticalListSortingStrategy}>
+          <div className="flex flex-col gap-2">
+            {items.map((item, i) => (
+              <SortableItem key={itemIds[i]} id={itemIds[i]}>
+                {/* Add left padding for the drag handle */}
+                <div className="pl-5">
+                  <div className="absolute right-2 top-2">
+                    <button type="button" onClick={() => removeItem(i)} className="cursor-pointer rounded-xs p-0.5 text-muted-foreground hover:text-red-500">
+                      <X size={12} />
+                    </button>
+                  </div>
+                  {renderItem(item, i, (updated) => {
+                    const copy = [...items]
+                    copy[i] = updated
+                    onChange(copy)
+                  })}
+                </div>
+              </SortableItem>
+            ))}
           </div>
-        ))}
-      </div>
+        </SortableContext>
+      </DndContext>
     </div>
   )
 }
@@ -388,141 +457,35 @@ export function ResumeDetail({ resumeId }: { resumeId: string }) {
         {/* ── Tab 2: View Resume ── */}
         {tab === 'view' && (
           <div className="flex w-full flex-col items-center overflow-y-auto p-6">
-            <div className="mb-4 flex w-full max-w-[600px] items-center justify-between rounded-sm border border-border bg-card p-2 px-3">
-              <div className="flex items-center gap-2">
-                <span className="label-mono mb-0">Style Template:</span>
-                <select
-                  value={resume.template || 'minimalist'}
-                  onChange={(e) => updateResume(resume.id, { template: e.target.value as 'minimalist' | 'modern' | 'classic' })}
-                  className="rounded-xs border border-border bg-background px-1.5 py-0.5 text-[11px] outline-none focus:border-primary"
-                >
-                  <option value="minimalist">Minimalist (Georgia)</option>
-                  <option value="modern">Modern (Inter)</option>
-                  <option value="classic">Classic (Times New Roman)</option>
-                </select>
+            <div className="mb-4 w-full max-w-[600px] rounded-sm border border-border bg-card p-3">
+              <div className="mb-2 flex items-center justify-between">
+                <span className="label-mono">Choose a Template</span>
+                <div className="flex gap-1.5">
+                  <button onClick={() => window.open(`/api/export/pdf?id=${resume.id}`, '_blank')} className="rounded-sm px-2 py-1 text-[11px] text-muted-foreground hover:bg-background hover:text-foreground">Export PDF</button>
+                  <button onClick={() => notify({ message: 'DOCX export coming soon', type: 'info' })} className="rounded-sm px-2 py-1 text-[11px] text-muted-foreground hover:bg-background hover:text-foreground">Export DOCX</button>
+                </div>
               </div>
-              <div className="flex gap-1.5">
-                <button onClick={() => window.open(`/api/export/pdf?id=${resume.id}`, '_blank')} className="rounded-sm px-2 py-1 text-[11px] text-muted-foreground hover:bg-background hover:text-foreground">Export PDF</button>
-                <button onClick={() => notify({ message: 'DOCX export coming soon', type: 'info' })} className="rounded-sm px-2 py-1 text-[11px] text-muted-foreground hover:bg-background hover:text-foreground">Export DOCX</button>
-              </div>
+              <TemplateGallery
+                value={resume.template || DEFAULT_TEMPLATE}
+                onChange={(template) => updateResume(resume.id, { template })}
+              />
             </div>
-            <div className="resume-paper w-full max-w-[600px] rounded-xs p-8" style={{ boxShadow: 'var(--shadow-paper)' }}>
-              <div className="text-center text-base font-bold">{resume.persona || 'Your Name'}</div>
-              <div className="mb-3 text-center font-mono text-[9px] text-muted-foreground">
-                {resume.email || 'john@email.com'} · {resume.location || 'San Francisco, CA'}
-              </div>
-              <div className="mb-3.5">
-                <div className="mb-1 border-b border-border pb-0.5 text-[10px] font-bold uppercase tracking-wider">Summary</div>
-                <div className="text-muted-foreground">{resume.summary || `Professional with experience in ${resume.skills.slice(0, 3).join(', ')}.`}</div>
-              </div>
-              <div className="mb-3.5">
-                <div className="mb-1 border-b border-border pb-0.5 text-[10px] font-bold uppercase tracking-wider">Skills</div>
-                <div className="flex flex-wrap gap-1">
-                  {resume.skills.map((s) => (
-                    <span key={s} className="rounded-xs border border-border bg-background px-1.5 py-0.5 text-[9px]">{s}</span>
-                  ))}
-                </div>
-              </div>
-              <div>
-                <div className="mb-1 border-b border-border pb-0.5 text-[10px] font-bold uppercase tracking-wider">Experience</div>
-                {(resume.experience || []).map((exp, i) => (
-                  <div key={i} className="mb-2">
-                    <div className="flex justify-between font-semibold">
-                      <span>{exp.role}</span>
-                      <span className="font-mono text-[8px] text-muted-foreground">{exp.dates}</span>
-                    </div>
-                    <div className="mb-0.5 text-[9px] italic">{exp.company}</div>
-                    <ul className="ml-3 list-disc text-muted-foreground">
-                      {exp.bullets.map((b, j) => <li key={j}>{b}</li>)}
-                    </ul>
-                  </div>
-                ))}
-              </div>
-
-              {/* Education */}
-              {resume.education && resume.education.length > 0 && (
-                <div className="mt-3.5">
-                  <div className="mb-1 border-b border-border pb-0.5 text-[10px] font-bold uppercase tracking-wider">Education</div>
-                  {resume.education.map((edu, i) => (
-                    <div key={i} className="mb-2">
-                      <div className="flex justify-between font-semibold">
-                        <span>{edu.institution}</span>
-                        <span className="font-mono text-[8px] text-muted-foreground">{edu.dates}</span>
-                      </div>
-                      <div className="text-[9px] text-muted-foreground">
-                        {[edu.degree, edu.field].filter(Boolean).join(', ')}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-
-              {/* Projects */}
-              {resume.projects && resume.projects.length > 0 && (
-                <div className="mt-3.5">
-                  <div className="mb-1 border-b border-border pb-0.5 text-[10px] font-bold uppercase tracking-wider">Projects</div>
-                  {resume.projects.map((proj, i) => (
-                    <div key={i} className="mb-2">
-                      <div className="flex justify-between font-semibold">
-                        <span>
-                          {proj.name}
-                          {proj.link && (
-                            <span className="ml-1 text-[8px] text-muted-foreground font-normal font-mono">
-                              ({proj.link})
-                            </span>
-                          )}
-                        </span>
-                      </div>
-                      <div className="text-[9px] text-muted-foreground mb-1">{proj.description}</div>
-                      {proj.techStack && proj.techStack.length > 0 && (
-                        <div className="flex flex-wrap gap-1">
-                          {proj.techStack.map((tech) => (
-                            <span key={tech} className="rounded-xs border border-border bg-background px-1.5 py-0.5 text-[8px]">{tech}</span>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              )}
-
-              {/* Certifications */}
-              {resume.certifications && resume.certifications.length > 0 && (
-                <div className="mt-3.5">
-                  <div className="mb-1 border-b border-border pb-0.5 text-[10px] font-bold uppercase tracking-wider">Certifications</div>
-                  {resume.certifications.map((cert, i) => (
-                    <div key={i} className="flex justify-between mb-1 font-semibold">
-                      <span>{cert.name} <span className="text-muted-foreground font-normal">({cert.issuer})</span></span>
-                      <span className="font-mono text-[8px] text-muted-foreground font-normal">{cert.date}</span>
-                    </div>
-                  ))}
-                </div>
-              )}
-
-              {/* Languages */}
-              {resume.languages && resume.languages.length > 0 && (
-                <div className="mt-3.5">
-                  <div className="mb-1 border-b border-border pb-0.5 text-[10px] font-bold uppercase tracking-wider">Languages</div>
-                  <div className="flex flex-wrap gap-3">
-                    {resume.languages.map((lang, i) => (
-                      <div key={i} className="text-[9px]">
-                        <span className="font-semibold">{lang.name}</span>: <span className="text-muted-foreground">{lang.proficiency}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Custom Sections */}
-              {resume.customSections && resume.customSections.map((sec, i) => (
-                <div key={i} className="mt-3.5">
-                  <div className="mb-1 border-b border-border pb-0.5 text-[10px] font-bold uppercase tracking-wider">{sec.title}</div>
-                  <ul className="ml-3 list-disc text-muted-foreground text-[9px] leading-relaxed">
-                    {sec.bullets.map((b, j) => <li key={j}>{b}</li>)}
-                  </ul>
-                </div>
-              ))}
-            </div>
+            {(() => {
+              const template = resume.template || DEFAULT_TEMPLATE
+              switch (template) {
+                case 'modern':
+                  return <ModernPreview resume={resume} />
+                case 'classic':
+                  return <ClassicPreview resume={resume} />
+                case 'executive':
+                  return <ExecutivePreview resume={resume} />
+                case 'photo':
+                  return <PhotoPreview resume={resume} />
+                case 'minimalist':
+                default:
+                  return <MinimalistPreview resume={resume} />
+              }
+            })()}
           </div>
         )}
 

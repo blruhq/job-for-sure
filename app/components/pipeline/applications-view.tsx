@@ -2,12 +2,23 @@
 
 import { useState } from 'react'
 import { useRouter } from '~/i18n/routing'
-import { Trash2, Plus, Link2, MessageSquare, KanbanSquare } from 'lucide-react'
+import { Trash2, Link2 } from 'lucide-react'
 import { cn } from '~/lib/utils'
 import { useAppStore } from '~/lib/store'
 import { notify } from '~/lib/toast'
 import { useTranslations } from 'next-intl'
 import type { ApplicationBoard, ApplicationColumnId, PipelineJob } from '~/types/resume'
+import {
+  DndContext,
+  PointerSensor,
+  TouchSensor,
+  useSensor,
+  useSensors,
+  useDraggable,
+  useDroppable,
+  closestCorners,
+  type DragEndEvent,
+} from '@dnd-kit/core'
 
 const COLUMNS: { id: ApplicationColumnId; labelKey: string; dot: string; next: ApplicationColumnId | null }[] = [
   { id: 'bookmark', labelKey: 'bookmark', dot: '#9F9E98', next: 'applied' },
@@ -16,14 +27,59 @@ const COLUMNS: { id: ApplicationColumnId; labelKey: string; dot: string; next: A
   { id: 'offers', labelKey: 'offers', dot: '#2B5F45', next: null },
 ]
 
+// ── Draggable job card wrapper ──
+function DraggableJobCard({ job, children }: { job: PipelineJob; children: React.ReactNode }) {
+  const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
+    id: job.key,
+  })
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={{
+        transform: transform ? `translate3d(${transform.x}px, ${transform.y}px, 0)` : undefined,
+        opacity: isDragging ? 0.4 : 1,
+        zIndex: isDragging ? 50 : 'auto',
+      }}
+      {...attributes}
+      {...listeners}
+      className={cn(
+        'group cursor-grab rounded-sm border border-border/60 bg-card p-2.5 transition-all active:cursor-grabbing hover:border-primary/50',
+      )}
+    >
+      {children}
+    </div>
+  )
+}
+
+// ── Droppable column wrapper ──
+function DroppableColumn({ colId, isOver, children }: { colId: ApplicationColumnId; isOver: boolean; children: React.ReactNode }) {
+  const { setNodeRef } = useDroppable({ id: colId })
+
+  return (
+    <div
+      ref={setNodeRef}
+      className={cn(
+        'flex w-72 shrink-0 flex-col rounded-sm border border-border transition-colors',
+        isOver && 'border-primary bg-accent-soft/30',
+      )}
+    >
+      {children}
+    </div>
+  )
+}
+
 export function ApplicationsView() {
   const router = useRouter()
   const t = useTranslations('applications')
-  const { applications, resumes, moveJob, removeJob, clearApplications } = useAppStore()
+  const { applications, moveJob, removeJob, clearApplications } = useAppStore()
   const [filter, setFilter] = useState('all')
-  const [draggedKey, setDraggedKey] = useState<string | null>(null)
-  const [draggedFrom, setDraggedFrom] = useState<ApplicationColumnId | null>(null)
   const [dragOverCol, setDragOverCol] = useState<ApplicationColumnId | null>(null)
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
+    useSensor(TouchSensor, { activationConstraint: { delay: 150, tolerance: 5 } }),
+  )
 
   // ── All jobs for filter ──
   const allJobs = [...applications.bookmark, ...applications.applied, ...applications.interviewing, ...applications.offers]
@@ -35,28 +91,43 @@ export function ApplicationsView() {
   const total = allJobs.length
   const avgScore = total > 0 ? Math.round(allJobs.reduce((s, j) => s + j.score, 0) / total) : 0
 
-  // ── Drag handlers ──
-  const onDragStart = (e: React.DragEvent, jobKey: string, fromCol: ApplicationColumnId) => {
-    setDraggedKey(jobKey)
-    setDraggedFrom(fromCol)
-    e.dataTransfer.effectAllowed = 'move'
+  // ── Find which column a job belongs to ──
+  const findJobColumn = (jobKey: string): ApplicationColumnId | null => {
+    for (const colId of ['bookmark', 'applied', 'interviewing', 'offers'] as ApplicationColumnId[]) {
+      if (applications[colId].some((j) => j.key === jobKey)) return colId
+    }
+    return null
   }
-  const onDragEnd = () => {
-    setDraggedKey(null)
-    setDraggedFrom(null)
+
+  // ── DnD handler ──
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event
     setDragOverCol(null)
-  }
-  const onDragOver = (e: React.DragEvent, col: ApplicationColumnId) => {
-    e.preventDefault()
-    setDragOverCol(col)
-  }
-  const onDrop = (e: React.DragEvent, toCol: ApplicationColumnId) => {
-    e.preventDefault()
-    if (draggedKey && draggedFrom && draggedFrom !== toCol) {
-      moveJob(draggedKey, draggedFrom, toCol)
+    if (!over) return
+
+    const jobKey = active.id as string
+    const fromCol = findJobColumn(jobKey)
+    // `over.id` could be a column ID (dropped on empty column area)
+    // or another job's key (dropped on a job card inside a column)
+    const overId = over.id as string
+    const isColumnId = ['bookmark', 'applied', 'interviewing', 'offers'].includes(overId)
+
+    let toCol: ApplicationColumnId | null = null
+    if (isColumnId) {
+      toCol = overId as ApplicationColumnId
+    } else {
+      // Dropped on a job — find that job's column
+      toCol = findJobColumn(overId)
+    }
+
+    if (fromCol && toCol && fromCol !== toCol) {
+      moveJob(jobKey, fromCol, toCol)
       notify({ message: `Moved to ${toCol}`, type: 'success' })
     }
-    onDragEnd()
+  }
+
+  const handleDragOver = (event: React.DragEvent | null, colId: ApplicationColumnId) => {
+    setDragOverCol(colId)
   }
 
   return (
@@ -87,107 +158,112 @@ export function ApplicationsView() {
       </div>
 
       {/* ── Kanban Board ── */}
-      <div className="flex flex-1 gap-3 overflow-x-auto p-4">
-        {COLUMNS.map((col) => {
-          const jobs = filterJobs(applications[col.id])
-          const isOver = dragOverCol === col.id
+      <DndContext
+        sensors={sensors}
+        collisionDetection={closestCorners}
+        onDragEnd={handleDragEnd}
+        onDragOver={(e) => {
+          // Highlight column during drag
+          const overId = e.over?.id as string | undefined
+          if (overId) {
+            const isColumnId = ['bookmark', 'applied', 'interviewing', 'offers'].includes(overId)
+            if (isColumnId) {
+              setDragOverCol(overId as ApplicationColumnId)
+            } else {
+              // Over a job — find its column
+              const col = findJobColumn(overId)
+              if (col) setDragOverCol(col)
+            }
+          }
+        }}
+      >
+        <div className="flex flex-1 gap-3 overflow-x-auto p-4">
+          {COLUMNS.map((col) => {
+            const jobs = filterJobs(applications[col.id])
+            const isOver = dragOverCol === col.id
 
-          return (
-            <div
-              key={col.id}
-              className={cn(
-                'flex w-72 shrink-0 flex-col rounded-sm border border-border transition-colors',
-                isOver && 'border-primary bg-accent-soft/30'
-              )}
-              onDragOver={(e) => onDragOver(e, col.id)}
-              onDrop={(e) => onDrop(e, col.id)}
-            >
-              {/* Column Header */}
-              <div className="flex items-center justify-between border-b border-border px-3 py-2">
-                <div className="flex items-center gap-2">
-                  <span className="h-2 w-2 rounded-full" style={{ backgroundColor: col.dot }} />
-                  <span className="text-xs font-semibold text-foreground">{t(col.labelKey)}</span>
-                  <span className="text-[10px] font-mono text-muted-foreground">{jobs.length}</span>
-                </div>
-                <button
-                  onClick={() => clearApplications()}
-                  className="text-[10px] text-muted-foreground hover:text-destructive transition-colors cursor-pointer"
-                  title="Clear"
-                >
-                  ×
-                </button>
-              </div>
-
-              {/* Job Cards */}
-              <div className="flex flex-col gap-1.5 p-2 overflow-y-auto">
-                {jobs.length === 0 && (
-                  <div className="px-2 py-4 text-center">
-                    <p className="text-[11px] text-muted-foreground">{t('noApplications')}</p>
-                    <button
-                      onClick={() => router.push('/chat')}
-                      className="mt-2 text-[10px] text-primary hover:underline cursor-pointer"
-                    >
-                      {t('addJobs')}
-                    </button>
+            return (
+              <DroppableColumn key={col.id} colId={col.id} isOver={isOver}>
+                {/* Column Header */}
+                <div className="flex items-center justify-between border-b border-border px-3 py-2">
+                  <div className="flex items-center gap-2">
+                    <span className="h-2 w-2 rounded-full" style={{ backgroundColor: col.dot }} />
+                    <span className="text-xs font-semibold text-foreground">{t(col.labelKey)}</span>
+                    <span className="text-[10px] font-mono text-muted-foreground">{jobs.length}</span>
                   </div>
-                )}
-
-                {jobs.map((job) => (
-                  <div
-                    key={job.key}
-                    draggable
-                    onDragStart={(e) => onDragStart(e, job.key, col.id)}
-                    onDragEnd={onDragEnd}
-                    className={cn(
-                      'group cursor-grab rounded-sm border border-border/60 bg-card p-2.5 transition-all active:cursor-grabbing hover:border-primary/50',
-                      draggedKey === job.key && 'opacity-50'
-                    )}
+                  <button
+                    onClick={() => clearApplications()}
+                    className="text-[10px] text-muted-foreground hover:text-destructive transition-colors cursor-pointer"
+                    title="Clear"
                   >
-                    <div className="flex items-start justify-between gap-1">
-                      <div className="min-w-0 flex-1">
-                      <div className="text-[11px] font-semibold text-foreground truncate">{job.title}</div>
-                      <div className="text-[10px] text-muted-foreground truncate">{job.company}</div>
-                      </div>
-                      {job.score > 0 && (
-                        <span className={cn(
-                          'shrink-0 rounded-xs px-1 py-px text-[9px] font-mono font-semibold',
-                          job.score >= 85 ? 'bg-success/10 text-success' : job.score >= 70 ? 'bg-primary/10 text-primary' : 'bg-warn/10 text-warn'
-                        )}>
-                          {job.score}%
-                        </span>
-                      )}
-                    </div>
-                    <div className="mt-1.5 flex items-center gap-2 text-[9px] text-muted-foreground">
-                      {job.loc && <span className="truncate">{job.loc}</span>}
-                    </div>
-                    <div className="mt-1.5 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                      {job.url && (
-                        <a
-                          href={job.url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="flex items-center gap-0.5 rounded-xs px-1.5 py-0.5 text-[9px] text-muted-foreground hover:text-primary transition-colors"
-                        >
-                          <Link2 size={10} /> Open
-                        </a>
-                      )}
+                    ×
+                  </button>
+                </div>
+
+                {/* Job Cards */}
+                <div className="flex flex-col gap-1.5 p-2 overflow-y-auto">
+                  {jobs.length === 0 && (
+                    <div className="px-2 py-4 text-center">
+                      <p className="text-[11px] text-muted-foreground">{t('noApplications')}</p>
                       <button
-                        onClick={() => {
-                          removeJob(job.key, col.id)
-                          notify({ message: 'Removed from board', type: 'info' })
-                        }}
-                        className="flex items-center gap-0.5 rounded-xs px-1.5 py-0.5 text-[9px] text-muted-foreground hover:text-destructive transition-colors cursor-pointer"
+                        onClick={() => router.push('/chat')}
+                        className="mt-2 text-[10px] text-primary hover:underline cursor-pointer"
                       >
-                        <Trash2 size={10} /> Remove
+                        {t('addJobs')}
                       </button>
                     </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )
-        })}
-      </div>
+                  )}
+
+                  {jobs.map((job) => (
+                    <DraggableJobCard key={job.key} job={job}>
+                      <div className="flex items-start justify-between gap-1">
+                        <div className="min-w-0 flex-1">
+                          <div className="text-[11px] font-semibold text-foreground truncate">{job.title}</div>
+                          <div className="text-[10px] text-muted-foreground truncate">{job.company}</div>
+                        </div>
+                        {job.score > 0 && (
+                          <span className={cn(
+                            'shrink-0 rounded-xs px-1 py-px text-[9px] font-mono font-semibold',
+                            job.score >= 85 ? 'bg-success/10 text-success' : job.score >= 70 ? 'bg-primary/10 text-primary' : 'bg-warn/10 text-warn'
+                          )}>
+                            {job.score}%
+                          </span>
+                        )}
+                      </div>
+                      <div className="mt-1.5 flex items-center gap-2 text-[9px] text-muted-foreground">
+                        {job.loc && <span className="truncate">{job.loc}</span>}
+                      </div>
+                      <div className="mt-1.5 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                        {job.url && (
+                          <a
+                            href={job.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            onClick={(e) => e.stopPropagation()}
+                            className="flex items-center gap-0.5 rounded-xs px-1.5 py-0.5 text-[9px] text-muted-foreground hover:text-primary transition-colors"
+                          >
+                            <Link2 size={10} /> Open
+                          </a>
+                        )}
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            removeJob(job.key, col.id)
+                            notify({ message: 'Removed from board', type: 'info' })
+                          }}
+                          className="flex items-center gap-0.5 rounded-xs px-1.5 py-0.5 text-[9px] text-muted-foreground hover:text-destructive transition-colors cursor-pointer"
+                        >
+                          <Trash2 size={10} /> Remove
+                        </button>
+                      </div>
+                    </DraggableJobCard>
+                  ))}
+                </div>
+              </DroppableColumn>
+            )
+          })}
+        </div>
+      </DndContext>
     </div>
   )
 }

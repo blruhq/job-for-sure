@@ -25,7 +25,7 @@ export interface ResumeExperience {
   bullets: string[]
 }
 
-export type ResumeTemplate = 'minimalist' | 'modern' | 'classic'
+export type ResumeTemplate = 'minimalist' | 'modern' | 'classic' | 'executive' | 'photo'
 
 export interface ResumeEducation {
   institution: string
@@ -66,6 +66,7 @@ export interface Resume {
   phone?: string
   location?: string
   github?: string
+  photoUrl?: string        // Optional profile photo URL (for photo template)
   score: number
   updated: string
   skills: string[]

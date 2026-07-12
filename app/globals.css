@@ -329,15 +329,33 @@ html[lang="th"] {
 ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
 ::-webkit-scrollbar-thumb:hover { background: var(--muted-foreground); }
 
-/* ── Resume paper (shared across ATS, editor, inline preview) ── */
+/* ── Resume paper base (all templates) ── */
 .resume-paper {
   background: #FFFFFF;
   color: #2D2D2A;
-  font-family: Georgia, 'Times New Roman', serif;
   font-size: 11px;
   line-height: 1.5;
+  box-shadow: var(--shadow-paper);
 }
 .dark .resume-paper {
   background: #1C1B18;
   color: #D5D4D0;
+}
+
+/* Per-template font overrides */
+.resume-paper[data-template="minimalist"] {
+  font-family: var(--font-sans);
+}
+.resume-paper[data-template="modern"] {
+  font-family: var(--font-sans);
+}
+.resume-paper[data-template="classic"] {
+  font-family: Lora, Georgia, 'Times New Roman', serif;
+  line-height: 1.7;
+}
+.resume-paper[data-template="executive"] {
+  font-family: var(--font-sans);
+}
+.resume-paper[data-template="photo"] {
+  font-family: var(--font-sans);
 }
