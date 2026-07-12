@@ -5,12 +5,14 @@ import { useRouter } from 'next/navigation'
 import { ArrowLeft, Wand2, Download, Trash2, Plus, X, PlusCircle, Lightbulb, GripVertical } from 'lucide-react'
 import {
   DndContext,
-  closestCenter,
   PointerSensor,
   TouchSensor,
   useSensor,
   useSensors,
+  pointerWithin,
+  DragOverlay,
   type DragEndEvent,
+  type DragStartEvent,
 } from '@dnd-kit/core'
 import {
   SortableContext,
@@ -166,6 +168,7 @@ function EditableList<T>({
   createNew: () => T
   label: string
 }) {
+  const [activeId, setActiveId] = useState<string | null>(null)
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
     useSensor(TouchSensor, { activationConstraint: { delay: 150, tolerance: 5 } }),
@@ -175,8 +178,13 @@ function EditableList<T>({
   // Items may not have an `id` field, so we use index-based keys
   const itemIds = items.map((_, i) => `item-${label}-${i}`)
 
+  const handleDragStart = (event: DragStartEvent) => {
+    setActiveId(event.active.id as string)
+  }
+
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event
+    setActiveId(null)
     if (!over || active.id === over.id) return
     const oldIndex = itemIds.indexOf(active.id as string)
     const newIndex = itemIds.indexOf(over.id as string)
@@ -207,7 +215,12 @@ function EditableList<T>({
       {items.length === 0 && (
         <p className="py-2 text-center text-[10px] text-muted-foreground/50 italic">No entries yet. Click "Add" to create one.</p>
       )}
-      <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+      <DndContext
+        sensors={sensors}
+        collisionDetection={pointerWithin}
+        onDragStart={handleDragStart}
+        onDragEnd={handleDragEnd}
+      >
         <SortableContext items={itemIds} strategy={verticalListSortingStrategy}>
           <div className="flex flex-col gap-2">
             {items.map((item, i) => (
@@ -229,6 +242,21 @@ function EditableList<T>({
             ))}
           </div>
         </SortableContext>
+
+        {/* ── Floating drag overlay ── */}
+        <DragOverlay dropAnimation={null}>
+          {activeId ? (
+            <div className="rounded-xs border border-border bg-background p-3 shadow-[0_4px_16px_rgba(0,0,0,0.1)]">
+              <div className="pl-5">
+                {renderItem(
+                  items[itemIds.indexOf(activeId)],
+                  itemIds.indexOf(activeId),
+                  () => {},
+                )}
+              </div>
+            </div>
+          ) : null}
+        </DragOverlay>
       </DndContext>
     </div>
   )
