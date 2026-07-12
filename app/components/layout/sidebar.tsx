@@ -99,7 +99,7 @@ export function Sidebar() {
             key={r.id}
             className={cn(
               'group flex items-center gap-1 rounded-sm transition-colors hover:bg-sidebar-hover border-l-2',
-              r.id === activeResumeId ? 'border-l-primary' : 'border-l-transparent',
+              r.id === activeResumeId ? 'bg-sidebar-hover border-l-primary' : 'border-l-transparent',
               c ? 'justify-center px-0 mx-2' : 'px-2 py-1',
             )}
           >
