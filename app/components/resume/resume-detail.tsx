@@ -354,6 +354,7 @@ export function ResumeDetail({ resumeId }: { resumeId: string }) {
   const [editLocation, setEditLocation] = useState(resume?.location ?? '')
   const [editPhone, setEditPhone] = useState(resume?.phone ?? '')
   const [editGithub, setEditGithub] = useState(resume?.github ?? '')
+  const [editRole, setEditRole] = useState(resume?.role ?? '')
   const [editSummary, setEditSummary] = useState(resume?.summary ?? '')
   const [editSkillsArr, setEditSkillsArr] = useState<string[]>(resume?.skills ?? [])
   const [editExperiences, setEditExperiences] = useState<ResumeExperience[]>(resume?.experience ?? [])
@@ -457,6 +458,12 @@ export function ResumeDetail({ resumeId }: { resumeId: string }) {
               <div className="flex-1">
                 <label className="label-mono mb-1 block">GitHub / Portfolio</label>
                 <input value={editGithub} onChange={(e) => setEditGithub(e.target.value)} placeholder="https://github.com/..." className="w-full rounded-xs border border-border bg-background px-2.5 py-1.5 text-[11px] outline-none focus:border-primary" />
+              </div>
+            </div>
+            <div className="flex gap-3 mt-3">
+              <div className="flex-1">
+                <label className="label-mono mb-1 block">Headline / Target Role</label>
+                <input value={editRole} onChange={(e) => setEditRole(e.target.value)} placeholder="e.g. Software Engineer (shown under your name on PDF)" className="w-full rounded-xs border border-border bg-background px-2.5 py-1.5 text-[11px] outline-none focus:border-primary" />
               </div>
             </div>
           </>
@@ -705,6 +712,7 @@ export function ResumeDetail({ resumeId }: { resumeId: string }) {
     updateResume(resume.id, {
       name: editName,
       persona: editPersona,
+      role: editRole,
       email: editEmail,
       location: editLocation,
       phone: editPhone,

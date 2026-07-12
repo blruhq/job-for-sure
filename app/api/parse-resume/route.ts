@@ -147,8 +147,9 @@ Guidelines:
      - "degree": Degree type (e.g. "B.Sc.")
      - "field": Field of study (e.g. "Information Technology")
      - "dates": Duration or graduation date (e.g. "Nov 2022 – Dec 2025")
-6. Role Targeting:
-   - "role" (root-level field) is REQUIRED. Infer the target job title (e.g. "Software Engineer", "Frontend Developer"). Never return empty string.
+ 6. Role / Headline:
+    - "role": Extract the person's professional headline or target job title ONLY if it appears explicitly in the resume text (e.g., a title under their name, or their most recent job title).
+    - If the resume does NOT have an explicit headline or target role, return empty string "". Do NOT guess or infer.
 7. Custom / Additional Sections:
    - If the resume contains other sections (e.g. "Open Source Contributions", "Extracurriculars", "Awards", "Publications", "Volunteering") that do not map to the fields above, extract them into "customSections".
    - "title": The name of the section (e.g. "Open Source Contributions").
@@ -164,21 +165,8 @@ Guidelines:
       maxOutputTokens: 4000,
     })
 
-    // ── Safety net: if AI still returns empty role, infer from skills/summary ──
-    if (!parsed.role) {
-      const skillsLower = parsed.skills.join(' ').toLowerCase()
-      if (skillsLower.includes('frontend') || skillsLower.includes('react') || skillsLower.includes('vue')) {
-        parsed.role = 'Frontend Developer'
-      } else if (skillsLower.includes('backend') || skillsLower.includes('node') || skillsLower.includes('go') || skillsLower.includes('python')) {
-        parsed.role = 'Software Engineer'
-      } else if (skillsLower.includes('data') || skillsLower.includes('sql') || skillsLower.includes('python')) {
-        parsed.role = 'Data Analyst'
-      } else if (parsed.experience.length > 0 && parsed.experience[0].role) {
-        parsed.role = parsed.experience[0].role
-      } else {
-        parsed.role = 'Software Engineer'
-      }
-    }
+    // Role is now extract-only — no fabrication.
+    // If empty, leave empty. Job search will prompt the user for a target role.
 
     await captureServerEvent(user.id, 'resume_uploaded')
     return NextResponse.json(parsed)
