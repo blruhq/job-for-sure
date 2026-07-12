@@ -334,14 +334,6 @@ export function ChatView() {
         </div>
       )}
 
-      {/* Job preview — shows real jobs inline after resume upload */}
-      {!processing && jobPreviewResumeId && resumes.find((r) => r.id === jobPreviewResumeId) && (
-        <JobPreview
-          resume={resumes.find((r) => r.id === jobPreviewResumeId)!}
-          onDismiss={() => setJobPreviewResumeId(null)}
-        />
-      )}
-
       {/* Entry cards — shown when chat is empty */}
       {showEntryCards && (
         <div className="flex flex-col items-center justify-center px-6 py-10">
@@ -409,6 +401,16 @@ export function ChatView() {
             { id: 'salary', label: 'Salary advice', value: 'Give me salary advice for my role' },
             { id: 'score', label: 'Score my resume', value: 'Can you score my resume and tell me how to improve it?' },
           ]}
+          bottomContent={
+            !processing && jobPreviewResumeId && resumes.find((r) => r.id === jobPreviewResumeId) ? (
+              <div className="mx-auto max-w-[680px] w-full px-4 md:px-0 py-3 animate-fade-up">
+                <JobPreview
+                  resume={resumes.find((r) => r.id === jobPreviewResumeId)!}
+                  onDismiss={() => setJobPreviewResumeId(null)}
+                />
+              </div>
+            ) : null
+          }
           className="h-full chat-fade-in"
         />
       </div>

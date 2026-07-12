@@ -39,7 +39,9 @@ Your capabilities:
 
 ${context?.activeResume ? `
 The user's active resume profile:
-- Name: ${context.activeResume.name}
+- Display Name: ${context.activeResume.name}
+- Target Role: ${context.activeResume.role}
+- Candidate Name: ${context.activeResume.persona}
 - Skills: ${context.activeResume.skills?.join(', ') || 'None listed'}
 - Summary: ${context.activeResume.summary || 'Not provided'}
 ` : ''}

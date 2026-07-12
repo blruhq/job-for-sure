@@ -25,6 +25,7 @@ export function AgentChat({
   emptySuggestionsPlacement = "input",
   emptySuggestionsPosition = "top",
   questionTool,
+  bottomContent,
   className,
   style,
 }: AgentChatProps) {
@@ -159,6 +160,7 @@ export function AgentChat({
           initialScrollBehavior={initialScrollBehavior}
           enableImagePreview={enableImagePreview}
           suppressQuestionTool={Boolean(pendingQuestion)}
+          bottomContent={bottomContent}
         />
       )}
       {!isCenteredEmptyState ? inputBarNode : null}

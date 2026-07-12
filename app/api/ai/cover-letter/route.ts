@@ -66,7 +66,7 @@ export async function POST(req: NextRequest) {
   - ย่อหน้าเปิด: แนะนำตัวและระบุตำแหน่งที่สมัคร
   - ย่อหน้าเนื้อหา: แสดงคุณค่าและความเหมาะสม อ้างอิงความสำเร็จ 1-2 ข้อจากประสบการณ์
   - ย่อหน้าปิด: กล่าวถึงความตั้งใจและขอโอกาสในการสัมภาษณ์
-  - คำลงท้าย: "ขอแสดงความนับถือ" ตามด้วยชื่อผู้สมัคร (${resume.name})
+  - คำลงท้าย: "ขอแสดงความนับถือ" ตามด้วยชื่อผู้สมัคร (${resume.persona})
 - แปลข้อมูลนำเข้าที่เป็นภาษาอื่น (เช่น อังกฤษ) เป็นภาษาไทยก่อนนำไปใช้ในจดหมาย
 - ส่งออกเฉพาะข้อความจดหมายเท่านั้น ไม่มีคำอธิบายเพิ่มเติมหรือ markdown`
 
@@ -83,7 +83,7 @@ Rules:
   - Opening paragraph (hooking the reader, stating the role applied for)
   - Body paragraphs (demonstrating value, explaining fit, citing 1-2 major achievements from experience)
   - Closing paragraph (call to action, express enthusiasm, thank them for consideration)
-  - Sign-off (e.g., "Sincerely,") followed by the candidate's name (which is ${resume.name}).
+  - Sign-off (e.g., "Sincerely,") followed by the candidate's name (which is ${resume.persona}).
 - Translate any input fields provided in a different language (like Thai) into English before incorporating them into the generated cover letter.
 - Return ONLY the cover letter text itself. No extra markdown explanation, conversational intro/outro, or styling.`
 

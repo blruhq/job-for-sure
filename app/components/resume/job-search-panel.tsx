@@ -120,7 +120,7 @@ export function JobSearchPanel({ resume }: { resume: Resume }) {
           query: searchQuery,
           location: (loc ?? location).trim() || undefined,
           skills: resume.skills,
-          role: resume.name,
+          role: resume.role,
           sources: FAST_FREE_SOURCES,
           limit: 100,
           fresh,
@@ -144,7 +144,7 @@ export function JobSearchPanel({ resume }: { resume: Resume }) {
             query: searchQuery,
             location: (loc ?? location).trim() || undefined,
             skills: resume.skills,
-            role: resume.name,
+            role: resume.role,
             sources: FULL_FREE_SOURCES,
             limit: 100,
             fresh,
@@ -165,7 +165,7 @@ export function JobSearchPanel({ resume }: { resume: Resume }) {
         setLoading(false)
       }
     }
-  }, [query, location, resume.skills, resume.name, mergeResults])
+  }, [query, location, resume.skills, resume.role, mergeResults])
 
   // Auto-search on mount
   useEffect(() => {
@@ -272,7 +272,7 @@ export function JobSearchPanel({ resume }: { resume: Resume }) {
         level: job.score >= 75 ? 'high' : 'mid',
         time: 'just now',
         url: job.url,
-        resume: resume.name,
+        resume: resume.role,
       })
       notify({ message: `Bookmarked: ${job.title} at ${job.company}`, type: 'success' })
     }
@@ -308,7 +308,7 @@ export function JobSearchPanel({ resume }: { resume: Resume }) {
           query,
           location: location.trim() || undefined,
           skills: resume.skills,
-          role: resume.name,
+          role: resume.role,
           sources: PAID_SOURCES,
           includePaid: true,
           limit: 50,
@@ -325,7 +325,7 @@ export function JobSearchPanel({ resume }: { resume: Resume }) {
     } finally {
       setPaidLoading(false)
     }
-  }, [query, location, resume.skills, resume.name, paidLoading, paidLoaded, mergeResults])
+  }, [query, location, resume.skills, resume.role, paidLoading, paidLoaded, mergeResults])
 
   // ═══════════════════════════════════════════════════════════════
   // RENDER

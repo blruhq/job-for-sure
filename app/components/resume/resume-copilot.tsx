@@ -15,6 +15,7 @@ export function ResumeCopilot({ resume }: { resume: Resume }) {
     body: {
       resume: {
         name: resume.name,
+        role: resume.role,
         persona: resume.persona,
         email: resume.email,
         location: resume.location,

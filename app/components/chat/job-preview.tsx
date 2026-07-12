@@ -111,17 +111,17 @@ export function JobPreview({ resume, onDismiss }: { resume: Resume; onDismiss?: 
   // ── Loading ──
   if (loading) {
     return (
-      <div className="shrink-0 border-b border-border/50 bg-card px-4 py-2 md:px-8">
-        <div className="mx-auto flex max-w-[680px] items-center justify-between">
+      <div className="w-full rounded-md border border-border bg-card p-4">
+        <div className="flex items-center justify-between">
           <div className="flex items-center gap-2 text-muted-foreground">
-            <Loader2 size={11} className="animate-spin text-primary" />
-            <span className="font-mono text-[10px]">
+            <Loader2 size={12} className="animate-spin text-primary" />
+            <span className="font-mono text-[11px]">
               Searching real jobs across 9 sources…
             </span>
           </div>
           {onDismiss && (
             <button onClick={onDismiss} className="cursor-pointer text-muted-foreground hover:text-foreground">
-              <X size={12} />
+              <X size={13} />
             </button>
           )}
         </div>
@@ -136,8 +136,8 @@ export function JobPreview({ resume, onDismiss }: { resume: Resume; onDismiss?: 
 
   // ── Results ──
   return (
-    <div className="shrink-0 max-h-[45vh] overflow-y-auto border-b border-border/50 bg-card px-4 py-2.5 md:px-8">
-      <div className="mx-auto max-w-[680px]">
+    <div className="w-full rounded-md border border-border bg-card p-4">
+      <div>
         {/* Header */}
         <div className="mb-2 flex items-center justify-between">
           <div className="flex items-center gap-1.5">
@@ -163,9 +163,9 @@ export function JobPreview({ resume, onDismiss }: { resume: Resume; onDismiss?: 
           </div>
         </div>
 
-        {/* Job cards (top 10) */}
+        {/* Job cards (top 5) */}
         <div className="grid grid-cols-1 gap-2">
-          {jobs.slice(0, 10).map((job) => {
+          {jobs.slice(0, 5).map((job) => {
             const key = job.id
             const bm = isBookmarked(key)
             return (
@@ -286,12 +286,12 @@ export function JobPreview({ resume, onDismiss }: { resume: Resume; onDismiss?: 
         </div>
 
         {/* View more */}
-        {jobs.length > 10 && (
+        {jobs.length > 5 && (
           <button
             onClick={() => router.push(`/resume/${resume.id}`)}
             className="mt-2 flex w-full cursor-pointer items-center justify-center gap-1 rounded-sm border border-dashed border-border py-1.5 text-[11px] text-muted-foreground transition-colors hover:border-primary hover:text-primary"
           >
-            +{jobs.length - 10} more jobs · View all <ChevronRight size={11} />
+            +{jobs.length - 5} more jobs · View all <ChevronRight size={11} />
           </button>
         )}
 

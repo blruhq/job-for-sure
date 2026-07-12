@@ -28,10 +28,11 @@ export async function POST(req: Request) {
     const { messages, resume } = body.data
 
   const systemPrompt = `You are an AI Resume Co-Pilot embedded in a resume editor. You help the user improve their resume in real-time.
-
+ 
 The user is currently editing this resume:
-- Name: ${resume?.name || 'Unknown'}
-- Persona/Title: ${resume?.persona || 'Not set'}
+- Resume Title (Filename): ${resume?.name || 'Unknown'}
+- Target Role / Job Title: ${resume?.role || 'Not set'}
+- Candidate Name: ${resume?.persona || 'Not set'}
 - Email: ${resume?.email || 'Not set'}
 - Location: ${resume?.location || 'Not set'}
 - Summary: ${resume?.summary || 'Not set'}

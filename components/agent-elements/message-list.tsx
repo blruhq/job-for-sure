@@ -50,6 +50,7 @@ export type MessageListProps = {
     userMessage?: string;
   };
   toolRenderers?: Record<string, React.ComponentType<CustomToolRendererProps>>;
+  bottomContent?: React.ReactNode;
 };
 
 const SCROLL_THRESHOLD = 80;
@@ -280,6 +281,7 @@ export const MessageList = memo(function MessageList({
   slots,
   classNames,
   toolRenderers,
+  bottomContent,
 }: MessageListProps) {
   const chatContainerRef = useRef<HTMLDivElement>(null);
   const contentWrapperRef = useRef<HTMLDivElement>(null);
@@ -625,6 +627,7 @@ export const MessageList = memo(function MessageList({
             );
           })}
         </div>
+        {bottomContent}
         {showAssistantBreathingSpace && (
           <div
             aria-hidden="true"

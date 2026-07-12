@@ -172,6 +172,9 @@ export type AgentChatProps = {
     }) => void;
   };
 
+  /** Content to render at the bottom of the message list (in-flow scrollable) */
+  bottomContent?: React.ReactNode;
+
   className?: string;
   style?: React.CSSProperties;
 };
