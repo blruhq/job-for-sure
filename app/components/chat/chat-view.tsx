@@ -13,7 +13,6 @@ import { BuildWizard, type WizardData } from '~/components/chat/build-wizard'
 import { PasteJDModal } from '~/components/chat/paste-jd-modal'
 import { SkeletonChatMessage, SkeletonCard } from '~/components/ui/skeleton'
 import { Upload, FileText, ClipboardList, Loader2, Paperclip, RotateCcw } from 'lucide-react'
-import { JobPreview } from '~/components/chat/job-preview'
 
 export function ChatView() {
   const router = useRouter()
@@ -22,7 +21,6 @@ export function ChatView() {
   const [wizardOpen, setWizardOpen] = useState(false)
   const [pasteOpen, setPasteOpen] = useState(false)
   const [processing, setProcessing] = useState(false)
-  const [jobPreviewResumeId, setJobPreviewResumeId] = useState<string | null>(null)
 
   // ── CHAT PERSISTENCE (sessionStorage) ──
   // Load saved messages from sessionStorage on mount.
@@ -156,7 +154,6 @@ export function ChatView() {
 
       addResume(resume)
       sendMessage({ text: `I just uploaded my resume. Here's my profile:\n- **Name:** ${resume.persona || 'Not specified'}\n- **Role:** ${resume.role}\n- **Skills:** ${resume.skills.join(', ')}\n- **Summary:** ${resume.summary || 'Not provided'}\n- **Location:** ${resume.location || 'Not specified'}\n\nCan you analyze my resume and give me feedback on how to improve it?` })
-      setJobPreviewResumeId(resume.id)
     } catch (err) {
       console.error(err)
       notify({ message: err instanceof Error ? err.message : 'Failed to process resume. Try Build from Template instead.', type: 'error' })
@@ -187,7 +184,6 @@ export function ChatView() {
 
       addResume(resume)
       sendMessage({ text: `I built my resume profile:\n- **Name:** ${resume.persona || data.name}\n- **Role:** ${resume.role}\n- **Skills:** ${resume.skills.join(', ')}\n- **Summary:** ${resume.summary || 'Not provided'}\n\nCan you give me feedback and suggestions?` })
-      setJobPreviewResumeId(resume.id)
     } catch (err) {
       console.error(err)
       notify({ message: 'Failed to create resume from wizard', type: 'error' })
@@ -404,16 +400,6 @@ export function ChatView() {
               { id: 'salary', label: 'Salary advice', value: 'Give me salary advice for my role' },
               { id: 'score', label: 'Score my resume', value: 'Can you score my resume and tell me how to improve it?' },
             ]}
-            bottomContent={
-              !processing && jobPreviewResumeId && resumes.find((r) => r.id === jobPreviewResumeId) ? (
-                <div className="mx-auto max-w-[680px] w-full px-4 md:px-0 py-3 animate-fade-up">
-                  <JobPreview
-                    resume={resumes.find((r) => r.id === jobPreviewResumeId)!}
-                    onDismiss={() => setJobPreviewResumeId(null)}
-                  />
-                </div>
-              ) : null
-            }
             className="h-full chat-fade-in"
           />
         )}
