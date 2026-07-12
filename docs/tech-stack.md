@@ -13,6 +13,8 @@
 | Vercel AI SDK | (`ai` 7.0+) | AI integration |
 | OpenAI SDK | (`@ai-sdk/openai` 4.0+) | LLM provider |
 | `@react-pdf/renderer` | 4.5+ | Server-side PDF generation |
+| `unpdf` | 1.6+ | Server-side PDF text extraction |
+| `mammoth` | 1.12+ | DOCX text extraction |
 | `next-intl` | 4.13+ | Internationalization (`/en`, `/th`) |
 | PostHog | (JS 1.39+, Node 5.40+) | Client + server analytics |
 | Upstash Redis | 1.38+ | Caching + rate limiting |

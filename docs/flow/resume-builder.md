@@ -12,11 +12,23 @@
 
 ### Upload / Parse
 ```
-1. User uploads PDF or pastes text
-2. PDF path: pdfjs-dist extracts text → AI parses → fills Resume type
-3. Text path: AI parses directly
-4. If AI parsing fails → fallback to minimal blank form
-5. User can edit parsed result
+1. User uploads PDF, DOCX, TXT, or MD file
+2. Client sends File to /api/parse-resume via FormData (no client-side extraction)
+3. Server extracts text:
+   ├── PDF  → unpdf (server-side pdfjs, no CDN worker)
+   ├── DOCX → mammoth
+   └── TXT/MD → plain text read
+4. Server sends extracted text to AI for structured parsing
+5. AI prompt always infers role/title (never empty)
+6. If AI returns empty role → safety-net infers from skills/experience
+7. If AI parsing fails → fallback to minimal blank form
+8. User can edit parsed result
+
+Rejected formats:
+   ├── .doc → "Please save as .docx or PDF"
+   └── Other → "Unsupported format"
+
+OCR fallback (deferred): tesseract.js for Canva/scanned PDFs
 ```
 
 ### Editor (Tab: "Resume Editor")
@@ -69,7 +81,8 @@ User can accept or override freely.
 ### Export
 ```
 [Export PDF]  →  server-side @react-pdf/renderer  →  downloads A4 PDF
-[Export DOCX] →  future (mammoth.js or cloud API)
+                   Uses local TTF fonts (public/fonts/) — no CDN dependency
+[Export DOCX] →  future (docx npm package)
 ```
 
 ## Edge Cases

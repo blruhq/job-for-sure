@@ -150,7 +150,8 @@
     "savedSuccess": "Cover letter saved successfully!",
     "copiedClipboard": "Copied to clipboard!",
     "generateFailed": "Failed to generate cover letter. Please try again.",
-    "saveFailed": "Failed to save cover letter."
+    "saveFailed": "Failed to save cover letter.",
+    "delete": "Delete"
   },
   "applications": {
     "bookmark": "Bookmark",
