@@ -96,6 +96,14 @@ const styles = StyleSheet.create({
     marginBottom: 1,
     paddingLeft: 10,
   },
+  languagesRow: {
+    flexDirection: 'row' as const,
+    flexWrap: 'wrap' as const,
+    gap: 12,
+  },
+  langText: {
+    fontSize: 9,
+  },
 })
 
 export function ResumePDF({ resume }: { resume: Resume }) {
@@ -148,6 +156,87 @@ export function ResumePDF({ resume }: { resume: Resume }) {
             ))}
           </View>
         )}
+
+        {/* Education */}
+        {resume.education && resume.education.length > 0 && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Education</Text>
+            {resume.education.map((edu, i) => (
+              <View key={i} style={styles.experienceBlock}>
+                <View style={styles.expHeader}>
+                  <Text style={styles.expRole}>{edu.institution}</Text>
+                  <Text style={styles.expDates}>{edu.dates}</Text>
+                </View>
+                <Text style={styles.expCompany}>
+                  {[edu.degree, edu.field].filter(Boolean).join(', ')}
+                </Text>
+              </View>
+            ))}
+          </View>
+        )}
+
+        {/* Projects */}
+        {resume.projects && resume.projects.length > 0 && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Projects</Text>
+            {resume.projects.map((proj, i) => (
+              <View key={i} style={styles.experienceBlock}>
+                <View style={styles.expHeader}>
+                  <Text style={styles.expRole}>
+                    {proj.name}{proj.link ? ` (${proj.link})` : ''}
+                  </Text>
+                </View>
+                <Text style={styles.summary}>{proj.description}</Text>
+                {proj.techStack && proj.techStack.length > 0 && (
+                  <Text style={[styles.expCompany, { marginTop: 2 }]}>
+                    Tech Stack: {proj.techStack.join(', ')}
+                  </Text>
+                )}
+              </View>
+            ))}
+          </View>
+        )}
+
+        {/* Certifications */}
+        {resume.certifications && resume.certifications.length > 0 && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Certifications</Text>
+            {resume.certifications.map((cert, i) => (
+              <View key={i} style={{ marginBottom: 4 }}>
+                <View style={styles.expHeader}>
+                  <Text style={{ fontWeight: 600, fontSize: 9 }}>
+                    {cert.name} ({cert.issuer})
+                  </Text>
+                  <Text style={styles.expDates}>{cert.date}</Text>
+                </View>
+              </View>
+            ))}
+          </View>
+        )}
+
+        {/* Languages */}
+        {resume.languages && resume.languages.length > 0 && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Languages</Text>
+            <View style={styles.languagesRow}>
+              {resume.languages.map((lang, i) => (
+                <Text key={i} style={styles.langText}>
+                  {lang.name} ({lang.proficiency})
+                </Text>
+              ))}
+            </View>
+          </View>
+        )}
+
+        {/* Custom Sections */}
+        {resume.customSections && resume.customSections.map((sec, i) => (
+          <View key={i} style={styles.section}>
+            <Text style={styles.sectionTitle}>{sec.title}</Text>
+            {sec.bullets.map((b, j) => (
+              <Text key={j} style={styles.bullet}>• {b}</Text>
+            ))}
+          </View>
+        ))}
       </Page>
     </Document>
   )

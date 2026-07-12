@@ -53,6 +53,12 @@ const ParseResumeSchema = z.object({
       proficiency: z.string().default(''),
     })
   ).default([]),
+  customSections: z.array(
+    z.object({
+      title: z.string().default(''),
+      bullets: z.array(z.string()).default([]),
+    })
+  ).default([]),
   role: z.string().default(''),
 })
 
@@ -143,7 +149,11 @@ Guidelines:
      - "dates": Duration or graduation date (e.g. "Nov 2022 – Dec 2025")
 6. Role Targeting:
    - "role" (root-level field) is REQUIRED. Infer the target job title (e.g. "Software Engineer", "Frontend Developer"). Never return empty string.
-7. General Rules:
+7. Custom / Additional Sections:
+   - If the resume contains other sections (e.g. "Open Source Contributions", "Extracurriculars", "Awards", "Publications", "Volunteering") that do not map to the fields above, extract them into "customSections".
+   - "title": The name of the section (e.g. "Open Source Contributions").
+   - "bullets": Array of individual items/bullets or text blocks in that section. Keep them verbatim.
+8. General Rules:
    - Extract ONLY what's in the text. Don't fabricate.
    - If a field isn't present, use empty string or empty array.
    - Skills should be individual technologies/tools (e.g. "React", not "Frontend Development").

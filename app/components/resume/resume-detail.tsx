@@ -10,22 +10,24 @@ import { ConfirmDialog } from '~/components/ui/confirm-dialog'
 import { ResumeCopilot } from '~/components/resume/resume-copilot'
 import { CoverLetterEditor } from '~/components/resume/cover-letter-editor'
 import { JobSearchPanel } from '~/components/resume/job-search-panel'
-import type { ResumeEducation, ResumeProject, ResumeExperience, ResumeCertification, ResumeLanguage } from '~/types/resume'
+import type { ResumeEducation, ResumeProject, ResumeExperience, ResumeCertification, ResumeLanguage, ResumeCustomSection } from '~/types/resume'
 
 // ── Helpers ──
 
-type SectionKey = 'projects' | 'certifications' | 'languages'
+type SectionKey = 'projects' | 'certifications' | 'languages' | 'custom'
 
 const SECTION_LABELS: Record<SectionKey, string> = {
   projects: 'Projects',
   certifications: 'Certifications',
   languages: 'Languages',
+  custom: 'Custom Section',
 }
 
 const SECTION_ICONS: Record<SectionKey, string> = {
   projects: '📦',
   certifications: '📜',
   languages: '🌐',
+  custom: '✍️',
 }
 
 function detectSectionSuggestions(resume: { summary?: string; skills?: string[]; experience?: ResumeExperience[] }): SectionKey[] {
@@ -227,6 +229,7 @@ export function ResumeDetail({ resumeId }: { resumeId: string }) {
   const [editProjectsArr, setEditProjectsArr] = useState<ResumeProject[]>(resume?.projects ?? [])
   const [editCertifications, setEditCertifications] = useState<ResumeCertification[]>(resume?.certifications ?? [])
   const [editLanguages, setEditLanguages] = useState<ResumeLanguage[]>(resume?.languages ?? [])
+  const [editCustomSections, setEditCustomSections] = useState<ResumeCustomSection[]>(resume?.customSections ?? [])
   const [optimizing, setOptimizing] = useState(false)
   const [suggestions, setSuggestions] = useState<SectionKey[]>([])
   const [suggestionDismissed, setSuggestionDismissed] = useState(false)
@@ -254,7 +257,10 @@ export function ResumeDetail({ resumeId }: { resumeId: string }) {
     if (editProjectsArr.length > 0) has.projects = true
     if (editCertifications.length > 0) has.certifications = true
     if (editLanguages.length > 0) has.languages = true
-    return (['projects', 'certifications', 'languages'] as SectionKey[]).filter((s) => !has[s])
+    const list = (['projects', 'certifications', 'languages'] as SectionKey[]).filter((s) => !has[s])
+    // Always allow adding custom sections
+    list.push('custom')
+    return list
   })()
 
   const handleAddSection = useCallback((section: SectionKey) => {
@@ -262,6 +268,8 @@ export function ResumeDetail({ resumeId }: { resumeId: string }) {
       setEditCertifications((prev) => [...prev, { name: '', issuer: '', date: '' }])
     } else if (section === 'languages') {
       setEditLanguages((prev) => [...prev, { name: '', proficiency: '' }])
+    } else if (section === 'custom') {
+      setEditCustomSections((prev) => [...prev, { title: 'New Section', bullets: [] }])
     }
     setShowAddSectionPicker(false)
   }, [])
@@ -289,6 +297,7 @@ export function ResumeDetail({ resumeId }: { resumeId: string }) {
       projects: editProjectsArr,
       certifications: editCertifications,
       languages: editLanguages,
+      customSections: editCustomSections,
     })
     notify({ message: 'Resume saved', type: 'success' })
     setTab('jobs')
@@ -429,6 +438,90 @@ export function ResumeDetail({ resumeId }: { resumeId: string }) {
                   </div>
                 ))}
               </div>
+
+              {/* Education */}
+              {resume.education && resume.education.length > 0 && (
+                <div className="mt-3.5">
+                  <div className="mb-1 border-b border-border pb-0.5 text-[10px] font-bold uppercase tracking-wider">Education</div>
+                  {resume.education.map((edu, i) => (
+                    <div key={i} className="mb-2">
+                      <div className="flex justify-between font-semibold">
+                        <span>{edu.institution}</span>
+                        <span className="font-mono text-[8px] text-muted-foreground">{edu.dates}</span>
+                      </div>
+                      <div className="text-[9px] text-muted-foreground">
+                        {[edu.degree, edu.field].filter(Boolean).join(', ')}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* Projects */}
+              {resume.projects && resume.projects.length > 0 && (
+                <div className="mt-3.5">
+                  <div className="mb-1 border-b border-border pb-0.5 text-[10px] font-bold uppercase tracking-wider">Projects</div>
+                  {resume.projects.map((proj, i) => (
+                    <div key={i} className="mb-2">
+                      <div className="flex justify-between font-semibold">
+                        <span>
+                          {proj.name}
+                          {proj.link && (
+                            <span className="ml-1 text-[8px] text-muted-foreground font-normal font-mono">
+                              ({proj.link})
+                            </span>
+                          )}
+                        </span>
+                      </div>
+                      <div className="text-[9px] text-muted-foreground mb-1">{proj.description}</div>
+                      {proj.techStack && proj.techStack.length > 0 && (
+                        <div className="flex flex-wrap gap-1">
+                          {proj.techStack.map((tech) => (
+                            <span key={tech} className="rounded-xs border border-border bg-background px-1.5 py-0.5 text-[8px]">{tech}</span>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* Certifications */}
+              {resume.certifications && resume.certifications.length > 0 && (
+                <div className="mt-3.5">
+                  <div className="mb-1 border-b border-border pb-0.5 text-[10px] font-bold uppercase tracking-wider">Certifications</div>
+                  {resume.certifications.map((cert, i) => (
+                    <div key={i} className="flex justify-between mb-1 font-semibold">
+                      <span>{cert.name} <span className="text-muted-foreground font-normal">({cert.issuer})</span></span>
+                      <span className="font-mono text-[8px] text-muted-foreground font-normal">{cert.date}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* Languages */}
+              {resume.languages && resume.languages.length > 0 && (
+                <div className="mt-3.5">
+                  <div className="mb-1 border-b border-border pb-0.5 text-[10px] font-bold uppercase tracking-wider">Languages</div>
+                  <div className="flex flex-wrap gap-3">
+                    {resume.languages.map((lang, i) => (
+                      <div key={i} className="text-[9px]">
+                        <span className="font-semibold">{lang.name}</span>: <span className="text-muted-foreground">{lang.proficiency}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Custom Sections */}
+              {resume.customSections && resume.customSections.map((sec, i) => (
+                <div key={i} className="mt-3.5">
+                  <div className="mb-1 border-b border-border pb-0.5 text-[10px] font-bold uppercase tracking-wider">{sec.title}</div>
+                  <ul className="ml-3 list-disc text-muted-foreground text-[9px] leading-relaxed">
+                    {sec.bullets.map((b, j) => <li key={j}>{b}</li>)}
+                  </ul>
+                </div>
+              ))}
             </div>
           </div>
         )}
@@ -667,17 +760,49 @@ export function ResumeDetail({ resumeId }: { resumeId: string }) {
                           <div className="flex-1">
                             <label className="label-mono mb-0.5 block text-[9px]">Proficiency</label>
                             <select
-                              value={lang.proficiency}
-                              onChange={(e) => update({ ...lang, proficiency: e.target.value })}
-                              className="w-full rounded-xs border border-border bg-background px-2 py-1 text-[11px] outline-none focus:border-primary"
+                               value={lang.proficiency}
+                               onChange={(e) => update({ ...lang, proficiency: e.target.value })}
+                               className="w-full rounded-xs border border-border bg-background px-2 py-1 text-[11px] outline-none focus:border-primary"
                             >
-                              <option value="">Select...</option>
-                              <option value="Basic">Basic</option>
-                              <option value="Conversational">Conversational</option>
-                              <option value="Professional">Professional</option>
-                              <option value="Fluent">Fluent</option>
-                              <option value="Native">Native</option>
+                               <option value="">Select...</option>
+                               <option value="Basic">Basic</option>
+                               <option value="Conversational">Conversational</option>
+                               <option value="Professional">Professional</option>
+                               <option value="Fluent">Fluent</option>
+                               <option value="Native">Native</option>
                             </select>
+                          </div>
+                        </div>
+                      )}
+                    />
+                  )}
+
+                  {/* Custom Sections — Dynamic List */}
+                  {editCustomSections.length > 0 && (
+                    <EditableList<ResumeCustomSection>
+                      items={editCustomSections}
+                      onChange={setEditCustomSections}
+                      label="Custom Sections"
+                      createNew={() => ({ title: 'New Section', bullets: [] })}
+                      renderItem={(sec, _i, update) => (
+                        <div className="flex flex-col gap-2">
+                          <div>
+                            <label className="label-mono mb-0.5 block text-[9px]">Section Title</label>
+                            <input
+                              value={sec.title}
+                              onChange={(e) => update({ ...sec, title: e.target.value })}
+                              placeholder="e.g. Open Source Contributions"
+                              className="w-full rounded-xs border border-border bg-background px-2 py-1 text-[11px] outline-none focus:border-primary"
+                            />
+                          </div>
+                          <div>
+                            <label className="label-mono mb-0.5 block text-[9px]">Highlights (one per line)</label>
+                            <textarea
+                              value={sec.bullets.join('\n')}
+                              onChange={(e) => update({ ...sec, bullets: e.target.value.split('\n').filter(Boolean) })}
+                              rows={3}
+                              className="w-full resize-y rounded-xs border border-border bg-background px-2 py-1 text-[11px] outline-none focus:border-primary"
+                            />
                           </div>
                         </div>
                       )}

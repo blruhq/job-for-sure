@@ -52,6 +52,11 @@ export interface ResumeLanguage {
   proficiency: string
 }
 
+export interface ResumeCustomSection {
+  title: string
+  bullets: string[]
+}
+
 export interface Resume {
   id: string
   name: string          // Display name (filename or custom title) — shown in sidebar, dropdowns
@@ -70,6 +75,7 @@ export interface Resume {
   projects?: ResumeProject[]
   certifications?: ResumeCertification[]
   languages?: ResumeLanguage[]
+  customSections?: ResumeCustomSection[]
   companies: Company[]
   stretch: Company[]
   template?: ResumeTemplate
