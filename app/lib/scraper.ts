@@ -1,4 +1,6 @@
 import * as cheerio from 'cheerio'
+import { lookup } from 'node:dns/promises'
+import { isIP } from 'node:net'
 import type { JobDescription } from '~/types/resume'
 
 export interface ScrapeResult {
@@ -12,19 +14,74 @@ export interface ScrapeResult {
 // Block requests to private networks, loopback, link-local, etc.
 // Prevents attackers from using the scraper as a proxy to reach
 // internal services or cloud metadata endpoints.
+//
+// Two-layer defense:
+//   1. String-literal checks for known-bad hostnames
+//   2. DNS resolution + IP range validation (blocks rebinding)
+//
+// Without layer 2, an attacker can register a domain that resolves
+// to 169.254.169.254 and bypass the string check. By resolving the
+// hostname and validating the actual IP, we close that hole.
 
-const BLOCKED_HOSTS = [
+const BLOCKED_HOSTS = new Set([
   'localhost',
   '0.0.0.0',
   '169.254.169.254', // AWS/GCP/Azure metadata
   'metadata.google.internal',
-]
+])
+
+/**
+ * Check if an IPv4 address is in a private / reserved range.
+ */
+function isPrivateIPv4(ip: string): boolean {
+  const parts = ip.split('.').map(Number)
+  if (parts.length !== 4 || parts.some(p => p < 0 || p > 255)) return true // malformed → block
+  const [a, b] = parts
+  return (
+    a === 10 ||                         // private 10.0.0.0/8
+    (a === 172 && b >= 16 && b <= 31) || // private 172.16.0.0/12
+    (a === 192 && b === 168) ||          // private 192.168.0.0/16
+    a === 127 ||                         // loopback 127.0.0.0/8
+    a === 0 ||                           // 0.0.0.0/8
+    (a === 169 && b === 254) ||          // link-local 169.254.0.0/16
+    a >= 224                             // multicast/reserved 224.0.0.0/4
+  )
+}
+
+/**
+ * Check if an IPv6 address is loopback, link-local, or unique-local.
+ */
+function isPrivateIPv6(ip: string): boolean {
+  const lower = ip.toLowerCase()
+  return (
+    lower === '::1' ||              // loopback
+    lower.startsWith('fe80:') ||    // link-local
+    lower.startsWith('fc') ||       // unique-local fc00::/7
+    lower.startsWith('fd') ||       // unique-local fc00::/7
+    lower.startsWith('::ffff:')     // IPv4-mapped (check the embedded IPv4)
+      && isPrivateIPv4(lower.slice('::ffff:'.length))
+  )
+}
+
+/**
+ * Check if any resolved IP address is in a private/reserved range.
+ */
+function isBlockedIP(ip: string): boolean {
+  const version = isIP(ip)
+  if (version === 4) return isPrivateIPv4(ip)
+  if (version === 6) return isPrivateIPv6(ip)
+  return true // unknown format → block
+}
 
 /**
  * Validate that a URL is safe to fetch server-side.
- * Rejects non-HTTPS, private IPs, localhost, and link-local addresses.
+ * Performs both string-literal checks AND DNS resolution to prevent
+ * DNS rebinding attacks.
+ *
+ * @throws Error if the URL is invalid, uses a blocked protocol/host,
+ *   or resolves to a private/reserved IP address.
  */
-function validateUrl(url: string): void {
+async function validateUrl(url: string): Promise<void> {
   let parsed: URL
   try {
     parsed = new URL(url)
@@ -39,31 +96,38 @@ function validateUrl(url: string): void {
 
   const hostname = parsed.hostname.toLowerCase()
 
-  // Block known metadata/loopback hosts
-  if (BLOCKED_HOSTS.includes(hostname)) {
+  // Layer 1: Block known metadata/loopback hostnames
+  if (BLOCKED_HOSTS.has(hostname)) {
     throw new Error('Blocked host')
   }
 
-  // Block IP literals in private/loopback/link-local ranges
-  if (hostname.match(/^\d{1,3}(\.\d{1,3}){3}$/)) {
-    const parts = hostname.split('.').map(Number)
-    const [a, b] = parts
-    if (
-      a === 10 || // private 10.0.0.0/8
-      (a === 172 && b >= 16 && b <= 31) || // private 172.16.0.0/12
-      (a === 192 && b === 168) || // private 192.168.0.0/16
-      a === 127 || // loopback 127.0.0.0/8
-      a === 0 || // 0.0.0.0/8
-      (a === 169 && b === 254) || // link-local 169.254.0.0/16
-      a >= 224 // multicast/reserved 224.0.0.0/4
-    ) {
+  // Layer 1b: If hostname is already an IP literal, validate directly
+  const ipVersion = isIP(hostname)
+  if (ipVersion > 0) {
+    if (isBlockedIP(hostname)) {
       throw new Error('Blocked private/reserved IP')
     }
+    return // Valid public IP literal
   }
 
-  // Block IPv6 loopback and link-local
-  if (hostname === '[::1]' || hostname.startsWith('[fe80:') || hostname.startsWith('[fc') || hostname.startsWith('[fd')) {
-    throw new Error('Blocked IPv6 address')
+  // Layer 2: DNS resolution — prevent rebinding attacks
+  // Resolve the hostname and check ALL returned addresses.
+  let records: { address: string }[]
+  try {
+    records = await lookup(hostname, { all: true })
+  } catch {
+    throw new Error(`DNS resolution failed for ${hostname}`)
+  }
+
+  if (records.length === 0) {
+    throw new Error(`No DNS records for ${hostname}`)
+  }
+
+  // EVERY resolved IP must be public. If ANY resolves to private → block.
+  for (const record of records) {
+    if (isBlockedIP(record.address)) {
+      throw new Error(`Blocked: ${hostname} resolves to private IP ${record.address}`)
+    }
   }
 }
 
@@ -72,9 +136,9 @@ function validateUrl(url: string): void {
  * Strategy: try provider-specific parser first, fall back to generic.
  */
 export async function scrapeJob(url: string): Promise<ScrapeResult> {
-  // SSRF: validate URL before any network call
+  // SSRF: validate URL (including DNS resolution) before any network call
   try {
-    validateUrl(url)
+    await validateUrl(url)
   } catch (err) {
     return {
       success: false,

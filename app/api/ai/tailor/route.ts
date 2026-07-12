@@ -1,13 +1,14 @@
 import { NextResponse } from 'next/server'
 import { generateObjectWithFailover } from '~/lib/ai-providers'
 import { withAuth } from '~/lib/with-auth'
+import { ResumeDataSchema, JobDataSchema } from '~/lib/schemas'
 import { z } from 'zod'
 
 export const maxDuration = 60
 
 const TailorInputBody = z.object({
-  resume: z.record(z.unknown()),
-  job: z.record(z.unknown()),
+  resume: ResumeDataSchema,
+  job: JobDataSchema,
 })
 
 const TailorSchema = z.object({
@@ -56,7 +57,7 @@ Rules:
 - Keep the same length or shorter than original
 - Preserve all dates, company names, and factual data
 - Always output the optimized resume fields (summary, experience bullets, skills, persona) in the same language as the INPUT resume. Do not translate the resume content to another language. If the input resume is in Thai, output in Thai. If in English, output in English.`,
-    prompt: JSON.stringify({ resume, job }),
+    prompt: `<resume>${JSON.stringify(resume)}</resume>\n<job>${JSON.stringify(job)}</job>`,
     schema: TailorSchema,
     temperature: 0.4,
     maxOutputTokens: 2048,

@@ -1,5 +1,5 @@
 import { Ratelimit } from '@upstash/ratelimit'
-import { Redis } from '@upstash/redis'
+import { getRedis } from '~/lib/redis'
 
 /**
  * Per-user rate limiters for API endpoints.
@@ -15,17 +15,6 @@ import { Redis } from '@upstash/redis'
 
 let _aiRatelimit: Ratelimit | null = null
 let _generalRatelimit: Ratelimit | null = null
-let _redis: Redis | null = null
-
-function getRedis(): Redis {
-  if (!_redis) {
-    _redis = new Redis({
-      url: process.env.UPSTASH_REDIS_REST_URL!,
-      token: process.env.UPSTASH_REDIS_REST_TOKEN!,
-    })
-  }
-  return _redis
-}
 
 function getAiRatelimit(): Ratelimit {
   if (!_aiRatelimit) {

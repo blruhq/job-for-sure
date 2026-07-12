@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { Mail } from 'lucide-react'
+import { authClient } from '~/lib/auth-client'
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState('')
@@ -16,7 +17,6 @@ export default function ForgotPasswordPage() {
     setError('')
 
     try {
-      const { authClient } = await import('~/lib/auth-client')
       const { error: authError } = await authClient.requestPasswordReset({
         email,
         redirectTo: `${window.location.origin}/reset-password`,

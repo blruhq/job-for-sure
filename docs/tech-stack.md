@@ -10,8 +10,8 @@
 | Drizzle ORM | 0.42+ | Database ORM + migrations |
 | Drizzle Kit | 0.30+ | Migration CLI |
 | Better Auth | 1.2+ | Auth (email/password + Google OAuth) |
-| Vercel AI SDK | (`ai` 7.0+) | AI integration |
-| OpenAI SDK | (`@ai-sdk/openai` 4.0+) | LLM provider |
+| Vercel AI SDK | (`ai` 7.0+) | AI integration (DeepSeek V4 Flash via OpenAI-compatible API) |
+| OpenAI SDK | (`@ai-sdk/openai` 4.0+) | LLM provider (OpenAI-compatible client for DeepSeek endpoints) |
 | `@react-pdf/renderer` | 4.5+ | Server-side PDF generation |
 | `unpdf` | 1.6+ | Server-side PDF text extraction |
 | `mammoth` | 1.12+ | DOCX text extraction |

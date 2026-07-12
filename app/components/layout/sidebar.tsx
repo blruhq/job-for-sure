@@ -8,6 +8,7 @@ import { useAppStore } from '~/lib/store'
 import { notify } from '~/lib/toast'
 import { ConfirmDialog } from '~/components/ui/confirm-dialog'
 import { useTranslations } from 'next-intl'
+import { authClient } from '~/lib/auth-client'
 
 const NAV_ITEMS = [
   { href: '/dashboard', labelKey: 'dashboard', icon: LayoutDashboard },
@@ -30,7 +31,6 @@ export function Sidebar() {
   useEffect(() => {
     async function checkAdmin() {
       try {
-        const { authClient } = await import('~/lib/auth-client')
         const { data: session } = await authClient.getSession()
         if (session?.user?.email) {
           setIsAdmin(true)

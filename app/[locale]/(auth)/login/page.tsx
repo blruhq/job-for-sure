@@ -4,6 +4,7 @@ import { useState, Suspense } from 'react'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { FileText } from 'lucide-react'
+import { authClient } from '~/lib/auth-client'
 
 function LoginForm() {
   const router = useRouter()
@@ -20,7 +21,6 @@ function LoginForm() {
     setError('')
 
     try {
-      const { authClient } = await import('~/lib/auth-client')
       const { data, error: authError } = await authClient.signIn.email({ email, password })
       if (authError) {
         setError(authError.message || 'Invalid credentials')
@@ -44,7 +44,6 @@ function LoginForm() {
 
   const handleGoogle = async () => {
     try {
-      const { authClient } = await import('~/lib/auth-client')
       await authClient.signIn.social({ provider: 'google' })
     } catch {
       setError('Google OAuth not configured.')

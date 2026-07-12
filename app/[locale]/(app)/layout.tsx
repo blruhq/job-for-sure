@@ -6,6 +6,7 @@ import { AppStoreProvider, useAppStore } from '~/lib/store'
 import { Sidebar } from '~/components/layout/sidebar'
 import { Topbar } from '~/components/layout/navbar'
 import { Skeleton } from '~/components/ui/skeleton'
+import { authClient } from '~/lib/auth-client'
 
 function AuthGuard({ children }: { children: React.ReactNode }) {
   const router = useRouter()
@@ -16,7 +17,6 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
 
     async function check() {
       try {
-        const { authClient } = await import('~/lib/auth-client')
         const { data: session } = await authClient.getSession()
         if (!cancelled) {
           if (session) {

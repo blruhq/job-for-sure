@@ -3,17 +3,11 @@ import { db } from '~/lib/db'
 import { applicationsData } from '~/lib/schema'
 import { withAuth } from '~/lib/with-auth'
 import { captureServerEvent } from '~/lib/posthog-server'
+import { EMPTY_APPLICATIONS } from '~/lib/constants'
+import { ApplicationBoardSchema } from '~/lib/schemas'
 import { eq } from 'drizzle-orm'
-import { z } from 'zod'
 
-const EMPTY_APPLICATIONS = { bookmark: [], applied: [], interviewing: [], offers: [] }
-
-const ApplicationsBody = z.object({
-  bookmark: z.array(z.record(z.unknown())).optional(),
-  applied: z.array(z.record(z.unknown())).optional(),
-  interviewing: z.array(z.record(z.unknown())).optional(),
-  offers: z.array(z.record(z.unknown())).optional(),
-}).passthrough()
+const ApplicationsBody = ApplicationBoardSchema
 
 export const GET = withAuth(async (_req, { user }) => {
   const [row] = await db

@@ -1,8 +1,9 @@
 'use client'
 
-import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react'
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import type { ApplicationBoard, PipelineJob, Resume } from '~/types/resume'
 import { notify } from '~/lib/toast'
+import { EMPTY_APPLICATIONS } from '~/lib/constants'
 
 // ═══════════════════════════════════════════════════════════════
 // CONTEXT TYPE
@@ -41,8 +42,6 @@ interface AppStore {
 }
 
 const AppCtx = createContext<AppStore | null>(null)
-
-const EMPTY_APPLICATIONS: ApplicationBoard = { bookmark: [], applied: [], interviewing: [], offers: [] }
 
 // ═══════════════════════════════════════════════════════════════
 // API HELPERS
@@ -185,18 +184,29 @@ export function AppStoreProvider({ children }: { children: ReactNode }) {
 
   const activeResume = resumes.find(r => r.id === activeResumeId) ?? null
 
+  // ── Ref mirror of applications for rollback without side effects in updater ──
+  const applicationsRef = useRef(applications)
+  applicationsRef.current = applications
+
   // ── Applications actions with Rollback ──
+  // FIX: Previous version fired apiPost inside the setApplications updater,
+  // which double-fired in React StrictMode and caused stale closures on rollback.
+  // Now: compute next state purely, update state, THEN persist outside the updater.
   const updateApplicationsAndPersist = useCallback((updater: (prev: ApplicationBoard) => ApplicationBoard) => {
-    let oldVal: ApplicationBoard | null = null
-    setApplications(prev => {
-      oldVal = prev
-      const next = updater(prev)
-      apiPost('/api/applications', next).catch((err) => {
-        console.error(err)
-        if (oldVal) setApplications(oldVal)
-        notify({ message: 'Failed to update application board. Changes rolled back.', type: 'error' })
-      })
-      return next
+    const prev = applicationsRef.current
+    const next = updater(prev)
+
+    // Only proceed if the updater actually changed something
+    if (next === prev) return
+
+    // Optimistically update UI
+    setApplications(next)
+
+    // Persist outside the state updater — safe for StrictMode
+    apiPost('/api/applications', next).catch((err) => {
+      console.error(err)
+      setApplications(prev) // Rollback to snapshot
+      notify({ message: 'Failed to update application board. Changes rolled back.', type: 'error' })
     })
   }, [])
 

@@ -1,12 +1,13 @@
 import { NextResponse } from 'next/server'
 import { generateObjectWithFailover } from '~/lib/ai-providers'
 import { withAuth } from '~/lib/with-auth'
+import { ResumeDataSchema } from '~/lib/schemas'
 import { z } from 'zod'
 
 export const maxDuration = 60
 
 const AtsInputBody = z.object({
-  resume: z.record(z.unknown()),
+  resume: ResumeDataSchema,
   jdText: z.string().max(20000).optional().nullable(),
 })
 
@@ -53,8 +54,8 @@ Provide a multi-dimensional health score with the following categories:
 List matched/strong areas as "matched", weaknesses/missing aspects as "missing", and provide concrete suggestions for improvements.`
 
   const userPrompt = hasJd
-    ? `Resume Data: ${JSON.stringify(resume)}\n\nJob Description: ${jdText}`
-    : `Resume Data: ${JSON.stringify(resume)}`
+    ? `<resume_data>${JSON.stringify(resume)}</resume_data>\n\n<job_description>${jdText}</job_description>`
+    : `<resume_data>${JSON.stringify(resume)}</resume_data>`
 
   const result = await generateObjectWithFailover<z.infer<typeof AtsSchema>>({
     system: systemPrompt,

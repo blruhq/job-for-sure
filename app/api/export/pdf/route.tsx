@@ -4,20 +4,13 @@ import { ResumePDF } from '~/components/resume/resume-pdf'
 import { CoverLetterPDF } from '~/components/resume/cover-letter-pdf'
 import { db } from '~/lib/db'
 import { resumes } from '~/lib/schema'
-import { getSessionUser } from '~/lib/auth-helpers'
-import { checkGeneralRateLimit } from '~/lib/ratelimit'
-import { eq, and } from 'drizzle-orm'
+import { withAuth } from '~/lib/with-auth'
+import { eq, and, isNull } from 'drizzle-orm'
 
 export const runtime = 'nodejs'
 
 // GET /api/export/pdf?id=xxx&type=resume|cover-letter
-export async function GET(request: Request) {
-  const user = await getSessionUser()
-  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-
-  const limited = await checkGeneralRateLimit(user.id)
-  if (limited) return limited
-
+export const GET = withAuth(async (request, { user }) => {
   const { searchParams } = new URL(request.url)
   const id = searchParams.get('id')
   const type = searchParams.get('type') || 'resume'
@@ -30,10 +23,12 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: 'Invalid export type' }, { status: 400 })
   }
 
+  // FIX: Added isNull(resumes.deletedAt) — previously soft-deleted resumes
+  // could still be exported.
   const [row] = await db
     .select()
     .from(resumes)
-    .where(and(eq(resumes.id, id), eq(resumes.userId, user.id)))
+    .where(and(eq(resumes.id, id), eq(resumes.userId, user.id), isNull(resumes.deletedAt)))
     .limit(1)
 
   if (!row) return NextResponse.json({ error: 'Resume not found' }, { status: 404 })
@@ -41,10 +36,10 @@ export async function GET(request: Request) {
   const resume = typeof row.data === 'string' ? JSON.parse(row.data) : row.data
 
   // Generate PDF stream based on type
-  const doc = type === 'cover-letter' 
+  const doc = type === 'cover-letter'
     ? <CoverLetterPDF resume={resume} />
     : <ResumePDF resume={resume} />
-  
+
   const stream = await ReactPDF.renderToStream(doc)
 
   // Convert stream to buffer
@@ -64,4 +59,4 @@ export async function GET(request: Request) {
       'Content-Disposition': `attachment; filename="${filename}"`,
     },
   })
-}
+}, { rateLimitType: 'general', route: '/api/export/pdf' })

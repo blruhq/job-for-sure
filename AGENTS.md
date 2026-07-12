@@ -11,7 +11,7 @@
 | Styling | Tailwind CSS v4 + `@tailwindcss/postcss` |
 | Database | PostgreSQL (Neon Serverless) + Drizzle ORM |
 | Auth | Better Auth (email/password + Google OAuth) |
-| AI SDK | Vercel AI SDK (`ai`, `@ai-sdk/openai`) |
+| AI SDK | Vercel AI SDK (`ai`, `@ai-sdk/openai`) — DeepSeek V4 Flash via failover |
 | PDF | `@react-pdf/renderer` (server-side, no headless browser) |
 | i18n | `next-intl` (locale prefix: `/en`, `/th`) |
 | Testing | Vitest (unit) + Playwright (E2E) |

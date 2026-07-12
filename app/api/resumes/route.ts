@@ -44,5 +44,8 @@ export const POST = withAuth(async (req, { user }) => {
     target: resumes.id,
     set: { data: resume.data, updatedAt: new Date() },
   })
-  return NextResponse.json(resume)
+
+  // FIX: Return data as a parsed object (matching GET shape),
+  // not as a raw stringified JSON.
+  return NextResponse.json({ ...resume, data })
 }, { rateLimitType: 'general', route: '/api/resumes' })

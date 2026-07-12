@@ -1,4 +1,4 @@
-import { Redis } from '@upstash/redis'
+import { getRedis } from '~/lib/redis'
 
 // ═══════════════════════════════════════════════════════════════
 // SEARCH CACHE — Upstash Redis with TTL
@@ -11,18 +11,6 @@ import { Redis } from '@upstash/redis'
 // ═══════════════════════════════════════════════════════════════
 
 const TTL_SECONDS = 6 * 60 * 60 // 6 hours
-
-let _redis: Redis | null = null
-
-function getRedis(): Redis {
-  if (!_redis) {
-    _redis = new Redis({
-      url: process.env.UPSTASH_REDIS_REST_URL!,
-      token: process.env.UPSTASH_REDIS_REST_TOKEN!,
-    })
-  }
-  return _redis
-}
 
 export async function getCached<T>(key: string): Promise<T | null> {
   try {

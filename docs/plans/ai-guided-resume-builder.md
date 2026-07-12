@@ -81,9 +81,9 @@ export type CustomSectionType = 'bullets' | 'dated-items' | 'grid'
 
 export interface ResumeCustomSection {
   title: string
-  type: CustomSectionType
-  items: CustomSectionItem[]
-  bullets: string[] // Backward compat — kept for existing resumes
+  type?: CustomSectionType       // Optional — old resumes don't have this
+  items?: CustomSectionItem[]    // Optional — old resumes use bullets instead
+  bullets: string[]              // Backward compat — kept for existing resumes
 }
 ```
 
@@ -313,6 +313,8 @@ const ChatBody = z.object({
   messages: z.array(z.any()),
   context: z.any().optional(),
   mode: z.enum(['coach', 'build']).optional().default('coach'),
+  buildRole: z.string().optional().default(''),
+  buildIndustry: z.string().optional().default(''),
 })
 ```
 
@@ -322,14 +324,16 @@ Find the `systemPrompt` variable (around line 71). Insert this BEFORE the `syste
 
 ```typescript
   const mode = body.data.mode || 'coach'
+  const buildRole = body.data.buildRole || ''
+  const buildIndustry = body.data.buildIndustry || ''
 
   // ── Build-mode system prompt ──
   // Used when user is building a new resume from scratch via chat.
   // The AI guides them through each section conversationally.
-  const buildSystemPrompt = `You are Job For Sure — an AI resume building assistant. The user is building a new resume from scratch${context?.activeResume?.role ? ` for a ${context?.activeResume?.role} role` : ''}.
+  const buildSystemPrompt = `You are Job For Sure — an AI resume building assistant. The user is building a new resume from scratch${buildRole ? ` for a ${buildRole} role` : ''}${buildIndustry ? ` in the ${buildIndustry} industry` : ''}.
 
 ## Your Process (follow this order):
-1. Start by asking about their MOST RECENT job: "What was your title, company, and dates?"
+1. In your FIRST response, set expectations: "I'll ask about your experience, education, and skills — one section at a time. Should take about 5 minutes." Then ask about their MOST RECENT job: "What was your title, company, and dates?"
 2. After they answer, ask for 2-3 key achievements in that role
 3. Ask if they have previous roles to add (one at a time)
 4. Ask about education: institution, degree, field, dates
@@ -426,7 +430,16 @@ Add IMMEDIATELY AFTER it:
 
 ```typescript
   // ── BUILD MODE ──
-  const [buildData, setBuildData] = useState<WizardData | null>(null)
+  // Restore from sessionStorage on mount (survives refresh)
+  const [buildData, setBuildData] = useState<WizardData | null>(() => {
+    if (typeof window === 'undefined') return null
+    try {
+      const saved = sessionStorage.getItem('jfs-build-data')
+      return saved ? JSON.parse(saved) : null
+    } catch {
+      return null
+    }
+  })
   const [savingResume, setSavingResume] = useState(false)
 ```
 
@@ -441,12 +454,59 @@ Add IMMEDIATELY AFTER it (BEFORE the transport useMemo):
 
 ```typescript
   // Build-mode ref — MUST be set synchronously before sendMessage
-  const buildDataRef = useRef<WizardData | null>(null)
+  const buildDataRef = useRef<WizardData | null>(buildData)
   buildDataRef.current = buildData
+
+  // Persist buildData to sessionStorage (survives refresh)
+  useEffect(() => {
+    if (buildData) {
+      sessionStorage.setItem('jfs-build-data', JSON.stringify(buildData))
+    } else {
+      sessionStorage.removeItem('jfs-build-data')
+    }
+  }, [buildData])
 
   // Saving ref — for stable CustomInputBar
   const savingResumeRef = useRef(false)
   savingResumeRef.current = savingResume
+```
+
+#### 4.2b: Add build progress detection
+
+Add this AFTER the refs block (after `savingResumeRef`), BEFORE the transport useMemo:
+
+```typescript
+  // ── BUILD PROGRESS DETECTION ──
+  // Scans USER messages for keywords to detect which sections have been covered.
+  // Client-side only — no AI calls. "Good enough" heuristic.
+  const BUILD_SECTIONS = [
+    { id: 'experience', label: 'Experience', keywords: ['job', 'work', 'company', 'role at', 'my title', 'position', 'employer', 'worked at', 'hired', 'my boss', 'colleague', 'salary', 'promotion'] },
+    { id: 'education', label: 'Education', keywords: ['school', 'university', 'degree', 'studied', 'graduated', 'college', 'bachelor', 'master', 'phd', 'diploma', 'gpa', 'student'] },
+    { id: 'skills', label: 'Skills', keywords: ['skill', 'technolog', 'tools', 'framework', 'proficient', 'i know', 'i use', 'experienced with', 'familiar with', 'i work with'] },
+    { id: 'summary', label: 'Summary', keywords: ['summary', 'about me', 'professional summary', 'years of experience', 'passionate about'] },
+  ] as const
+
+  const coveredSectionsRef = useRef<Set<string>>(new Set())
+```
+
+Then, AFTER the `useChat` hook (after line 74 `const { messages, status, sendMessage, stop, setMessages } = useChat(...)`), add this computation:
+
+```typescript
+  // Recompute covered sections whenever messages change
+  if (buildDataRef.current) {
+    const userText = messages
+      .filter((m: any) => m.role === 'user')
+      .map((m: any) => m.parts?.map((p: any) => p.text || '').join(' ') || '')
+      .join(' ')
+      .toLowerCase()
+    const covered = new Set<string>()
+    for (const section of BUILD_SECTIONS) {
+      if (section.keywords.some(kw => userText.includes(kw))) {
+        covered.add(section.id)
+      }
+    }
+    coveredSectionsRef.current = covered
+  }
 ```
 
 #### 4.3: Fix transport to use refs
@@ -468,6 +528,8 @@ NEW:
     return new DefaultChatTransport({
       body: () => ({
         mode: buildDataRef.current ? 'build' : 'coach',
+        buildRole: buildDataRef.current?.role || '',
+        buildIndustry: buildDataRef.current?.industry || '',
         context: {
           activeResume: activeResumeRef.current
 ```
@@ -487,6 +549,26 @@ Find `handleWizardComplete` (line 224). Replace the ENTIRE function with:
     // Send initial message to start the guided conversation
     sendMessage({ text: `I want to build a resume for a ${data.role} role${data.industry ? ` in ${data.industry}` : ''}.` })
   }
+```
+
+Also find the `handleNewChat` function (around line 92) and update it to clear build data:
+
+OLD:
+```typescript
+  const handleNewChat = useCallback(() => {
+    sessionStorage.removeItem('jfs-chat-messages')
+    window.location.reload()
+  }, [])
+```
+
+NEW:
+```typescript
+  const handleNewChat = useCallback(() => {
+    sessionStorage.removeItem('jfs-chat-messages')
+    sessionStorage.removeItem('jfs-build-data')
+    buildDataRef.current = null
+    window.location.reload()
+  }, [])
 ```
 
 #### 4.5: Add handleSaveResume function
@@ -557,6 +639,7 @@ Add AFTER `handleWizardComplete`:
       // Exit build mode
       buildDataRef.current = null
       setBuildData(null)
+      sessionStorage.removeItem('jfs-build-data')
 
       notify({ message: 'Resume created!', type: 'success' })
 
@@ -598,6 +681,7 @@ Add AFTER `handleSaveResume`:
     // Exit build mode
     buildDataRef.current = null
     setBuildData(null)
+    sessionStorage.removeItem('jfs-build-data')
 
     notify({ message: 'Opened blank resume in editor', type: 'info' })
     router.push(`/resume/${resume.id}`)
@@ -625,6 +709,7 @@ Replace the ENTIRE `CustomInputBar` `useCallback` with:
         {/* ── Build mode banner ── */}
         {building && (
           <div className="border-t border-primary/20 bg-primary/5 px-4 py-2">
+            {/* Row 1: info + buttons */}
             <div className="mx-auto flex max-w-an items-center justify-between gap-3">
               <div className="flex min-w-0 items-center gap-2">
                 <Sparkles size={12} className="shrink-0 text-primary" />
@@ -644,12 +729,33 @@ Replace the ENTIRE `CustomInputBar` `useCallback` with:
                 </button>
                 <button
                   onClick={() => handleSaveResumeRef.current()}
-                  disabled={saving}
-                  className="flex cursor-pointer items-center gap-1 rounded-xs bg-primary px-2.5 py-1 text-[10px] font-medium text-primary-foreground transition-opacity hover:opacity-90 disabled:opacity-50"
+                  disabled={saving || !coveredSectionsRef.current.has('experience')}
+                  className="flex cursor-pointer items-center gap-1 rounded-xs bg-primary px-2.5 py-1 text-[10px] font-medium text-primary-foreground transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
+                  title={!coveredSectionsRef.current.has('experience') ? 'Share at least one job experience first' : 'Save your resume'}
                 >
                   <Save size={10} /> {saving ? 'Saving...' : 'Save Resume'}
                 </button>
               </div>
+            </div>
+            {/* Row 2: Progress dots */}
+            <div className="mx-auto mt-1.5 flex max-w-an items-center gap-3">
+              {BUILD_SECTIONS.map((s) => {
+                const done = coveredSectionsRef.current.has(s.id)
+                return (
+                  <div key={s.id} className="flex items-center gap-1">
+                    <span className={cn(
+                      'h-1.5 w-1.5 rounded-full transition-colors',
+                      done ? 'bg-success' : 'bg-border',
+                    )} />
+                    <span className={cn(
+                      'text-[9px] font-mono transition-colors',
+                      done ? 'text-success' : 'text-muted-foreground',
+                    )}>
+                      {s.label}
+                    </span>
+                  </div>
+                )
+              })}
             </div>
           </div>
         )}
@@ -1068,6 +1174,10 @@ If ANY step fails, fix the errors and re-run. Do NOT skip to manual testing.
 10. **Action pills hidden**: During build mode, the Upload/Build/Paste pills are hidden
 11. **Template switch**: In editor View tab, switch template → content still renders correctly
 12. **Custom sections in PDF**: Export PDF → custom sections show with correct format (items or bullets)
+13. **Progress indicator**: During build mode, dots light up green as user discusses each section (Experience → Education → Skills → Summary). Verify by chatting about a job and watching the Experience dot turn green.
+14. **Save guardrail**: "Save Resume" button is DISABLED until the Experience dot turns green. Hover the disabled button → tooltip says "Share at least one job experience first".
+15. **Refresh persistence**: During build mode, refresh the page → build banner reappears with role/template info. Progress dots reflect what was already discussed.
+16. **First AI message sets expectations**: AI's first response says "I'll ask about your experience, education, and skills — one section at a time. Should take about 5 minutes." before asking the first question.
 
 ---
 
@@ -1093,6 +1203,16 @@ If ANY step fails, fix the errors and re-run. Do NOT skip to manual testing.
 
 10. **Do NOT change `parse-resume` route**: The existing PDF upload flow is unchanged. It still returns `bullets` format for custom sections. The new `items` format only comes from the chat extraction API.
 
+11. **Progress detection is heuristic**: The `BUILD_SECTIONS` keyword scanner runs on every render when in build mode. It scans USER messages only (not assistant). It's intentionally simple — false positives (e.g., user says "I worked at" → Experience lights up even though they haven't given details) are fine. The goal is to give the user a sense of progress, not perfect tracking.
+
+12. **`BUILD_SECTIONS` must be outside CustomInputBar**: The `BUILD_SECTIONS` constant and `coveredSectionsRef` are defined in the `ChatView` component body. Inside `CustomInputBar`, reference them via `coveredSectionsRef.current`. The constant itself is stable (defined with `as const` at component level), so it can be referenced directly inside `useCallback([])`.
+
+13. **buildData persisted in sessionStorage**: Key is `'jfs-build-data'`. Set in a `useEffect` whenever `buildData` changes. Cleared on save, on escape, and on new chat. On mount, `useState` initializer reads from sessionStorage so build mode survives refresh.
+
+14. **Save button guardrail**: The Save button checks `coveredSectionsRef.current.has('experience')`. Until the user mentions job/company/work keywords, the button is disabled with a tooltip explaining why. This prevents extracting a nearly-empty resume.
+
+15. **Transport sends buildRole + buildIndustry**: The transport body includes `buildRole` and `buildIndustry` (read from `buildDataRef.current`). These are passed to the chat API and injected into the build system prompt so the AI knows the target role from the very first message.
+
 ---
 
 ## Summary of All Changes
@@ -1102,7 +1222,7 @@ If ANY step fails, fix the errors and re-run. Do NOT skip to manual testing.
 | `app/types/resume.ts` | Edit | Add `CustomSectionItem`, `CustomSectionType`, update `ResumeCustomSection` |
 | `app/lib/company-data.ts` | Edit | Add `template` param + `ResumeTemplate` import |
 | `app/components/chat/build-wizard.tsx` | Rewrite | 2-step: template gallery + role/industry input |
-| `app/components/chat/chat-view.tsx` | Edit | Build mode state + refs, banner with Save + Manual, fixed transport closure |
+| `app/components/chat/chat-view.tsx` | Edit | Build mode state + refs, banner with progress dots + Save + Manual, fixed transport closure |
 | `app/api/chat/route.ts` | Edit | Accept `mode`, build-mode system prompt (no save promises) |
 | `app/api/resume/from-chat/route.ts` | **NEW** | Extraction API (temp 0.2, no hallucination) |
 | `app/components/resume/templates/*.pdf.tsx` (×5) | Edit | New custom section item rendering + backward compat |

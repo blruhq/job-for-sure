@@ -3,6 +3,7 @@
 import { useState, Suspense } from 'react'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
+import { authClient } from '~/lib/auth-client'
 
 function ResetPasswordForm() {
   const router = useRouter()
@@ -66,7 +67,6 @@ function ResetPasswordForm() {
     setError('')
 
     try {
-      const { authClient } = await import('~/lib/auth-client')
       const { error: authError } = await authClient.resetPassword({
         newPassword: password,
         token,

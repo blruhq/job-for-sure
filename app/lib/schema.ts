@@ -229,3 +229,43 @@ export const coverLettersRelations = relations(coverLetters, ({ one }) => ({
     references: [resumes.id],
   }),
 }));
+
+// ═══════════════════════════════════════════════════════════════
+// MISSING RELATIONS (previously had FK but no relations definition)
+// ═══════════════════════════════════════════════════════════════
+
+export const userPreferencesRelations = relations(userPreferences, ({ one }) => ({
+  user: one(user, {
+    fields: [userPreferences.userId],
+    references: [user.id],
+  }),
+}));
+
+export const applicationsDataRelations = relations(applicationsData, ({ one }) => ({
+  user: one(user, {
+    fields: [applicationsData.userId],
+    references: [user.id],
+  }),
+}));
+
+export const tailoredResumesRelations = relations(tailoredResumes, ({ one }) => ({
+  user: one(user, {
+    fields: [tailoredResumes.userId],
+    references: [user.id],
+  }),
+  baseResume: one(resumes, {
+    fields: [tailoredResumes.baseResumeId],
+    references: [resumes.id],
+  }),
+}));
+
+export const applicationsRelations = relations(applications, ({ one }) => ({
+  user: one(user, {
+    fields: [applications.userId],
+    references: [user.id],
+  }),
+  tailoredResume: one(tailoredResumes, {
+    fields: [applications.tailoredResumeId],
+    references: [tailoredResumes.id],
+  }),
+}));

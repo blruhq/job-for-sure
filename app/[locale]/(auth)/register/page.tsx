@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
+import { authClient } from '~/lib/auth-client'
 
 export default function RegisterPage() {
   const router = useRouter()
@@ -19,7 +20,6 @@ export default function RegisterPage() {
     setError('')
 
     try {
-      const { authClient } = await import('~/lib/auth-client')
       const { data, error: authError } = await authClient.signUp.email({ name, email, password })
       if (authError) {
         setError(authError.message || 'Registration failed')
@@ -44,7 +44,6 @@ export default function RegisterPage() {
 
   const handleGoogle = async () => {
     try {
-      const { authClient } = await import('~/lib/auth-client')
       await authClient.signIn.social({ provider: 'google' })
     } catch {
       setError('Google OAuth not configured.')

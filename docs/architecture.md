@@ -86,10 +86,10 @@ User query ──► cache check (Upstash)
 ```
 generateTextWithFailover(options) / generateObjectWithFailover(options)
     │
-    ├── Try primary model (OpenAI GPT-4o)
+    ├── Try primary model (DeepSeek Official — api.deepseek.com)
     │   └── If fails → log error, try fallback
     │
-    ├── Try fallback model (OpenAI GPT-4o-mini or alternative)
+    ├── Try fallback model (DeepInfra — api.deepinfra.com)
     │   └── If fails → throw error
     │
     └── Return result

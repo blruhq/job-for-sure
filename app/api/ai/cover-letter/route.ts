@@ -4,12 +4,13 @@ import { withAuth } from '~/lib/with-auth'
 import { db } from '~/lib/db'
 import { coverLetters } from '~/lib/schema'
 import { captureServerEvent } from '~/lib/posthog-server'
+import { ResumeDataSchema } from '~/lib/schemas'
 import { z } from 'zod'
 
 export const maxDuration = 60
 
 const CoverLetterInputBody = z.object({
-  resume: z.record(z.unknown()),
+  resume: ResumeDataSchema,
   jdText: z.string().max(20000).optional(),
   company: z.string().max(200).optional(),
   role: z.string().max(200).optional(),
@@ -25,7 +26,7 @@ export const POST = withAuth(async (req, { user }) => {
   const { resume, jdText, company, role, focus, language } = body.data
   const isThai = language === 'th'
 
-  let prompt = `Resume:\n${JSON.stringify(resume)}\n\n`
+  let prompt = `<resume_data>\n${JSON.stringify(resume)}\n</resume_data>\n\n`
 
   if (company && role) {
     prompt += `Target Role: ${role} at ${company}.\n`
@@ -33,10 +34,10 @@ export const POST = withAuth(async (req, { user }) => {
       prompt += `Focus/Highlight Areas: ${focus}\n`
     }
     if (jdText) {
-      prompt += `Job Description Context:\n${jdText}`
+      prompt += `<job_description>\n${jdText}\n</job_description>`
     }
   } else if (jdText) {
-    prompt += `Job Description:\n${jdText}`
+    prompt += `<job_description>\n${jdText}\n</job_description>`
   } else {
     const topCompany = (resume as any).companies?.[0]
     if (topCompany) {
