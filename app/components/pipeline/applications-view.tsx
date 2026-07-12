@@ -16,12 +16,24 @@ import {
   useSensors,
   useDroppable,
   closestCorners,
+  pointerWithin,
   DragOverlay,
+  type CollisionDetection,
   type DragEndEvent,
   type DragStartEvent,
 } from '@dnd-kit/core'
 import { useSortable, SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
+
+const COLUMN_IDS: ApplicationColumnId[] = ['bookmark', 'applied', 'interviewing', 'offers']
+
+// ── Collision detection: pointerWithin first (responsive column entry),
+//    fall back to closestCorners for card-level precision ──
+const collisionDetection: CollisionDetection = (args) => {
+  const pointerCollisions = pointerWithin(args)
+  if (pointerCollisions.length > 0) return pointerCollisions
+  return closestCorners(args)
+}
 
 const COLUMNS: { id: ApplicationColumnId; labelKey: string; dot: string; next: ApplicationColumnId | null }[] = [
   { id: 'bookmark', labelKey: 'bookmark', dot: '#9F9E98', next: 'applied' },
@@ -122,7 +134,7 @@ export function ApplicationsView() {
 
   // ── Find which column a job belongs to ──
   const findJobColumn = (jobKey: string): ApplicationColumnId | null => {
-    for (const colId of ['bookmark', 'applied', 'interviewing', 'offers'] as ApplicationColumnId[]) {
+    for (const colId of COLUMN_IDS) {
       if (applications[colId].some((j) => j.key === jobKey)) return colId
     }
     return null
@@ -140,7 +152,7 @@ export function ApplicationsView() {
     if (!fromCol) return
 
     const overId = over.id as string
-    const isColumnId = ['bookmark', 'applied', 'interviewing', 'offers'].includes(overId)
+    const isColumnId = COLUMN_IDS.includes(overId as ApplicationColumnId)
 
     let toCol: ApplicationColumnId
     let toIndex: number | undefined
@@ -209,14 +221,14 @@ export function ApplicationsView() {
       {/* ── Kanban Board ── */}
       <DndContext
         sensors={sensors}
-        collisionDetection={closestCorners}
+        collisionDetection={collisionDetection}
         onDragStart={handleDragStart}
         onDragEnd={handleDragEnd}
         onDragOver={(e) => {
           // Highlight column during drag
           const overId = e.over?.id as string | undefined
           if (overId) {
-            const isColumnId = ['bookmark', 'applied', 'interviewing', 'offers'].includes(overId)
+            const isColumnId = COLUMN_IDS.includes(overId as ApplicationColumnId)
             if (isColumnId) {
               setDragOverCol(overId as ApplicationColumnId)
             } else {
