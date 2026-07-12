@@ -23,6 +23,7 @@ export function createResume(data: {
   projects?: Resume['projects']
   certifications?: Resume['certifications']
   languages?: Resume['languages']
+  customSections?: Resume['customSections']
 }): Resume {
   resumeCounter++
   return {
@@ -43,6 +44,7 @@ export function createResume(data: {
     projects: data.projects,
     certifications: data.certifications,
     languages: data.languages,
+    customSections: data.customSections,
     companies: [],
     stretch: [],
   }

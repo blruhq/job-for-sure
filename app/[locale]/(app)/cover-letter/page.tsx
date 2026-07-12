@@ -149,6 +149,10 @@ export default function StandaloneCoverLetterPage() {
           name: l.name || '',
           proficiency: l.proficiency || '',
         })),
+        customSections: parsed.customSections?.map((cs: any) => ({
+          title: cs.title || '',
+          bullets: cs.bullets || [],
+        })),
       })
 
       addResume(resume)
