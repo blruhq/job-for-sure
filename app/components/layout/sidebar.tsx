@@ -99,7 +99,7 @@ export function Sidebar() {
             key={r.id}
             className={cn(
               'group flex items-center gap-1 rounded-sm transition-colors border-l-2',
-              r.id === activeResumeId
+              r.id === activeResumeId && pathname === `/resume/${r.id}`
                 ? 'bg-sidebar-active border-l-primary'
                 : 'hover:bg-sidebar-hover border-l-transparent',
               c ? 'justify-center px-0 mx-2' : 'px-2 py-1',
