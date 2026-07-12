@@ -14,7 +14,7 @@ import type { Resume } from '~/types/resume'
 import { BuildWizard, type WizardData } from '~/components/chat/build-wizard'
 import { PasteJDModal } from '~/components/chat/paste-jd-modal'
 import { Skeleton } from '~/components/ui/skeleton'
-import { JobPreview } from '~/components/chat/job-preview'
+import { UploadCardMessage } from '~/components/chat/upload-card-message'
 import { Upload, FileText, ClipboardList, Loader2, Paperclip, RotateCcw } from 'lucide-react'
 
 export function ChatView() {
@@ -23,9 +23,8 @@ export function ChatView() {
   const fileRef = useRef<HTMLInputElement>(null)
   const [wizardOpen, setWizardOpen] = useState(false)
   const [pasteOpen, setPasteOpen] = useState(false)
-  // Upload flow stages: idle → parsing → jobs-loading → done
-  const [uploadStage, setUploadStage] = useState<'idle' | 'parsing' | 'jobs-loading' | 'done'>('idle')
-  const [uploadedResume, setUploadedResume] = useState<Resume | null>(null)
+  // Upload flow: idle → parsing → idle (card injected as message)
+  const [uploadStage, setUploadStage] = useState<'idle' | 'parsing'>('idle')
 
   // ── CHAT PERSISTENCE (sessionStorage) ──
   // Load saved messages from sessionStorage on mount.
@@ -72,7 +71,7 @@ export function ChatView() {
     })
   }, [])
 
-  const { messages, status, sendMessage, stop } = useChat({ transport, messages: savedMessages })
+  const { messages, status, sendMessage, stop, setMessages } = useChat({ transport, messages: savedMessages })
 
   // Sync messages back to sessionStorage when the response completes (not during stream)
   const prevMessagesRef = useRef('')
@@ -129,7 +128,6 @@ export function ChatView() {
     }
 
     setUploadStage('parsing')
-    setUploadedResume(null)
     try {
       // Send file to server — server handles text extraction + AI parsing
       const formData = new FormData()
@@ -192,10 +190,21 @@ export function ChatView() {
 
       addResume(resume)
       setActiveResumeId(resume.id)
-      setUploadedResume(resume)
-      setUploadStage('jobs-loading')
-      // JobPreview will auto-fetch jobs on mount.
-      // When done, onLoadComplete fires → stage becomes 'done' → input unlocks.
+
+      // Inject upload card as a chat message — it stays frozen at this position.
+      // New chat messages will naturally appear below it.
+      const uploadText = `📎 Resume uploaded: ${resume.persona || 'Unknown'}${resume.role ? ` — ${resume.role}` : ''}`
+      setMessages(prev => [...prev, {
+        id: `upload-${Date.now()}`,
+        role: 'user',
+        parts: [
+          { type: 'data-upload', data: { resumeId: resume.id } },
+          { type: 'text', text: uploadText },
+        ],
+        createdAt: new Date(),
+      } as any])
+
+      setUploadStage('idle')
     } catch (err) {
       console.error(err)
       notify({ message: err instanceof Error ? err.message : 'Failed to process resume. Try Build from Template instead.', type: 'error' })
@@ -206,7 +215,6 @@ export function ChatView() {
   // ── BUILD FROM TEMPLATE WIZARD ──
   const handleWizardComplete = async (data: WizardData) => {
     setUploadStage('parsing')
-    setUploadedResume(null)
     try {
       const resume = createResume({
         name: data.role,
@@ -226,8 +234,20 @@ export function ChatView() {
 
       addResume(resume)
       setActiveResumeId(resume.id)
-      setUploadedResume(resume)
-      setUploadStage('jobs-loading')
+
+      // Inject upload card as a chat message
+      const uploadText = `📎 Resume created: ${resume.persona || 'Unknown'}${resume.role ? ` — ${resume.role}` : ''}`
+      setMessages(prev => [...prev, {
+        id: `upload-${Date.now()}`,
+        role: 'user',
+        parts: [
+          { type: 'data-upload', data: { resumeId: resume.id } },
+          { type: 'text', text: uploadText },
+        ],
+        createdAt: new Date(),
+      } as any])
+
+      setUploadStage('idle')
     } catch (err) {
       console.error(err)
       notify({ message: 'Failed to create resume from wizard', type: 'error' })
@@ -251,8 +271,8 @@ export function ChatView() {
   const showPillBarRef = useRef(false)
   showPillBarRef.current = showPillBar
 
-  // Ref for disabling input during upload flow
-  const isUploading = uploadStage === 'parsing' || uploadStage === 'jobs-loading'
+  // Ref for disabling input during resume parsing
+  const isUploading = uploadStage === 'parsing'
   const isUploadingRef = useRef(isUploading)
   isUploadingRef.current = isUploading
 
@@ -311,7 +331,7 @@ export function ChatView() {
     )
   }, [])
 
-  const slots = useMemo(() => ({ InputBar: CustomInputBar }), [])
+  const slots = useMemo(() => ({ InputBar: CustomInputBar, UserMessage: UploadCardMessage }), [])
 
   // ── ENTRY CARDS (shown above AgentChat when no messages) ──
   const showEntryCards = messages.length === 0 && uploadStage === 'idle'
@@ -448,91 +468,6 @@ export function ChatView() {
                       <Skeleton className="h-2.5 w-2/5" />
                     </div>
                   </div>
-                </div>
-              ) : uploadStage === 'jobs-loading' && uploadedResume ? (
-                <div className="mx-auto max-w-an w-full px-4 py-3 space-y-3">
-                  {/* Resume summary card */}
-                  <div className="rounded-md border border-border bg-card p-4">
-                    <div className="flex items-center gap-1.5 mb-1">
-                      <span className="text-[13px] font-semibold text-foreground">{uploadedResume.persona || 'Your Name'}</span>
-                      {uploadedResume.role && (
-                        <span className="text-[11px] text-primary">· {uploadedResume.role}</span>
-                      )}
-                    </div>
-                    {uploadedResume.summary && (
-                      <p className="text-[11px] text-muted-foreground leading-relaxed">{uploadedResume.summary}</p>
-                    )}
-                    {uploadedResume.skills.length > 0 && (
-                      <div className="mt-2 flex flex-wrap gap-1">
-                        {uploadedResume.skills.slice(0, 12).map((s, i) => (
-                          <span key={i} className="rounded-xs bg-muted/50 px-1.5 py-0.5 text-[9px] text-muted-foreground">{s}</span>
-                        ))}
-                        {uploadedResume.skills.length > 12 && (
-                          <span className="text-[9px] text-muted-foreground">+{uploadedResume.skills.length - 12} more</span>
-                        )}
-                      </div>
-                    )}
-                    <div className="mt-3 flex items-center gap-3">
-                      <button
-                        onClick={() => router.push(`/resume/${uploadedResume.id}`)}
-                        className="cursor-pointer text-[11px] font-medium text-primary hover:underline"
-                      >
-                        View Resume →
-                      </button>
-                      <button
-                        onClick={() => router.push(`/resume/${uploadedResume.id}?tab=editor`)}
-                        className="cursor-pointer text-[11px] font-medium text-muted-foreground hover:text-foreground"
-                      >
-                        Edit Resume →
-                      </button>
-                    </div>
-                  </div>
-                  {/* Job preview (shows its own loading then jobs) */}
-                  <JobPreview
-                    resume={uploadedResume}
-                    onLoadComplete={() => setUploadStage('done')}
-                  />
-                </div>
-              ) : uploadStage === 'done' && uploadedResume ? (
-                <div className="mx-auto max-w-an w-full px-4 py-3 space-y-3">
-                  {/* Resume summary card stays visible */}
-                  <div className="rounded-md border border-border bg-card p-4">
-                    <div className="flex items-center gap-1.5 mb-1">
-                      <span className="text-[13px] font-semibold text-foreground">{uploadedResume.persona || 'Your Name'}</span>
-                      {uploadedResume.role && (
-                        <span className="text-[11px] text-primary">· {uploadedResume.role}</span>
-                      )}
-                    </div>
-                    {uploadedResume.summary && (
-                      <p className="text-[11px] text-muted-foreground leading-relaxed">{uploadedResume.summary}</p>
-                    )}
-                    {uploadedResume.skills.length > 0 && (
-                      <div className="mt-2 flex flex-wrap gap-1">
-                        {uploadedResume.skills.slice(0, 12).map((s, i) => (
-                          <span key={i} className="rounded-xs bg-muted/50 px-1.5 py-0.5 text-[9px] text-muted-foreground">{s}</span>
-                        ))}
-                        {uploadedResume.skills.length > 12 && (
-                          <span className="text-[9px] text-muted-foreground">+{uploadedResume.skills.length - 12} more</span>
-                        )}
-                      </div>
-                    )}
-                    <div className="mt-3 flex items-center gap-3">
-                      <button
-                        onClick={() => router.push(`/resume/${uploadedResume.id}`)}
-                        className="cursor-pointer text-[11px] font-medium text-primary hover:underline"
-                      >
-                        View Resume →
-                      </button>
-                      <button
-                        onClick={() => router.push(`/resume/${uploadedResume.id}?tab=editor`)}
-                        className="cursor-pointer text-[11px] font-medium text-muted-foreground hover:text-foreground"
-                      >
-                        Edit Resume →
-                      </button>
-                    </div>
-                  </div>
-                  {/* Job preview stays visible with results */}
-                  <JobPreview resume={uploadedResume} />
                 </div>
               ) : undefined
             }
