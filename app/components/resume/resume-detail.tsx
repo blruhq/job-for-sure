@@ -406,7 +406,7 @@ export function ResumeDetail({ resumeId }: { resumeId: string }) {
                 <button onClick={() => notify({ message: 'DOCX export coming soon', type: 'info' })} className="rounded-sm px-2 py-1 text-[11px] text-muted-foreground hover:bg-background hover:text-foreground">Export DOCX</button>
               </div>
             </div>
-            <div className="resume-paper w-full max-w-[600px] min-h-[750px] rounded-xs p-8" style={{ boxShadow: 'var(--shadow-paper)' }}>
+            <div className="resume-paper w-full max-w-[600px] rounded-xs p-8" style={{ boxShadow: 'var(--shadow-paper)' }}>
               <div className="text-center text-base font-bold">{resume.persona || 'Your Name'}</div>
               <div className="mb-3 text-center font-mono text-[9px] text-muted-foreground">
                 {resume.email || 'john@email.com'} · {resume.location || 'San Francisco, CA'}
