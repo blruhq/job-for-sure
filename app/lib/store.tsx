@@ -23,7 +23,7 @@ interface AppStore {
   bookmarkJob: (job: PipelineJob) => void
   toggleBookmark: (key: string) => void
   isBookmarked: (key: string) => boolean
-  moveJob: (jobKey: string, fromCol: keyof ApplicationBoard, toCol: keyof ApplicationBoard) => void
+  moveJob: (jobKey: string, fromCol: keyof ApplicationBoard, toCol: keyof ApplicationBoard, toIndex?: number) => void
   removeJob: (jobKey: string, fromCol: keyof ApplicationBoard) => void
   clearApplications: () => void
 
@@ -221,15 +221,35 @@ export function AppStoreProvider({ children }: { children: ReactNode }) {
     return applications.bookmark.some(j => j.key === key)
   }, [applications])
 
-  const moveJob = useCallback((jobKey: string, fromCol: keyof ApplicationBoard, toCol: keyof ApplicationBoard) => {
+  const moveJob = useCallback((jobKey: string, fromCol: keyof ApplicationBoard, toCol: keyof ApplicationBoard, toIndex?: number) => {
     updateApplicationsAndPersist(prev => {
+      // Same column — reorder within
+      if (fromCol === toCol) {
+        const items = [...prev[fromCol]]
+        const idx = items.findIndex(j => j.key === jobKey)
+        if (idx === -1) return prev
+        const [job] = items.splice(idx, 1)
+        const target = typeof toIndex === 'number' && toIndex >= 0 && toIndex <= items.length
+          ? toIndex
+          : 0
+        items.splice(target, 0, job)
+        return { ...prev, [fromCol]: items }
+      }
+
+      // Cross-column move
       const from = [...prev[fromCol]]
       const to = [...prev[toCol]]
       const idx = from.findIndex(j => j.key === jobKey)
       if (idx === -1) return prev
       const [job] = from.splice(idx, 1)
       job.time = toCol === 'applied' ? 'just now' : toCol === 'interviewing' ? 'scheduled' : toCol === 'offers' ? 'received' : 'saved'
-      to.unshift(job)
+
+      if (typeof toIndex === 'number' && toIndex >= 0 && toIndex <= to.length) {
+        to.splice(toIndex, 0, job)
+      } else {
+        to.unshift(job)
+      }
+
       return { ...prev, [fromCol]: from, [toCol]: to }
     })
   }, [updateApplicationsAndPersist])

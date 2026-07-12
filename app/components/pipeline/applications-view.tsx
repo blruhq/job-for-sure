@@ -14,13 +14,14 @@ import {
   TouchSensor,
   useSensor,
   useSensors,
-  useDraggable,
   useDroppable,
   closestCorners,
   DragOverlay,
   type DragEndEvent,
   type DragStartEvent,
 } from '@dnd-kit/core'
+import { useSortable, SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable'
+import { CSS } from '@dnd-kit/utilities'
 
 const COLUMNS: { id: ApplicationColumnId; labelKey: string; dot: string; next: ApplicationColumnId | null }[] = [
   { id: 'bookmark', labelKey: 'bookmark', dot: '#9F9E98', next: 'applied' },
@@ -29,20 +30,24 @@ const COLUMNS: { id: ApplicationColumnId; labelKey: string; dot: string; next: A
   { id: 'offers', labelKey: 'offers', dot: '#2B5F45', next: null },
 ]
 
-// ── Draggable job card wrapper ──
+// ── Sortable job card wrapper (draggable + droppable within column) ──
 function DraggableJobCard({ job, children }: { job: PipelineJob; children: React.ReactNode }) {
-  const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: job.key,
   })
 
   return (
     <div
       ref={setNodeRef}
-      style={{ opacity: isDragging ? 0.3 : 1 }}
+      style={{
+        transform: CSS.Transform.toString(transform),
+        transition,
+        opacity: isDragging ? 0.3 : 1,
+      }}
       {...attributes}
       {...listeners}
       className={cn(
-        'group cursor-grab rounded-sm border border-border/60 bg-card p-2.5 transition-all active:cursor-grabbing hover:border-primary/50',
+        'group cursor-grab rounded-sm border border-border/60 bg-card p-2.5 active:cursor-grabbing hover:border-primary/50',
       )}
     >
       {children}
@@ -128,27 +133,40 @@ export function ApplicationsView() {
     const { active, over } = event
     setActiveJob(null)
     setDragOverCol(null)
-    if (!over) return
+    if (!over || !active) return
 
     const jobKey = active.id as string
     const fromCol = findJobColumn(jobKey)
-    // `over.id` could be a column ID (dropped on empty column area)
-    // or another job's key (dropped on a job card inside a column)
+    if (!fromCol) return
+
     const overId = over.id as string
     const isColumnId = ['bookmark', 'applied', 'interviewing', 'offers'].includes(overId)
 
-    let toCol: ApplicationColumnId | null = null
+    let toCol: ApplicationColumnId
+    let toIndex: number | undefined
+
     if (isColumnId) {
+      // Dropped on column empty area — insert at top
       toCol = overId as ApplicationColumnId
+      toIndex = 0
     } else {
-      // Dropped on a job — find that job's column
-      toCol = findJobColumn(overId)
+      // Dropped on a job card — insert before that card
+      const targetCol = findJobColumn(overId)
+      if (!targetCol) return
+      toCol = targetCol
+      const targetIdx = applications[toCol].findIndex((j) => j.key === overId)
+      toIndex = targetIdx !== -1 ? targetIdx : 0
     }
 
-    if (fromCol && toCol && fromCol !== toCol) {
-      moveJob(jobKey, fromCol, toCol)
-      notify({ message: `Moved to ${toCol}`, type: 'success' })
+    // Skip if dropped back in the same position (no reorder / no move)
+    if (fromCol === toCol) {
+      const currentIdx = applications[fromCol].findIndex((j) => j.key === jobKey)
+      // If dropping on itself or the adjacent position that didn't change, skip
+      if (toIndex === currentIdx || toIndex === currentIdx + 1) return
     }
+
+    moveJob(jobKey, fromCol, toCol, toIndex)
+    notify({ message: fromCol !== toCol ? `Moved to ${toCol}` : 'Reordered', type: 'success' })
   }
 
   const handleDragStart = (event: DragStartEvent) => {
@@ -246,34 +264,36 @@ export function ApplicationsView() {
                     </div>
                   )}
 
-                  {jobs.map((job) => (
-                    <DraggableJobCard key={job.key} job={job}>
-                      <JobCardContent job={job} />
-                      <div className="mt-1.5 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                        {job.url && (
-                          <a
-                            href={job.url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            onClick={(e) => e.stopPropagation()}
-                            className="flex items-center gap-0.5 rounded-xs px-1.5 py-0.5 text-[9px] text-muted-foreground hover:text-primary transition-colors"
+                  <SortableContext items={jobs.map((j) => j.key)} strategy={verticalListSortingStrategy}>
+                    {jobs.map((job) => (
+                      <DraggableJobCard key={job.key} job={job}>
+                        <JobCardContent job={job} />
+                        <div className="mt-1.5 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                          {job.url && (
+                            <a
+                              href={job.url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              onClick={(e) => e.stopPropagation()}
+                              className="flex items-center gap-0.5 rounded-xs px-1.5 py-0.5 text-[9px] text-muted-foreground hover:text-primary transition-colors"
+                            >
+                              <Link2 size={10} /> Open
+                            </a>
+                          )}
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              removeJob(job.key, col.id)
+                              notify({ message: 'Removed from board', type: 'info' })
+                            }}
+                            className="flex items-center gap-0.5 rounded-xs px-1.5 py-0.5 text-[9px] text-muted-foreground hover:text-destructive transition-colors cursor-pointer"
                           >
-                            <Link2 size={10} /> Open
-                          </a>
-                        )}
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation()
-                            removeJob(job.key, col.id)
-                            notify({ message: 'Removed from board', type: 'info' })
-                          }}
-                          className="flex items-center gap-0.5 rounded-xs px-1.5 py-0.5 text-[9px] text-muted-foreground hover:text-destructive transition-colors cursor-pointer"
-                        >
-                          <Trash2 size={10} /> Remove
-                        </button>
-                      </div>
-                    </DraggableJobCard>
-                  ))}
+                            <Trash2 size={10} /> Remove
+                          </button>
+                        </div>
+                      </DraggableJobCard>
+                    ))}
+                  </SortableContext>
                 </div>
               </DroppableColumn>
             )
