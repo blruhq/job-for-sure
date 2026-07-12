@@ -51,11 +51,11 @@ export function JobPreview({ resume, onDismiss }: { resume: Resume; onDismiss?: 
       const res = await fetch('/api/jobs/search', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          query: resume.name,
+          body: JSON.stringify({
+          query: resume.role,
           location: resume.location || undefined,
           skills: resume.skills,
-          role: resume.name,
+          role: resume.role,
           limit: 10,
         }),
       })
@@ -68,7 +68,7 @@ export function JobPreview({ resume, onDismiss }: { resume: Resume; onDismiss?: 
     } finally {
       setLoading(false)
     }
-  }, [resume.name, resume.location, resume.skills])
+  }, [resume.role, resume.location, resume.skills])
 
   useEffect(() => {
     fetchJobs()
@@ -81,11 +81,11 @@ export function JobPreview({ resume, onDismiss }: { resume: Resume; onDismiss?: 
       const res = await fetch('/api/jobs/search', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          query: resume.name,
+          body: JSON.stringify({
+          query: resume.role,
           location: resume.location || undefined,
           skills: resume.skills,
-          role: resume.name,
+          role: resume.role,
           sources: ['linkedin' as const, 'indeed' as const, 'jobsdb' as const],
           includePaid: true,
           limit: 20,
@@ -145,7 +145,7 @@ export function JobPreview({ resume, onDismiss }: { resume: Resume; onDismiss?: 
               {total > jobs.length ? `${total} real jobs` : `${jobs.length} real job${jobs.length !== 1 ? 's' : ''}`}
             </span>
             <span className="text-[11px] text-muted-foreground">
-              for &ldquo;{resume.name}&rdquo;
+              for &ldquo;{resume.role}&rdquo;
             </span>
           </div>
           <div className="flex items-center gap-2">
@@ -238,7 +238,7 @@ export function JobPreview({ resume, onDismiss }: { resume: Resume; onDismiss?: 
                           level: job.score >= 75 ? 'high' : 'mid',
                           time: 'just now',
                           url: job.url,
-                          resume: resume.name,
+                          resume: resume.role,
                         })
                         notify({ message: `Bookmarked: ${job.title}`, type: 'success' })
                       }

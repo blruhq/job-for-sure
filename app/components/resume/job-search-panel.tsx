@@ -72,8 +72,8 @@ export function JobSearchPanel({ resume }: { resume: Resume }) {
   const router = useRouter()
   const { isBookmarked, bookmarkJob, toggleBookmark, addResume, setActiveResumeId } = useAppStore()
 
-  // ── FIX: use resume.name (role title), NOT resume.persona (person's name) ──
-  const [query, setQuery] = useState(resume.name || '')
+  // ── Search query defaults to the AI-detected role ──
+  const [query, setQuery] = useState(resume.role || resume.name || '')
   const [location, setLocation] = useState(resume.location || '')
   const [results, setResults] = useState<ScoredJob[]>([])
   const [loading, setLoading] = useState(false)

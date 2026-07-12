@@ -115,7 +115,8 @@ export default function StandaloneCoverLetterPage() {
       const parsed = await res.json()
 
       const resume = createResume({
-        name: parsed.role || file.name.replace(/\.(pdf|docx|txt|md)$/i, ''),
+        name: file.name.replace(/\.(pdf|docx|txt|md)$/i, ''),
+        role: parsed.role || 'Software Engineer',
         persona: parsed.name || 'Your Name',
         email: parsed.email,
         location: parsed.location,

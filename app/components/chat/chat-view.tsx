@@ -12,7 +12,7 @@ import { notify } from '~/lib/toast'
 import { BuildWizard, type WizardData } from '~/components/chat/build-wizard'
 import { PasteJDModal } from '~/components/chat/paste-jd-modal'
 import { SkeletonChatMessage, SkeletonCard } from '~/components/ui/skeleton'
-import { Upload, FileText, ClipboardList, Loader2, Paperclip } from 'lucide-react'
+import { Upload, FileText, ClipboardList, Loader2, Paperclip, RotateCcw } from 'lucide-react'
 import { JobPreview } from '~/components/chat/job-preview'
 
 export function ChatView() {
@@ -24,7 +24,41 @@ export function ChatView() {
   const [processing, setProcessing] = useState(false)
   const [jobPreviewResumeId, setJobPreviewResumeId] = useState<string | null>(null)
 
-  const { messages, status, sendMessage, stop } = useChat()
+  // ── CHAT PERSISTENCE (sessionStorage) ──
+  // Load saved messages from sessionStorage on mount.
+  const [savedMessages] = useState(() => {
+    if (typeof window === 'undefined') return []
+    try {
+      const saved = sessionStorage.getItem('jfs-chat-messages')
+      return saved ? JSON.parse(saved) : []
+    } catch {
+      return []
+    }
+  })
+
+  // We pass `messages: savedMessages` to seed the hook in AI SDK v4/v5
+  const { messages, status, sendMessage, stop } = useChat({ messages: savedMessages })
+
+  // Sync messages back to sessionStorage when the response completes (not during stream)
+  const prevMessagesRef = useRef('')
+  useEffect(() => {
+    if (status === 'streaming' || status === 'submitted') return
+    if (messages.length === 0) return
+    const serialized = JSON.stringify(messages)
+    if (serialized === prevMessagesRef.current) return
+    prevMessagesRef.current = serialized
+    try {
+      sessionStorage.setItem('jfs-chat-messages', serialized)
+    } catch {
+      /* quota exceeded — silently fail */
+    }
+  }, [messages, status])
+
+  // New Chat handler: clear session storage & reload
+  const handleNewChat = useCallback(() => {
+    sessionStorage.removeItem('jfs-chat-messages')
+    window.location.reload()
+  }, [])
 
   // ── Auto-send pending chat message (from "Coach for Job" button) ──
   useEffect(() => {
@@ -78,7 +112,8 @@ export function ChatView() {
 
       // Create resume from parsed data
       const resume = createResume({
-        name: parsed.role || file.name.replace(/\.(pdf|docx|txt|md)$/i, ''),
+        name: file.name.replace(/\.(pdf|docx|txt|md)$/i, ''),
+        role: parsed.role || 'Software Engineer',
         persona: parsed.name || 'Your Name',
         email: parsed.email,
         phone: parsed.phone,
@@ -116,7 +151,7 @@ export function ChatView() {
       })
 
       addResume(resume)
-      sendMessage({ text: `I just uploaded my resume. Here's my profile:\n- **Name:** ${resume.persona || 'Not specified'}\n- **Role:** ${resume.name}\n- **Skills:** ${resume.skills.join(', ')}\n- **Summary:** ${resume.summary || 'Not provided'}\n- **Location:** ${resume.location || 'Not specified'}\n\nCan you analyze my resume and give me feedback on how to improve it?` })
+      sendMessage({ text: `I just uploaded my resume. Here's my profile:\n- **Name:** ${resume.persona || 'Not specified'}\n- **Role:** ${resume.role}\n- **Skills:** ${resume.skills.join(', ')}\n- **Summary:** ${resume.summary || 'Not provided'}\n- **Location:** ${resume.location || 'Not specified'}\n\nCan you analyze my resume and give me feedback on how to improve it?` })
       setJobPreviewResumeId(resume.id)
     } catch (err) {
       console.error(err)
@@ -132,6 +167,7 @@ export function ChatView() {
     try {
       const resume = createResume({
         name: data.role,
+        role: data.role,
         persona: data.name,
         email: data.email,
         location: data.location,
@@ -146,7 +182,7 @@ export function ChatView() {
       })
 
       addResume(resume)
-      sendMessage({ text: `I built my resume profile:\n- **Name:** ${resume.persona || data.name}\n- **Role:** ${resume.name}\n- **Skills:** ${resume.skills.join(', ')}\n- **Summary:** ${resume.summary || 'Not provided'}\n\nCan you give me feedback and suggestions?` })
+      sendMessage({ text: `I built my resume profile:\n- **Name:** ${resume.persona || data.name}\n- **Role:** ${resume.role}\n- **Skills:** ${resume.skills.join(', ')}\n- **Summary:** ${resume.summary || 'Not provided'}\n\nCan you give me feedback and suggestions?` })
       setJobPreviewResumeId(resume.id)
     } catch (err) {
       console.error(err)
@@ -163,7 +199,7 @@ export function ChatView() {
       notify({ message: 'Upload or build a resume first, then paste a job posting.', type: 'info' })
       return
     }
-    sendMessage({ text: `Analyze this job posting against my resume (${activeResume.name}). Here's the JD:\n\n${jdText.slice(0, 2000)}` })
+    sendMessage({ text: `Analyze this job posting against my resume (${activeResume.role}). Here's the JD:\n\n${jdText.slice(0, 2000)}` })
   }
 
   // ── PILL BAR — persistent actions above input when chat has messages ──
@@ -269,6 +305,16 @@ export function ChatView() {
             ))}
           </select>
         </div>
+        {messages.length > 0 && (
+          <button
+            onClick={handleNewChat}
+            className="ml-auto flex cursor-pointer items-center gap-1 rounded-xs px-1.5 py-0.5 text-[10px] text-muted-foreground hover:text-foreground transition-colors"
+            title="Start a new conversation"
+          >
+            <RotateCcw size={11} />
+            New Chat
+          </button>
+        )}
       </div>
 
       {/* Processing skeleton — replaces spinner text with real-looking cards */}

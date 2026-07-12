@@ -54,8 +54,9 @@ export interface ResumeLanguage {
 
 export interface Resume {
   id: string
-  name: string
-  persona: string
+  name: string          // Display name (filename or custom title) — shown in sidebar, dropdowns
+  role: string          // AI-detected job title — used for job search, AI context
+  persona: string       // Person's real name
   email?: string
   phone?: string
   location?: string

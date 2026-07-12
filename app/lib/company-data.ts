@@ -10,6 +10,7 @@ let resumeCounter = 0
 
 export function createResume(data: {
   name: string
+  role: string
   persona: string
   email?: string
   phone?: string
@@ -27,6 +28,7 @@ export function createResume(data: {
   return {
     id: String(Date.now()) + '_' + resumeCounter,
     name: data.name,
+    role: data.role,
     persona: data.persona,
     email: data.email,
     phone: data.phone,
