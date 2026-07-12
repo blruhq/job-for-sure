@@ -229,7 +229,7 @@ export function AppStoreProvider({ children }: { children: ReactNode }) {
       if (idx === -1) return prev
       const [job] = from.splice(idx, 1)
       job.time = toCol === 'applied' ? 'just now' : toCol === 'interviewing' ? 'scheduled' : toCol === 'offers' ? 'received' : 'saved'
-      to.push(job)
+      to.unshift(job)
       return { ...prev, [fromCol]: from, [toCol]: to }
     })
   }, [updateApplicationsAndPersist])
