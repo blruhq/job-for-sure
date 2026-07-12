@@ -20,6 +20,7 @@ export function registerFonts() {
     family: 'Inter',
     fonts: [
       { src: fontSrc('inter-regular.ttf'), fontWeight: 400 },
+      { src: fontSrc('inter-italic.ttf'), fontWeight: 400, fontStyle: 'italic' },
       { src: fontSrc('inter-medium.ttf'), fontWeight: 500 },
       { src: fontSrc('inter-semibold.ttf'), fontWeight: 600 },
       { src: fontSrc('inter-bold.ttf'), fontWeight: 700 },
