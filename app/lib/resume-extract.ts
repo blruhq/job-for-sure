@@ -113,8 +113,10 @@ async function extractPdfText(file: File | Blob): Promise<string> {
         if (idx > 0) {
           const gap = x - (lastX + lastWidth)
           // Insert spaces proportional to the visual gap (approx. 6px per space)
-          if (gap > 4) {
-            const spaces = Math.min(10, Math.max(1, Math.round(gap / 6)))
+          // Even if the gap is slightly negative (up to -10px) due to font bounding box tolerances,
+          // we still insert at least one space to separate distinct text fragments.
+          if (gap > -10) {
+            const spaces = Math.min(10, Math.max(1, Math.round(Math.max(0, gap) / 6)))
             rowString += ' '.repeat(spaces)
           }
         }
