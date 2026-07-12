@@ -11,16 +11,16 @@ const styles = StyleSheet.create({
     fontSize: 10,
     fontFamily: 'Inter',
     color: COLORS.text,
-    lineHeight: 1.5,
+    lineHeight: 1.35,
   },
   header: {
     textAlign: 'center',
-    marginBottom: 20,
+    marginBottom: 12,
   },
   name: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: 700,
-    marginBottom: 4,
+    marginBottom: 2,
     color: COLORS.ink,
   },
   contact: {
@@ -29,7 +29,7 @@ const styles = StyleSheet.create({
     fontFamily: 'JetBrains Mono',
   },
   section: {
-    marginBottom: 14,
+    marginBottom: 10,
   },
   sectionTitle: {
     fontSize: 10,
@@ -38,13 +38,13 @@ const styles = StyleSheet.create({
     letterSpacing: 0.5,
     borderBottomWidth: 1,
     borderBottomColor: COLORS.border,
-    paddingBottom: 4,
-    marginBottom: 6,
+    paddingBottom: 2,
+    marginBottom: 4,
   },
   summary: {
     fontSize: 10,
     color: COLORS.muted,
-    lineHeight: 1.6,
+    lineHeight: 1.35,
   },
   skillsRow: {
     flexDirection: 'row',
@@ -59,7 +59,7 @@ const styles = StyleSheet.create({
     borderRadius: 2,
   },
   experienceBlock: {
-    marginBottom: 10,
+    marginBottom: 6,
   },
   expHeader: {
     flexDirection: 'row',
@@ -78,11 +78,11 @@ const styles = StyleSheet.create({
     fontSize: 9,
     color: COLORS.muted,
     fontStyle: 'italic',
-    marginBottom: 2,
+    marginBottom: 1,
   },
   bullet: {
     fontSize: 9,
-    marginBottom: 1,
+    marginBottom: 0,
     paddingLeft: 10,
   },
   languagesRow: {
@@ -96,7 +96,7 @@ const styles = StyleSheet.create({
   projectTech: {
     fontSize: 8,
     color: COLORS.muted,
-    marginTop: 2,
+    marginTop: 1,
   },
 })
 
@@ -108,7 +108,7 @@ export function MinimalistPDF({ resume }: { resume: Resume }) {
         <View style={styles.header}>
           <Text style={styles.name}>{resume.persona || 'Your Name'}</Text>
           <Text style={styles.contact}>
-            {[resume.email, resume.location].filter(Boolean).join(' · ')}
+            {[resume.email, resume.phone, resume.location, resume.github].filter(Boolean).join('  ·  ')}
           </Text>
         </View>
 
@@ -117,6 +117,24 @@ export function MinimalistPDF({ resume }: { resume: Resume }) {
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Summary</Text>
             <Text style={styles.summary}>{resume.summary}</Text>
+          </View>
+        )}
+
+        {/* Education — FIRST for new grads */}
+        {resume.education && resume.education.length > 0 && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Education</Text>
+            {resume.education.map((edu, i) => (
+              <View key={i} style={styles.experienceBlock}>
+                <View style={styles.expHeader}>
+                  <Text style={styles.expRole}>{edu.institution}</Text>
+                  <Text style={styles.expDates}>{edu.dates}</Text>
+                </View>
+                <Text style={styles.expCompany}>
+                  {[edu.degree, edu.field].filter(Boolean).join(', ')}
+                </Text>
+              </View>
+            ))}
           </View>
         )}
 
@@ -151,24 +169,6 @@ export function MinimalistPDF({ resume }: { resume: Resume }) {
           </View>
         )}
 
-        {/* Education */}
-        {resume.education && resume.education.length > 0 && (
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Education</Text>
-            {resume.education.map((edu, i) => (
-              <View key={i} style={styles.experienceBlock}>
-                <View style={styles.expHeader}>
-                  <Text style={styles.expRole}>{edu.institution}</Text>
-                  <Text style={styles.expDates}>{edu.dates}</Text>
-                </View>
-                <Text style={styles.expCompany}>
-                  {[edu.degree, edu.field].filter(Boolean).join(', ')}
-                </Text>
-              </View>
-            ))}
-          </View>
-        )}
-
         {/* Projects */}
         {resume.projects && resume.projects.length > 0 && (
           <View style={styles.section}>
@@ -196,7 +196,7 @@ export function MinimalistPDF({ resume }: { resume: Resume }) {
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Certifications</Text>
             {resume.certifications.map((cert, i) => (
-              <View key={i} style={{ marginBottom: 4 }}>
+              <View key={i} style={{ marginBottom: 2 }}>
                 <View style={styles.expHeader}>
                   <Text style={{ fontWeight: 600, fontSize: 9 }}>
                     {cert.name} ({cert.issuer})

@@ -44,6 +44,17 @@ export function registerFonts() {
   })
 }
 
+// Shared spacing system — professional resume standards
+export const SPACING = {
+  pagePadding: 40,
+  sectionGap: 10,
+  entryGap: 6,
+  titleGap: 6,
+  lineHeight: 1.35,
+  lineHeightSerif: 1.5,
+  nameToRole: 4,
+} as const
+
 // Shared color palette matching the app's design tokens
 export const COLORS = {
   ink: '#1C1B16',

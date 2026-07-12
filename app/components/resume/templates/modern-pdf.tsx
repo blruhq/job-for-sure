@@ -11,11 +11,11 @@ const styles = StyleSheet.create({
     fontSize: 10,
     fontFamily: 'Inter',
     color: COLORS.text,
-    lineHeight: 1.5,
+    lineHeight: 1.35,
   },
   headerBlock: {
-    marginBottom: 16,
-    paddingBottom: 12,
+    marginBottom: 10,
+    paddingBottom: 8,
     borderBottomWidth: 1,
     borderBottomColor: COLORS.border,
   },
@@ -23,12 +23,12 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 700,
     color: COLORS.ink,
-    marginBottom: 2,
+    marginBottom: 4,
   },
   role: {
-    fontSize: 12,
+    fontSize: 11,
     color: COLORS.primary,
-    marginBottom: 4,
+    marginBottom: 2,
   },
   contact: {
     fontSize: 8,
@@ -37,19 +37,19 @@ const styles = StyleSheet.create({
   },
   body: {
     flexDirection: 'row',
-    gap: 16,
+    gap: 12,
   },
   sidebar: {
     width: '33%',
     backgroundColor: COLORS.sidebarBg,
-    padding: 20,
+    padding: 14,
     borderRadius: 4,
   },
   main: {
     width: '67%',
   },
   sidebarSection: {
-    marginBottom: 14,
+    marginBottom: 10,
   },
   sidebarSectionTitle: {
     fontSize: 9,
@@ -57,25 +57,25 @@ const styles = StyleSheet.create({
     textTransform: 'uppercase',
     letterSpacing: 0.5,
     color: COLORS.primary,
-    marginBottom: 6,
+    marginBottom: 4,
   },
   sidebarLabel: {
     fontSize: 8,
     color: COLORS.muted,
     fontWeight: 600,
-    marginBottom: 1,
+    marginBottom: 0,
   },
   sidebarValue: {
     fontSize: 9,
-    marginBottom: 6,
+    marginBottom: 4,
   },
   skillBadge: {
     fontSize: 8,
     backgroundColor: COLORS.primarySoft,
     color: COLORS.primary,
-    padding: '3 8',
+    padding: '2 6',
     borderRadius: 3,
-    marginBottom: 4,
+    marginBottom: 3,
     overflow: 'hidden',
   },
   skillsCol: {
@@ -87,25 +87,25 @@ const styles = StyleSheet.create({
     marginBottom: 2,
   },
   mainSection: {
-    marginBottom: 14,
+    marginBottom: 10,
   },
   mainSectionTitle: {
-    fontSize: 11,
+    fontSize: 10,
     fontWeight: 700,
     textTransform: 'uppercase',
     color: COLORS.primary,
     borderLeftWidth: 2,
     borderLeftColor: COLORS.primary,
-    paddingLeft: 6,
-    marginBottom: 8,
+    paddingLeft: 5,
+    marginBottom: 5,
   },
   summary: {
     fontSize: 10,
     color: COLORS.muted,
-    lineHeight: 1.6,
+    lineHeight: 1.35,
   },
   experienceBlock: {
-    marginBottom: 10,
+    marginBottom: 6,
   },
   expHeader: {
     flexDirection: 'row',
@@ -123,36 +123,28 @@ const styles = StyleSheet.create({
   expCompany: {
     fontSize: 9,
     color: COLORS.muted,
-    marginBottom: 2,
+    marginBottom: 1,
   },
   bullet: {
     fontSize: 9,
-    marginBottom: 1,
+    marginBottom: 0,
     paddingLeft: 10,
   },
   projectTechBadge: {
     fontSize: 7,
     backgroundColor: COLORS.primarySoft,
     color: COLORS.primary,
-    padding: '2 6',
+    padding: '1 5',
     borderRadius: 2,
   },
   projectTechRow: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     gap: 3,
-    marginTop: 3,
+    marginTop: 2,
   },
   certItem: {
-    marginBottom: 4,
-  },
-  certHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
-  certName: {
-    fontWeight: 600,
-    fontSize: 9,
+    marginBottom: 3,
   },
 })
 
@@ -165,7 +157,7 @@ export function ModernPDF({ resume }: { resume: Resume }) {
           <Text style={styles.name}>{resume.persona || 'Your Name'}</Text>
           {resume.role && <Text style={styles.role}>{resume.role}</Text>}
           <Text style={styles.contact}>
-            {[resume.email, resume.phone, resume.location, resume.github].filter(Boolean).join(' · ')}
+            {[resume.email, resume.phone, resume.location, resume.github].filter(Boolean).join('  ·  ')}
           </Text>
         </View>
 
@@ -250,6 +242,24 @@ export function ModernPDF({ resume }: { resume: Resume }) {
               </View>
             )}
 
+            {/* Education — FIRST for new grads */}
+            {resume.education && resume.education.length > 0 && (
+              <View style={styles.mainSection}>
+                <Text style={styles.mainSectionTitle}>Education</Text>
+                {resume.education.map((edu, i) => (
+                  <View key={i} style={styles.experienceBlock}>
+                    <View style={styles.expHeader}>
+                      <Text style={styles.expRole}>{edu.institution}</Text>
+                      <Text style={styles.expDates}>{edu.dates}</Text>
+                    </View>
+                    <Text style={styles.expCompany}>
+                      {[edu.degree, edu.field].filter(Boolean).join(', ')}
+                    </Text>
+                  </View>
+                ))}
+              </View>
+            )}
+
             {/* Experience */}
             {resume.experience && resume.experience.length > 0 && (
               <View style={styles.mainSection}>
@@ -264,24 +274,6 @@ export function ModernPDF({ resume }: { resume: Resume }) {
                     {exp.bullets.map((b, j) => (
                       <Text key={j} style={styles.bullet}>• {b}</Text>
                     ))}
-                  </View>
-                ))}
-              </View>
-            )}
-
-            {/* Education */}
-            {resume.education && resume.education.length > 0 && (
-              <View style={styles.mainSection}>
-                <Text style={styles.mainSectionTitle}>Education</Text>
-                {resume.education.map((edu, i) => (
-                  <View key={i} style={styles.experienceBlock}>
-                    <View style={styles.expHeader}>
-                      <Text style={styles.expRole}>{edu.institution}</Text>
-                      <Text style={styles.expDates}>{edu.dates}</Text>
-                    </View>
-                    <Text style={styles.expCompany}>
-                      {[edu.degree, edu.field].filter(Boolean).join(', ')}
-                    </Text>
                   </View>
                 ))}
               </View>

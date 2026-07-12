@@ -7,45 +7,45 @@ registerFonts()
 
 const styles = StyleSheet.create({
   page: {
-    padding: 50,
+    padding: 40,
     fontSize: 10,
     fontFamily: 'Lora',
     color: COLORS.text,
-    lineHeight: 1.7,
+    lineHeight: 1.5,
   },
   header: {
     textAlign: 'center',
-    marginBottom: 24,
+    marginBottom: 12,
   },
   name: {
     fontSize: 20,
     fontWeight: 700,
     fontFamily: 'Lora',
-    marginBottom: 4,
+    marginBottom: 2,
     color: COLORS.ink,
   },
   contact: {
-    fontSize: 10,
+    fontSize: 9,
     color: COLORS.muted,
     fontFamily: 'Lora',
   },
   section: {
-    marginBottom: 16,
+    marginBottom: 10,
   },
   sectionTitle: {
-    fontSize: 11,
+    fontSize: 10,
     fontWeight: 700,
     fontFamily: 'Lora',
     textAlign: 'center',
     borderBottomWidth: 1,
     borderBottomColor: COLORS.border,
-    paddingBottom: 4,
-    marginBottom: 8,
+    paddingBottom: 2,
+    marginBottom: 4,
   },
   summary: {
     fontSize: 10,
     color: COLORS.muted,
-    lineHeight: 1.7,
+    lineHeight: 1.5,
     fontFamily: 'Lora',
   },
   skillsRow: {
@@ -64,7 +64,7 @@ const styles = StyleSheet.create({
     fontFamily: 'Lora',
   },
   experienceBlock: {
-    marginBottom: 12,
+    marginBottom: 6,
   },
   expHeader: {
     flexDirection: 'row',
@@ -85,14 +85,14 @@ const styles = StyleSheet.create({
     fontSize: 9,
     color: COLORS.muted,
     fontFamily: 'Lora',
-    marginBottom: 2,
+    marginBottom: 1,
   },
   bullet: {
     fontSize: 10,
-    marginBottom: 1,
+    marginBottom: 0,
     paddingLeft: 12,
     fontFamily: 'Lora',
-    lineHeight: 1.6,
+    lineHeight: 1.4,
   },
   languagesRow: {
     flexDirection: 'row',
@@ -107,7 +107,7 @@ const styles = StyleSheet.create({
   projectTech: {
     fontSize: 9,
     color: COLORS.muted,
-    marginTop: 2,
+    marginTop: 1,
     fontFamily: 'Lora',
   },
 })
@@ -120,7 +120,7 @@ export function ClassicPDF({ resume }: { resume: Resume }) {
         <View style={styles.header}>
           <Text style={styles.name}>{resume.persona || 'Your Name'}</Text>
           <Text style={styles.contact}>
-            {[resume.email, resume.phone, resume.location].filter(Boolean).join(' · ')}
+            {[resume.email, resume.phone, resume.location].filter(Boolean).join('  ·  ')}
           </Text>
         </View>
 
@@ -132,6 +132,24 @@ export function ClassicPDF({ resume }: { resume: Resume }) {
           </View>
         )}
 
+        {/* Education — FIRST for new grads */}
+        {resume.education && resume.education.length > 0 && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Education</Text>
+            {resume.education.map((edu, i) => (
+              <View key={i} style={styles.experienceBlock}>
+                <View style={styles.expHeader}>
+                  <Text style={styles.expRole}>{edu.institution}</Text>
+                  <Text style={styles.expDates}>{edu.dates}</Text>
+                </View>
+                <Text style={styles.expCompany}>
+                  {[edu.degree, edu.field].filter(Boolean).join(', ')}
+                </Text>
+              </View>
+            ))}
+          </View>
+        )}
+
         {/* Skills */}
         {resume.skills.length > 0 && (
           <View style={styles.section}>
@@ -139,7 +157,7 @@ export function ClassicPDF({ resume }: { resume: Resume }) {
             <View style={styles.skillsRow}>
               {resume.skills.map((s, i) => (
                 <React.Fragment key={i}>
-                  {i > 0 && <Text style={styles.skillSeparator}> · </Text>}
+                  {i > 0 && <Text style={styles.skillSeparator}>  ·  </Text>}
                   <Text style={styles.skill}>{s}</Text>
                 </React.Fragment>
               ))}
@@ -161,24 +179,6 @@ export function ClassicPDF({ resume }: { resume: Resume }) {
                 {exp.bullets.map((b, j) => (
                   <Text key={j} style={styles.bullet}>• {b}</Text>
                 ))}
-              </View>
-            ))}
-          </View>
-        )}
-
-        {/* Education */}
-        {resume.education && resume.education.length > 0 && (
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Education</Text>
-            {resume.education.map((edu, i) => (
-              <View key={i} style={styles.experienceBlock}>
-                <View style={styles.expHeader}>
-                  <Text style={styles.expRole}>{edu.institution}</Text>
-                  <Text style={styles.expDates}>{edu.dates}</Text>
-                </View>
-                <Text style={styles.expCompany}>
-                  {[edu.degree, edu.field].filter(Boolean).join(', ')}
-                </Text>
               </View>
             ))}
           </View>
@@ -211,7 +211,7 @@ export function ClassicPDF({ resume }: { resume: Resume }) {
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Certifications</Text>
             {resume.certifications.map((cert, i) => (
-              <View key={i} style={{ marginBottom: 4 }}>
+              <View key={i} style={{ marginBottom: 2 }}>
                 <View style={styles.expHeader}>
                   <Text style={{ fontWeight: 700, fontSize: 10, fontFamily: 'Lora' }}>
                     {cert.name}

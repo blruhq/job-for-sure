@@ -10,22 +10,22 @@ const styles = StyleSheet.create({
     fontSize: 10,
     fontFamily: 'Inter',
     color: COLORS.text,
-    lineHeight: 1.5,
+    lineHeight: 1.35,
   },
   headerBar: {
     backgroundColor: COLORS.dark,
-    padding: '24 40',
+    padding: '20 40',
   },
   headerName: {
     fontSize: 22,
     fontWeight: 700,
     color: COLORS.white,
-    marginBottom: 2,
+    marginBottom: 4,
   },
   headerRole: {
-    fontSize: 12,
+    fontSize: 11,
     color: COLORS.primary,
-    marginBottom: 4,
+    marginBottom: 2,
   },
   headerContact: {
     fontSize: 8,
@@ -35,6 +35,7 @@ const styles = StyleSheet.create({
   body: {
     flexDirection: 'row',
     padding: 40,
+    paddingTop: 24,
     gap: 20,
   },
   sidebar: {
@@ -44,7 +45,7 @@ const styles = StyleSheet.create({
     width: '70%',
   },
   sidebarSection: {
-    marginBottom: 16,
+    marginBottom: 10,
   },
   sidebarSectionTitle: {
     fontSize: 10,
@@ -53,26 +54,26 @@ const styles = StyleSheet.create({
     color: COLORS.primary,
     borderBottomWidth: 1,
     borderBottomColor: COLORS.primary,
-    paddingBottom: 3,
-    marginBottom: 8,
+    paddingBottom: 2,
+    marginBottom: 5,
   },
   skillItem: {
-    fontSize: 10,
-    marginBottom: 4,
-    paddingLeft: 8,
+    fontSize: 9,
+    marginBottom: 3,
+    paddingLeft: 6,
     borderLeftWidth: 2,
     borderLeftColor: COLORS.primary,
   },
   langText: {
     fontSize: 9,
-    marginBottom: 3,
-    paddingLeft: 8,
+    marginBottom: 2,
+    paddingLeft: 6,
     borderLeftWidth: 2,
     borderLeftColor: COLORS.primary,
   },
   certItem: {
-    marginBottom: 6,
-    paddingLeft: 8,
+    marginBottom: 4,
+    paddingLeft: 6,
     borderLeftWidth: 2,
     borderLeftColor: COLORS.primary,
   },
@@ -85,7 +86,7 @@ const styles = StyleSheet.create({
     color: COLORS.muted,
   },
   mainSection: {
-    marginBottom: 16,
+    marginBottom: 10,
   },
   mainSectionTitle: {
     fontSize: 10,
@@ -94,16 +95,16 @@ const styles = StyleSheet.create({
     color: COLORS.primary,
     borderBottomWidth: 1,
     borderBottomColor: COLORS.primary,
-    paddingBottom: 3,
-    marginBottom: 8,
+    paddingBottom: 2,
+    marginBottom: 5,
   },
   summary: {
-    fontSize: 11,
+    fontSize: 10,
     color: COLORS.text,
-    lineHeight: 1.7,
+    lineHeight: 1.35,
   },
   experienceBlock: {
-    marginBottom: 12,
+    marginBottom: 6,
   },
   expHeader: {
     flexDirection: 'row',
@@ -122,17 +123,17 @@ const styles = StyleSheet.create({
     fontSize: 9,
     color: COLORS.muted,
     fontStyle: 'italic',
-    marginBottom: 2,
+    marginBottom: 1,
   },
   bullet: {
     fontSize: 9,
-    marginBottom: 1,
+    marginBottom: 0,
     paddingLeft: 10,
   },
   projectTech: {
     fontSize: 8,
     color: COLORS.muted,
-    marginTop: 2,
+    marginTop: 1,
   },
 })
 
@@ -145,7 +146,7 @@ export function ExecutivePDF({ resume }: { resume: Resume }) {
           <Text style={styles.headerName}>{resume.persona || 'Your Name'}</Text>
           {resume.role && <Text style={styles.headerRole}>{resume.role}</Text>}
           <Text style={styles.headerContact}>
-            {[resume.email, resume.phone, resume.location, resume.github].filter(Boolean).join(' · ')}
+            {[resume.email, resume.phone, resume.location, resume.github].filter(Boolean).join('  ·  ')}
           </Text>
         </View>
 
@@ -194,8 +195,26 @@ export function ExecutivePDF({ resume }: { resume: Resume }) {
             {/* Summary */}
             {resume.summary && (
               <View style={styles.mainSection}>
-                <Text style={styles.mainSectionTitle}>Executive Summary</Text>
+                <Text style={styles.mainSectionTitle}>Summary</Text>
                 <Text style={styles.summary}>{resume.summary}</Text>
+              </View>
+            )}
+
+            {/* Education — FIRST for new grads */}
+            {resume.education && resume.education.length > 0 && (
+              <View style={styles.mainSection}>
+                <Text style={styles.mainSectionTitle}>Education</Text>
+                {resume.education.map((edu, i) => (
+                  <View key={i} style={styles.experienceBlock}>
+                    <View style={styles.expHeader}>
+                      <Text style={styles.expRole}>{edu.institution}</Text>
+                      <Text style={styles.expDates}>{edu.dates}</Text>
+                    </View>
+                    <Text style={styles.expCompany}>
+                      {[edu.degree, edu.field].filter(Boolean).join(', ')}
+                    </Text>
+                  </View>
+                ))}
               </View>
             )}
 
@@ -213,24 +232,6 @@ export function ExecutivePDF({ resume }: { resume: Resume }) {
                     {exp.bullets.map((b, j) => (
                       <Text key={j} style={styles.bullet}>• {b}</Text>
                     ))}
-                  </View>
-                ))}
-              </View>
-            )}
-
-            {/* Education */}
-            {resume.education && resume.education.length > 0 && (
-              <View style={styles.mainSection}>
-                <Text style={styles.mainSectionTitle}>Education</Text>
-                {resume.education.map((edu, i) => (
-                  <View key={i} style={styles.experienceBlock}>
-                    <View style={styles.expHeader}>
-                      <Text style={styles.expRole}>{edu.institution}</Text>
-                      <Text style={styles.expDates}>{edu.dates}</Text>
-                    </View>
-                    <Text style={styles.expCompany}>
-                      {[edu.degree, edu.field].filter(Boolean).join(', ')}
-                    </Text>
                   </View>
                 ))}
               </View>
