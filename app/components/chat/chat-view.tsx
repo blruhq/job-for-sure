@@ -321,22 +321,6 @@ export function ChatView() {
         )}
       </div>
 
-      {/* Processing skeleton — replaces spinner text with real-looking cards */}
-      {processing && (
-        <div className="border-b border-border/50 px-4 py-3 md:px-8">
-          <div className="mx-auto max-w-[680px] space-y-3">
-            <SkeletonChatMessage />
-            <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-              <SkeletonCard lines={2} />
-              <SkeletonCard lines={2} />
-            </div>
-            <div className="flex items-center gap-2 text-muted-foreground">
-              <Loader2 size={10} className="animate-spin text-primary" />
-              <span className="font-mono text-[10px]">AI is analyzing your resume…</span>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* Entry cards — shown when chat is empty */}
       {showEntryCards && (
@@ -392,31 +376,47 @@ export function ChatView() {
 
       {/* Agent Chat — fills remaining space */}
       <div className="flex-1 overflow-hidden">
-        <AgentChat
-          messages={messages}
-          status={status}
-          onSend={handleSend}
-          onStop={stop}
-          slots={slots}
-          suggestions={[
-            { id: 'upload', label: '📎 Upload resume', value: 'I want to upload my resume' },
-            { id: 'find-jobs', label: 'Find matching jobs', value: 'Find matching jobs for my resume' },
-            { id: 'interview', label: 'Interview prep', value: 'Help me prepare for an interview' },
-            { id: 'salary', label: 'Salary advice', value: 'Give me salary advice for my role' },
-            { id: 'score', label: 'Score my resume', value: 'Can you score my resume and tell me how to improve it?' },
-          ]}
-          bottomContent={
-            !processing && jobPreviewResumeId && resumes.find((r) => r.id === jobPreviewResumeId) ? (
-              <div className="mx-auto max-w-[680px] w-full px-4 md:px-0 py-3 animate-fade-up">
-                <JobPreview
-                  resume={resumes.find((r) => r.id === jobPreviewResumeId)!}
-                  onDismiss={() => setJobPreviewResumeId(null)}
-                />
+        {processing && messages.length === 0 ? (
+          <div className="flex h-full items-center justify-center px-4">
+            <div className="w-full max-w-[680px] space-y-3 animate-fade-up">
+              <SkeletonChatMessage />
+              <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+                <SkeletonCard lines={2} />
+                <SkeletonCard lines={2} />
               </div>
-            ) : null
-          }
-          className="h-full chat-fade-in"
-        />
+              <div className="flex items-center gap-2 text-muted-foreground">
+                <Loader2 size={10} className="animate-spin text-primary" />
+                <span className="font-mono text-[10px]">AI is analyzing your resume…</span>
+              </div>
+            </div>
+          </div>
+        ) : (
+          <AgentChat
+            messages={messages}
+            status={status}
+            onSend={handleSend}
+            onStop={stop}
+            slots={slots}
+            suggestions={[
+              { id: 'upload', label: '📎 Upload resume', value: 'I want to upload my resume' },
+              { id: 'find-jobs', label: 'Find matching jobs', value: 'Find matching jobs for my resume' },
+              { id: 'interview', label: 'Interview prep', value: 'Help me prepare for an interview' },
+              { id: 'salary', label: 'Salary advice', value: 'Give me salary advice for my role' },
+              { id: 'score', label: 'Score my resume', value: 'Can you score my resume and tell me how to improve it?' },
+            ]}
+            bottomContent={
+              !processing && jobPreviewResumeId && resumes.find((r) => r.id === jobPreviewResumeId) ? (
+                <div className="mx-auto max-w-[680px] w-full px-4 md:px-0 py-3 animate-fade-up">
+                  <JobPreview
+                    resume={resumes.find((r) => r.id === jobPreviewResumeId)!}
+                    onDismiss={() => setJobPreviewResumeId(null)}
+                  />
+                </div>
+              ) : null
+            }
+            className="h-full chat-fade-in"
+          />
+        )}
       </div>
 
       {/* Hidden file input */}
