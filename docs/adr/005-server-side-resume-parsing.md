@@ -19,6 +19,15 @@ The original resume parsing flow used client-side `pdfjs-dist` with a CDN worker
 
 Move all file parsing to the server side. The client sends the raw `File` via `FormData`; the server handles extraction and AI parsing.
 
+Separated display names from search queries in the `Resume` data model to avoid title conflicts (e.g. filename showing up as search query):
+- `resume.name`: Stores the display name (uploaded filename without extension, or custom title).
+- `resume.role`: Stores the AI-detected job title (e.g. "Software Engineer"), used internally for job searches and AI coach context.
+- `resume.persona`: Stores the candidate's real name, used for letter sign-off.
+
+Moved the Job Preview cards from the fixed top panel directly into the Agent Chat scrollable message list:
+- Added a `bottomContent` slot to `AgentChat` and `MessageList` components.
+- The 5 matching job cards now flow inline as part of the chat stream instead of being pinned.
+
 ### Tools
 
 | Task | Tool | Rationale |
@@ -33,20 +42,6 @@ Move all file parsing to the server side. The client sends the raw `File` via `F
 `POST /api/parse-resume` accepts two content types:
 - `multipart/form-data` with `file` field → server extracts text
 - `application/json` with `{ text }` → backward compatibility for paste paths
-
-### UI Data Model & Field Separation
-
-To resolve conflicts between the sidebar display name (should match filename) and the internal job search query (should match AI-extracted role):
-- `resume.name` is repurposed as the **display name** (defaults to filename without extension on upload). Used for the left sidebar, profile select dropdowns, and PDF export filename.
-- A new `resume.role` field is introduced to store the **AI-detected job title**. Used for job search queries (`/api/jobs/search`) and career coach prompt context.
-- `resume.persona` continues to store the candidate's real name.
-
-### Inline Job Recommendations
-
-Instead of rendering job previews as a fixed/sticky top panel above the chat area (which restricted workspace and felt unnatural), they are moved into the chat flow:
-- Added a `bottomContent` slot to `AgentChat` and `MessageList` components.
-- Renders up to 5 job cards cleanly as an inline bento card container inside the scrollable message list.
-- A "View all →" button navigates directly to the resume's full job search page.
 
 ### AI Prompt Changes
 
@@ -64,6 +59,8 @@ Instead of rendering job previews as a fixed/sticky top panel above the chat are
 ## Consequences
 
 - **Positive:** Reliable extraction for Google Docs, Word, LaTeX, and LinkedIn PDFs. DOCX support added. PDF export works. Role always populated. Job search returns relevant results.
+- **Positive:** Sidebar and profile dropdown show user-friendly file/custom titles, while job search queries remain highly targeted via separate role field.
+- **Positive:** Cleaner chat UI: matching job recommendations flow naturally in the conversation instead of being pinned to the top of the viewport.
 - **Positive:** Zero client bundle impact — all parsing libraries are server-only.
 - **Negative:** Server processing time increases (extraction + AI parse in one request). Mitigated by `maxDuration = 60`.
 - **Negative:** `.doc` (legacy binary format) is not supported. Users are asked to save as `.docx` or PDF.

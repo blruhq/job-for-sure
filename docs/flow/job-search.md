@@ -4,8 +4,9 @@
 > As a tech job seeker, I want to search for jobs by keyword and location, see how well they match my resume, and bookmark promising ones for later.
 
 ## Entry Points
-- Resume Detail → "Find Jobs" tab
-- Chat → "Find me jobs like X"
+- Resume Detail → "Find Jobs" tab (full board with filters and infinite scroll)
+- Chat → Resume upload (inline 5-card preview flowing inside chat stream)
+- Chat → "Find me jobs like X" (AI suggestions)
 
 ## Flow States
 
@@ -27,6 +28,8 @@
 ```
 
 ### Results Display
+
+#### 1. Full Job Board (Resume Detail Page)
 ```
 ┌──────────────────────────────────────────────────┐
 │  Search: "React Developer" · Bangkok   [Search]  │
@@ -44,6 +47,13 @@
 │  └────┴──────────────────────────┴──────┴──────┘  │
 └──────────────────────────────────────────────────┘
 ```
+
+#### 2. Chat Job Preview (Inline Chat Flow)
+Upon successful resume upload, the system automatically fetches jobs matching the resume's `role` and displays a maximum of 5 cards inline at the end of the scrollable message list.
+- Renders directly in the chat flow (not pinned or fixed).
+- Includes the match score, company logo, salary, visa support, and basic action buttons (Bookmark, ATS Fit, Interview, Apply).
+- Shows a "+N more jobs · View all" button linking to `/resume/[id]` for the full search panel.
+- Includes a button to search paid sources (LinkedIn, Indeed, JobsDB) on demand.
 
 ### Actions
 ```
