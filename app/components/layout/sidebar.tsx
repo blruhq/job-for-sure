@@ -98,8 +98,10 @@ export function Sidebar() {
           <div
             key={r.id}
             className={cn(
-              'group flex items-center gap-1 rounded-sm transition-colors',
-              r.id === activeResumeId ? 'bg-sidebar-active' : 'hover:bg-sidebar-hover',
+              'group flex items-center gap-1 rounded-sm transition-colors border-l-2',
+              r.id === activeResumeId
+                ? 'bg-sidebar-active border-l-primary'
+                : 'hover:bg-sidebar-hover border-l-transparent',
               c ? 'justify-center px-0 mx-2' : 'px-2 py-1',
             )}
           >

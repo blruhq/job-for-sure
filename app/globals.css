@@ -91,7 +91,7 @@
   --sidebar: #EFEEE9;
   --sidebar-foreground: #1C1B16;
   --sidebar-hover: #E8E7E1;
-  --sidebar-active: #E2E1DA;
+  --sidebar-active: #D8D6CE;
   --sidebar-border: #E6E5DF;
   --sidebar-accent: #5B6ABF;
 
@@ -206,7 +206,7 @@ html[lang="th"] {
   --sidebar: #161614;
   --sidebar-foreground: #EFEEE9;
   --sidebar-hover: #1F1F1D;
-  --sidebar-active: #252522;
+  --sidebar-active: #2E2E2B;
   --sidebar-border: rgba(255, 255, 255, 0.07);
   --sidebar-accent: #7B8AD8;
 
