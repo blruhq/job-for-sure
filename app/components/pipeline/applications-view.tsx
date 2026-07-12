@@ -17,7 +17,9 @@ import {
   useDraggable,
   useDroppable,
   closestCorners,
+  DragOverlay,
   type DragEndEvent,
+  type DragStartEvent,
 } from '@dnd-kit/core'
 
 const COLUMNS: { id: ApplicationColumnId; labelKey: string; dot: string; next: ApplicationColumnId | null }[] = [
@@ -29,18 +31,14 @@ const COLUMNS: { id: ApplicationColumnId; labelKey: string; dot: string; next: A
 
 // ── Draggable job card wrapper ──
 function DraggableJobCard({ job, children }: { job: PipelineJob; children: React.ReactNode }) {
-  const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
+  const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
     id: job.key,
   })
 
   return (
     <div
       ref={setNodeRef}
-      style={{
-        transform: transform ? `translate3d(${transform.x}px, ${transform.y}px, 0)` : undefined,
-        opacity: isDragging ? 0.4 : 1,
-        zIndex: isDragging ? 50 : 'auto',
-      }}
+      style={{ opacity: isDragging ? 0.3 : 1 }}
       {...attributes}
       {...listeners}
       className={cn(
@@ -69,12 +67,38 @@ function DroppableColumn({ colId, isOver, children }: { colId: ApplicationColumn
   )
 }
 
+// ── Card content (used in both card and overlay) ──
+function JobCardContent({ job }: { job: PipelineJob }) {
+  return (
+    <>
+      <div className="flex items-start justify-between gap-1">
+        <div className="min-w-0 flex-1">
+          <div className="text-[11px] font-semibold text-foreground truncate">{job.title}</div>
+          <div className="text-[10px] text-muted-foreground truncate">{job.company}</div>
+        </div>
+        {job.score > 0 && (
+          <span className={cn(
+            'shrink-0 rounded-xs px-1 py-px text-[9px] font-mono font-semibold',
+            job.score >= 85 ? 'bg-success/10 text-success' : job.score >= 70 ? 'bg-primary/10 text-primary' : 'bg-warn/10 text-warn'
+          )}>
+            {job.score}%
+          </span>
+        )}
+      </div>
+      <div className="mt-1.5 flex items-center gap-2 text-[9px] text-muted-foreground">
+        {job.loc && <span className="truncate">{job.loc}</span>}
+      </div>
+    </>
+  )
+}
+
 export function ApplicationsView() {
   const router = useRouter()
   const t = useTranslations('applications')
   const { applications, moveJob, removeJob, clearApplications } = useAppStore()
   const [filter, setFilter] = useState('all')
   const [dragOverCol, setDragOverCol] = useState<ApplicationColumnId | null>(null)
+  const [activeJob, setActiveJob] = useState<PipelineJob | null>(null)
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
@@ -102,6 +126,7 @@ export function ApplicationsView() {
   // ── DnD handler ──
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event
+    setActiveJob(null)
     setDragOverCol(null)
     if (!over) return
 
@@ -124,6 +149,12 @@ export function ApplicationsView() {
       moveJob(jobKey, fromCol, toCol)
       notify({ message: `Moved to ${toCol}`, type: 'success' })
     }
+  }
+
+  const handleDragStart = (event: DragStartEvent) => {
+    const jobKey = event.active.id as string
+    const job = allJobs.find((j) => j.key === jobKey)
+    setActiveJob(job ?? null)
   }
 
   const handleDragOver = (event: React.DragEvent | null, colId: ApplicationColumnId) => {
@@ -161,6 +192,7 @@ export function ApplicationsView() {
       <DndContext
         sensors={sensors}
         collisionDetection={closestCorners}
+        onDragStart={handleDragStart}
         onDragEnd={handleDragEnd}
         onDragOver={(e) => {
           // Highlight column during drag
@@ -216,23 +248,7 @@ export function ApplicationsView() {
 
                   {jobs.map((job) => (
                     <DraggableJobCard key={job.key} job={job}>
-                      <div className="flex items-start justify-between gap-1">
-                        <div className="min-w-0 flex-1">
-                          <div className="text-[11px] font-semibold text-foreground truncate">{job.title}</div>
-                          <div className="text-[10px] text-muted-foreground truncate">{job.company}</div>
-                        </div>
-                        {job.score > 0 && (
-                          <span className={cn(
-                            'shrink-0 rounded-xs px-1 py-px text-[9px] font-mono font-semibold',
-                            job.score >= 85 ? 'bg-success/10 text-success' : job.score >= 70 ? 'bg-primary/10 text-primary' : 'bg-warn/10 text-warn'
-                          )}>
-                            {job.score}%
-                          </span>
-                        )}
-                      </div>
-                      <div className="mt-1.5 flex items-center gap-2 text-[9px] text-muted-foreground">
-                        {job.loc && <span className="truncate">{job.loc}</span>}
-                      </div>
+                      <JobCardContent job={job} />
                       <div className="mt-1.5 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                         {job.url && (
                           <a
@@ -263,6 +279,15 @@ export function ApplicationsView() {
             )
           })}
         </div>
+
+        {/* ── Floating drag overlay ── */}
+        <DragOverlay dropAnimation={null}>
+          {activeJob ? (
+            <div className="w-72 rounded-sm border border-border/60 bg-card p-2.5 shadow-[0_8px_30px_rgba(0,0,0,0.12)]">
+              <JobCardContent job={activeJob} />
+            </div>
+          ) : null}
+        </DragOverlay>
       </DndContext>
     </div>
   )
