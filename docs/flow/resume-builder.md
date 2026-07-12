@@ -22,7 +22,11 @@
 5. AI prompt always infers role/title (never empty)
 6. If AI returns empty role → safety-net infers from skills/experience
 7. If AI parsing fails → fallback to minimal blank form
-8. User can edit parsed result
+8. Resume object created:
+   ├── resume.name    = Filename without extension (display title for sidebar/dropdowns)
+   ├── resume.role    = AI-detected role title (used for job search queries)
+   └── resume.persona = Candidate's real name (used for cover letter sign-offs)
+9. User can edit parsed result
 
 Rejected formats:
    ├── .doc → "Please save as .docx or PDF"

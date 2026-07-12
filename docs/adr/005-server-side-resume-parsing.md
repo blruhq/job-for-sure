@@ -34,6 +34,20 @@ Move all file parsing to the server side. The client sends the raw `File` via `F
 - `multipart/form-data` with `file` field → server extracts text
 - `application/json` with `{ text }` → backward compatibility for paste paths
 
+### UI Data Model & Field Separation
+
+To resolve conflicts between the sidebar display name (should match filename) and the internal job search query (should match AI-extracted role):
+- `resume.name` is repurposed as the **display name** (defaults to filename without extension on upload). Used for the left sidebar, profile select dropdowns, and PDF export filename.
+- A new `resume.role` field is introduced to store the **AI-detected job title**. Used for job search queries (`/api/jobs/search`) and career coach prompt context.
+- `resume.persona` continues to store the candidate's real name.
+
+### Inline Job Recommendations
+
+Instead of rendering job previews as a fixed/sticky top panel above the chat area (which restricted workspace and felt unnatural), they are moved into the chat flow:
+- Added a `bottomContent` slot to `AgentChat` and `MessageList` components.
+- Renders up to 5 job cards cleanly as an inline bento card container inside the scrollable message list.
+- A "View all →" button navigates directly to the resume's full job search page.
+
 ### AI Prompt Changes
 
 - `role` field is marked REQUIRED in the system prompt — never return empty
