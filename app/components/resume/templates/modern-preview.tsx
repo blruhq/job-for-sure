@@ -4,7 +4,7 @@ import type { Resume } from '~/types/resume'
 
 export function ModernPreview({ resume }: { resume: Resume }) {
   return (
-    <div className="resume-paper" data-template="modern">
+    <div className="resume-paper p-8" data-template="modern">
       {/* Header */}
       <div className="mb-4 border-b border-[#E6E5DF] pb-3">
         <div className="text-[20px] font-bold text-[#1C1B16]">{resume.persona || 'Your Name'}</div>

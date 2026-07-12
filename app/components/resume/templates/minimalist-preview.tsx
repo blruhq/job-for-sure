@@ -4,7 +4,7 @@ import type { Resume } from '~/types/resume'
 
 export function MinimalistPreview({ resume }: { resume: Resume }) {
   return (
-    <div className="resume-paper" data-template="minimalist">
+    <div className="resume-paper p-8" data-template="minimalist">
       {/* Header */}
       <div className="mb-5 text-center">
         <div className="mb-1 font-sans text-[18px] font-bold text-[#1C1B16]">

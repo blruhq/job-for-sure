@@ -4,7 +4,7 @@ import type { Resume } from '~/types/resume'
 
 export function ExecutivePreview({ resume }: { resume: Resume }) {
   return (
-    <div className="resume-paper" data-template="executive">
+    <div className="resume-paper p-8" data-template="executive">
       {/* Dark header bar */}
       <div className="bg-[#1C1B18] px-10 py-6">
         <div className="text-[22px] font-bold text-white">{resume.persona || 'Your Name'}</div>

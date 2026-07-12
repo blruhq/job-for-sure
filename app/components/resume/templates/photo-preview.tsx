@@ -14,7 +14,7 @@ export function PhotoPreview({ resume }: { resume: Resume }) {
   const initials = getInitials(resume.persona || resume.name)
 
   return (
-    <div className="resume-paper" data-template="photo">
+    <div className="resume-paper p-8" data-template="photo">
       <div className="flex gap-4">
         {/* Sidebar */}
         <div className="w-[33%] shrink-0 bg-[#F8F8F5] p-5">

@@ -470,22 +470,24 @@ export function ResumeDetail({ resumeId }: { resumeId: string }) {
                 onChange={(template) => updateResume(resume.id, { template })}
               />
             </div>
-            {(() => {
-              const template = resume.template || DEFAULT_TEMPLATE
-              switch (template) {
-                case 'modern':
-                  return <ModernPreview resume={resume} />
-                case 'classic':
-                  return <ClassicPreview resume={resume} />
-                case 'executive':
-                  return <ExecutivePreview resume={resume} />
-                case 'photo':
-                  return <PhotoPreview resume={resume} />
-                case 'minimalist':
-                default:
-                  return <MinimalistPreview resume={resume} />
-              }
-            })()}
+            <div className="w-full max-w-[600px] rounded-xs overflow-hidden">
+              {(() => {
+                const template = resume.template || DEFAULT_TEMPLATE
+                switch (template) {
+                  case 'modern':
+                    return <ModernPreview resume={resume} />
+                  case 'classic':
+                    return <ClassicPreview resume={resume} />
+                  case 'executive':
+                    return <ExecutivePreview resume={resume} />
+                  case 'photo':
+                    return <PhotoPreview resume={resume} />
+                  case 'minimalist':
+                  default:
+                    return <MinimalistPreview resume={resume} />
+                }
+              })()}
+            </div>
           </div>
         )}
 
