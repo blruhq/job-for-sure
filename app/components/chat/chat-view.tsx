@@ -3,15 +3,18 @@
 import { useRef, useState, useEffect, useCallback, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import { useChat } from '@ai-sdk/react'
+import { DefaultChatTransport } from 'ai'
 import { AgentChat } from '@/components/agent-elements/agent-chat'
 import { InputBar } from '@/components/agent-elements/input-bar'
 import type { InputBarProps } from '@/components/agent-elements/input-bar'
 import { useAppStore } from '~/lib/store'
 import { createResume } from '~/lib/company-data'
 import { notify } from '~/lib/toast'
+import type { Resume } from '~/types/resume'
 import { BuildWizard, type WizardData } from '~/components/chat/build-wizard'
 import { PasteJDModal } from '~/components/chat/paste-jd-modal'
-import { SkeletonChatMessage, SkeletonCard } from '~/components/ui/skeleton'
+import { Skeleton } from '~/components/ui/skeleton'
+import { JobPreview } from '~/components/chat/job-preview'
 import { Upload, FileText, ClipboardList, Loader2, Paperclip, RotateCcw } from 'lucide-react'
 
 export function ChatView() {
@@ -20,7 +23,9 @@ export function ChatView() {
   const fileRef = useRef<HTMLInputElement>(null)
   const [wizardOpen, setWizardOpen] = useState(false)
   const [pasteOpen, setPasteOpen] = useState(false)
-  const [processing, setProcessing] = useState(false)
+  // Upload flow stages: idle → parsing → jobs-loading → done
+  const [uploadStage, setUploadStage] = useState<'idle' | 'parsing' | 'jobs-loading' | 'done'>('idle')
+  const [uploadedResume, setUploadedResume] = useState<Resume | null>(null)
 
   // ── CHAT PERSISTENCE (sessionStorage) ──
   // Load saved messages from sessionStorage on mount.
@@ -34,8 +39,40 @@ export function ChatView() {
     }
   })
 
-  // We pass `messages: savedMessages` to seed the hook in AI SDK v4/v5
-  const { messages, status, sendMessage, stop } = useChat({ messages: savedMessages })
+  // Ref to always have current activeResume for transport body
+  const activeResumeRef = useRef(activeResume)
+  activeResumeRef.current = activeResume
+
+  // Transport sends resume context with every chat request
+  const transport = useMemo(() => {
+    return new DefaultChatTransport({
+      body: () => ({
+        context: {
+          activeResume: activeResumeRef.current
+            ? {
+                name: activeResumeRef.current.name,
+                role: activeResumeRef.current.role,
+                persona: activeResumeRef.current.persona,
+                email: activeResumeRef.current.email,
+                phone: activeResumeRef.current.phone,
+                location: activeResumeRef.current.location,
+                github: activeResumeRef.current.github,
+                summary: activeResumeRef.current.summary,
+                skills: activeResumeRef.current.skills,
+                experience: activeResumeRef.current.experience,
+                education: activeResumeRef.current.education,
+                projects: activeResumeRef.current.projects,
+                certifications: activeResumeRef.current.certifications,
+                languages: activeResumeRef.current.languages,
+                customSections: activeResumeRef.current.customSections,
+              }
+            : null,
+        },
+      }),
+    })
+  }, [])
+
+  const { messages, status, sendMessage, stop } = useChat({ transport, messages: savedMessages })
 
   // Sync messages back to sessionStorage when the response completes (not during stream)
   const prevMessagesRef = useRef('')
@@ -91,7 +128,8 @@ export function ChatView() {
       return
     }
 
-    setProcessing(true)
+    setUploadStage('parsing')
+    setUploadedResume(null)
     try {
       // Send file to server — server handles text extraction + AI parsing
       const formData = new FormData()
@@ -108,17 +146,17 @@ export function ChatView() {
       }
       const parsed = await res.json()
 
-      // Create resume from parsed data
+      // Create resume from parsed data — no role fallback fabrication
       const resume = createResume({
         name: file.name.replace(/\.(pdf|docx|txt|md)$/i, ''),
-        role: parsed.role || 'Software Engineer',
+        role: parsed.role || '',
         persona: parsed.name || 'Your Name',
         email: parsed.email,
         phone: parsed.phone,
         location: parsed.location,
         github: parsed.github,
         summary: parsed.summary,
-        skills: parsed.skills?.length > 0 ? parsed.skills : ['JavaScript', 'Git'],
+        skills: parsed.skills?.length > 0 ? parsed.skills : [],
         experience: parsed.experience?.map((e: any) => ({
           company: e.company || '',
           role: e.role || '',
@@ -153,18 +191,22 @@ export function ChatView() {
       })
 
       addResume(resume)
-      sendMessage({ text: `I just uploaded my resume. Here's my profile:\n- **Name:** ${resume.persona || 'Not specified'}\n- **Role:** ${resume.role}\n- **Skills:** ${resume.skills.join(', ')}\n- **Summary:** ${resume.summary || 'Not provided'}\n- **Location:** ${resume.location || 'Not specified'}\n\nCan you analyze my resume and give me feedback on how to improve it?` })
+      setActiveResumeId(resume.id)
+      setUploadedResume(resume)
+      setUploadStage('jobs-loading')
+      // JobPreview will auto-fetch jobs on mount.
+      // When done, onLoadComplete fires → stage becomes 'done' → input unlocks.
     } catch (err) {
       console.error(err)
       notify({ message: err instanceof Error ? err.message : 'Failed to process resume. Try Build from Template instead.', type: 'error' })
-    } finally {
-      setProcessing(false)
+      setUploadStage('idle')
     }
   }
 
   // ── BUILD FROM TEMPLATE WIZARD ──
   const handleWizardComplete = async (data: WizardData) => {
-    setProcessing(true)
+    setUploadStage('parsing')
+    setUploadedResume(null)
     try {
       const resume = createResume({
         name: data.role,
@@ -183,12 +225,13 @@ export function ChatView() {
       })
 
       addResume(resume)
-      sendMessage({ text: `I built my resume profile:\n- **Name:** ${resume.persona || data.name}\n- **Role:** ${resume.role}\n- **Skills:** ${resume.skills.join(', ')}\n- **Summary:** ${resume.summary || 'Not provided'}\n\nCan you give me feedback and suggestions?` })
+      setActiveResumeId(resume.id)
+      setUploadedResume(resume)
+      setUploadStage('jobs-loading')
     } catch (err) {
       console.error(err)
       notify({ message: 'Failed to create resume from wizard', type: 'error' })
-    } finally {
-      setProcessing(false)
+      setUploadStage('idle')
     }
   }
 
@@ -207,6 +250,11 @@ export function ChatView() {
   const showPillBar = messages.length > 0
   const showPillBarRef = useRef(false)
   showPillBarRef.current = showPillBar
+
+  // Ref for disabling input during upload flow
+  const isUploading = uploadStage === 'parsing' || uploadStage === 'jobs-loading'
+  const isUploadingRef = useRef(isUploading)
+  isUploadingRef.current = isUploading
 
   // Stable custom InputBar — never recreates, so InputBar inside never remounts
   const CustomInputBar = useCallback(function CustomInputBar(props: InputBarProps) {
@@ -248,6 +296,7 @@ export function ChatView() {
 
         <InputBar
           {...inputBarProps}
+          disabled={isUploadingRef.current}
           leftActions={
             <button
               onClick={() => fileRef.current?.click()}
@@ -265,7 +314,7 @@ export function ChatView() {
   const slots = useMemo(() => ({ InputBar: CustomInputBar }), [])
 
   // ── ENTRY CARDS (shown above AgentChat when no messages) ──
-  const showEntryCards = messages.length === 0 && !processing
+  const showEntryCards = messages.length === 0 && uploadStage === 'idle'
 
   return (
     <div className="flex h-full flex-col">
@@ -372,21 +421,6 @@ export function ChatView() {
 
       {/* Agent Chat — fills remaining space */}
       <div className="flex-1 overflow-hidden">
-        {processing && messages.length === 0 ? (
-          <div className="flex h-full items-center justify-center px-4">
-            <div className="w-full max-w-[680px] space-y-3 animate-fade-up">
-              <SkeletonChatMessage />
-              <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-                <SkeletonCard lines={2} />
-                <SkeletonCard lines={2} />
-              </div>
-              <div className="flex items-center gap-2 text-muted-foreground">
-                <Loader2 size={10} className="animate-spin text-primary" />
-                <span className="font-mono text-[10px]">AI is analyzing your resume…</span>
-              </div>
-            </div>
-          </div>
-        ) : (
           <AgentChat
             messages={messages}
             status={status}
@@ -400,9 +434,110 @@ export function ChatView() {
               { id: 'salary', label: 'Salary advice', value: 'Give me salary advice for my role' },
               { id: 'score', label: 'Score my resume', value: 'Can you score my resume and tell me how to improve it?' },
             ]}
+            bottomContent={
+              uploadStage === 'parsing' ? (
+                <div className="mx-auto max-w-an w-full px-4 py-3">
+                  <div className="rounded-md border border-border bg-card p-4">
+                    <div className="flex items-center gap-2 text-muted-foreground">
+                      <Loader2 size={12} className="animate-spin text-primary" />
+                      <span className="font-mono text-[11px]">Parsing your resume…</span>
+                    </div>
+                    <div className="mt-3 space-y-2">
+                      <Skeleton className="h-3 w-3/5" />
+                      <Skeleton className="h-2.5 w-4/5" />
+                      <Skeleton className="h-2.5 w-2/5" />
+                    </div>
+                  </div>
+                </div>
+              ) : uploadStage === 'jobs-loading' && uploadedResume ? (
+                <div className="mx-auto max-w-an w-full px-4 py-3 space-y-3">
+                  {/* Resume summary card */}
+                  <div className="rounded-md border border-border bg-card p-4">
+                    <div className="flex items-center gap-1.5 mb-1">
+                      <span className="text-[13px] font-semibold text-foreground">{uploadedResume.persona || 'Your Name'}</span>
+                      {uploadedResume.role && (
+                        <span className="text-[11px] text-primary">· {uploadedResume.role}</span>
+                      )}
+                    </div>
+                    {uploadedResume.summary && (
+                      <p className="text-[11px] text-muted-foreground leading-relaxed">{uploadedResume.summary}</p>
+                    )}
+                    {uploadedResume.skills.length > 0 && (
+                      <div className="mt-2 flex flex-wrap gap-1">
+                        {uploadedResume.skills.slice(0, 12).map((s, i) => (
+                          <span key={i} className="rounded-xs bg-muted/50 px-1.5 py-0.5 text-[9px] text-muted-foreground">{s}</span>
+                        ))}
+                        {uploadedResume.skills.length > 12 && (
+                          <span className="text-[9px] text-muted-foreground">+{uploadedResume.skills.length - 12} more</span>
+                        )}
+                      </div>
+                    )}
+                    <div className="mt-3 flex items-center gap-3">
+                      <button
+                        onClick={() => router.push(`/resume/${uploadedResume.id}`)}
+                        className="cursor-pointer text-[11px] font-medium text-primary hover:underline"
+                      >
+                        View Resume →
+                      </button>
+                      <button
+                        onClick={() => router.push(`/resume/${uploadedResume.id}?tab=editor`)}
+                        className="cursor-pointer text-[11px] font-medium text-muted-foreground hover:text-foreground"
+                      >
+                        Edit Resume →
+                      </button>
+                    </div>
+                  </div>
+                  {/* Job preview (shows its own loading then jobs) */}
+                  <JobPreview
+                    resume={uploadedResume}
+                    onLoadComplete={() => setUploadStage('done')}
+                  />
+                </div>
+              ) : uploadStage === 'done' && uploadedResume ? (
+                <div className="mx-auto max-w-an w-full px-4 py-3 space-y-3">
+                  {/* Resume summary card stays visible */}
+                  <div className="rounded-md border border-border bg-card p-4">
+                    <div className="flex items-center gap-1.5 mb-1">
+                      <span className="text-[13px] font-semibold text-foreground">{uploadedResume.persona || 'Your Name'}</span>
+                      {uploadedResume.role && (
+                        <span className="text-[11px] text-primary">· {uploadedResume.role}</span>
+                      )}
+                    </div>
+                    {uploadedResume.summary && (
+                      <p className="text-[11px] text-muted-foreground leading-relaxed">{uploadedResume.summary}</p>
+                    )}
+                    {uploadedResume.skills.length > 0 && (
+                      <div className="mt-2 flex flex-wrap gap-1">
+                        {uploadedResume.skills.slice(0, 12).map((s, i) => (
+                          <span key={i} className="rounded-xs bg-muted/50 px-1.5 py-0.5 text-[9px] text-muted-foreground">{s}</span>
+                        ))}
+                        {uploadedResume.skills.length > 12 && (
+                          <span className="text-[9px] text-muted-foreground">+{uploadedResume.skills.length - 12} more</span>
+                        )}
+                      </div>
+                    )}
+                    <div className="mt-3 flex items-center gap-3">
+                      <button
+                        onClick={() => router.push(`/resume/${uploadedResume.id}`)}
+                        className="cursor-pointer text-[11px] font-medium text-primary hover:underline"
+                      >
+                        View Resume →
+                      </button>
+                      <button
+                        onClick={() => router.push(`/resume/${uploadedResume.id}?tab=editor`)}
+                        className="cursor-pointer text-[11px] font-medium text-muted-foreground hover:text-foreground"
+                      >
+                        Edit Resume →
+                      </button>
+                    </div>
+                  </div>
+                  {/* Job preview stays visible with results */}
+                  <JobPreview resume={uploadedResume} />
+                </div>
+              ) : undefined
+            }
             className="h-full chat-fade-in"
           />
-        )}
       </div>
 
       {/* Hidden file input */}

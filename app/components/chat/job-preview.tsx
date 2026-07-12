@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import {
   Bookmark, ExternalLink, Loader2, ChevronRight, MessageSquare, Plane, X, Briefcase, Brain,
@@ -34,7 +34,7 @@ const SOURCE_SHORT: Record<JobSource, string> = {
 // that navigates to the full Find Jobs search panel.
 // ═══════════════════════════════════════════════════════════════
 
-export function JobPreview({ resume, onDismiss }: { resume: Resume; onDismiss?: () => void }) {
+export function JobPreview({ resume, onDismiss, onLoadComplete }: { resume: Resume; onDismiss?: () => void; onLoadComplete?: () => void }) {
   const router = useRouter()
   const { isBookmarked, bookmarkJob, toggleBookmark } = useAppStore()
 
@@ -73,6 +73,15 @@ export function JobPreview({ resume, onDismiss }: { resume: Resume; onDismiss?: 
   useEffect(() => {
     fetchJobs()
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Notify parent when loading completes (success or error)
+  const onLoadCompleteRef = useRef(onLoadComplete)
+  onLoadCompleteRef.current = onLoadComplete
+  useEffect(() => {
+    if (!loading) {
+      onLoadCompleteRef.current?.()
+    }
+  }, [loading])
 
   const handleLoadPaid = useCallback(async () => {
     if (paidLoading || paidLoaded) return
