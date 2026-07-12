@@ -318,16 +318,20 @@ function SortableSection({ id, children }: { id: string; children: React.ReactNo
       }}
       className="relative group/section"
     >
-      <button
-        type="button"
-        {...attributes}
-        {...listeners}
-        className="absolute -left-0.5 top-1/2 -translate-y-1/2 cursor-grab text-muted-foreground/20 opacity-0 group-hover/section:opacity-100 transition-opacity hover:text-muted-foreground active:cursor-grabbing z-10"
-        title="Drag to reorder section"
-      >
-        <GripVertical size={14} />
-      </button>
-      {children}
+      <div className="flex gap-1">
+        <button
+          type="button"
+          {...attributes}
+          {...listeners}
+          className="mt-1.5 shrink-0 cursor-grab text-muted-foreground/20 opacity-0 group-hover/section:opacity-100 transition-opacity hover:text-muted-foreground active:cursor-grabbing"
+          title="Drag to reorder section"
+        >
+          <GripVertical size={14} />
+        </button>
+        <div className="flex-1 min-w-0">
+          {children}
+        </div>
+      </div>
     </div>
   )
 }
