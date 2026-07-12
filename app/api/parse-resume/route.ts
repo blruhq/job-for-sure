@@ -107,6 +107,13 @@ export async function POST(req: NextRequest) {
       text = body.data.text
     }
 
+    // ── Debug Logging ──
+    console.log('[parse-resume] Extracted text length:', text.length)
+    console.log('[parse-resume] Extracted text preview (first 500 chars):')
+    console.log('--------------------------------------------------')
+    console.log(text.slice(0, 500))
+    console.log('--------------------------------------------------')
+
     // ── AI parse ──
     const parsed = await generateObjectWithFailover<z.infer<typeof ParseResumeSchema>>({
       system: `You are a resume parser. Extract ALL structured information from resume text.
