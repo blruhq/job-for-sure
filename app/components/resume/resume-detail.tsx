@@ -323,7 +323,7 @@ function SortableSection({ id, children }: { id: string; children: React.ReactNo
           type="button"
           {...attributes}
           {...listeners}
-          className="mt-1.5 shrink-0 cursor-grab text-muted-foreground/20 opacity-0 group-hover/section:opacity-100 transition-opacity hover:text-muted-foreground active:cursor-grabbing"
+          className="mt-1.5 shrink-0 cursor-grab text-muted-foreground/30 opacity-60 group-hover/section:opacity-100 transition-all hover:text-foreground/70 active:cursor-grabbing hover:scale-110"
           title="Drag to reorder section"
         >
           <GripVertical size={14} />
