@@ -142,7 +142,7 @@ function SortableItem({ id, children }: { id: string; children: React.ReactNode 
         type="button"
         {...attributes}
         {...listeners}
-        className="absolute left-1.5 top-1/2 -translate-y-1/2 cursor-grab text-muted-foreground/40 hover:text-muted-foreground active:cursor-grabbing"
+        className="absolute left-1.5 top-1/2 -translate-y-1/2 cursor-grab text-muted-foreground/60 hover:text-muted-foreground active:cursor-grabbing"
         title="Drag to reorder"
       >
         <GripVertical size={14} />
@@ -323,7 +323,7 @@ function SortableSection({ id, children }: { id: string; children: React.ReactNo
           type="button"
           {...attributes}
           {...listeners}
-          className="mt-1.5 shrink-0 cursor-grab text-muted-foreground/30 opacity-60 group-hover/section:opacity-100 transition-all hover:text-foreground/70 active:cursor-grabbing hover:scale-110"
+          className="mt-1.5 shrink-0 cursor-grab text-muted-foreground/50 opacity-80 group-hover/section:opacity-100 transition-all hover:text-foreground/80 active:cursor-grabbing hover:scale-110"
           title="Drag to reorder section"
         >
           <GripVertical size={14} />
