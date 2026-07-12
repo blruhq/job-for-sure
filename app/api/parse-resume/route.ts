@@ -116,18 +116,38 @@ export async function POST(req: NextRequest) {
 
     // ── AI parse ──
     const parsed = await generateObjectWithFailover<z.infer<typeof ParseResumeSchema>>({
-      system: `You are a resume parser. Extract ALL structured information from resume text.
+      system: `You are a professional resume parser. Extract ALL structured information from the provided resume text into a VALID JSON matching the schema.
 
-Rules:
-- Extract EVERY section present in the text: experience, education, projects, certifications, languages, open source contributions.
-- "role" field is REQUIRED. NEVER return empty string. Infer the primary job title from the candidate's experience, summary, or skills.
-  Examples: "Software Engineer", "Frontend Developer", "Data Analyst", "Product Manager", "UX Designer".
-- Extract ONLY what's in the text. Don't fabricate.
-- If a field isn't present, use empty string or empty array.
-- Skills should be individual technologies/tools (e.g. "React", not "Frontend Development").
-- Keep bullet points concise (one line each).
-- For projects, extract name, description, tech stack, and link if available.
-- Return VALID JSON matching the provided schema.`,
+Guidelines:
+1. Contact Information:
+   - Identify the candidate's name, email, location (city, country), phone, and GitHub/LinkedIn URLs. These are usually at the very top of the text, sometimes on the same line. Do not skip them.
+2. Summary:
+   - Extract the summary/profile paragraph. Do not omit it.
+3. Experience:
+   - Extract every job entry. For each entry, extract:
+     - "company": Organization name
+     - "role": Job title (e.g. "Software Engineer Intern")
+     - "dates": Duration (e.g. "June 2025 – December 2025")
+     - "bullets": Bullet points of accomplishments. Keep them verbatim as they appear.
+4. Projects:
+   - Extract all projects. For each project, extract:
+     - "name": Project name
+     - "description": Description of what was built and its impact
+     - "techStack": Array of individual technologies/tools used in this project (e.g. ["Next.js", "PostgreSQL", "Docker"])
+     - "link": Project URL if present
+5. Education:
+   - Extract university/degree/field and dates (e.g. "Nov 2022 – Dec 2025").
+     - "institution": Name of the university or school (e.g. "Stamford International University")
+     - "degree": Degree type (e.g. "B.Sc.")
+     - "field": Field of study (e.g. "Information Technology")
+     - "dates": Duration or graduation date (e.g. "Nov 2022 – Dec 2025")
+6. Role Targeting:
+   - "role" (root-level field) is REQUIRED. Infer the target job title (e.g. "Software Engineer", "Frontend Developer"). Never return empty string.
+7. General Rules:
+   - Extract ONLY what's in the text. Don't fabricate.
+   - If a field isn't present, use empty string or empty array.
+   - Skills should be individual technologies/tools (e.g. "React", not "Frontend Development").
+   - Return VALID JSON matching the provided schema.`,
       prompt: text.slice(0, 20000), // Cap at 20K chars
       schema: ParseResumeSchema,
       temperature: 0.2,
