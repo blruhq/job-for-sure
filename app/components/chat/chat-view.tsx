@@ -192,8 +192,11 @@ export function ChatView() {
       setActiveResumeId(resume.id)
 
       // Inject upload card as a chat message — it stays frozen at this position.
-      // New chat messages will naturally appear below it.
+      // Follow with an assistant ack so the last message isn't 'user' (avoids infinite "Processing..." spinner).
       const uploadText = `📎 Resume uploaded: ${resume.persona || 'Unknown'}${resume.role ? ` — ${resume.role}` : ''}`
+      const ackText = resume.role
+        ? `Great! I've parsed your resume. I can see you're a **${resume.role}**. I found ${resume.skills.length} skills in your profile. Ask me anything — I have your full resume context.`
+        : `Great! I've parsed your resume. Ask me anything — I have your full resume context.`
       setMessages(prev => [...prev, {
         id: `upload-${Date.now()}`,
         role: 'user',
@@ -201,6 +204,11 @@ export function ChatView() {
           { type: 'data-upload', data: { resumeId: resume.id } },
           { type: 'text', text: uploadText },
         ],
+        createdAt: new Date(),
+      } as any, {
+        id: `upload-ack-${Date.now()}`,
+        role: 'assistant',
+        parts: [{ type: 'text', text: ackText }],
         createdAt: new Date(),
       } as any])
 
@@ -235,8 +243,11 @@ export function ChatView() {
       addResume(resume)
       setActiveResumeId(resume.id)
 
-      // Inject upload card as a chat message
+      // Inject upload card as a chat message + assistant ack (avoids infinite "Processing..." spinner)
       const uploadText = `📎 Resume created: ${resume.persona || 'Unknown'}${resume.role ? ` — ${resume.role}` : ''}`
+      const ackText = resume.role
+        ? `Great! I've created your resume profile. You're targeting **${resume.role}** roles. Ask me anything — I have your full resume context.`
+        : `Great! I've created your resume profile. Ask me anything — I have your full resume context.`
       setMessages(prev => [...prev, {
         id: `upload-${Date.now()}`,
         role: 'user',
@@ -244,6 +255,11 @@ export function ChatView() {
           { type: 'data-upload', data: { resumeId: resume.id } },
           { type: 'text', text: uploadText },
         ],
+        createdAt: new Date(),
+      } as any, {
+        id: `upload-ack-${Date.now()}`,
+        role: 'assistant',
+        parts: [{ type: 'text', text: ackText }],
         createdAt: new Date(),
       } as any])
 
