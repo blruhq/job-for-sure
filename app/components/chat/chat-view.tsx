@@ -1,9 +1,11 @@
 'use client'
 
-import { useRef, useState, useEffect } from 'react'
+import { useRef, useState, useEffect, useCallback, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import { useChat } from '@ai-sdk/react'
 import { AgentChat } from '@/components/agent-elements/agent-chat'
+import { InputBar } from '@/components/agent-elements/input-bar'
+import type { InputBarProps } from '@/components/agent-elements/input-bar'
 import { useAppStore } from '~/lib/store'
 import { createResume } from '~/lib/company-data'
 import { notify } from '~/lib/toast'
@@ -11,7 +13,7 @@ import { BuildWizard, type WizardData } from '~/components/chat/build-wizard'
 import { PasteJDModal } from '~/components/chat/paste-jd-modal'
 import { SkeletonChatMessage, SkeletonCard } from '~/components/ui/skeleton'
 import { extractPdfText } from '~/lib/pdf-parse'
-import { Upload, FileText, ClipboardList, Loader2 } from 'lucide-react'
+import { Upload, FileText, ClipboardList, Loader2, Paperclip } from 'lucide-react'
 import { JobPreview } from '~/components/chat/job-preview'
 
 export function ChatView() {
@@ -185,6 +187,68 @@ export function ChatView() {
     })
   }
 
+  // ── PILL BAR — persistent actions above input when chat has messages ──
+  // Use a ref so the custom InputBar component stays stable (no remount)
+  const showPillBar = messages.length > 0
+  const showPillBarRef = useRef(false)
+  showPillBarRef.current = showPillBar
+
+  // Stable custom InputBar — never recreates, so InputBar inside never remounts
+  const CustomInputBar = useCallback(function CustomInputBar(props: InputBarProps) {
+    // Destructure onAttach to prevent it from reaching InputBar (hides the + button)
+    const { onAttach, ...inputBarProps } = props
+
+    return (
+      <div>
+        {/* Action pills — visible when chat has messages */}
+        {showPillBarRef.current && (
+          <div className="px-3">
+            <div className="mx-auto max-w-an">
+              <div className="flex items-center gap-1.5 pb-1.5">
+                <button
+                  onClick={() => fileRef.current?.click()}
+                  className="inline-flex cursor-pointer items-center gap-1 rounded-md border border-border bg-card px-2 py-1 text-[11px] font-medium text-foreground transition-all hover:border-primary/30 hover:bg-accent-soft"
+                >
+                  <Upload size={11} />
+                  Upload Resume
+                </button>
+                <button
+                  onClick={() => setWizardOpen(true)}
+                  className="inline-flex cursor-pointer items-center gap-1 rounded-md border border-border bg-card px-2 py-1 text-[11px] font-medium text-foreground transition-all hover:border-primary/30 hover:bg-accent-soft"
+                >
+                  <FileText size={11} />
+                  Build Template
+                </button>
+                <button
+                  onClick={() => setPasteOpen(true)}
+                  className="inline-flex cursor-pointer items-center gap-1 rounded-md border border-border bg-card px-2 py-1 text-[11px] font-medium text-foreground transition-all hover:border-primary/30 hover:bg-accent-soft"
+                >
+                  <ClipboardList size={11} />
+                  Paste Job
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        <InputBar
+          {...inputBarProps}
+          leftActions={
+            <button
+              onClick={() => fileRef.current?.click()}
+              className="size-7 rounded-full inline-flex items-center justify-center hover:bg-muted transition-colors cursor-pointer"
+              aria-label="Attach file"
+            >
+              <Paperclip size={14} className="text-neutral-400 dark:text-neutral-600" />
+            </button>
+          }
+        />
+      </div>
+    )
+  }, [])
+
+  const slots = useMemo(() => ({ InputBar: CustomInputBar }), [])
+
   // ── ENTRY CARDS (shown above AgentChat when no messages) ──
   const showEntryCards = messages.length === 0 && !processing
 
@@ -312,9 +376,7 @@ export function ChatView() {
           status={status}
           onSend={handleSend}
           onStop={stop}
-          attachments={{
-            onAttach: () => fileRef.current?.click(),
-          }}
+          slots={slots}
           suggestions={[
             { id: 'upload', label: '📎 Upload resume', value: 'I want to upload my resume' },
             { id: 'find-jobs', label: 'Find matching jobs', value: 'Find matching jobs for my resume' },
