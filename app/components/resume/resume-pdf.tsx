@@ -66,9 +66,6 @@ const styles = StyleSheet.create({
   skill: {
     fontSize: 9,
     padding: '2 6',
-    borderWidth: 1,
-    borderColor: '#E6E5DF',
-    borderRadius: 2,
   },
   experienceBlock: {
     marginBottom: 10,
