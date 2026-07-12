@@ -23,12 +23,12 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 700,
     color: COLORS.ink,
-    marginBottom: 4,
+    marginBottom: 6,
   },
   role: {
     fontSize: 11,
     color: COLORS.primary,
-    marginBottom: 2,
+    marginBottom: 4,
   },
   contact: {
     fontSize: 8,

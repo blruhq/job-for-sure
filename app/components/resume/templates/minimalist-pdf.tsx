@@ -20,8 +20,13 @@ const styles = StyleSheet.create({
   name: {
     fontSize: 20,
     fontWeight: 700,
-    marginBottom: 2,
+    marginBottom: 4,
     color: COLORS.ink,
+  },
+  role: {
+    fontSize: 11,
+    color: COLORS.primary,
+    marginBottom: 4,
   },
   contact: {
     fontSize: 9,
@@ -107,6 +112,7 @@ export function MinimalistPDF({ resume }: { resume: Resume }) {
         {/* Name & Contact */}
         <View style={styles.header}>
           <Text style={styles.name}>{resume.persona || 'Your Name'}</Text>
+          {resume.role && <Text style={styles.role}>{resume.role}</Text>}
           <Text style={styles.contact}>
             {[resume.email, resume.phone, resume.location, resume.github].filter(Boolean).join('  ·  ')}
           </Text>

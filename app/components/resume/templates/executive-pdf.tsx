@@ -20,12 +20,12 @@ const styles = StyleSheet.create({
     fontSize: 22,
     fontWeight: 700,
     color: COLORS.white,
-    marginBottom: 4,
+    marginBottom: 6,
   },
   headerRole: {
     fontSize: 11,
     color: COLORS.primary,
-    marginBottom: 2,
+    marginBottom: 4,
   },
   headerContact: {
     fontSize: 8,
