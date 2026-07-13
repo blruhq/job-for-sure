@@ -160,4 +160,32 @@ describe('filterByQuery token-based location matching', () => {
     expect(ids).not.toContain('2')
     expect(ids).not.toContain('4')
   })
+
+  it('handles remote job geographical restriction filtering correctly', () => {
+    const remoteJobs: JobResult[] = [
+      makeJob({ id: 'r1', title: 'React Developer', location: 'Remote - USA', locationType: 'remote' }),
+      makeJob({ id: 'r2', title: 'React Developer', location: 'Remote - Canada', locationType: 'remote' }),
+      makeJob({ id: 'r3', title: 'React Developer', location: 'Remote - UK', locationType: 'remote' }),
+      makeJob({ id: 'r4', title: 'React Developer', location: 'Remote - APAC', locationType: 'remote' }),
+      makeJob({ id: 'r5', title: 'React Developer', location: 'Remote - Global', locationType: 'remote' }),
+      makeJob({ id: 'r6', title: 'React Developer', location: 'Remote - Europe', locationType: 'remote' }),
+      makeJob({ id: 'r7', title: 'React Developer', location: 'Remote - Thailand', locationType: 'remote' }),
+      makeJob({ id: 'r8', title: 'React Developer', location: 'Remote u.s.a.', locationType: 'remote' }),
+    ]
+
+    const results = filterByQuery(remoteJobs, 'React', 'Bangkok, Thailand')
+    const ids = results.map(r => r.id)
+    
+    // Should keep r4 (APAC), r5 (Global), and r7 (Thailand)
+    expect(ids).toContain('r4')
+    expect(ids).toContain('r5')
+    expect(ids).toContain('r7')
+    
+    // Should discard r1 (USA), r2 (Canada), r3 (UK), r6 (Europe), r8 (u.s.a.)
+    expect(ids).not.toContain('r1')
+    expect(ids).not.toContain('r2')
+    expect(ids).not.toContain('r3')
+    expect(ids).not.toContain('r6')
+    expect(ids).not.toContain('r8')
+  })
 })

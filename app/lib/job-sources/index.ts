@@ -279,15 +279,37 @@ export function filterByQuery(jobs: JobResult[], query: string, location?: strin
     }
 
     if (locationLower && locationLower !== 'remote' && locationLower !== 'anywhere') {
-      const jobLoc = job.location.toLowerCase()
-      if (job.locationType !== 'remote') {
-        const locationTokens = locationLower
-          .split(/[\s,]+/)
-          .map((t) => t.trim())
-          .filter((t) => t.length > 1)
+      const jobLoc = job.location.toLowerCase().replace(/\./g, '')
+      const locationTokens = locationLower
+        .split(/[\s,]+/)
+        .map((t) => t.trim())
+        .filter((t) => t.length > 1)
 
+      if (job.locationType !== 'remote') {
         const matchesLocation = locationTokens.some((token) => jobLoc.includes(token))
         if (!matchesLocation) return false
+      } else {
+        // 1. Direct match (e.g. user location token matches job location exactly)
+        const directMatch = locationTokens.some((token) => jobLoc.includes(token))
+        if (!directMatch) {
+          // 2. APAC / Asia region matching for users in Thailand
+          const isUserInThailand = locationTokens.some(t => t === 'thailand' || t === 'bangkok')
+          const isApacJob = jobLoc.includes('apac') || jobLoc.includes('asia') || jobLoc.includes('global') || jobLoc.includes('worldwide') || jobLoc.includes('anywhere')
+          
+          if (!(isUserInThailand && isApacJob)) {
+            // 3. Check for restricted regions that do not match the user
+            const restrictedKeywords = [
+              'us', 'usa', 'united states', 'canada', 'europe', 'uk', 'united kingdom', 
+              'germany', 'france', 'london', 'latam', 'americas', 'emea', 'north america', 'south america'
+            ]
+            const isRestricted = restrictedKeywords.some((region) => {
+              const regex = new RegExp(`\\b${region}\\b`, 'i')
+              return regex.test(jobLoc)
+            })
+
+            if (isRestricted) return false
+          }
+        }
       }
     }
 
