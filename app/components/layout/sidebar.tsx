@@ -26,6 +26,9 @@ const NAV_HOME: readonly NavItem[] = [
 const NAV_TOOLS: readonly NavItem[] = [
   { href: '/ats', labelKey: 'atsOptimizer', icon: CheckSquare },
   { href: '/cover-letter', labelKey: 'coverLetter', icon: Mail },
+]
+
+const NAV_PRACTICE: readonly NavItem[] = [
   { href: '/interview', labelKey: 'interviewPrep', icon: Brain },
 ]
 
@@ -259,6 +262,16 @@ export function Sidebar() {
           items={NAV_JOBS}
           collapsed={c}
           label={t('jobs')}
+          pathname={pathname}
+          t={t}
+          totalPipeline={totalPipeline}
+        />
+
+        {/* ── PRACTICE ── */}
+        <NavSection
+          items={NAV_PRACTICE}
+          collapsed={c}
+          label={t('practice')}
           pathname={pathname}
           t={t}
           totalPipeline={totalPipeline}
