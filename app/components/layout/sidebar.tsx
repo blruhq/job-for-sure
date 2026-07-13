@@ -7,10 +7,10 @@ import { cn } from '~/lib/utils'
 import { useAppStore } from '~/lib/store'
 import { notify } from '~/lib/toast'
 import { ConfirmDialog } from '~/components/ui/confirm-dialog'
-import { PreviewCard } from '@base-ui/react/preview-card'
 import { Tooltip } from '~/components/ui/tooltip'
 import { useTranslations } from 'next-intl'
 import { authClient } from '~/lib/auth-client'
+import { PreviewCard } from '@base-ui/react/preview-card'
 
 type NavItem = {
   href: string
@@ -61,6 +61,71 @@ export function Sidebar() {
 
   const totalPipeline = applications.bookmark.length + applications.applied.length + applications.interviewing.length + applications.offers.length
 
+  // ── Reusable nav item renderer ──
+  // KEY: text spans stay MOUNTED. When collapsed, they fade via opacity
+  // and get clipped by the aside's overflow-hidden. No DOM unmount = no jitter.
+  // Icon centering: animate padding-left from 10px → 20px (synced with 200ms width transition).
+  function renderNavItems(items: readonly NavItem[]) {
+    return items.map((item) => {
+      const isActive = pathname === item.href
+      const Icon = item.icon
+      const label = t(item.labelKey)
+      const hasBadge = 'badge' in item && item.badge
+      return (
+        <Tooltip key={item.href} label={label} disabled={!c}>
+          <Link
+            href={item.href}
+            className={cn(
+              'flex items-center gap-2 rounded-sm text-xs font-medium transition-[padding,background-color,color] duration-200 ease-[cubic-bezier(0.2,0,0,1)]',
+              isActive
+                ? 'bg-sidebar-active text-foreground font-semibold'
+                : 'text-muted-foreground hover:bg-sidebar-hover hover:text-foreground',
+              // Collapsed: pad to center icon in 56px. Expanded: normal 10px padding.
+              c ? 'pl-[20px] pr-[21px] py-1.5' : 'px-2.5 py-1.5',
+            )}
+          >
+            <span className="relative shrink-0">
+              <Icon size={15} className={cn(isActive ? 'text-primary' : 'opacity-70')} />
+              {/* Activity dot badge — only when collapsed AND has pipeline items */}
+              {c && hasBadge && totalPipeline > 0 && (
+                <span className="absolute -top-0.5 -right-0.5 h-1.5 w-1.5 rounded-full bg-destructive ring-1 ring-sidebar" />
+              )}
+            </span>
+            {/* Label: stays mounted, fades when collapsed. whitespace-nowrap + clipped by aside overflow-hidden */}
+            <span className={cn('whitespace-nowrap transition-opacity duration-150', c ? 'opacity-0' : 'opacity-100')}>
+              {label}
+            </span>
+            {/* Badge count: stays mounted, fades when collapsed */}
+            {hasBadge && totalPipeline > 0 && (
+              <span
+                className={cn(
+                  'ml-auto whitespace-nowrap rounded-xs bg-accent-soft px-1.5 py-px font-mono text-[10px] font-semibold text-primary transition-opacity duration-150',
+                  c ? 'opacity-0' : 'opacity-100',
+                )}
+              >
+                {totalPipeline}
+              </span>
+            )}
+          </Link>
+        </Tooltip>
+      )
+    })
+  }
+
+  // ── Section label renderer — collapses height when sidebar is collapsed ──
+  function renderSectionLabel(labelKey: string) {
+    return (
+      <div
+        className={cn(
+          'label-mono px-2.5 overflow-hidden transition-[opacity,max-height,padding] duration-150',
+          c ? 'opacity-0 max-h-0 pt-0 pb-0' : 'opacity-100 max-h-8 pt-3 pb-1',
+        )}
+      >
+        {t(labelKey)}
+      </div>
+    )
+  }
+
   return (
     <aside
       className={cn(
@@ -68,111 +133,38 @@ export function Sidebar() {
         c ? 'w-[var(--sidebar-collapsed-width)]' : 'w-[var(--sidebar-width)]',
       )}
     >
-      {/* ── WORKSPACE ── */}
+      {/* ══ WORKSPACE ══ */}
       <div className="flex flex-col gap-0.5 p-1">
-        <div className={cn('label-mono px-2.5 pt-3 pb-1', c && 'opacity-0')}>
-          {t('navigate')}
-        </div>
-        {NAV_WORKSPACE.map((item) => {
-          const isActive = pathname === item.href
-          const Icon = item.icon
-          const label = t(item.labelKey)
-          return (
-            <Tooltip key={item.href} label={label} disabled={!c}>
-              <Link
-                href={item.href}
-                className={cn(
-                  'flex items-center gap-2 rounded-sm px-2.5 py-1.5 text-xs font-medium transition-colors',
-                  isActive
-                    ? 'bg-sidebar-active text-foreground font-semibold'
-                    : 'text-muted-foreground hover:bg-sidebar-hover hover:text-foreground',
-                  c && 'justify-center px-0 mx-2',
-                )}
-              >
-                <span className="relative shrink-0">
-                  <Icon size={15} className={cn(isActive ? 'text-primary' : 'opacity-70')} />
-                  {c && 'badge' in item && item.badge && totalPipeline > 0 && (
-                    <span className="absolute -top-0.5 -right-0.5 h-1.5 w-1.5 rounded-full bg-red-500 ring-1 ring-sidebar" />
-                  )}
-                </span>
-                <span className={cn('transition-opacity duration-150', c && 'opacity-0')}>{label}</span>
-                {'badge' in item && item.badge && totalPipeline > 0 && (
-                  <span className={cn('ml-auto rounded-xs bg-accent-soft px-1.5 py-px font-mono text-[10px] font-semibold text-primary transition-opacity duration-150', c && 'opacity-0')}>
-                    {totalPipeline}
-                  </span>
-                )}
-              </Link>
-            </Tooltip>
-          )
-        })}
+        {renderSectionLabel('navigate')}
+        {renderNavItems(NAV_WORKSPACE)}
       </div>
 
-      {/* ── TAILOR & APPLY ── */}
+      {/* ══ TAILOR & APPLY ══ */}
       <div className="flex flex-col gap-0.5 p-1">
-        <div className={cn('label-mono px-2.5 pt-3 pb-1', c && 'opacity-0')}>
-          {t('tailorApply')}
-        </div>
-        {NAV_TAILOR.map((item) => {
-          const isActive = pathname === item.href
-          const Icon = item.icon
-          const label = t(item.labelKey)
-          return (
-            <Tooltip key={item.href} label={label} disabled={!c}>
-              <Link
-                href={item.href}
-                className={cn(
-                  'flex items-center gap-2 rounded-sm px-2.5 py-1.5 text-xs font-medium transition-colors',
-                  isActive
-                    ? 'bg-sidebar-active text-foreground font-semibold'
-                    : 'text-muted-foreground hover:bg-sidebar-hover hover:text-foreground',
-                  c && 'justify-center px-0 mx-2',
-                )}
-              >
-                <Icon size={15} className={cn('shrink-0', isActive ? 'text-primary' : 'opacity-70')} />
-                <span className={cn('transition-opacity duration-150', c && 'opacity-0')}>{label}</span>
-              </Link>
-            </Tooltip>
-          )
-        })}
+        {renderSectionLabel('tailorApply')}
+        {renderNavItems(NAV_TAILOR)}
       </div>
 
-      {/* ── PREPARE ── */}
+      {/* ══ PREPARE ══ */}
       <div className="flex flex-col gap-0.5 p-1">
-        <div className={cn('label-mono px-2.5 pt-3 pb-1', c && 'opacity-0')}>
-          {t('prepare')}
-        </div>
-        {NAV_PREPARE.map((item) => {
-          const isActive = pathname === item.href
-          const Icon = item.icon
-          const label = t(item.labelKey)
-          return (
-            <Tooltip key={item.href} label={label} disabled={!c}>
-              <Link
-                href={item.href}
-                className={cn(
-                  'flex items-center gap-2 rounded-sm px-2.5 py-1.5 text-xs font-medium transition-colors',
-                  isActive
-                    ? 'bg-sidebar-active text-foreground font-semibold'
-                    : 'text-muted-foreground hover:bg-sidebar-hover hover:text-foreground',
-                  c && 'justify-center px-0 mx-2',
-                )}
-              >
-                <Icon size={15} className={cn('shrink-0', isActive ? 'text-primary' : 'opacity-70')} />
-                <span className={cn('transition-opacity duration-150', c && 'opacity-0')}>{label}</span>
-              </Link>
-            </Tooltip>
-          )
-        })}
+        {renderSectionLabel('prepare')}
+        {renderNavItems(NAV_PREPARE)}
       </div>
 
-      {/* ── RESUMES ── */}
+      {/* ══ RESUMES ══ */}
       {c ? (
-        /* COLLAPSED: single icon + hover flyout */
-        <div className="flex flex-col items-center p-1 pt-3">
+        /* COLLAPSED: single Documents icon → hover opens flyout (PreviewCard) */
+        <div className="flex flex-col items-center p-1">
           <PreviewCard.Root>
-            <PreviewCard.Trigger className="flex h-7 w-7 items-center justify-center rounded-sm text-muted-foreground hover:bg-sidebar-hover hover:text-foreground cursor-pointer">
-              <FileText size={15} />
-            </PreviewCard.Trigger>
+            <PreviewCard.Trigger
+              delay={300}
+              closeDelay={200}
+              render={
+                <button className="flex h-7 w-7 items-center justify-center rounded-sm text-muted-foreground transition-colors hover:bg-sidebar-hover hover:text-foreground cursor-pointer focus:outline-none">
+                  <FileText size={15} />
+                </button>
+              }
+            />
             <PreviewCard.Portal>
               <PreviewCard.Positioner side="right" align="start" sideOffset={8} className="z-[100]">
                 <PreviewCard.Popup className="min-w-[200px] rounded-md border border-border bg-popover p-1 shadow-lg">
@@ -189,17 +181,17 @@ export function Sidebar() {
                       }}
                       className={cn(
                         'flex w-full items-center gap-2 rounded-sm px-2 py-1.5 text-xs transition-colors',
-                        r.id === activeResumeId ? 'bg-sidebar-active font-semibold text-foreground' : 'text-muted-foreground hover:bg-sidebar-hover hover:text-foreground',
+                        r.id === activeResumeId ? 'bg-sidebar-active font-semibold' : 'hover:bg-sidebar-hover',
                       )}
                     >
-                      <span className={cn('h-2 w-2 rounded-full border-2 shrink-0', r.id === activeResumeId ? 'border-primary bg-primary' : 'border-muted-foreground')} />
+                      <span className={cn('h-2 w-2 shrink-0 rounded-full border-2', r.id === activeResumeId ? 'border-primary bg-primary' : 'border-muted-foreground')} />
                       <span className="flex-1 truncate text-left">{r.name}</span>
-                      <span className="font-mono text-[10px] font-semibold text-success shrink-0">{r.score}%</span>
+                      <span className="font-mono text-[10px] font-semibold text-success">{r.score}%</span>
                     </button>
                   ))}
                   <button
                     onClick={() => { router.push('/chat'); notify({ message: 'Upload a resume in chat to add one!', type: 'info' }) }}
-                    className="flex w-full items-center gap-1.5 rounded-sm px-2 py-1.5 text-xs text-primary hover:bg-accent-soft cursor-pointer"
+                    className="flex w-full items-center gap-1.5 rounded-sm px-2 py-1.5 text-xs text-primary hover:bg-accent-soft"
                   >
                     <Plus size={13} strokeWidth={2.5} />
                     {t('newResume')}
@@ -210,11 +202,12 @@ export function Sidebar() {
           </PreviewCard.Root>
         </div>
       ) : (
-        /* EXPANDED: existing resume list */
+        /* EXPANDED: full resume list */
         <div className="flex flex-col gap-0.5 p-1">
-          <div className={cn('label-mono px-2.5 pt-3 pb-1', c && 'opacity-0')}>
-            {t('resumes')}
-          </div>
+          <div className="label-mono px-2.5 pt-3 pb-1">{t('resumes')}</div>
+          {resumes.length === 0 && (
+            <div className="px-2 py-3 text-xs text-muted-foreground text-center">{t('noResumes')}</div>
+          )}
           {resumes.map((r) => (
             <div
               key={r.id}
@@ -231,9 +224,7 @@ export function Sidebar() {
                   setActiveResumeId(r.id)
                   router.push(`/resume/${r.id}`)
                 }}
-                className={cn(
-                  'flex cursor-pointer items-center gap-2 text-xs flex-1 min-w-0',
-                )}
+                className="flex cursor-pointer items-center gap-2 text-xs flex-1 min-w-0"
               >
                 <span
                   className={cn(
@@ -256,12 +247,9 @@ export function Sidebar() {
               </button>
             </div>
           ))}
-          {/* Add resume */}
           <button
             onClick={() => { router.push('/chat'); notify({ message: 'Upload a resume in chat to add one!', type: 'info' }); }}
-            className={cn(
-              'flex items-center gap-1.5 rounded-sm px-2 py-1.5 text-xs text-primary transition-colors hover:bg-accent-soft',
-            )}
+            className="flex items-center gap-1.5 rounded-sm px-2 py-1.5 text-xs text-primary transition-colors hover:bg-accent-soft"
           >
             <Plus size={13} className="shrink-0" strokeWidth={2.5} />
             <span>{t('newResume')}</span>
@@ -269,24 +257,31 @@ export function Sidebar() {
         </div>
       )}
 
-      {/* ── ACCOUNT ── */}
+      {/* ══ ACCOUNT ══ */}
       <div className="flex flex-col gap-0.5 p-1">
-        <div className={cn('label-mono px-2.5 pt-3 pb-1', c && 'opacity-0')}>
+        <div
+          className={cn(
+            'label-mono px-2.5 overflow-hidden transition-[opacity,max-height,padding] duration-150',
+            c ? 'opacity-0 max-h-0 pt-0 pb-0' : 'opacity-100 max-h-8 pt-3 pb-1',
+          )}
+        >
           Account
         </div>
         <Tooltip label={t('settings')} disabled={!c}>
           <Link
             href="/settings"
             className={cn(
-              'flex items-center gap-2 rounded-sm px-2.5 py-1.5 text-xs font-medium transition-colors',
+              'flex items-center gap-2 rounded-sm text-xs font-medium transition-[padding,background-color,color] duration-200 ease-[cubic-bezier(0.2,0,0,1)]',
               pathname === '/settings'
                 ? 'bg-sidebar-active text-foreground font-semibold'
                 : 'text-muted-foreground hover:bg-sidebar-hover hover:text-foreground',
-              c && 'justify-center px-0 mx-2',
+              c ? 'pl-[20px] pr-[21px] py-1.5' : 'px-2.5 py-1.5',
             )}
           >
             <Settings size={15} className="shrink-0 opacity-70" />
-            <span className={cn('transition-opacity duration-150', c && 'opacity-0')}>{t('settings')}</span>
+            <span className={cn('whitespace-nowrap transition-opacity duration-150', c ? 'opacity-0' : 'opacity-100')}>
+              {t('settings')}
+            </span>
           </Link>
         </Tooltip>
         {isAdmin && (
@@ -294,15 +289,17 @@ export function Sidebar() {
             <Link
               href="/admin"
               className={cn(
-                'flex items-center gap-2 rounded-sm px-2.5 py-1.5 text-xs font-medium transition-colors',
+                'flex items-center gap-2 rounded-sm text-xs font-medium transition-[padding,background-color,color] duration-200 ease-[cubic-bezier(0.2,0,0,1)]',
                 pathname === '/admin'
                   ? 'bg-sidebar-active text-foreground font-semibold'
                   : 'text-muted-foreground hover:bg-sidebar-hover hover:text-foreground',
-                c && 'justify-center px-0 mx-2',
+                c ? 'pl-[20px] pr-[21px] py-1.5' : 'px-2.5 py-1.5',
               )}
             >
               <Shield size={15} className="shrink-0 opacity-70" />
-              <span className={cn('transition-opacity duration-150', c && 'opacity-0')}>Admin</span>
+              <span className={cn('whitespace-nowrap transition-opacity duration-150', c ? 'opacity-0' : 'opacity-100')}>
+                Admin
+              </span>
             </Link>
           </Tooltip>
         )}
