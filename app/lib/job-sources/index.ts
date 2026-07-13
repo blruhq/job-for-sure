@@ -263,7 +263,7 @@ function deduplicateJobs(jobs: JobResult[]): JobResult[] {
   return Array.from(seen.values())
 }
 
-function filterByQuery(jobs: JobResult[], query: string, location?: string): JobResult[] {
+export function filterByQuery(jobs: JobResult[], query: string, location?: string): JobResult[] {
   const queryTerms = query
     .toLowerCase()
     .split(/\s+/)
@@ -280,8 +280,14 @@ function filterByQuery(jobs: JobResult[], query: string, location?: string): Job
 
     if (locationLower && locationLower !== 'remote' && locationLower !== 'anywhere') {
       const jobLoc = job.location.toLowerCase()
-      if (job.locationType !== 'remote' && !jobLoc.includes(locationLower)) {
-        return false
+      if (job.locationType !== 'remote') {
+        const locationTokens = locationLower
+          .split(/[\s,]+/)
+          .map((t) => t.trim())
+          .filter((t) => t.length > 1)
+
+        const matchesLocation = locationTokens.some((token) => jobLoc.includes(token))
+        if (!matchesLocation) return false
       }
     }
 

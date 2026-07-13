@@ -107,7 +107,9 @@ export const POST = withAuth(async (req, { user }) => {
 
 Guidelines:
 1. Contact Information:
-   - Identify the candidate's name, email, location (city, country), phone, and GitHub/LinkedIn URLs. These are usually at the very top of the text, sometimes on the same line. Do not skip them. If the location (city, country) is not explicitly present in the contact header, infer their city/country of residence based on their most recent work experience or university locations mentioned in the resume.
+   - Identify the candidate's name, email, location (city, country), phone, and GitHub/LinkedIn URLs. These are usually at the very top of the text, sometimes on the same line. Do not skip them.
+   - For Name: Look at the very top of the resume. If the candidate's name is inline/mixed with email or social URLs (e.g., "longpantorn@gmail.com Pantorn Chuavallee linkedin.com/pantornChuavallee"), isolate the name ("Pantorn Chuavallee") from the rest.
+   - For Location: If not explicitly found in a contact header, scan the education sections or recent job locations to extract their city/country (e.g., "Bangkok, Thailand" or "Thailand, Bangkok").
 2. Summary:
    - Extract the summary/profile paragraph. Do not omit it.
 3. Experience:
@@ -129,7 +131,11 @@ Guidelines:
      - "field": Field of study (e.g. "Information Technology")
      - "dates": Duration or graduation date (e.g. "Nov 2022 – Dec 2025")
  6. Role / Headline:
-    - "role": Extract the person's professional headline or target job title if it appears explicitly (e.g., a title under their name, or their most recent job title). If the resume does NOT have an explicit headline or target role, infer their target professional role (e.g., "Software Engineer", "Product Manager", "Product Designer") based on their skills, projects, and work experience. Do not leave it blank.
+    - "role": Infer the candidate's target job title based on their skills, projects, and work experience using career progression logic:
+      - If their most recent job title is an internship/student role (e.g., "Software Engineer Intern", "Marketing Intern"), or if total experience is under 1 year, set target role to "Junior [Role]" (e.g., "Junior Software Engineer", "Junior Marketing Specialist").
+      - If their most recent job contains "Junior" or if total experience is 1-2 years, set target role to "Junior [Role]".
+      - Otherwise, set target role to the standard professional title matching their experience (e.g., "Software Engineer", "Product Manager", "Mechanical Engineer").
+      - DO NOT just copy "Intern" or "Internship" as the target role unless it is the only information available.
 7. Custom / Additional Sections:
    - If the resume contains other sections (e.g. "Open Source Contributions", "Extracurriculars", "Awards", "Publications", "Volunteering") that do not map to the fields above, extract them into "customSections".
    - "title": The name of the section (e.g. "Open Source Contributions").

@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { scoreJob, rankJobs, inferExperienceLevel } from '~/lib/job-sources/scoring'
+import { filterByQuery } from '~/lib/job-sources'
 import type { JobResult } from '~/lib/job-sources/types'
 
 // Helper to create a minimal job
@@ -127,5 +128,36 @@ describe('inferExperienceLevel', () => {
     expect(inferExperienceLevel('Software Engineer')).toBe('mid')
     expect(inferExperienceLevel('Product Manager')).toBe('mid')
     expect(inferExperienceLevel('Designer')).toBe('mid')
+  })
+})
+
+describe('filterByQuery token-based location matching', () => {
+  const jobs: JobResult[] = [
+    makeJob({ id: '1', title: 'React Developer', location: 'Bangkok', locationType: 'onsite' }),
+    makeJob({ id: '2', title: 'React Developer', location: 'Thailand', locationType: 'onsite' }),
+    makeJob({ id: '3', title: 'React Developer', location: 'Bangkok, Thailand', locationType: 'onsite' }),
+    makeJob({ id: '4', title: 'React Developer', location: 'Singapore', locationType: 'onsite' }),
+    makeJob({ id: '5', title: 'React Developer', location: 'Remote', locationType: 'remote' }),
+  ]
+
+  it('matches Bangkok and Thailand bidirectionally when location is Bangkok, Thailand', () => {
+    const results = filterByQuery(jobs, 'React', 'Bangkok, Thailand')
+    const ids = results.map(r => r.id)
+    // Should keep Bangkok (id 1), Thailand (id 2), Bangkok, Thailand (id 3), and Remote (id 5)
+    expect(ids).toContain('1')
+    expect(ids).toContain('2')
+    expect(ids).toContain('3')
+    expect(ids).toContain('5')
+    // Should discard Singapore (id 4)
+    expect(ids).not.toContain('4')
+  })
+
+  it('matches correctly when location has single token Bangkok', () => {
+    const results = filterByQuery(jobs, 'React', 'Bangkok')
+    const ids = results.map(r => r.id)
+    expect(ids).toContain('1')
+    expect(ids).toContain('3')
+    expect(ids).not.toContain('2')
+    expect(ids).not.toContain('4')
   })
 })
