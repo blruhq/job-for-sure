@@ -64,7 +64,8 @@ export function Sidebar() {
   // ── Reusable nav item renderer ──
   // KEY: text spans stay MOUNTED. When collapsed, they fade via opacity
   // and get clipped by the aside's overflow-hidden. No DOM unmount = no jitter.
-  // Icon centering: animate padding-left from 10px → 20px (synced with 200ms width transition).
+  // Icon centering: animate padding-left from 10px → 16px (synced with 200ms width transition).
+  // 16px accounts for parent div p-1 (4px): 4 + 16 + 7.5 (half icon) = 27.5px ≈ 28px center.
   function renderNavItems(items: readonly NavItem[]) {
     return items.map((item) => {
       const isActive = pathname === item.href
@@ -81,7 +82,7 @@ export function Sidebar() {
                 ? 'bg-sidebar-active text-foreground font-semibold'
                 : 'text-muted-foreground hover:bg-sidebar-hover hover:text-foreground',
               // Collapsed: pad to center icon in 56px. Expanded: normal 10px padding.
-              c ? 'pl-[20px] pr-[21px] py-1.5' : 'px-2.5 py-1.5',
+              c ? 'pl-[16px] pr-[17px] py-1.5' : 'px-2.5 py-1.5',
             )}
           >
             <span className="relative shrink-0">
@@ -112,16 +113,30 @@ export function Sidebar() {
     })
   }
 
-  // ── Section label renderer — collapses height when sidebar is collapsed ──
-  function renderSectionLabel(labelKey: string) {
+  // ── Section label renderer — FIXED HEIGHT in both states (no vertical shift)
+  // When expanded: shows text label. When collapsed: shows thin separator line.
+  // First section (showSeparator=false): blank space when collapsed (Option B).
+  function renderSectionLabel(labelKey: string, showSeparator = true) {
     return (
-      <div
-        className={cn(
-          'label-mono px-2.5 overflow-hidden transition-[opacity,max-height,padding] duration-150',
-          c ? 'opacity-0 max-h-0 pt-0 pb-0' : 'opacity-100 max-h-8 pt-3 pb-1',
+      <div className="relative h-[28px] px-2.5 shrink-0">
+        {/* Text label — always mounted, visible when expanded */}
+        <span
+          className={cn(
+            'label-mono absolute inset-0 flex items-center px-2.5 transition-opacity duration-150',
+            c ? 'opacity-0' : 'opacity-100',
+          )}
+        >
+          {t(labelKey)}
+        </span>
+        {/* Separator line — visible when collapsed. Skipped for first section. */}
+        {showSeparator && (
+          <span
+            className={cn(
+              'absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 h-px w-4 bg-sidebar-border transition-opacity duration-150',
+              c ? 'opacity-100' : 'opacity-0',
+            )}
+          />
         )}
-      >
-        {t(labelKey)}
       </div>
     )
   }
@@ -135,7 +150,7 @@ export function Sidebar() {
     >
       {/* ══ WORKSPACE ══ */}
       <div className="flex flex-col gap-0.5 p-1">
-        {renderSectionLabel('navigate')}
+        {renderSectionLabel('navigate', false)}
         {renderNavItems(NAV_WORKSPACE)}
       </div>
 
@@ -259,13 +274,21 @@ export function Sidebar() {
 
       {/* ══ ACCOUNT ══ */}
       <div className="flex flex-col gap-0.5 p-1">
-        <div
-          className={cn(
-            'label-mono px-2.5 overflow-hidden transition-[opacity,max-height,padding] duration-150',
-            c ? 'opacity-0 max-h-0 pt-0 pb-0' : 'opacity-100 max-h-8 pt-3 pb-1',
-          )}
-        >
-          Account
+        <div className="relative h-[28px] px-2.5 shrink-0">
+          <span
+            className={cn(
+              'label-mono absolute inset-0 flex items-center px-2.5 transition-opacity duration-150',
+              c ? 'opacity-0' : 'opacity-100',
+            )}
+          >
+            Account
+          </span>
+          <span
+            className={cn(
+              'absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 h-px w-4 bg-sidebar-border transition-opacity duration-150',
+              c ? 'opacity-100' : 'opacity-0',
+            )}
+          />
         </div>
         <Tooltip label={t('settings')} disabled={!c}>
           <Link
@@ -275,7 +298,7 @@ export function Sidebar() {
               pathname === '/settings'
                 ? 'bg-sidebar-active text-foreground font-semibold'
                 : 'text-muted-foreground hover:bg-sidebar-hover hover:text-foreground',
-              c ? 'pl-[20px] pr-[21px] py-1.5' : 'px-2.5 py-1.5',
+              c ? 'pl-[16px] pr-[17px] py-1.5' : 'px-2.5 py-1.5',
             )}
           >
             <Settings size={15} className="shrink-0 opacity-70" />
@@ -293,7 +316,7 @@ export function Sidebar() {
                 pathname === '/admin'
                   ? 'bg-sidebar-active text-foreground font-semibold'
                   : 'text-muted-foreground hover:bg-sidebar-hover hover:text-foreground',
-                c ? 'pl-[20px] pr-[21px] py-1.5' : 'px-2.5 py-1.5',
+                c ? 'pl-[16px] pr-[17px] py-1.5' : 'px-2.5 py-1.5',
               )}
             >
               <Shield size={15} className="shrink-0 opacity-70" />
