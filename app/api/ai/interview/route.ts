@@ -86,68 +86,6 @@ const InterviewEvaluateSchema = z.object({
   modelAnswer: z.string().catch(''),
 })
 
-// ── Batch evaluation schema (NEW — for end-of-session grading) ──
-
-const BatchEvaluationItemSchema = z.object({
-  questionIndex: z.number().catch(0),
-  score: z
-    .preprocess(
-      (val) => {
-        if (typeof val === 'string') {
-          const parsed = parseFloat(val)
-          if (isNaN(parsed)) return 5
-          return Math.min(10, Math.max(1, parsed))
-        }
-        if (typeof val === 'number') return Math.min(10, Math.max(1, val))
-        return 5
-      },
-      z.number().min(1).max(10),
-    )
-    .catch(5),
-  strengths: z
-    .preprocess(
-      (val) => {
-        if (Array.isArray(val)) return val.map(String)
-        if (typeof val === 'string') return val.split('\n').map((s) => s.trim()).filter(Boolean)
-        if (val == null) return []
-        return [String(val)]
-      },
-      z.array(z.string()),
-    )
-    .catch([]),
-  improvements: z
-    .preprocess(
-      (val) => {
-        if (Array.isArray(val)) return val.map(String)
-        if (typeof val === 'string') return val.split('\n').map((s) => s.trim()).filter(Boolean)
-        if (val == null) return []
-        return [String(val)]
-      },
-      z.array(z.string()),
-    )
-    .catch([]),
-  modelAnswer: z.string().catch(''),
-})
-
-const BatchEvaluationSchema = z.object({
-  evaluations: z.array(BatchEvaluationItemSchema),
-  overallScore: z
-    .preprocess(
-      (val) => {
-        if (typeof val === 'string') {
-          const parsed = parseFloat(val)
-          if (isNaN(parsed)) return 5
-          return Math.min(10, Math.max(1, parsed))
-        }
-        if (typeof val === 'number') return Math.min(10, Math.max(1, val))
-        return 5
-      },
-      z.number().min(1).max(10),
-    )
-    .catch(5),
-  summary: z.string().catch(''),
-})
-
 const QuestionInput = z.object({
   action: z.literal('question'),
   resume: ResumeDataSchema.optional(),

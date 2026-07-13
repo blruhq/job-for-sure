@@ -41,6 +41,7 @@ function NavSection({
   pathname,
   t,
   totalPipeline,
+  showSeparator = true,
 }: {
   items: readonly NavItem[]
   collapsed: boolean
@@ -48,12 +49,18 @@ function NavSection({
   pathname: string
   t: (key: string) => string
   totalPipeline: number
+  showSeparator?: boolean
 }) {
   return (
     <div className="flex flex-col gap-0.5 p-1">
-      <div className={cn('label-mono px-2.5 pt-3 pb-1', collapsed && 'opacity-0')}>
-        {label}
-      </div>
+        <div className="relative h-[28px] px-2.5 shrink-0">
+          <span className={cn('label-mono absolute inset-0 flex items-center px-2.5 transition-opacity duration-150', collapsed ? 'opacity-0' : 'opacity-100')}>
+            {label}
+          </span>
+          {showSeparator && (
+            <span className={cn('absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 h-0.5 w-5 bg-muted-foreground/30 transition-opacity duration-150', collapsed ? 'opacity-100' : 'opacity-0')} />
+          )}
+        </div>
       {items.map((item) => {
         const isActive = pathname === item.href
         const Icon = item.icon
@@ -63,11 +70,11 @@ function NavSection({
             <Link
               href={item.href}
               className={cn(
-                'flex items-center gap-2 rounded-sm px-2.5 py-1.5 text-xs font-medium transition-colors',
+                'flex items-center gap-2 rounded-sm text-xs font-medium transition-[padding,background-color,color] duration-200 ease-[cubic-bezier(0.2,0,0,1)]',
                 isActive
                   ? 'bg-sidebar-active text-foreground font-semibold'
                   : 'text-muted-foreground hover:bg-sidebar-hover hover:text-foreground',
-                collapsed && 'justify-center px-0 mx-2',
+                collapsed ? 'pl-[16px] pr-[17px] py-1.5' : 'px-2.5 py-1.5',
               )}
             >
               <span className="relative shrink-0">
@@ -137,6 +144,7 @@ export function Sidebar() {
           pathname={pathname}
           t={t}
           totalPipeline={totalPipeline}
+          showSeparator={false}
         />
 
         {/* ── MY RESUMES ── */}
@@ -268,18 +276,21 @@ export function Sidebar() {
 
         {/* ── ACCOUNT ── */}
         <div className="flex flex-col gap-0.5 p-1 mt-auto">
-          <div className={cn('label-mono px-2.5 pt-3 pb-1', c && 'opacity-0')}>
-            Account
+          <div className="relative h-[28px] px-2.5 shrink-0">
+            <span className={cn('label-mono absolute inset-0 flex items-center px-2.5 transition-opacity duration-150', c ? 'opacity-0' : 'opacity-100')}>
+              Account
+            </span>
+            <span className={cn('absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 h-0.5 w-5 bg-muted-foreground/30 transition-opacity duration-150', c ? 'opacity-100' : 'opacity-0')} />
           </div>
           <Tooltip label={t('settings')} disabled={!c}>
             <Link
               href="/settings"
               className={cn(
-                'flex items-center gap-2 rounded-sm px-2.5 py-1.5 text-xs font-medium transition-colors',
+                'flex items-center gap-2 rounded-sm text-xs font-medium transition-[padding,background-color,color] duration-200 ease-[cubic-bezier(0.2,0,0,1)]',
                 pathname === '/settings'
                   ? 'bg-sidebar-active text-foreground font-semibold'
                   : 'text-muted-foreground hover:bg-sidebar-hover hover:text-foreground',
-                c && 'justify-center px-0 mx-2',
+                c ? 'pl-[16px] pr-[17px] py-1.5' : 'px-2.5 py-1.5',
               )}
             >
               <Settings size={15} className="shrink-0 opacity-70" />
@@ -291,11 +302,11 @@ export function Sidebar() {
               <Link
                 href="/admin"
                 className={cn(
-                  'flex items-center gap-2 rounded-sm px-2.5 py-1.5 text-xs font-medium transition-colors',
+                  'flex items-center gap-2 rounded-sm text-xs font-medium transition-[padding,background-color,color] duration-200 ease-[cubic-bezier(0.2,0,0,1)]',
                   pathname === '/admin'
                     ? 'bg-sidebar-active text-foreground font-semibold'
                     : 'text-muted-foreground hover:bg-sidebar-hover hover:text-foreground',
-                  c && 'justify-center px-0 mx-2',
+                  c ? 'pl-[16px] pr-[17px] py-1.5' : 'px-2.5 py-1.5',
                 )}
               >
                 <Shield size={15} className="shrink-0 opacity-70" />
