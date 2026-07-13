@@ -10,7 +10,6 @@ import { ConfirmDialog } from '~/components/ui/confirm-dialog'
 import { PreviewCard } from '@base-ui/react/preview-card'
 import { Tooltip } from '~/components/ui/tooltip'
 import { useTranslations } from 'next-intl'
-import { authClient } from '~/lib/auth-client'
 import { UploadModal } from '~/components/layout/upload-modal'
 
 type NavItem = {
@@ -110,12 +109,13 @@ export function Sidebar() {
   useEffect(() => {
     async function checkAdmin() {
       try {
-        const { data: session } = await authClient.getSession()
-        if (session?.user?.email) {
-          setIsAdmin(true)
+        const res = await fetch('/api/auth/is-admin')
+        if (res.ok) {
+          const { isAdmin } = await res.json()
+          setIsAdmin(isAdmin)
         }
       } catch {
-        // not logged in
+        // not admin
       }
     }
     checkAdmin()
