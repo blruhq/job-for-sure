@@ -98,7 +98,7 @@ export const JobDataSchema = z.object({
 export const ChatMessageSchema = z.object({
   id: z.string().max(200).optional(),
   role: z.enum(['user', 'assistant', 'system', 'tool']).catch('user'),
-  content: z.string().max(20000),
+  content: z.string().max(20000).optional().default(''),
   parts: z.array(z.unknown()).optional(),
 }).passthrough()
 
