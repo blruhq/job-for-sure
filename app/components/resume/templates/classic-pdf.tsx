@@ -250,9 +250,30 @@ export function ClassicPDF({ resume }: { resume: Resume }) {
         {resume.customSections && resume.customSections.map((sec, i) => (
           <View key={i} style={styles.section}>
             <Text style={styles.sectionTitle}>{sec.title}</Text>
-            {sec.bullets.map((b, j) => (
-              <Text key={j} style={styles.bullet}>• {b}</Text>
-            ))}
+            {sec.items && sec.items.length > 0 ? (
+              sec.items.map((item, j) => (
+                <View key={j} style={{ marginBottom: 4 }}>
+                  {(item.title || item.subtitle) && (
+                    <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                      <Text style={{ fontSize: 10, fontFamily: 'Lora', fontWeight: 700, color: COLORS.ink }}>
+                        {item.title}{item.subtitle ? ` — ${item.subtitle}` : ''}
+                      </Text>
+                      {item.date ? <Text style={{ fontSize: 9, fontFamily: 'Lora', color: COLORS.muted }}>{item.date}</Text> : null}
+                    </View>
+                  )}
+                  {item.description ? (
+                    <Text style={{ fontSize: 10, fontFamily: 'Lora', color: COLORS.muted }}>• {item.description}</Text>
+                  ) : null}
+                  {item.link ? (
+                    <Text style={{ fontSize: 9, fontFamily: 'Lora', color: '#5B6ABF' }}>{item.link}</Text>
+                  ) : null}
+                </View>
+              ))
+            ) : (
+              sec.bullets.map((b, j) => (
+                <Text key={j} style={styles.bullet}>• {b}</Text>
+              ))
+            )}
           </View>
         ))}
       </Page>

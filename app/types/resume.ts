@@ -52,9 +52,21 @@ export interface ResumeLanguage {
   proficiency: string
 }
 
+export interface CustomSectionItem {
+  title: string
+  subtitle: string
+  date: string
+  description: string
+  link: string
+}
+
+export type CustomSectionType = 'bullets' | 'dated-items' | 'grid'
+
 export interface ResumeCustomSection {
   title: string
-  bullets: string[]
+  type?: CustomSectionType       // Optional — old resumes don't have this
+  items?: CustomSectionItem[]    // Optional — old resumes use bullets instead
+  bullets: string[]              // Backward compat — kept for existing resumes
 }
 
 export interface Resume {

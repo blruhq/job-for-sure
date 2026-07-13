@@ -1,4 +1,4 @@
-import type { Resume } from '~/types/resume'
+import type { Resume, ResumeTemplate } from '~/types/resume'
 
 // ═══════════════════════════════════════════════════════════════
 // RESUME FACTORY — creates Resume objects from REAL data
@@ -22,6 +22,7 @@ export function createResume(data: {
   certifications?: Resume['certifications']
   languages?: Resume['languages']
   customSections?: Resume['customSections']
+  template?: ResumeTemplate
 }): Resume {
   return {
     id: crypto.randomUUID(),
@@ -44,6 +45,7 @@ export function createResume(data: {
     customSections: data.customSections,
     companies: [],
     stretch: [],
+    template: data.template,
   }
 }
 

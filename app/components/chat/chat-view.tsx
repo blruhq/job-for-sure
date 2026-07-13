@@ -10,12 +10,13 @@ import type { InputBarProps } from '@/components/agent-elements/input-bar'
 import { useAppStore } from '~/lib/store'
 import { createResume } from '~/lib/company-data'
 import { notify } from '~/lib/toast'
+import { cn } from '~/lib/utils'
 import type { Resume } from '~/types/resume'
 import { BuildWizard, type WizardData } from '~/components/chat/build-wizard'
 import { PasteJDModal } from '~/components/chat/paste-jd-modal'
 import { Skeleton } from '~/components/ui/skeleton'
 import { UploadCardMessage } from '~/components/chat/upload-card-message'
-import { Upload, FileText, ClipboardList, Loader2, Paperclip, RotateCcw } from 'lucide-react'
+import { Upload, FileText, ClipboardList, Loader2, Paperclip, RotateCcw, Sparkles, Save, Pencil } from 'lucide-react'
 
 export function ChatView() {
   const router = useRouter()
@@ -25,6 +26,19 @@ export function ChatView() {
   const [pasteOpen, setPasteOpen] = useState(false)
   // Upload flow: idle → parsing → idle (card injected as message)
   const [uploadStage, setUploadStage] = useState<'idle' | 'parsing'>('idle')
+
+  // ── BUILD MODE ──
+  // Restore from sessionStorage on mount (survives refresh)
+  const [buildData, setBuildData] = useState<WizardData | null>(() => {
+    if (typeof window === 'undefined') return null
+    try {
+      const saved = sessionStorage.getItem('jfs-build-data')
+      return saved ? JSON.parse(saved) : null
+    } catch {
+      return null
+    }
+  })
+  const [savingResume, setSavingResume] = useState(false)
 
   // ── CHAT PERSISTENCE (sessionStorage) ──
   // Load saved messages from sessionStorage on mount.
@@ -42,10 +56,42 @@ export function ChatView() {
   const activeResumeRef = useRef(activeResume)
   activeResumeRef.current = activeResume
 
+  // Build-mode ref — MUST be set synchronously before sendMessage
+  const buildDataRef = useRef<WizardData | null>(buildData)
+  buildDataRef.current = buildData
+
+  // Persist buildData to sessionStorage (survives refresh)
+  useEffect(() => {
+    if (buildData) {
+      sessionStorage.setItem('jfs-build-data', JSON.stringify(buildData))
+    } else {
+      sessionStorage.removeItem('jfs-build-data')
+    }
+  }, [buildData])
+
+  // Saving ref — for stable CustomInputBar
+  const savingResumeRef = useRef(false)
+  savingResumeRef.current = savingResume
+
+  // ── BUILD PROGRESS DETECTION ──
+  // Scans USER messages for keywords to detect which sections have been covered.
+  // Client-side only — no AI calls. "Good enough" heuristic.
+  const BUILD_SECTIONS = [
+    { id: 'experience', label: 'Experience', keywords: ['job', 'work', 'company', 'role at', 'my title', 'position', 'employer', 'worked at', 'hired', 'my boss', 'colleague', 'salary', 'promotion'] },
+    { id: 'education', label: 'Education', keywords: ['school', 'university', 'degree', 'studied', 'graduated', 'college', 'bachelor', 'master', 'phd', 'diploma', 'gpa', 'student'] },
+    { id: 'skills', label: 'Skills', keywords: ['skill', 'technolog', 'tools', 'framework', 'proficient', 'i know', 'i use', 'experienced with', 'familiar with', 'i work with'] },
+    { id: 'summary', label: 'Summary', keywords: ['summary', 'about me', 'professional summary', 'years of experience', 'passionate about'] },
+  ] as const
+
+  const coveredSectionsRef = useRef<Set<string>>(new Set())
+
   // Transport sends resume context with every chat request
   const transport = useMemo(() => {
     return new DefaultChatTransport({
       body: () => ({
+        mode: buildDataRef.current ? 'build' : 'coach',
+        buildRole: buildDataRef.current?.role || '',
+        buildIndustry: buildDataRef.current?.industry || '',
         context: {
           activeResume: activeResumeRef.current
             ? {
@@ -73,6 +119,22 @@ export function ChatView() {
 
   const { messages, status, sendMessage, stop, setMessages } = useChat({ transport, messages: savedMessages })
 
+  // Recompute covered sections whenever messages change
+  if (buildDataRef.current) {
+    const userText = messages
+      .filter((m: any) => m.role === 'user')
+      .map((m: any) => m.parts?.map((p: any) => p.text || '').join(' ') || '')
+      .join(' ')
+      .toLowerCase()
+    const covered = new Set<string>()
+    for (const section of BUILD_SECTIONS) {
+      if (section.keywords.some(kw => userText.includes(kw))) {
+        covered.add(section.id)
+      }
+    }
+    coveredSectionsRef.current = covered
+  }
+
   // Sync messages back to sessionStorage when the response completes (not during stream)
   const prevMessagesRef = useRef('')
   useEffect(() => {
@@ -91,6 +153,8 @@ export function ChatView() {
   // New Chat handler: clear session storage & reload
   const handleNewChat = useCallback(() => {
     sessionStorage.removeItem('jfs-chat-messages')
+    sessionStorage.removeItem('jfs-build-data')
+    buildDataRef.current = null
     window.location.reload()
   }, [])
 
@@ -220,56 +284,124 @@ export function ChatView() {
     }
   }
 
-  // ── BUILD FROM TEMPLATE WIZARD ──
-  const handleWizardComplete = async (data: WizardData) => {
-    setUploadStage('parsing')
+  // ── BUILD FROM TEMPLATE (NEW FLOW) ──
+  const handleWizardComplete = (data: WizardData) => {
+    // Set ref SYNCHRONOUSLY before sendMessage so transport reads correct mode
+    buildDataRef.current = data
+    setBuildData(data)
+    setWizardOpen(false)
+
+    // Send initial message to start the guided conversation
+    sendMessage({ text: `I want to build a resume for a ${data.role} role${data.industry ? ` in ${data.industry}` : ''}.` })
+  }
+
+  // ── SAVE RESUME FROM CHAT ──
+  const handleSaveResumeRef = useRef<() => void>(() => {})
+
+  const handleSaveResume = useCallback(async () => {
+    if (!buildDataRef.current || savingResumeRef.current) return
+    savingResumeRef.current = true
+    setSavingResume(true)
+
     try {
+      const res = await fetch('/api/resume/from-chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          messages: messages.map((m: any) => ({
+            role: m.role,
+            content: m.parts?.map((p: any) => p.text || '').join(' ') || '',
+          })),
+          template: buildDataRef.current.template,
+          role: buildDataRef.current.role,
+          industry: buildDataRef.current.industry,
+        }),
+      })
+
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}))
+        throw new Error(errData.error || 'Failed to build resume')
+      }
+
+      const parsed = await res.json()
+
       const resume = createResume({
-        name: data.role,
-        role: data.role,
-        persona: data.name,
-        email: data.email,
-        location: data.location,
-        summary: data.summary || `Professional with experience in ${data.skills.slice(0, 3).join(', ')}.`,
-        skills: data.skills,
-        experience: [{
-          company: data.company,
-          role: data.companyRole || data.role,
-          dates: data.dates,
-          bullets: data.bullets.split('\n').filter(Boolean),
-        }],
+        name: `${parsed.persona || buildDataRef.current.role} Resume`,
+        role: buildDataRef.current.role,
+        persona: parsed.persona || 'Your Name',
+        email: parsed.email,
+        phone: parsed.phone,
+        location: parsed.location,
+        github: parsed.github,
+        summary: parsed.summary,
+        skills: parsed.skills || [],
+        experience: parsed.experience || [],
+        education: parsed.education || [],
+        projects: parsed.projects || [],
+        certifications: parsed.certifications || [],
+        languages: parsed.languages || [],
+        customSections: parsed.customSections || [],
+        template: buildDataRef.current.template,
       })
 
       addResume(resume)
       setActiveResumeId(resume.id)
 
-      // Inject upload card as a chat message + assistant ack (avoids infinite "Processing..." spinner)
-      const uploadText = `📎 Resume created: ${resume.persona || 'Unknown'}${resume.role ? ` — ${resume.role}` : ''}`
-      const ackText = resume.role
-        ? `Great! I've created your resume profile. You're targeting **${resume.role}** roles. Ask me anything — I have your full resume context.`
-        : `Great! I've created your resume profile. Ask me anything — I have your full resume context.`
-      setMessages(prev => [...prev, {
-        id: `upload-${Date.now()}`,
-        role: 'user',
-        parts: [
-          { type: 'data-upload', data: { resumeId: resume.id } },
-          { type: 'text', text: uploadText },
-        ],
-        createdAt: new Date(),
-      } as any, {
-        id: `upload-ack-${Date.now()}`,
+      const ackText = `✅ Resume saved! I've created your **${buildDataRef.current.role}** resume with the **${buildDataRef.current.template}** template. You can open the editor to make any changes.`
+      setMessages((prev: any[]) => [...prev, {
+        id: `save-ack-${Date.now()}`,
         role: 'assistant',
         parts: [{ type: 'text', text: ackText }],
         createdAt: new Date(),
       } as any])
 
-      setUploadStage('idle')
+      // Exit build mode
+      buildDataRef.current = null
+      setBuildData(null)
+      sessionStorage.removeItem('jfs-build-data')
+
+      notify({ message: 'Resume created!', type: 'success' })
+
+      setTimeout(() => router.push(`/resume/${resume.id}`), 600)
     } catch (err) {
       console.error(err)
-      notify({ message: 'Failed to create resume from wizard', type: 'error' })
-      setUploadStage('idle')
+      notify({ message: err instanceof Error ? err.message : 'Failed to build resume', type: 'error' })
+    } finally {
+      savingResumeRef.current = false
+      setSavingResume(false)
     }
-  }
+  }, [messages, addResume, setActiveResumeId, setMessages, router])
+
+  // Keep ref in sync so CustomInputBar (useCallback[]) always calls latest version
+  handleSaveResumeRef.current = handleSaveResume
+
+  // ── ESCAPE HATCH: Switch to manual editor ──
+  const handleSwitchToManual = useCallback(() => {
+    if (!buildDataRef.current) return
+
+    // Create a blank resume with the chosen template + role
+    const resume = createResume({
+      name: `${buildDataRef.current.role} Resume`,
+      role: buildDataRef.current.role,
+      persona: 'Your Name',
+      skills: [],
+      template: buildDataRef.current.template,
+    })
+
+    addResume(resume)
+    setActiveResumeId(resume.id)
+
+    // Exit build mode
+    buildDataRef.current = null
+    setBuildData(null)
+    sessionStorage.removeItem('jfs-build-data')
+
+    notify({ message: 'Opened blank resume in editor', type: 'info' })
+    router.push(`/resume/${resume.id}`)
+  }, [addResume, setActiveResumeId, router])
+
+  const handleSwitchToManualRef = useRef(handleSwitchToManual)
+  handleSwitchToManualRef.current = handleSwitchToManual
 
   // ── PASTE JOB DESCRIPTION ──
   const handlePasteJD = (jdText: string) => {
@@ -294,13 +426,69 @@ export function ChatView() {
 
   // Stable custom InputBar — never recreates, so InputBar inside never remounts
   const CustomInputBar = useCallback(function CustomInputBar(props: InputBarProps) {
-    // Destructure onAttach to prevent it from reaching InputBar (hides the + button)
     const { onAttach, ...inputBarProps } = props
+
+    const building = buildDataRef.current
+    const saving = savingResumeRef.current
 
     return (
       <div>
-        {/* Action pills — visible when chat has messages */}
-        {showPillBarRef.current && (
+        {/* ── Build mode banner ── */}
+        {building && (
+          <div className="border-t border-primary/20 bg-primary/5 px-4 py-2">
+            {/* Row 1: info + buttons */}
+            <div className="mx-auto flex max-w-an items-center justify-between gap-3">
+              <div className="flex min-w-0 items-center gap-2">
+                <Sparkles size={12} className="shrink-0 text-primary" />
+                <span className="truncate text-[11px] text-foreground">
+                  Building: <strong>{building.role}</strong>
+                  {building.industry ? ` · ${building.industry}` : ''}
+                  {' · '}{building.template}
+                </span>
+              </div>
+              <div className="flex shrink-0 items-center gap-1.5">
+                <button
+                  onClick={() => handleSwitchToManualRef.current()}
+                  className="flex cursor-pointer items-center gap-1 rounded-xs border border-border bg-background px-2 py-1 text-[10px] text-muted-foreground transition-colors hover:text-foreground"
+                  title="Switch to manual editor"
+                >
+                  <Pencil size={10} /> Manual
+                </button>
+                <button
+                  onClick={() => handleSaveResumeRef.current()}
+                  disabled={saving || !coveredSectionsRef.current.has('experience')}
+                  className="flex cursor-pointer items-center gap-1 rounded-xs bg-primary px-2.5 py-1 text-[10px] font-medium text-primary-foreground transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
+                  title={!coveredSectionsRef.current.has('experience') ? 'Share at least one job experience first' : 'Save your resume'}
+                >
+                  <Save size={10} /> {saving ? 'Saving...' : 'Save Resume'}
+                </button>
+              </div>
+            </div>
+            {/* Row 2: Progress dots */}
+            <div className="mx-auto mt-1.5 flex max-w-an items-center gap-3">
+              {BUILD_SECTIONS.map((s) => {
+                const done = coveredSectionsRef.current.has(s.id)
+                return (
+                  <div key={s.id} className="flex items-center gap-1">
+                    <span className={cn(
+                      'h-1.5 w-1.5 rounded-full transition-colors',
+                      done ? 'bg-success' : 'bg-border',
+                    )} />
+                    <span className={cn(
+                      'text-[9px] font-mono transition-colors',
+                      done ? 'text-success' : 'text-muted-foreground',
+                    )}>
+                      {s.label}
+                    </span>
+                  </div>
+                )
+              })}
+            </div>
+          </div>
+        )}
+
+        {/* Action pills — visible when chat has messages AND not in build mode */}
+        {showPillBarRef.current && !building && (
           <div className="px-3">
             <div className="mx-auto max-w-an">
               <div className="flex items-center gap-1.5 pb-1.5">
@@ -332,7 +520,7 @@ export function ChatView() {
 
         <InputBar
           {...inputBarProps}
-          disabled={isUploadingRef.current}
+          disabled={isUploadingRef.current || saving}
           leftActions={
             <button
               onClick={() => fileRef.current?.click()}

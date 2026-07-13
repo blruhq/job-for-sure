@@ -652,7 +652,7 @@ export function ResumeDetail({ resumeId }: { resumeId: string }) {
             items={editCustomSections}
             onChange={setEditCustomSections}
             label="Custom Sections"
-            createNew={() => ({ title: 'New Section', bullets: [] })}
+            createNew={() => ({ title: 'New Section', type: 'bullets' as const, items: [], bullets: [] })}
             renderItem={(sec, _i, update) => (
               <div className="flex flex-col gap-2">
                 <div>
@@ -660,19 +660,67 @@ export function ResumeDetail({ resumeId }: { resumeId: string }) {
                   <input
                     value={sec.title}
                     onChange={(e) => update({ ...sec, title: e.target.value })}
-                    placeholder="e.g. Open Source Contributions"
+                    placeholder="e.g. Speaking, Volunteer Work, Publications"
                     className="w-full rounded-xs border border-border bg-background px-2 py-1 text-[11px] outline-none focus:border-primary"
                   />
                 </div>
-                <div>
-                  <label className="label-mono mb-0.5 block text-[9px]">Highlights (one per line)</label>
-                  <textarea
-                    value={sec.bullets.join('\n')}
-                    onChange={(e) => update({ ...sec, bullets: e.target.value.split('\n').filter(Boolean) })}
-                    rows={3}
-                    className="w-full resize-y rounded-xs border border-border bg-background px-2 py-1 text-[11px] outline-none focus:border-primary"
-                  />
-                </div>
+                {/* Items editor (new format) */}
+                {sec.items && sec.items.length > 0 ? (
+                  <div className="space-y-2">
+                    {sec.items.map((item, idx) => (
+                      <div key={idx} className="rounded-xs border border-border/50 bg-background p-2">
+                        <div className="flex gap-1.5">
+                          <div className="flex-1">
+                            <label className="label-mono mb-0.5 block text-[8px]">Title</label>
+                            <input value={item.title} onChange={(e) => {
+                              const items = sec.items!.map((it, j) => j === idx ? { ...it, title: e.target.value } : it)
+                              update({ ...sec, items })
+                            }} className="w-full rounded-xs border border-border bg-background px-1.5 py-0.5 text-[10px] outline-none focus:border-primary" />
+                          </div>
+                          <div className="flex-1">
+                            <label className="label-mono mb-0.5 block text-[8px]">Subtitle</label>
+                            <input value={item.subtitle} onChange={(e) => {
+                              const items = sec.items!.map((it, j) => j === idx ? { ...it, subtitle: e.target.value } : it)
+                              update({ ...sec, items })
+                            }} className="w-full rounded-xs border border-border bg-background px-1.5 py-0.5 text-[10px] outline-none focus:border-primary" />
+                          </div>
+                          <div className="w-24">
+                            <label className="label-mono mb-0.5 block text-[8px]">Date</label>
+                            <input value={item.date} onChange={(e) => {
+                              const items = sec.items!.map((it, j) => j === idx ? { ...it, date: e.target.value } : it)
+                              update({ ...sec, items })
+                            }} className="w-full rounded-xs border border-border bg-background px-1.5 py-0.5 text-[10px] outline-none focus:border-primary" />
+                          </div>
+                        </div>
+                        <div className="mt-1">
+                          <label className="label-mono mb-0.5 block text-[8px]">Description</label>
+                          <textarea value={item.description} onChange={(e) => {
+                            const items = sec.items!.map((it, j) => j === idx ? { ...it, description: e.target.value } : it)
+                            update({ ...sec, items })
+                          }} rows={1} className="w-full resize-y rounded-xs border border-border bg-background px-1.5 py-0.5 text-[10px] outline-none focus:border-primary" />
+                        </div>
+                      </div>
+                    ))}
+                    <button
+                      type="button"
+                      onClick={() => update({ ...sec, items: [...(sec.items || []), { title: '', subtitle: '', date: '', description: '', link: '' }] })}
+                      className="cursor-pointer rounded-xs border border-dashed border-border px-2 py-1 text-[10px] text-muted-foreground hover:border-primary hover:text-primary"
+                    >
+                      + Add Item
+                    </button>
+                  </div>
+                ) : (
+                  /* Legacy format: simple bullets textarea */
+                  <div>
+                    <label className="label-mono mb-0.5 block text-[9px]">Highlights (one per line)</label>
+                    <textarea
+                      value={sec.bullets?.join('\n') || ''}
+                      onChange={(e) => update({ ...sec, bullets: e.target.value.split('\n').filter(Boolean) })}
+                      rows={3}
+                      className="w-full resize-y rounded-xs border border-border bg-background px-2 py-1 text-[11px] outline-none focus:border-primary"
+                    />
+                  </div>
+                )}
               </div>
             )}
           />
@@ -691,7 +739,7 @@ export function ResumeDetail({ resumeId }: { resumeId: string }) {
     } else if (section === 'languages') {
       setEditLanguages((prev) => [...prev, { name: '', proficiency: '' }])
     } else if (section === 'custom') {
-      setEditCustomSections((prev) => [...prev, { title: 'New Section', bullets: [] }])
+      setEditCustomSections((prev) => [...prev, { title: 'New Section', type: 'bullets' as const, items: [], bullets: [] }])
     }
     setShowAddSectionPicker(false)
   }, [])
