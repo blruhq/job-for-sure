@@ -199,6 +199,8 @@
     "stopListening": "Stop Listening",
     "listening": "Listening...",
     "finishAndEvaluate": "Finish & Evaluate",
+    "submitAnswer": "Submit Answer",
+    "tryAgain": "Try Again",
     "evaluatingTitle": "Evaluating Your Interview",
     "evaluatingDesc": "Analyzing your answers...",
     "questionBreakdown": "Question-by-Question Breakdown"

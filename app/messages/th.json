@@ -199,6 +199,8 @@
     "stopListening": "หยุดฟัง",
     "listening": "กำลังฟัง...",
     "finishAndEvaluate": "เสร็จและประเมิน",
+    "submitAnswer": "ส่งคำตอบ",
+    "tryAgain": "ลองอีกครั้ง",
     "evaluatingTitle": "กำลังประเมินการสัมภาษณ์",
     "evaluatingDesc": "กำลังวิเคราะห์คำตอบของคุณ...",
     "questionBreakdown": "รายละเอียดทีละคำถาม"
