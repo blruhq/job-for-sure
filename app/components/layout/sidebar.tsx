@@ -132,7 +132,7 @@ export function Sidebar() {
         {showSeparator && (
           <span
             className={cn(
-              'absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 h-0.5 w-5 bg-muted-foreground/50 transition-opacity duration-150',
+              'absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 h-0.5 w-5 bg-muted-foreground/30 transition-opacity duration-150',
               c ? 'opacity-100' : 'opacity-0',
             )}
           />
@@ -285,7 +285,7 @@ export function Sidebar() {
           </span>
           <span
             className={cn(
-              'absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 h-0.5 w-5 bg-muted-foreground/50 transition-opacity duration-150',
+              'absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 h-0.5 w-5 bg-muted-foreground/30 transition-opacity duration-150',
               c ? 'opacity-100' : 'opacity-0',
             )}
           />
