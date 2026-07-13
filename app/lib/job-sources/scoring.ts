@@ -41,6 +41,7 @@ export function scoreJob(
   job: JobResult,
   skills: string[],
   role?: string,
+  location?: string,
 ): ScoredJob {
   const haystack = `${job.title} ${job.description} ${(job.tags || []).join(' ')}`.toLowerCase()
 
@@ -71,7 +72,29 @@ export function scoreJob(
     }
   }
 
-  const score = Math.round(coverage * 80 + titleMatch * 20)
+  // Location Proximity Bonus: City (+20), Country (+10), Global (+0)
+  let locationBonus = 0
+  if (location) {
+    const locLower = location.toLowerCase().trim()
+    const jobLocLower = job.location.toLowerCase().replace(/\./g, '')
+    const tokens = locLower
+      .split(/[\s,]+/)
+      .map((t) => t.trim())
+      .filter((t) => t.length > 1)
+
+    if (tokens.length > 0) {
+      const cityToken = tokens[0]
+      const countryToken = tokens[tokens.length - 1]
+
+      if (jobLocLower.includes(cityToken)) {
+        locationBonus = 20
+      } else if (jobLocLower.includes(countryToken)) {
+        locationBonus = 10
+      }
+    }
+  }
+
+  const score = Math.round(coverage * 80 + titleMatch * 20 + locationBonus)
 
   return {
     ...job,
@@ -80,9 +103,14 @@ export function scoreJob(
   }
 }
 
-export function rankJobs(jobs: JobResult[], skills: string[], role?: string): ScoredJob[] {
+export function rankJobs(
+  jobs: JobResult[],
+  skills: string[],
+  role?: string,
+  location?: string,
+): ScoredJob[] {
   return jobs
-    .map((job) => scoreJob(job, skills, role))
+    .map((job) => scoreJob(job, skills, role, location))
     .sort((a, b) => b.score - a.score)
 }
 

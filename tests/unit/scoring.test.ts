@@ -83,6 +83,27 @@ describe('scoreJob', () => {
     const result = scoreJob(job, [], undefined)
     expect(result.score).toBe(0)
   })
+
+  it('adds city-level proximity bonus (+20) and scales with 60% skills weight', () => {
+    const job = makeJob({ location: 'Bangkok, Thailand', description: 'React Node' })
+    const result = scoreJob(job, ['React', 'Node'], undefined, 'Bangkok, Thailand')
+    // Coverage: 2/2 = 80 + Title match: 0 + Location match: +20 (Bangkok) = 100
+    expect(result.score).toBe(100)
+  })
+
+  it('adds country-level proximity bonus (+10) when only country matches', () => {
+    const job = makeJob({ location: 'Chiang Mai, Thailand', description: 'React Node' })
+    const result = scoreJob(job, ['React', 'Node'], undefined, 'Bangkok, Thailand')
+    // Coverage: 2/2 = 80 + Location match: +10 (Thailand) = 90
+    expect(result.score).toBe(90)
+  })
+
+  it('adds no proximity bonus (0) for non-matching locations', () => {
+    const job = makeJob({ location: 'Singapore', description: 'React Node' })
+    const result = scoreJob(job, ['React', 'Node'], undefined, 'Bangkok, Thailand')
+    // Coverage: 2/2 = 80 + Location match: +0 = 80
+    expect(result.score).toBe(80)
+  })
 })
 
 describe('rankJobs', () => {

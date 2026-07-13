@@ -76,8 +76,10 @@ export async function searchJobs(params: SearchParams): Promise<SearchResult> {
   if (!fresh) {
     const cached = await getCached<SearchResult>(key)
     if (cached) {
-      const rescored = rankJobs(cached.jobs.map(stripScore), skills, role).slice(0, limit)
-      return { ...cached, jobs: rescored, cached: true }
+      // Re-filter cached jobs in case location logic or query parameters changed
+      const refiltered = filterByQuery(cached.jobs.map(stripScore), query, location)
+      const rescored = rankJobs(refiltered, skills, role, location).slice(0, limit)
+      return { ...cached, jobs: rescored, total: refiltered.length, cached: true }
     }
   }
 
@@ -171,7 +173,7 @@ export async function searchJobs(params: SearchParams): Promise<SearchResult> {
   })
 
   // 7. Score against user skills
-  const scored = rankJobs(filtered, skills, role).slice(0, limit)
+  const scored = rankJobs(filtered, skills, role, location).slice(0, limit)
 
   // 8. Build result
   const result: SearchResult = {
