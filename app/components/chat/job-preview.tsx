@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import {
-  Bookmark, ExternalLink, Loader2, ChevronRight, MessageSquare, Plane, X, Briefcase, Brain,
+  Bookmark, ExternalLink, Loader2, ChevronRight, MessageSquare, Plane, X, Brain,
 } from 'lucide-react'
 import { cn } from '~/lib/utils'
 import { useAppStore } from '~/lib/store'
@@ -42,13 +42,10 @@ export function JobPreview({ resume, onDismiss, onLoadComplete }: { resume: Resu
   const [loading, setLoading] = useState(true)
   const [total, setTotal] = useState(0)
   const [error, setError] = useState(false)
-  const [paidLoading, setPaidLoading] = useState(false)
-  const [paidLoaded, setPaidLoaded] = useState(false)
 
   const fetchJobs = useCallback(async () => {
     setLoading(true)
     setError(false)
-    setPaidLoaded(false)
     try {
       const res = await fetch('/api/jobs/search', {
         method: 'POST',
@@ -84,40 +81,6 @@ export function JobPreview({ resume, onDismiss, onLoadComplete }: { resume: Resu
       onLoadCompleteRef.current?.()
     }
   }, [loading])
-
-  const handleLoadPaid = useCallback(async () => {
-    if (paidLoading || paidLoaded) return
-    setPaidLoading(true)
-    try {
-      const res = await fetch('/api/jobs/search', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-          query: resume.role,
-          location: resume.location || undefined,
-          skills: resume.skills,
-          role: resume.role,
-          sources: ['linkedin' as const, 'indeed' as const, 'jobsdb' as const],
-          includePaid: true,
-          limit: 20,
-        }),
-      })
-      if (res.ok) {
-        const data: SearchResult = await res.json()
-        setJobs(prev => {
-          const seen = new Set(prev.map(j => j.id))
-          const merged = [...prev, ...data.jobs.filter(j => !seen.has(j.id))]
-          return merged.sort((a, b) => b.score - a.score)
-        })
-        setTotal(prev => prev + data.total)
-        setPaidLoaded(true)
-      }
-    } catch {
-      // silent
-    } finally {
-      setPaidLoading(false)
-    }
-  }, [resume, paidLoading, paidLoaded])
 
   // ── Loading ──
   if (loading) {
@@ -306,21 +269,6 @@ export function JobPreview({ resume, onDismiss, onLoadComplete }: { resume: Resu
           </button>
         )}
 
-        {/* Paid sources */}
-        {!paidLoaded && (
-          <button
-            onClick={handleLoadPaid}
-            disabled={paidLoading}
-            className="mt-2 flex w-full cursor-pointer items-center justify-center gap-1.5 rounded-sm border border-primary/30 bg-accent-soft py-1.5 text-[11px] font-medium text-primary transition-colors hover:bg-primary hover:text-primary-foreground disabled:opacity-50"
-          >
-            {paidLoading ? (
-              <Loader2 size={11} className="animate-spin" />
-            ) : (
-              <Briefcase size={11} />
-            )}
-            {paidLoading ? 'Loading…' : 'Search LinkedIn, Indeed & JobsDB'}
-          </button>
-        )}
       </div>
     </div>
   )
