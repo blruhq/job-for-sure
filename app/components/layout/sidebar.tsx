@@ -254,21 +254,21 @@ export function Sidebar() {
           </div>
         )}
 
-        {/* ── TOOLS ── */}
-        <NavSection
-          items={NAV_TOOLS}
-          collapsed={c}
-          label={t('tools')}
-          pathname={pathname}
-          t={t}
-          totalPipeline={totalPipeline}
-        />
-
         {/* ── JOBS ── */}
         <NavSection
           items={NAV_JOBS}
           collapsed={c}
           label={t('jobs')}
+          pathname={pathname}
+          t={t}
+          totalPipeline={totalPipeline}
+        />
+
+        {/* ── TOOLS ── */}
+        <NavSection
+          items={NAV_TOOLS}
+          collapsed={c}
+          label={t('tools')}
           pathname={pathname}
           t={t}
           totalPipeline={totalPipeline}
