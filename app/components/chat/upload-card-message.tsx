@@ -1,8 +1,9 @@
 'use client'
 
-import { memo } from 'react'
+import { memo, useState, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import type { UIMessage } from 'ai'
+import { Briefcase, MapPin, Check, Pencil } from 'lucide-react'
 import { UserMessage } from '@/components/agent-elements/user-message'
 import { useAppStore } from '~/lib/store'
 import { JobPreview } from '~/components/chat/job-preview'
@@ -19,31 +20,107 @@ export const UploadCardMessage = memo(function UploadCardMessage({
   enableImagePreview = true,
 }: UploadCardMessageProps) {
   const router = useRouter()
-  const { resumes } = useAppStore()
+  const { resumes, updateResume } = useAppStore()
 
   // Check for data-upload part
   const uploadPart = (message.parts ?? []).find(
     (p: any) => p.type === 'data-upload'
   ) as { type: 'data-upload'; data: { resumeId: string } } | undefined
 
+  const resumeId = uploadPart?.data.resumeId
+  const resume = resumes.find((r) => r.id === resumeId)
+
+  const [isEditing, setIsEditing] = useState(false)
+  const [roleInput, setRoleInput] = useState('')
+  const [locationInput, setLocationInput] = useState('')
+
+  // Sync inputs with resume object
+  const lastResumeIdRef = useRef<string | null>(null)
+  if (resume && resume.id !== lastResumeIdRef.current) {
+    lastResumeIdRef.current = resume.id
+    setRoleInput(resume.role || '')
+    setLocationInput(resume.location || '')
+    setIsEditing(!resume.role)
+  }
+
   if (uploadPart) {
-    const resume = resumes.find((r) => r.id === uploadPart.data.resumeId)
     if (!resume) return null
 
     return (
       <div className="w-full space-y-3">
         {/* Resume summary card */}
         <div className="rounded-md border border-border bg-card p-4">
-          <div className="flex items-center gap-1.5 mb-1">
+          <div className="flex items-center justify-between mb-3">
             <span className="text-[13px] font-semibold text-foreground">{resume.persona || 'Your Name'}</span>
-            {resume.role && (
-              <span className="text-[11px] text-primary">· {resume.role}</span>
+            {!isEditing && (
+              <button 
+                onClick={() => setIsEditing(true)}
+                className="cursor-pointer text-[10px] text-muted-foreground hover:text-foreground flex items-center gap-1"
+              >
+                <Pencil size={10} /> Edit Filters
+              </button>
             )}
           </div>
-          {resume.summary && (
-            <p className="text-[11px] text-muted-foreground leading-relaxed">{resume.summary}</p>
+
+          {isEditing ? (
+            <div className="space-y-3 bg-muted/30 p-2.5 rounded-sm border border-border/50">
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-medium text-muted-foreground flex items-center gap-1">
+                  <Briefcase size={10} /> Target Role
+                </label>
+                <input
+                  type="text"
+                  value={roleInput}
+                  onChange={(e) => setRoleInput(e.target.value)}
+                  placeholder="e.g. Software Engineer"
+                  className="w-full text-[11px] px-2 py-1 rounded border border-border bg-background outline-none focus:border-primary"
+                />
+              </div>
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-medium text-muted-foreground flex items-center gap-1">
+                  <MapPin size={10} /> Location
+                </label>
+                <input
+                  type="text"
+                  value={locationInput}
+                  onChange={(e) => setLocationInput(e.target.value)}
+                  placeholder="e.g. Thailand or Remote"
+                  className="w-full text-[11px] px-2 py-1 rounded border border-border bg-background outline-none focus:border-primary"
+                />
+              </div>
+              <button
+                onClick={() => {
+                  updateResume(resume.id, { role: roleInput, location: locationInput })
+                  setIsEditing(false)
+                }}
+                disabled={roleInput.trim().length < 2}
+                className="w-full flex cursor-pointer items-center justify-center gap-1 rounded bg-primary py-1 text-[11px] font-medium text-primary-foreground transition-opacity hover:opacity-90 disabled:opacity-50"
+              >
+                <Check size={11} /> Confirm & Search Jobs
+              </button>
+            </div>
+          ) : (
+            <div className="space-y-1 text-[11px] text-muted-foreground">
+              {resume.role && (
+                <div className="flex items-center gap-1.5">
+                  <Briefcase size={10} className="text-primary shrink-0" />
+                  <span>Targeting: <strong className="text-foreground">{resume.role}</strong></span>
+                </div>
+              )}
+              {resume.location && (
+                <div className="flex items-center gap-1.5">
+                  <MapPin size={10} className="text-primary shrink-0" />
+                  <span>Location: <strong className="text-foreground">{resume.location}</strong></span>
+                </div>
+              )}
+            </div>
           )}
-          {resume.skills.length > 0 && (
+
+          {resume.summary && !isEditing && (
+            <p className="mt-2 text-[11px] text-muted-foreground leading-relaxed">{resume.summary}</p>
+          )}
+
+          {resume.skills.length > 0 && !isEditing && (
             <div className="mt-2 flex flex-wrap gap-1">
               {resume.skills.slice(0, 12).map((s, i) => (
                 <span key={i} className="rounded-xs bg-muted/50 px-1.5 py-0.5 text-[9px] text-muted-foreground">{s}</span>
@@ -53,23 +130,26 @@ export const UploadCardMessage = memo(function UploadCardMessage({
               )}
             </div>
           )}
-          <div className="mt-3 flex items-center gap-3">
-            <button
-              onClick={() => router.push(`/resume/${resume.id}`)}
-              className="cursor-pointer text-[11px] font-medium text-primary hover:underline"
-            >
-              View Resume →
-            </button>
-            <button
-              onClick={() => router.push(`/resume/${resume.id}?tab=editor`)}
-              className="cursor-pointer text-[11px] font-medium text-muted-foreground hover:text-foreground"
-            >
-              Edit Resume →
-            </button>
-          </div>
+
+          {!isEditing && (
+            <div className="mt-3 flex items-center gap-3">
+              <button
+                onClick={() => router.push(`/resume/${resume.id}`)}
+                className="cursor-pointer text-[11px] font-medium text-primary hover:underline"
+              >
+                View Resume →
+              </button>
+              <button
+                onClick={() => router.push(`/resume/${resume.id}?tab=editor`)}
+                className="cursor-pointer text-[11px] font-medium text-muted-foreground hover:text-foreground"
+              >
+                Edit Resume →
+              </button>
+            </div>
+          )}
         </div>
         {/* Job preview — manages its own loading */}
-        <JobPreview resume={resume} />
+        {!isEditing && <JobPreview resume={resume} />}
       </div>
     )
   }

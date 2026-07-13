@@ -47,6 +47,8 @@ export function JobPreview({ resume, onDismiss, onLoadComplete }: { resume: Resu
 
   const fetchJobs = useCallback(async () => {
     setLoading(true)
+    setError(false)
+    setPaidLoaded(false)
     try {
       const res = await fetch('/api/jobs/search', {
         method: 'POST',
@@ -72,7 +74,7 @@ export function JobPreview({ resume, onDismiss, onLoadComplete }: { resume: Resu
 
   useEffect(() => {
     fetchJobs()
-  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [fetchJobs])
 
   // Notify parent when loading completes (success or error)
   const onLoadCompleteRef = useRef(onLoadComplete)

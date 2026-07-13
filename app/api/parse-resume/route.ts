@@ -107,7 +107,7 @@ export const POST = withAuth(async (req, { user }) => {
 
 Guidelines:
 1. Contact Information:
-   - Identify the candidate's name, email, location (city, country), phone, and GitHub/LinkedIn URLs. These are usually at the very top of the text, sometimes on the same line. Do not skip them.
+   - Identify the candidate's name, email, location (city, country), phone, and GitHub/LinkedIn URLs. These are usually at the very top of the text, sometimes on the same line. Do not skip them. If the location (city, country) is not explicitly present in the contact header, infer their city/country of residence based on their most recent work experience or university locations mentioned in the resume.
 2. Summary:
    - Extract the summary/profile paragraph. Do not omit it.
 3. Experience:
@@ -129,8 +129,7 @@ Guidelines:
      - "field": Field of study (e.g. "Information Technology")
      - "dates": Duration or graduation date (e.g. "Nov 2022 – Dec 2025")
  6. Role / Headline:
-    - "role": Extract the person's professional headline or target job title ONLY if it appears explicitly in the resume text (e.g., a title under their name, or their most recent job title).
-    - If the resume does NOT have an explicit headline or target role, return empty string "". Do NOT guess or infer.
+    - "role": Extract the person's professional headline or target job title if it appears explicitly (e.g., a title under their name, or their most recent job title). If the resume does NOT have an explicit headline or target role, infer their target professional role (e.g., "Software Engineer", "Product Manager", "Product Designer") based on their skills, projects, and work experience. Do not leave it blank.
 7. Custom / Additional Sections:
    - If the resume contains other sections (e.g. "Open Source Contributions", "Extracurriculars", "Awards", "Publications", "Volunteering") that do not map to the fields above, extract them into "customSections".
    - "title": The name of the section (e.g. "Open Source Contributions").
