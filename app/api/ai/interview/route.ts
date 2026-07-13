@@ -226,7 +226,7 @@ Experience: ${(resume.experience || []).map((exp) => `${exp.role} at ${exp.compa
   const missingSection = missingSkills.length > 0
     ? `Here are the candidate's skill gaps (missing from their profile but highly relevant for this role):
 ${missingSkills.map((s) => `- ${s}`).join('\n')}
-Please weight the generated question toward testing or probing these missing skills, particularly system design, if relevant for technical interviews.`
+Please weight the generated question toward testing or probing these missing skills, particularly any domain-critical ones relevant for this role.`
     : ''
 
   const transferableSection = transferableSkills.length > 0
