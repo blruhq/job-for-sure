@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
-import { ArrowLeft, Wand2, Download, Trash2, Plus, X, PlusCircle, Lightbulb, GripVertical } from 'lucide-react'
+import { ArrowLeft, Wand2, Download, Trash2, Plus, X, PlusCircle, Lightbulb, GripVertical, ChevronDown, ChevronUp } from 'lucide-react'
 import {
   DndContext,
   PointerSensor,
@@ -30,7 +30,7 @@ import { CoverLetterEditor } from '~/components/resume/cover-letter-editor'
 import { JobSearchPanel } from '~/components/resume/job-search-panel'
 import type { ResumeEducation, ResumeProject, ResumeExperience, ResumeCertification, ResumeLanguage, ResumeCustomSection } from '~/types/resume'
 import { TemplateGallery } from '~/components/resume/templates/template-gallery'
-import { DEFAULT_TEMPLATE } from '~/components/resume/templates/registry'
+import { DEFAULT_TEMPLATE, getTemplateMeta } from '~/components/resume/templates/registry'
 import { ResumePreview } from '~/components/resume/resume-preview'
 
 // ── Helpers ──
@@ -338,6 +338,7 @@ export function ResumeDetail({ resumeId }: { resumeId: string }) {
   const router = useRouter()
   const { getResume, addResume, setActiveResumeId, deleteResume, updateResume } = useAppStore()
   const [tab, setTab] = useState<'jobs' | 'view' | 'editor' | 'cover-letter'>('jobs')
+  const [galleryOpen, setGalleryOpen] = useState(false)
   const [showDeleteDialog, setShowDeleteDialog] = useState(false)
   const [deleting, setDeleting] = useState(false)
 
@@ -862,17 +863,35 @@ export function ResumeDetail({ resumeId }: { resumeId: string }) {
             {/* Template gallery bar */}
             <div className="shrink-0 border-b border-border bg-card p-3">
               <div className="mx-auto max-w-[794px]">
-                <div className="mb-2 flex items-center justify-between">
-                  <span className="label-mono">Choose a Template</span>
+                <div className="flex items-center justify-between">
+                  <button
+                    onClick={() => setGalleryOpen(!galleryOpen)}
+                    className="flex cursor-pointer items-center gap-1.5 rounded-sm border border-border bg-background px-2.5 py-1 text-[11px] font-semibold text-foreground hover:bg-muted transition-colors"
+                  >
+                    <span>Template: {getTemplateMeta(resume?.template || DEFAULT_TEMPLATE).name}</span>
+                    {galleryOpen ? <ChevronUp size={12} className="text-muted-foreground" /> : <ChevronDown size={12} className="text-muted-foreground" />}
+                  </button>
                   <div className="flex gap-1.5">
-                    <button onClick={() => window.open(`/api/export/pdf?id=${resume.id}`, '_blank')} className="rounded-sm px-2 py-1 text-[11px] text-muted-foreground hover:bg-background hover:text-foreground">Export PDF</button>
+                    <button onClick={() => window.open(`/api/export/pdf?id=${resume?.id}`, '_blank')} className="rounded-sm px-2 py-1 text-[11px] text-muted-foreground hover:bg-background hover:text-foreground">Export PDF</button>
                     <button onClick={() => notify({ message: 'DOCX export coming soon', type: 'info' })} className="rounded-sm px-2 py-1 text-[11px] text-muted-foreground hover:bg-background hover:text-foreground">Export DOCX</button>
                   </div>
                 </div>
-                <TemplateGallery
-                  value={resume.template || DEFAULT_TEMPLATE}
-                  onChange={(template) => updateResume(resume.id, { template })}
-                />
+                <div className={cn(
+                  "grid transition-[grid-template-rows,opacity,margin-top] duration-200 ease-in-out",
+                  galleryOpen ? "grid-rows-[1fr] opacity-100 mt-3" : "grid-rows-[0fr] opacity-0 mt-0"
+                )}>
+                  <div className="overflow-hidden">
+                    <TemplateGallery
+                      value={resume?.template || DEFAULT_TEMPLATE}
+                      onChange={(template) => {
+                        if (resume) {
+                          updateResume(resume.id, { template })
+                          setGalleryOpen(false)
+                        }
+                      }}
+                    />
+                  </div>
+                </div>
               </div>
             </div>
             {/* PDF preview — fills remaining space */}
