@@ -11,16 +11,16 @@ import { z } from 'zod'
 export const maxDuration = 60
 
 const InterviewQuestionSchema = z.object({
-  question: z.string(),
-  category: z.string(),
-  tags: z.array(z.string()),
+  question: z.string().default(''),
+  category: z.string().default('behavioral'),
+  tags: z.array(z.string()).default([]),
 })
 
 const InterviewEvaluateSchema = z.object({
-  score: z.number().min(1).max(10),
-  strengths: z.array(z.string()),
-  improvements: z.array(z.string()),
-  modelAnswer: z.string(),
+  score: z.number().min(1).max(10).default(5),
+  strengths: z.array(z.string()).default([]),
+  improvements: z.array(z.string()).default([]),
+  modelAnswer: z.string().default(''),
 })
 
 const QuestionInput = z.object({
@@ -132,7 +132,11 @@ Instructions:
 2. Ensure the question matches the requested difficulty (${difficulty}) and type (${type}).
 3. If type is technical, ask a programming, architecture, or domain-specific problem. If behavioral, ask a scenario-based or past-experience question. If mixed, choose one.
 4. Identify a category ('behavioral' or 'technical') and 1-3 tags (e.g. "system-design", "leadership", "react", "conflict-resolution").
-5. Generate the interview question in the language that matches the target company and job details. If the candidate's resume or previous interactions are in Thai, you may also generate questions in Thai.`
+5. Generate the interview question in the language that matches the target company and job details. If the candidate's resume or previous interactions are in Thai, you may also generate questions in Thai.
+6. You MUST return a JSON object with exactly these fields:
+   - "question": string containing the generated interview question text.
+   - "category": string, either "behavioral" or "technical".
+   - "tags": array of 1-3 strings.`
 
   const result = await generateObjectWithFailover<z.infer<typeof InterviewQuestionSchema>>({
     system: systemPrompt,
