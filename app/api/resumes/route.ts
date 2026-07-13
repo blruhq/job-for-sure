@@ -4,6 +4,8 @@ import { resumes } from '~/lib/schema'
 import { withAuth } from '~/lib/with-auth'
 import { eq, and, isNull } from 'drizzle-orm'
 import { z } from 'zod'
+import { ResumeDataSchema } from '~/lib/schemas'
+import { MAX_RESUME_JSON_BYTES } from '~/lib/constants'
 
 // GET /api/resumes — list all resumes for the current user
 export const GET = withAuth(async (req, { user }) => {
@@ -18,7 +20,7 @@ export const GET = withAuth(async (req, { user }) => {
 
 const CreateResumeBody = z.object({
   id: z.string().max(100).optional(),
-  data: z.record(z.unknown()),
+  data: ResumeDataSchema,
   isBase: z.boolean().optional(),
 })
 
@@ -30,6 +32,15 @@ export const POST = withAuth(async (req, { user }) => {
   }
 
   const { id, data, isBase } = body.data
+
+  // Enforce max payload size
+  const payloadSize = JSON.stringify(data).length
+  if (payloadSize > MAX_RESUME_JSON_BYTES) {
+    return NextResponse.json(
+      { error: `Resume data too large (${payloadSize} bytes, max ${MAX_RESUME_JSON_BYTES})` },
+      { status: 413 }
+    )
+  }
 
   const resume = {
     id: id || crypto.randomUUID(),

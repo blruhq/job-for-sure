@@ -66,7 +66,8 @@ describe('ResumePDF', () => {
     }
 
     const doc = React.createElement(ResumePDF, { resume: mockResume })
-    const stream = await ReactPDF.renderToStream(doc)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const stream = await ReactPDF.renderToStream(doc as any)
     
     const chunks: Uint8Array[] = []
     for await (const chunk of stream as unknown as AsyncIterable<Uint8Array>) {

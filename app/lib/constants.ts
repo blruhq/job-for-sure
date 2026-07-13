@@ -17,7 +17,4 @@ export const EMPTY_APPLICATIONS: ApplicationBoard = {
  */
 export const MAX_RESUME_JSON_BYTES = 200_000 // 200KB
 
-/**
- * Hard cap on AI prompt input text length.
- */
-export const MAX_PROMPT_INPUT_CHARS = 30_000
+

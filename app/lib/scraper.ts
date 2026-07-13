@@ -176,39 +176,54 @@ function extractDomain(url: string): string {
 }
 
 const MAX_SCRAPE_BYTES = 2 * 1024 * 1024 // 2MB — prevent OOM from huge pages
+const MAX_REDIRECTS = 3
 
 async function fetchHTML(url: string): Promise<string> {
-  const response = await fetch(url, {
-    headers: {
-      'User-Agent': 'JobForSure-Bot/1.0 (+https://jobforsure.app)',
-      Accept: 'text/html,application/xhtml+xml',
-    },
-    signal: AbortSignal.timeout(10_000), // 10s hard timeout
-  })
+  let currentUrl = url
+  for (let i = 0; i <= MAX_REDIRECTS; i++) {
+    await validateUrl(currentUrl)
 
-  if (!response.ok) {
-    throw new Error(`HTTP ${response.status}: ${response.statusText}`)
-  }
+    const response = await fetch(currentUrl, {
+      headers: {
+        'User-Agent': 'JobForSure-Bot/1.0 (+https://jobforsure.app)',
+        Accept: 'text/html,application/xhtml+xml',
+      },
+      signal: AbortSignal.timeout(10_000),
+      redirect: 'manual',
+    })
 
-  // Stream-read with size limit to prevent memory exhaustion
-  const reader = response.body?.getReader()
-  if (!reader) return response.text()
-
-  const chunks: Uint8Array[] = []
-  let totalBytes = 0
-
-  while (true) {
-    const { done, value } = await reader.read()
-    if (done) break
-    totalBytes += value.byteLength
-    if (totalBytes > MAX_SCRAPE_BYTES) {
-      reader.cancel()
-      throw new Error('Response too large (max 2MB)')
+    if (response.status >= 300 && response.status < 400) {
+      const location = response.headers.get('location')
+      if (!location) throw new Error('Redirect with no Location header')
+      currentUrl = new URL(location, currentUrl).href
+      continue
     }
-    chunks.push(value)
+
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}: ${response.statusText}`)
+    }
+
+    const reader = response.body?.getReader()
+    if (!reader) return response.text()
+
+    const chunks: Uint8Array[] = []
+    let totalBytes = 0
+
+    while (true) {
+      const { done, value } = await reader.read()
+      if (done) break
+      totalBytes += value.byteLength
+      if (totalBytes > MAX_SCRAPE_BYTES) {
+        reader.cancel()
+        throw new Error('Response too large (max 2MB)')
+      }
+      chunks.push(value)
+    }
+
+    return new TextDecoder().decode(concatUint8Arrays(chunks))
   }
 
-  return new TextDecoder().decode(concatUint8Arrays(chunks))
+  throw new Error(`Too many redirects (max ${MAX_REDIRECTS})`)
 }
 
 function concatUint8Arrays(arrays: Uint8Array[]): Uint8Array {
@@ -403,20 +418,4 @@ function extractRequirements(text: string): string[] {
   return bullets.slice(0, 15)
 }
 
-/**
- * Create a manual job description from user-pasted text.
- */
-export function createManualJob(
-  title: string,
-  company: string,
-  description: string,
-): JobDescription {
-  return {
-    title,
-    company,
-    location: 'Remote',
-    description,
-    requirements: extractRequirements(description),
-    qualifications: [],
-  }
-}
+

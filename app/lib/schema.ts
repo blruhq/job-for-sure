@@ -26,6 +26,7 @@ export const session = pgTable(
     token: text("token").notNull().unique(),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at")
+      .defaultNow()
       .$onUpdate(() => new Date())
       .notNull(),
     ipAddress: text("ip_address"),
@@ -55,6 +56,7 @@ export const account = pgTable(
     password: text("password"),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at")
+      .defaultNow()
       .$onUpdate(() => new Date())
       .notNull(),
   },
@@ -114,7 +116,7 @@ export const resumes = pgTable("resumes", {
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
   deletedAt: timestamp("deleted_at"),
-});
+}, (table) => [index("resumes_userId_idx").on(table.userId)]);
 
 export const tailoredResumes = pgTable("tailored_resumes", {
   id: text("id").primaryKey(),
@@ -126,7 +128,7 @@ export const tailoredResumes = pgTable("tailored_resumes", {
   jobData: jsonb("job_data"),
   data: jsonb("data").notNull(),
   createdAt: timestamp("created_at").defaultNow(),
-});
+}, (table) => [index("tailored_resumes_userId_idx").on(table.userId)]);
 
 export const applications = pgTable("applications", {
   id: text("id").primaryKey(),
@@ -142,7 +144,7 @@ export const applications = pgTable("applications", {
   appliedAt: timestamp("applied_at"),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
-});
+}, (table) => [index("applications_userId_idx").on(table.userId)]);
 
 // ═══════════════════════════════════════════════════════════════
 // APPLICATION RELATIONS
@@ -187,7 +189,7 @@ export const interviewSessions = pgTable("interview_sessions", {
   exchanges: jsonb("exchanges").notNull(), // JSON array of InterviewExchange
   createdAt: timestamp("created_at").defaultNow().notNull(),
   deletedAt: timestamp("deleted_at"),
-});
+}, (table) => [index("interview_sessions_userId_idx").on(table.userId)]);
 
 export const interviewSessionsRelations = relations(interviewSessions, ({ one }) => ({
   user: one(user, {
@@ -217,7 +219,7 @@ export const coverLetters = pgTable("cover_letters", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow(),
   deletedAt: timestamp("deleted_at"),
-});
+}, (table) => [index("cover_letters_userId_idx").on(table.userId)]);
 
 export const coverLettersRelations = relations(coverLetters, ({ one }) => ({
   user: one(user, {

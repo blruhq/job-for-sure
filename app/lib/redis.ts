@@ -1,8 +1,10 @@
 import { Redis } from '@upstash/redis'
 
 /**
- * Shared Redis singleton — used by both ratelimit.ts and cache.ts.
- * Fail-open: if env vars are missing, exports null and callers handle it.
+ * Shared Upstash Redis singleton.
+ *
+ * Callers (ratelimit.ts, cache.ts) are responsible for fail-open behavior
+ * via try/catch — this function will throw if env vars are missing.
  */
 let _redis: Redis | null = null
 

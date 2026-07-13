@@ -143,16 +143,14 @@ export function AppStoreProvider({ children }: { children: ReactNode }) {
   }, [])
 
   const updateResume = useCallback((id: string, updates: Partial<Resume>) => {
-    setResumes(prev => {
-      const match = prev.find(r => r.id === id)
-      if (!match) return prev
-      const updated = { ...match, ...updates } as Resume
-      apiPatch(`/api/resumes/${id}`, { data: updated }).catch((err) => {
-        console.error(err)
-        setResumes(curr => curr.map(r => r.id === id ? match : r))
-        notify({ message: 'Failed to update resume. Changes rolled back.', type: 'error' })
-      })
-      return prev.map(r => r.id === id ? updated : r)
+    const match = resumesRef.current.find(r => r.id === id)
+    if (!match) return
+    const updated = { ...match, ...updates } as Resume
+    setResumes(prev => prev.map(r => r.id === id ? updated : r))
+    apiPatch(`/api/resumes/${id}`, { data: updated }).catch((err) => {
+      console.error(err)
+      setResumes(prev => prev.map(r => r.id === id ? match : r))
+      notify({ message: 'Failed to update resume. Changes rolled back.', type: 'error' })
     })
   }, [])
 
@@ -183,6 +181,10 @@ export function AppStoreProvider({ children }: { children: ReactNode }) {
   const getResume = useCallback((id: string) => resumes.find(r => r.id === id), [resumes])
 
   const activeResume = resumes.find(r => r.id === activeResumeId) ?? null
+
+  // ── Ref mirror of resumes for rollback without side effects in updater ──
+  const resumesRef = useRef(resumes)
+  resumesRef.current = resumes
 
   // ── Ref mirror of applications for rollback without side effects in updater ──
   const applicationsRef = useRef(applications)

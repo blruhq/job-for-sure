@@ -4,6 +4,8 @@ import { resumes } from '~/lib/schema'
 import { withAuth } from '~/lib/with-auth'
 import { eq, and, isNull } from 'drizzle-orm'
 import { z } from 'zod'
+import { ResumeDataSchema } from '~/lib/schemas'
+import { MAX_RESUME_JSON_BYTES } from '~/lib/constants'
 
 // GET /api/resumes/[id] — get a single resume
 export const GET = withAuth(async (req, { user, params }) => {
@@ -19,7 +21,7 @@ export const GET = withAuth(async (req, { user, params }) => {
 })
 
 const PatchResumeBody = z.object({
-  data: z.record(z.unknown()).optional(),
+  data: ResumeDataSchema.optional(),
   isBase: z.boolean().optional(),
 })
 
@@ -31,6 +33,16 @@ export const PATCH = withAuth(async (req, { user, params }) => {
     return NextResponse.json({ error: 'Invalid update data' }, { status: 400 })
   }
 
+  if (body.data.data) {
+    const payloadSize = JSON.stringify(body.data.data).length
+    if (payloadSize > MAX_RESUME_JSON_BYTES) {
+      return NextResponse.json(
+        { error: `Resume data too large (${payloadSize} bytes, max ${MAX_RESUME_JSON_BYTES})` },
+        { status: 413 }
+      )
+    }
+  }
+
   const updates: Record<string, unknown> = {
     updatedAt: new Date(),
   }
@@ -40,12 +52,12 @@ export const PATCH = withAuth(async (req, { user, params }) => {
   const [updated] = await db
     .update(resumes)
     .set(updates)
-    .where(and(eq(resumes.id, id), eq(resumes.userId, user.id)))
+    .where(and(eq(resumes.id, id), eq(resumes.userId, user.id), isNull(resumes.deletedAt)))
     .returning()
 
   if (!updated) return NextResponse.json({ error: 'Not found' }, { status: 404 })
   return NextResponse.json(updated)
-})
+}, { rateLimitType: 'general', route: '/api/resumes/[id]' })
 
 // DELETE /api/resumes/[id] — soft delete a resume
 export const DELETE = withAuth(async (req, { user, params }) => {

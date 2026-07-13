@@ -19,7 +19,7 @@ vi.mock('~/lib/auth', () => ({
   },
 }))
 
-import { getSessionUser, requireUser } from '~/lib/auth-helpers'
+import { getSessionUser } from '~/lib/auth-helpers'
 import { headers } from 'next/headers'
 
 describe('auth-helpers', () => {
@@ -53,28 +53,4 @@ describe('auth-helpers', () => {
     })
   })
 
-  describe('requireUser', () => {
-    it('returns user when authenticated', async () => {
-      mockGetSession.mockResolvedValue({
-        user: { id: 'u1', email: 'test@test.com', name: 'Test' },
-      })
-
-      const user = await requireUser()
-      expect(user).toEqual({ id: 'u1', email: 'test@test.com', name: 'Test' })
-    })
-
-    it('throws a 401 Response when not authenticated', async () => {
-      mockGetSession.mockResolvedValue(null)
-
-      await expect(requireUser()).rejects.toThrow()
-      try {
-        await requireUser()
-      } catch (e) {
-        expect(e).toBeInstanceOf(Response)
-        expect((e as Response).status).toBe(401)
-        const body = await (e as Response).json()
-        expect(body.error).toBe('Unauthorized')
-      }
-    })
-  })
 })

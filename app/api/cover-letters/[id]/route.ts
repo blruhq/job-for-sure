@@ -31,7 +31,7 @@ export const PATCH = withAuth<{ id: string }>(async (req, { user, params }) => {
 
   if (!updated) return NextResponse.json({ error: 'Not found' }, { status: 404 })
   return NextResponse.json(updated)
-}, { route: '/api/cover-letters/[id]' })
+}, { rateLimitType: 'general', route: '/api/cover-letters/[id]' })
 
 export const DELETE = withAuth<{ id: string }>(async (_req, { user, params }) => {
   const { id } = params
