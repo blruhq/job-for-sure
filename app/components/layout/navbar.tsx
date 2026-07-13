@@ -84,7 +84,7 @@ export function Topbar() {
       <div className="flex-1" />
 
       {/* Actions */}
-      <div className="flex items-center gap-1 pr-1">
+      <div className="flex items-center gap-1 pr-3">
         <LanguageSwitcher />
         <button
           onClick={toggle}
