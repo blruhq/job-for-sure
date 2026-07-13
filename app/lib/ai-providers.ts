@@ -59,12 +59,14 @@ export const providers: ProviderConfig[] = [
   {
     model: deepseekOfficial.chat(MODEL_ID),
     name: 'DeepSeek Official',
-    timeout: 45_000,
+    // DeepInfra fallback can be slower than the primary; keep enough headroom
+    // under the route's maxDuration while still giving slow providers a chance.
+    timeout: 55_000,
   },
   {
     model: deepinfraBackup.chat('deepseek-ai/DeepSeek-V4-Flash'),
     name: 'DeepInfra',
-    timeout: 45_000,
+    timeout: 55_000,
   },
 ]
 
