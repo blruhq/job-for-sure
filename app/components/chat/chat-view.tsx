@@ -14,6 +14,7 @@ import { cn } from '~/lib/utils'
 import type { Resume } from '~/types/resume'
 import { BuildWizard, type WizardData } from '~/components/chat/build-wizard'
 import { PasteJDModal } from '~/components/chat/paste-jd-modal'
+import { ConfirmDialog } from '~/components/ui/confirm-dialog'
 import { Skeleton } from '~/components/ui/skeleton'
 import { UploadCardMessage } from '~/components/chat/upload-card-message'
 import { Upload, FileText, ClipboardList, Loader2, Paperclip, RotateCcw, Sparkles, Save, Pencil } from 'lucide-react'
@@ -39,6 +40,9 @@ export function ChatView() {
     }
   })
   const [savingResume, setSavingResume] = useState(false)
+  const [showCancelBuildDialog, setShowCancelBuildDialog] = useState(false)
+  const [showManualDialog, setShowManualDialog] = useState(false)
+  const [buildStep, setBuildStep] = useState<string>('experience')
 
   // ── CHAT PERSISTENCE (sessionStorage) ──
   // Load saved messages from sessionStorage on mount.
@@ -73,17 +77,19 @@ export function ChatView() {
   const savingResumeRef = useRef(false)
   savingResumeRef.current = savingResume
 
-  // ── BUILD PROGRESS DETECTION ──
-  // Scans USER messages for keywords to detect which sections have been covered.
-  // Client-side only — no AI calls. "Good enough" heuristic.
-  const BUILD_SECTIONS = [
-    { id: 'experience', label: 'Experience', keywords: ['job', 'work', 'company', 'role at', 'my title', 'position', 'employer', 'worked at', 'hired', 'my boss', 'colleague', 'salary', 'promotion'] },
-    { id: 'education', label: 'Education', keywords: ['school', 'university', 'degree', 'studied', 'graduated', 'college', 'bachelor', 'master', 'phd', 'diploma', 'gpa', 'student'] },
-    { id: 'skills', label: 'Skills', keywords: ['skill', 'technolog', 'tools', 'framework', 'proficient', 'i know', 'i use', 'experienced with', 'familiar with', 'i work with'] },
-    { id: 'summary', label: 'Summary', keywords: ['summary', 'about me', 'professional summary', 'years of experience', 'passionate about'] },
-  ] as const
+  // Build step ref — for stable CustomInputBar (useCallback[])
+  const buildStepRef = useRef(buildStep)
+  buildStepRef.current = buildStep
 
-  const coveredSectionsRef = useRef<Set<string>>(new Set())
+  // ── BUILD PROGRESS STEPS ──
+  // Fixed order. Driven by AI progress marker (<!--jfs-progress:STEP-->),
+  // NOT by keyword matching. The AI knows what step it's on.
+  const BUILD_STEPS = [
+    { id: 'experience', label: 'Experience' },
+    { id: 'education', label: 'Education' },
+    { id: 'skills', label: 'Skills' },
+    { id: 'summary', label: 'Summary' },
+  ] as const
 
   // Transport sends resume context with every chat request
   const transport = useMemo(() => {
@@ -119,21 +125,27 @@ export function ChatView() {
 
   const { messages, status, sendMessage, stop, setMessages } = useChat({ transport, messages: savedMessages })
 
-  // Recompute covered sections whenever messages change
-  if (buildDataRef.current) {
-    const userText = messages
-      .filter((m: any) => m.role === 'user')
-      .map((m: any) => m.parts?.map((p: any) => p.text || '').join(' ') || '')
-      .join(' ')
-      .toLowerCase()
-    const covered = new Set<string>()
-    for (const section of BUILD_SECTIONS) {
-      if (section.keywords.some(kw => userText.includes(kw))) {
-        covered.add(section.id)
+  // ── Parse AI progress marker from last assistant message ──
+  // The AI appends <!--jfs-progress:STEP--> to every response.
+  // We scan the last assistant message (after streaming completes)
+  // and update the progress indicator.
+  useEffect(() => {
+    if (!buildDataRef.current) return
+    if (status === 'streaming' || status === 'submitted') return
+    // Find the last assistant message
+    const lastAssistant = [...messages].reverse().find((m: any) => m.role === 'assistant')
+    if (!lastAssistant) return
+    const text = lastAssistant.parts?.map((p: any) => p.text || '').join('') || ''
+    // Match ALL progress markers, take the LAST one (in case AI included multiple)
+    const matches = text.matchAll(/<!--jfs-progress:(\w+)-->/g)
+    const matchesArray = Array.from(matches)
+    if (matchesArray.length > 0) {
+      const step = matchesArray[matchesArray.length - 1][1]
+      if (['experience', 'education', 'skills', 'summary', 'complete'].includes(step)) {
+        setBuildStep(step)
       }
     }
-    coveredSectionsRef.current = covered
-  }
+  }, [messages, status])
 
   // Sync messages back to sessionStorage when the response completes (not during stream)
   const prevMessagesRef = useRef('')
@@ -152,9 +164,21 @@ export function ChatView() {
 
   // New Chat handler: clear session storage & reload
   const handleNewChat = useCallback(() => {
+    // If in build mode, show confirm dialog instead of immediately clearing
+    if (buildDataRef.current) {
+      setShowCancelBuildDialog(true)
+      return
+    }
+    sessionStorage.removeItem('jfs-chat-messages')
+    sessionStorage.removeItem('jfs-build-data')
+    window.location.reload()
+  }, [])
+
+  const handleConfirmCancelBuild = useCallback(() => {
     sessionStorage.removeItem('jfs-chat-messages')
     sessionStorage.removeItem('jfs-build-data')
     buildDataRef.current = null
+    setShowCancelBuildDialog(false)
     window.location.reload()
   }, [])
 
@@ -169,7 +193,8 @@ export function ChatView() {
 
   const handleSend = (message: { role: 'user'; content: string }) => {
     let content = message.content
-    if (targetCompanyKey !== 'none') {
+    // Only append target company context in coach mode (not build mode)
+    if (targetCompanyKey !== 'none' && !buildDataRef.current) {
       const job = applications.bookmark.find((j) => j.key === targetCompanyKey)
       if (job) {
         content += `\n\n*(Context: I am asking this in the context of my application for the ${job.title} role at ${job.company} (Match Score: ${job.score}%). Please tailor your response for this role.)*`
@@ -375,30 +400,86 @@ export function ChatView() {
   // Keep ref in sync so CustomInputBar (useCallback[]) always calls latest version
   handleSaveResumeRef.current = handleSaveResume
 
-  // ── ESCAPE HATCH: Switch to manual editor ──
-  const handleSwitchToManual = useCallback(() => {
-    if (!buildDataRef.current) return
+  // ── ESCAPE HATCH: Extract partial data, then open editor ──
+  const handleSwitchToManual = useCallback(async () => {
+    const data = buildDataRef.current
+    if (!data) return
+    setShowManualDialog(false)
 
-    // Create a blank resume with the chosen template + role
+    // If there are enough messages, try to extract partial data
+    const userMessages = messages.filter((m: any) => m.role === 'user')
+    if (userMessages.length >= 2) {
+      try {
+        const res = await fetch('/api/resume/from-chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            messages: messages.map((m: any) => ({
+              role: m.role,
+              content: m.parts?.map((p: any) => p.text || '').join(' ') || '',
+            })),
+            template: data.template,
+            role: data.role,
+            industry: data.industry,
+          }),
+        })
+
+        if (res.ok) {
+          const parsed = await res.json()
+          const resume = createResume({
+            name: `${data.role} Resume`,
+            role: data.role,
+            persona: parsed.persona || 'Your Name',
+            email: parsed.email,
+            phone: parsed.phone,
+            location: parsed.location,
+            github: parsed.github,
+            summary: parsed.summary,
+            skills: parsed.skills || [],
+            experience: parsed.experience || [],
+            education: parsed.education || [],
+            projects: parsed.projects || [],
+            certifications: parsed.certifications || [],
+            languages: parsed.languages || [],
+            customSections: parsed.customSections || [],
+            template: data.template,
+          })
+
+          addResume(resume)
+          setActiveResumeId(resume.id)
+
+          buildDataRef.current = null
+          setBuildData(null)
+          sessionStorage.removeItem('jfs-build-data')
+
+          notify({ message: 'Opened your resume in the editor', type: 'info' })
+          router.push(`/resume/${resume.id}`)
+          return
+        }
+      } catch {
+        // Extraction failed — fall through to blank resume
+      }
+    }
+
+    // Not enough data or extraction failed — create blank resume
     const resume = createResume({
-      name: `${buildDataRef.current.role} Resume`,
-      role: buildDataRef.current.role,
+      name: `${data.role} Resume`,
+      role: data.role,
       persona: 'Your Name',
       skills: [],
-      template: buildDataRef.current.template,
+      template: data.template,
     })
 
     addResume(resume)
     setActiveResumeId(resume.id)
 
-    // Exit build mode
     buildDataRef.current = null
     setBuildData(null)
     sessionStorage.removeItem('jfs-build-data')
 
     notify({ message: 'Opened blank resume in editor', type: 'info' })
     router.push(`/resume/${resume.id}`)
-  }, [addResume, setActiveResumeId, router])
+  }, [messages, addResume, setActiveResumeId, router])
 
   const handleSwitchToManualRef = useRef(handleSwitchToManual)
   handleSwitchToManualRef.current = handleSwitchToManual
@@ -443,46 +524,51 @@ export function ChatView() {
                 <span className="truncate text-[11px] text-foreground">
                   Building: <strong>{building.role}</strong>
                   {building.industry ? ` · ${building.industry}` : ''}
-                  {' · '}{building.template}
                 </span>
               </div>
               <div className="flex shrink-0 items-center gap-1.5">
                 <button
-                  onClick={() => handleSwitchToManualRef.current()}
+                  onClick={() => setShowManualDialog(true)}
                   className="flex cursor-pointer items-center gap-1 rounded-xs border border-border bg-background px-2 py-1 text-[10px] text-muted-foreground transition-colors hover:text-foreground"
-                  title="Switch to manual editor"
+                  title="Open what you have so far in the editor"
                 >
-                  <Pencil size={10} /> Manual
+                  <Pencil size={10} /> Edit Manually
                 </button>
                 <button
                   onClick={() => handleSaveResumeRef.current()}
-                  disabled={saving || !coveredSectionsRef.current.has('experience')}
+                  disabled={saving}
                   className="flex cursor-pointer items-center gap-1 rounded-xs bg-primary px-2.5 py-1 text-[10px] font-medium text-primary-foreground transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
-                  title={!coveredSectionsRef.current.has('experience') ? 'Share at least one job experience first' : 'Save your resume'}
+                  title="Save your resume"
                 >
                   <Save size={10} /> {saving ? 'Saving...' : 'Save Resume'}
                 </button>
               </div>
             </div>
-            {/* Row 2: Progress dots */}
-            <div className="mx-auto mt-1.5 flex max-w-an items-center gap-3">
-              {BUILD_SECTIONS.map((s) => {
-                const done = coveredSectionsRef.current.has(s.id)
+            {/* Row 2: AI-driven progress steps */}
+            <div className="mx-auto mt-1.5 flex max-w-an items-center gap-2.5">
+              {BUILD_STEPS.map((s, i) => {
+                const stepIndex = BUILD_STEPS.findIndex(x => x.id === buildStepRef.current)
+                const isComplete = buildStepRef.current === 'complete'
+                const done = isComplete || (stepIndex > -1 && i < stepIndex)
+                const current = !isComplete && stepIndex === i
                 return (
                   <div key={s.id} className="flex items-center gap-1">
                     <span className={cn(
                       'h-1.5 w-1.5 rounded-full transition-colors',
-                      done ? 'bg-success' : 'bg-border',
+                      done ? 'bg-success' : current ? 'bg-primary' : 'bg-border',
                     )} />
                     <span className={cn(
                       'text-[9px] font-mono transition-colors',
-                      done ? 'text-success' : 'text-muted-foreground',
+                      done ? 'text-success' : current ? 'text-primary' : 'text-muted-foreground',
                     )}>
                       {s.label}
                     </span>
                   </div>
                 )
               })}
+              {buildStepRef.current === 'complete' && (
+                <span className="text-[9px] font-mono text-success ml-1">✓ Ready to save!</span>
+              )}
             </div>
           </div>
         )}
@@ -504,7 +590,7 @@ export function ChatView() {
                   className="inline-flex cursor-pointer items-center gap-1 rounded-md border border-border bg-card px-2 py-1 text-[11px] font-medium text-foreground transition-all hover:border-primary/30 hover:bg-accent-soft"
                 >
                   <FileText size={11} />
-                  Build Template
+                  Build with AI
                 </button>
                 <button
                   onClick={() => setPasteOpen(true)}
@@ -542,7 +628,8 @@ export function ChatView() {
 
   return (
     <div className="flex h-full flex-col">
-      {/* Status bar */}
+      {/* Status bar — hidden during build mode */}
+      {!buildData && (
       <div className="flex shrink-0 flex-wrap items-center justify-between gap-2 border-b border-border/50 bg-card px-4 md:px-8 py-2.5 text-[11px]">
         <div className="flex items-center gap-1.5">
           <span className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">Profile:</span>
@@ -589,6 +676,7 @@ export function ChatView() {
           </button>
         )}
       </div>
+      )}
 
 
       {/* Entry cards — shown when chat is empty */}
@@ -623,8 +711,8 @@ export function ChatView() {
               <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-md bg-success-soft text-success transition-transform group-hover:scale-110">
                 <FileText size={18} />
               </div>
-              <div className="text-sm font-semibold text-foreground">Build from Template</div>
-              <div className="mt-0.5 text-[11px] text-muted-foreground">No resume? Start here</div>
+              <div className="text-sm font-semibold text-foreground">Build with AI</div>
+              <div className="mt-0.5 text-[11px] text-muted-foreground">Answer questions · 5 min</div>
             </button>
 
             {/* Paste Job Posting */}
@@ -651,7 +739,7 @@ export function ChatView() {
             onSend={handleSend}
             onStop={stop}
             slots={slots}
-            suggestions={[
+            suggestions={buildData ? [] : [
               { id: 'upload', label: '📎 Upload resume', value: 'I want to upload my resume' },
               { id: 'find-jobs', label: 'Find matching jobs', value: 'Find matching jobs for my resume' },
               { id: 'interview', label: 'Interview prep', value: 'Help me prepare for an interview' },
@@ -698,6 +786,28 @@ export function ChatView() {
         open={pasteOpen}
         onClose={() => setPasteOpen(false)}
         onSubmit={handlePasteJD}
+      />
+
+      {/* Cancel build confirm */}
+      <ConfirmDialog
+        open={showCancelBuildDialog}
+        onClose={() => setShowCancelBuildDialog(false)}
+        onConfirm={handleConfirmCancelBuild}
+        title="Cancel Resume Build?"
+        description="You'll lose the conversation progress. Your resume won't be created."
+        confirmLabel="Yes, Cancel Build"
+        variant="danger"
+      />
+
+      {/* Manual editor confirm */}
+      <ConfirmDialog
+        open={showManualDialog}
+        onClose={() => setShowManualDialog(false)}
+        onConfirm={() => handleSwitchToManualRef.current()}
+        title="Open in Editor?"
+        description="We'll create a resume with what you've shared so far and open it in the editor. You can continue editing there."
+        confirmLabel="Open in Editor"
+        variant="default"
       />
     </div>
   )

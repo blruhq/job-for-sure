@@ -18,8 +18,8 @@ export const POST = withAuth(async (req, { user }) => {
 
   // ── Build mode fields ──
   const mode = (raw.mode === 'build' ? 'build' : 'coach') as 'coach' | 'build'
-  const buildRole = typeof raw.buildRole === 'string' ? raw.buildRole : ''
-  const buildIndustry = typeof raw.buildIndustry === 'string' ? raw.buildIndustry : ''
+  const buildRole = typeof raw.buildRole === 'string' ? raw.buildRole.slice(0, 200) : ''
+  const buildIndustry = typeof raw.buildIndustry === 'string' ? raw.buildIndustry.slice(0, 200) : ''
 
   // ── Build-mode system prompt ──
   // Used when user is building a new resume from scratch via chat.
@@ -55,6 +55,20 @@ When you detect an opportunity, ask: "💡 I noticed you mentioned [topic]. Want
 - If they want to skip a section, let them. Say "No problem, we can add it later."
 - If they say "done" or "finished" or "that's everything", say: "Great! Whenever you're ready, click **Save Resume** in the bar above to create your resume. You can also tell me what else to add."
 - NEVER say "I'll save your resume" or "Let me create your resume" — you CANNOT save. Only the user can save by clicking the button.
+
+## PROGRESS TRACKING (MANDATORY — DO NOT SKIP)
+At the very END of EVERY response, append this exact HTML comment on its own line:
+<!--jfs-progress:STEP-->
+Where STEP is your current topic:
+- "experience" — currently asking about or discussing work history
+- "education" — currently asking about or discussing education
+- "skills" — currently asking about or discussing skills
+- "summary" — offering to write or discussing the professional summary
+- "complete" — the user has covered all sections and should click Save Resume
+
+Example end of response: "Got it! Now let's talk about your education.\n<!--jfs-progress:education-->"
+NEVER forget this marker. It MUST appear on EVERY response, including the first one.
+
 - Respond in the same language the user uses.`
 
   // ── Build full resume context string ──
