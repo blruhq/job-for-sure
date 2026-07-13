@@ -12,6 +12,7 @@ export default function robots(): MetadataRoute.Robots {
         '/*/resume',
         '/*/applications',
         '/*/interview',
+        '/*/cover-letter',
         '/*/settings',
         '/*/forgot-password',
         '/*/reset-password',

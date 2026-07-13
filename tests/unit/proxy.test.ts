@@ -93,7 +93,7 @@ describe('proxy middleware', () => {
   })
 
   describe('public routes', () => {
-    it('redirects authenticated user away from /en/login to dashboard', async () => {
+    it('redirects authenticated user away from /en/login to chat', async () => {
       mockGetSessionCookie.mockReturnValue(true)
 
       const req = makeRequest('/en/login')
@@ -101,7 +101,7 @@ describe('proxy middleware', () => {
 
       expect(res.status).toBe(307)
       const location = res.headers.get('location')
-      expect(location).toContain('/dashboard')
+      expect(location).toContain('/chat')
     })
 
     it('does not redirect unauthenticated user from login', async () => {
@@ -111,9 +111,9 @@ describe('proxy middleware', () => {
       const req = makeRequest('/en/login')
       const res = await proxy(req)
 
-      // Should not redirect to dashboard
+      // Should not redirect to chat
       if (res.status === 307) {
-        expect(res.headers.get('location')).not.toContain('/dashboard')
+        expect(res.headers.get('location')).not.toContain('/chat')
       }
     })
   })

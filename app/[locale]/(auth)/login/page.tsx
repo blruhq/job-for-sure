@@ -32,7 +32,7 @@ function LoginForm() {
         } catch {
           // PostHog not loaded — skip
         }
-        router.push('/dashboard')
+        router.push('/chat')
       }
     } catch (err) {
       console.error(err)

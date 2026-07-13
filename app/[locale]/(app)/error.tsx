@@ -36,10 +36,10 @@ export default function Error({
             Try again
           </button>
           <Link
-            href="/dashboard"
+            href="/chat"
             className="cursor-pointer rounded-md border border-border bg-background px-4 py-2 text-xs font-medium text-foreground transition-colors hover:bg-muted"
           >
-            Dashboard
+            Career Coach
           </Link>
         </div>
       </div>

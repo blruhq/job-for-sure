@@ -14,7 +14,7 @@ export default async function AdminPage() {
   const h = await headers()
   const session = await auth.api.getSession({ headers: h })
   if (!session) redirect('/login')
-  if (session.user.email !== process.env.ADMIN_EMAIL) redirect('/dashboard')
+  if (session.user.email !== process.env.ADMIN_EMAIL) redirect('/chat')
 
   // ── Stats queries ──
   const [userCount] = await db.select({ total: count() }).from(user)

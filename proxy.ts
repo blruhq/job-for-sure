@@ -5,7 +5,7 @@ import { routing } from './app/i18n/routing'
 
 const intlMiddleware = createMiddleware(routing)
 
-const protectedRoutes = ['/chat', '/ats', '/applications', '/resume', '/settings', '/interview', '/dashboard']
+const protectedRoutes = ['/chat', '/ats', '/applications', '/resume', '/settings', '/interview', '/dashboard', '/cover-letter']
 const publicRoutes = ['/', '/login', '/register']
 
 function stripLocale(pathname: string) {
@@ -54,7 +54,7 @@ export async function proxy(request: NextRequest) {
 
   // Authenticated user trying to access a public page → redirect to /[locale]/dashboard
   if (hasSession && isPublic(pathname)) {
-    return NextResponse.redirect(new URL(`/${locale}/dashboard`, request.url))
+    return NextResponse.redirect(new URL(`/${locale}/chat`, request.url))
   }
 
   // Unauthenticated user trying to access a protected route → redirect to /[locale]/login

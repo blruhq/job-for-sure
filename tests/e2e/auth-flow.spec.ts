@@ -54,7 +54,7 @@ test.describe('Authentication flows', () => {
     await page.getByRole('button', { name: /sign in/i }).click()
 
     await page.waitForTimeout(3000)
-    expect(page.url()).not.toMatch(/\/dashboard/)
+    expect(page.url()).not.toMatch(/\/chat/)
   })
 
   test('forgot-password page renders and accepts email', async ({ page }) => {
