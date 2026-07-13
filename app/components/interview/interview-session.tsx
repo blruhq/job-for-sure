@@ -1,8 +1,8 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
-import { Brain, User, AlertCircle, Sparkles, Check, ArrowRight, Loader2 } from 'lucide-react'
-import type { InterviewConfig, InterviewQuestion, AnswerFeedback, InterviewExchange } from '~/types/interview'
+import { useState, useEffect, useRef, useCallback } from 'react'
+import { Brain, User, AlertCircle, Sparkles, Check, ArrowRight, Loader2, Mic, MicOff } from 'lucide-react'
+import type { InterviewConfig, InterviewQuestion, InterviewQA, InterviewExchange, BatchEvaluationResult, AnswerFeedback } from '~/types/interview'
 import type { Resume } from '~/types/resume'
 import { Skeleton } from '~/components/ui/skeleton'
 
@@ -13,34 +13,115 @@ interface InterviewSessionProps {
 }
 
 export function InterviewSession({ config, resume, onEnd }: InterviewSessionProps) {
-  const [exchanges, setExchanges] = useState<InterviewExchange[]>([])
+  const [qaHistory, setQaHistory] = useState<InterviewQA[]>([])
   const [currentQuestion, setCurrentQuestion] = useState<InterviewQuestion | null>(null)
   const [currentAnswer, setCurrentAnswer] = useState('')
-  const [currentFeedback, setCurrentFeedback] = useState<AnswerFeedback | null>(null)
-  const [loading, setLoading] = useState<'idle' | 'question' | 'evaluate'>('idle')
+  const [loading, setLoading] = useState<'idle' | 'question' | 'evaluating'>('idle')
   const [error, setError] = useState<string | null>(null)
+
+  // Speech recognition state
+  const [isListening, setIsListening] = useState(false)
+  const [speechSupported, setSpeechSupported] = useState(false)
+  const recognitionRef = useRef<any>(null)
+  const answerRef = useRef('')
 
   const bottomRef = useRef<HTMLDivElement>(null)
 
-  // Auto scroll to bottom
+  // Keep answerRef in sync with state for speech recognition callback
+  useEffect(() => {
+    answerRef.current = currentAnswer
+  }, [currentAnswer])
+
   const scrollToBottom = () => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
   }
 
+  // ── Speech Recognition Setup ──
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const SpeechRecognition =
+        (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition
+      if (SpeechRecognition) {
+        setSpeechSupported(true)
+        const recognition = new SpeechRecognition()
+        recognition.continuous = true
+        recognition.interimResults = true
+        recognition.lang = ''
+
+        recognition.onresult = (event: any) => {
+          let interimTranscript = ''
+          let finalTranscript = ''
+
+          for (let i = event.resultIndex; i < event.results.length; i++) {
+            const transcript = event.results[i][0].transcript
+            if (event.results[i].isFinal) {
+              finalTranscript += transcript
+            } else {
+              interimTranscript += transcript
+            }
+          }
+
+          if (finalTranscript) {
+            const base = answerRef.current
+            const newAnswer = base + (base && !base.endsWith(' ') ? ' ' : '') + finalTranscript
+            setCurrentAnswer(newAnswer)
+          }
+        }
+
+        recognition.onerror = (event: any) => {
+          console.warn('Speech recognition error:', event.error)
+          setIsListening(false)
+        }
+
+        recognition.onend = () => {
+          setIsListening(false)
+        }
+
+        recognitionRef.current = recognition
+      }
+    }
+
+    return () => {
+      if (recognitionRef.current) {
+        try {
+          recognitionRef.current.stop()
+        } catch {
+          // already stopped
+        }
+      }
+    }
+  }, [])
+
+  const toggleListening = useCallback(() => {
+    if (!recognitionRef.current) return
+
+    if (isListening) {
+      recognitionRef.current.stop()
+      setIsListening(false)
+    } else {
+      try {
+        recognitionRef.current.start()
+        setIsListening(true)
+      } catch (err) {
+        console.warn('Failed to start speech recognition:', err)
+      }
+    }
+  }, [isListening])
+
   // Load first question on mount
   useEffect(() => {
     fetchQuestion()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   useEffect(() => {
     scrollToBottom()
-  }, [exchanges, currentQuestion, currentFeedback, loading])
+  }, [qaHistory, currentQuestion, loading])
 
   const fetchQuestion = async () => {
     setLoading('question')
     setError(null)
     setCurrentAnswer('')
-    setCurrentFeedback(null)
     setCurrentQuestion(null)
 
     try {
@@ -55,7 +136,7 @@ export function InterviewSession({ config, resume, onEnd }: InterviewSessionProp
             role: config.targetRole,
           },
           config,
-          previousQuestions: exchanges.map((e) => e.question.question),
+          previousQuestions: qaHistory.map((qa) => qa.question.question),
         }),
       })
 
@@ -77,10 +158,56 @@ export function InterviewSession({ config, resume, onEnd }: InterviewSessionProp
     }
   }
 
-  const submitAnswer = async () => {
+  // ── Save current Q&A and move to next question ──
+  const handleNextQuestion = () => {
     if (!currentQuestion || currentAnswer.trim().length < 20) return
 
-    setLoading('evaluate')
+    // Stop listening if active
+    if (isListening && recognitionRef.current) {
+      recognitionRef.current.stop()
+      setIsListening(false)
+    }
+
+    const newQA: InterviewQA = {
+      question: currentQuestion,
+      answer: currentAnswer,
+    }
+
+    const updated = [...qaHistory, newQA]
+    setQaHistory(updated)
+
+    // Check if we hit the limit
+    if (config.maxQuestions > 0 && updated.length >= config.maxQuestions) {
+      // Time to evaluate everything
+      runBatchEvaluation(updated)
+    } else {
+      fetchQuestion()
+    }
+  }
+
+  // ── End early: include current Q&A if answer exists ──
+  const handleEndEarly = () => {
+    if (isListening && recognitionRef.current) {
+      recognitionRef.current.stop()
+      setIsListening(false)
+    }
+
+    let allQA = qaHistory
+    if (currentQuestion && currentAnswer.trim().length >= 20) {
+      allQA = [...qaHistory, { question: currentQuestion, answer: currentAnswer }]
+    }
+
+    if (allQA.length === 0) {
+      onEnd([])
+      return
+    }
+
+    runBatchEvaluation(allQA)
+  }
+
+  // ── Batch evaluation: send ALL Q&A to AI for grading ──
+  const runBatchEvaluation = async (allQA: InterviewQA[]) => {
+    setLoading('evaluating')
     setError(null)
 
     try {
@@ -88,69 +215,45 @@ export function InterviewSession({ config, resume, onEnd }: InterviewSessionProp
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          action: 'evaluate',
+          action: 'batch-evaluate',
           target: {
             company: config.targetCompany,
             role: config.targetRole,
           },
-          config,
-          question: currentQuestion.question,
-          answer: currentAnswer,
+          difficulty: config.difficulty,
+          qaPairs: allQA.map((qa) => ({
+            question: qa.question.question,
+            answer: qa.answer,
+          })),
         }),
       })
 
       if (!response.ok) {
-        throw new Error('Failed to evaluate answer.')
+        throw new Error('Failed to evaluate interview.')
       }
 
-      const data = await response.json()
-      setCurrentFeedback({
-        score: data.score,
-        strengths: data.strengths || [],
-        improvements: data.improvements || [],
-        modelAnswer: data.modelAnswer || '',
+      const result: BatchEvaluationResult = await response.json()
+
+      // Merge evaluations back into Q&A pairs
+      const exchanges: InterviewExchange[] = allQA.map((qa, i) => {
+        const evaluation = result.evaluations?.find((e) => e.questionIndex === i) || result.evaluations?.[i]
+        const feedback: AnswerFeedback = {
+          score: evaluation?.score ?? 5,
+          strengths: evaluation?.strengths ?? [],
+          improvements: evaluation?.improvements ?? [],
+          modelAnswer: evaluation?.modelAnswer ?? '',
+        }
+        return { question: qa.question, answer: qa.answer, feedback }
       })
+
+      onEnd(exchanges)
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Something went wrong.')
-    } finally {
+      setError(err instanceof Error ? err.message : 'Something went wrong during evaluation.')
       setLoading('idle')
     }
   }
 
-  const handleNext = () => {
-    if (!currentQuestion || !currentFeedback) return
-
-    const newExchange: InterviewExchange = {
-      question: currentQuestion,
-      answer: currentAnswer,
-      feedback: currentFeedback,
-    }
-
-    const updated = [...exchanges, newExchange]
-    setExchanges(updated)
-
-    // Check if we hit the limit
-    if (config.maxQuestions > 0 && updated.length >= config.maxQuestions) {
-      onEnd(updated)
-    } else {
-      fetchQuestion()
-    }
-  }
-
-  const handleEnd = () => {
-    if (currentQuestion && currentFeedback) {
-      const newExchange: InterviewExchange = {
-        question: currentQuestion,
-        answer: currentAnswer,
-        feedback: currentFeedback,
-      }
-      onEnd([...exchanges, newExchange])
-    } else {
-      onEnd(exchanges)
-    }
-  }
-
-  const isLastQuestion = config.maxQuestions > 0 && exchanges.length + 1 >= config.maxQuestions
+  const isLastQuestion = config.maxQuestions > 0 && qaHistory.length + 1 >= config.maxQuestions
 
   return (
     <div className="flex h-full w-full flex-col bg-background">
@@ -172,14 +275,15 @@ export function InterviewSession({ config, resume, onEnd }: InterviewSessionProp
         <div className="text-right">
           <div className="text-xs font-semibold text-muted-foreground">
             {config.maxQuestions > 0 ? (
-              <span>Question {exchanges.length + (currentQuestion ? 1 : 0)} of {config.maxQuestions}</span>
+              <span>Question {qaHistory.length + (currentQuestion ? 1 : 0)} of {config.maxQuestions}</span>
             ) : (
-              <span>Question {exchanges.length + (currentQuestion ? 1 : 0)} (Unlimited Mode)</span>
+              <span>Question {qaHistory.length + (currentQuestion ? 1 : 0)} (Unlimited Mode)</span>
             )}
           </div>
           <button
-            onClick={handleEnd}
-            className="text-[10px] font-semibold text-destructive hover:opacity-80 active:scale-95 cursor-pointer"
+            onClick={handleEndEarly}
+            disabled={loading === 'evaluating'}
+            className="text-[10px] font-semibold text-destructive hover:opacity-80 active:scale-95 cursor-pointer disabled:opacity-50"
           >
             End & Summarize
           </button>
@@ -189,14 +293,14 @@ export function InterviewSession({ config, resume, onEnd }: InterviewSessionProp
       {/* Main scrolling chat area */}
       <div className="flex-1 overflow-y-auto px-4 py-6 md:px-8">
         <div className="mx-auto max-w-[680px] space-y-6">
-          
-          {/* 1. History of past questions/answers/feedbacks */}
-          {exchanges.map((exchange, idx) => (
-            <div key={exchange.question.id} className="space-y-4 border-b border-border/40 pb-6 last:border-0 last:pb-0">
+
+          {/* 1. History of past Q&A (no scores shown) */}
+          {qaHistory.map((qa, idx) => (
+            <div key={qa.question.id} className="space-y-4 border-b border-border/40 pb-6 last:border-0 last:pb-0">
               <div className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">
                 Question {idx + 1}
               </div>
-              
+
               {/* Historical Question Card */}
               <div className="rounded-lg border border-border bg-card p-4">
                 <div className="flex items-center gap-2 mb-2">
@@ -204,74 +308,30 @@ export function InterviewSession({ config, resume, onEnd }: InterviewSessionProp
                     <Brain size={12} />
                   </div>
                   <span className="text-[9px] font-mono uppercase tracking-wider bg-muted text-muted-foreground px-1.5 py-0.5 rounded">
-                    {exchange.question.category}
+                    {qa.question.category}
                   </span>
-                  {exchange.question.tags.map((tag) => (
+                  {qa.question.tags.map((tag) => (
                     <span key={tag} className="text-[9px] bg-muted/40 text-muted-foreground px-1.5 py-0.5 rounded">
                       #{tag}
                     </span>
                   ))}
                 </div>
-                <p className="text-xs text-foreground font-medium leading-relaxed">{exchange.question.question}</p>
+                <p className="text-xs text-foreground font-medium leading-relaxed">{qa.question.question}</p>
               </div>
 
               {/* Historical Answer Card */}
               <div className="flex items-start gap-3 justify-end pl-12">
                 <div className="rounded-lg bg-primary/5 border border-primary/10 p-3 text-xs text-foreground max-w-full">
-                  <p className="leading-relaxed whitespace-pre-wrap">{exchange.answer}</p>
+                  <p className="leading-relaxed whitespace-pre-wrap">{qa.answer}</p>
                 </div>
                 <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground text-[10px] font-semibold">
                   <User size={12} />
                 </div>
               </div>
-
-              {/* Historical Feedback Card */}
-              <div className="rounded-lg border border-border bg-card p-4 ml-6 mr-6">
-                <div className="flex items-center justify-between border-b border-border pb-3 mb-3">
-                  <div className="flex items-center gap-1.5">
-                    <Sparkles size={14} className="text-primary" />
-                    <span className="text-xs font-semibold text-foreground">AI Score & Feedback</span>
-                  </div>
-                  <div className="flex items-center gap-1 rounded bg-success-soft px-2 py-0.5 border border-success/15">
-                    <span className="text-[10px] font-bold text-success">Score: {exchange.feedback.score}/10</span>
-                  </div>
-                </div>
-                
-                <div className="space-y-3">
-                  <div>
-                    <h4 className="text-[10px] font-mono uppercase text-success font-semibold mb-1">Strengths</h4>
-                    <ul className="space-y-1">
-                      {exchange.feedback.strengths.map((str, i) => (
-                        <li key={i} className="text-xs text-muted-foreground flex items-start gap-1.5">
-                          <span className="text-success mt-0.5">•</span> {str}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-
-                  <div>
-                    <h4 className="text-[10px] font-mono uppercase text-warn font-semibold mb-1">Areas to Improve</h4>
-                    <ul className="space-y-1">
-                      {exchange.feedback.improvements.map((imp, i) => (
-                        <li key={i} className="text-xs text-muted-foreground flex items-start gap-1.5">
-                          <span className="text-warn mt-0.5">•</span> {imp}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-
-                  <div>
-                    <h4 className="text-[10px] font-mono uppercase text-primary font-semibold mb-1">Suggested Model Answer</h4>
-                    <p className="text-xs text-muted-foreground leading-relaxed italic bg-muted/30 p-2.5 rounded-sm border border-border/50">
-                      "{exchange.feedback.modelAnswer}"
-                    </p>
-                  </div>
-                </div>
-              </div>
             </div>
           ))}
 
-          {/* 2. Active loading state for question generation */}
+          {/* 2. Loading state for question generation */}
           {loading === 'question' && (
             <div className="space-y-3 animate-pulse">
               <Skeleton className="h-4 w-20" />
@@ -287,25 +347,40 @@ export function InterviewSession({ config, resume, onEnd }: InterviewSessionProp
             </div>
           )}
 
-          {/* 3. Error state with retry */}
-          {error && (
+          {/* 3. Evaluating state — full-screen loading */}
+          {loading === 'evaluating' && (
+            <div className="flex flex-col items-center justify-center py-20 space-y-4">
+              <div className="flex h-14 w-14 items-center justify-center rounded-full bg-primary/10">
+                <Loader2 size={24} className="animate-spin text-primary" />
+              </div>
+              <div className="text-center">
+                <p className="text-sm font-semibold text-foreground">Evaluating Your Interview</p>
+                <p className="text-xs text-muted-foreground mt-1">
+                  Analyzing {qaHistory.length} answer{qaHistory.length !== 1 ? 's' : ''}...
+                </p>
+              </div>
+            </div>
+          )}
+
+          {/* 4. Error state with retry */}
+          {error && loading !== 'evaluating' && (
             <div className="rounded-lg border border-destructive/20 bg-destructive/5 p-4 flex items-start gap-3">
               <AlertCircle className="text-destructive shrink-0 mt-0.5" size={16} />
               <div className="flex-1">
                 <h4 className="text-xs font-semibold text-destructive">Error</h4>
                 <p className="text-xs text-destructive/80 mt-0.5">{error}</p>
                 <button
-                  onClick={currentQuestion ? submitAnswer : fetchQuestion}
+                  onClick={currentQuestion ? handleNextQuestion : fetchQuestion}
                   className="mt-3 cursor-pointer rounded bg-destructive/15 border border-destructive/20 hover:bg-destructive/20 px-3 py-1 text-[10px] font-semibold text-destructive transition-colors"
                 >
-                  Retry Operation
+                  Retry
                 </button>
               </div>
             </div>
           )}
 
-          {/* 4. Active Question + Answer Area */}
-          {currentQuestion && (
+          {/* 5. Active Question + Answer Area */}
+          {currentQuestion && loading === 'idle' && (
             <div className="space-y-4">
               <div className="text-[10px] font-semibold text-primary uppercase tracking-wider">
                 Active Question
@@ -329,140 +404,74 @@ export function InterviewSession({ config, resume, onEnd }: InterviewSessionProp
                 <p className="text-xs text-foreground font-semibold leading-relaxed">{currentQuestion.question}</p>
               </div>
 
-              {/* Answer Input Area (only if not evaluated yet) */}
-              {!currentFeedback && (
-                <div className="space-y-2">
-                  <div className="label-mono flex justify-between">
-                    <span>Your Answer</span>
-                    <span className={currentAnswer.trim().length >= 20 ? 'text-success' : 'text-muted-foreground'}>
-                      {currentAnswer.trim().length} chars (min 20)
-                    </span>
-                  </div>
-                  <textarea
-                    value={currentAnswer}
-                    onChange={(e) => setCurrentAnswer(e.target.value)}
-                    disabled={loading === 'evaluate'}
-                    rows={5}
-                    placeholder="Type your response here. Try to structure it using the STAR format (Situation, Task, Action, Result) if behavioral, or explain your technical reasoning clearly..."
-                    className="w-full resize-y rounded-sm border border-border bg-background p-3 text-xs outline-none focus:border-primary disabled:opacity-60"
-                  />
-                  <div className="flex justify-end">
-                    <button
-                      onClick={submitAnswer}
-                      disabled={currentAnswer.trim().length < 20 || loading === 'evaluate'}
-                      className="cursor-pointer rounded-sm bg-primary px-4 py-2 text-xs font-medium text-primary-foreground transition-opacity hover:opacity-90 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 flex items-center gap-1.5"
-                    >
-                      {loading === 'evaluate' ? (
-                        <>
-                          <Loader2 size={12} className="animate-spin" /> Evaluating Answer...
-                        </>
-                      ) : (
-                        <>
-                          Submit Answer <ArrowRight size={12} />
-                        </>
-                      )}
-                    </button>
-                  </div>
+              {/* Answer Input Area */}
+              <div className="space-y-2">
+                <div className="label-mono flex justify-between items-center">
+                  <span>Your Answer</span>
+                  <span className={currentAnswer.trim().length >= 20 ? 'text-success' : 'text-muted-foreground'}>
+                    {currentAnswer.trim().length} chars (min 20)
+                  </span>
                 </div>
-              )}
+                <textarea
+                  value={currentAnswer}
+                  onChange={(e) => setCurrentAnswer(e.target.value)}
+                  rows={5}
+                  placeholder="Type your response, or click the microphone to speak..."
+                  className={`w-full resize-y rounded-sm border bg-background p-3 text-xs outline-none focus:border-primary transition-colors ${
+                    isListening ? 'border-primary ring-2 ring-primary/20' : 'border-border'
+                  }`}
+                />
 
-              {/* Active Evaluation loading block */}
-              {loading === 'evaluate' && (
-                <div className="rounded-lg border border-border bg-card p-4 space-y-3 animate-pulse ml-6 mr-6">
-                  <div className="flex justify-between border-b border-border pb-3">
-                    <Skeleton className="h-4 w-28" />
-                    <Skeleton className="h-4 w-16" />
+                {/* Input Controls Row */}
+                <div className="flex items-center justify-between gap-2">
+                  {/* Mic button (only show if speech is supported) */}
+                  <div className="flex items-center gap-2">
+                    {speechSupported && (
+                      <button
+                        type="button"
+                        onClick={toggleListening}
+                        className={`cursor-pointer rounded-sm border px-3 py-1.5 text-[10px] font-medium transition-all flex items-center gap-1.5 ${
+                          isListening
+                            ? 'border-destructive/30 bg-destructive/10 text-destructive animate-pulse'
+                            : 'border-border bg-background text-muted-foreground hover:bg-muted/50'
+                        }`}
+                      >
+                        {isListening ? (
+                          <>
+                            <MicOff size={12} /> Stop Listening
+                          </>
+                        ) : (
+                          <>
+                            <Mic size={12} /> Speak
+                          </>
+                        )}
+                      </button>
+                    )}
+                    {isListening && (
+                      <span className="text-[10px] text-muted-foreground animate-pulse">
+                        Listening...
+                      </span>
+                    )}
                   </div>
-                  <div className="space-y-2">
-                    <Skeleton className="h-3 w-1/3" />
-                    <Skeleton className="h-3 w-full" />
-                    <Skeleton className="h-3 w-5/6" />
-                  </div>
+
+                  {/* Next/Submit button */}
+                  <button
+                    onClick={handleNextQuestion}
+                    disabled={currentAnswer.trim().length < 20}
+                    className="cursor-pointer rounded-sm bg-primary px-4 py-2 text-xs font-medium text-primary-foreground transition-opacity hover:opacity-90 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 flex items-center gap-1.5"
+                  >
+                    {isLastQuestion ? (
+                      <>
+                        Finish & Evaluate <Check size={12} />
+                      </>
+                    ) : (
+                      <>
+                        Next Question <ArrowRight size={12} />
+                      </>
+                    )}
+                  </button>
                 </div>
-              )}
-
-              {/* Active Feedback Card (shown after submission) */}
-              {currentFeedback && (
-                <div className="space-y-4">
-                  {/* Your Submitted Answer */}
-                  <div className="flex items-start gap-3 justify-end pl-12">
-                    <div className="rounded-lg bg-primary/5 border border-primary/10 p-3 text-xs text-foreground max-w-full">
-                      <p className="leading-relaxed whitespace-pre-wrap">{currentAnswer}</p>
-                    </div>
-                    <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground text-[10px] font-semibold">
-                      <User size={12} />
-                    </div>
-                  </div>
-
-                  {/* Feedback Card */}
-                  <div className="rounded-lg border border-border bg-card p-4 ml-6 mr-6">
-                    <div className="flex items-center justify-between border-b border-border pb-3 mb-3">
-                      <div className="flex items-center gap-1.5">
-                        <Sparkles size={14} className="text-primary" />
-                        <span className="text-xs font-semibold text-foreground">AI Score & Feedback</span>
-                      </div>
-                      <div className="flex items-center gap-1 rounded bg-success-soft px-2 py-0.5 border border-success/15">
-                        <span className="text-[10px] font-bold text-success">Score: {currentFeedback.score}/10</span>
-                      </div>
-                    </div>
-                    
-                    <div className="space-y-3">
-                      <div>
-                        <h4 className="text-[10px] font-mono uppercase text-success font-semibold mb-1">Strengths</h4>
-                        <ul className="space-y-1">
-                          {currentFeedback.strengths.map((str, i) => (
-                            <li key={i} className="text-xs text-muted-foreground flex items-start gap-1.5">
-                              <span className="text-success mt-0.5">•</span> {str}
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-
-                      <div>
-                        <h4 className="text-[10px] font-mono uppercase text-warn font-semibold mb-1">Areas to Improve</h4>
-                        <ul className="space-y-1">
-                          {currentFeedback.improvements.map((imp, i) => (
-                            <li key={i} className="text-xs text-muted-foreground flex items-start gap-1.5">
-                              <span className="text-warn mt-0.5">•</span> {imp}
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-
-                      <div>
-                        <h4 className="text-[10px] font-mono uppercase text-primary font-semibold mb-1">Suggested Model Answer</h4>
-                        <p className="text-xs text-muted-foreground leading-relaxed italic bg-muted/30 p-2.5 rounded-sm border border-border/50">
-                          "{currentFeedback.modelAnswer}"
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Actions to move forward */}
-                  <div className="flex justify-end gap-2 pt-2">
-                    <button
-                      onClick={handleEnd}
-                      className="cursor-pointer rounded-sm border border-border bg-background hover:bg-muted/50 px-4 py-2 text-xs font-medium text-muted-foreground transition-colors"
-                    >
-                      End & Summarize
-                    </button>
-                    <button
-                      onClick={handleNext}
-                      className="cursor-pointer rounded-sm bg-primary px-4 py-2 text-xs font-medium text-primary-foreground transition-opacity hover:opacity-90 active:scale-[0.98] flex items-center gap-1"
-                    >
-                      {isLastQuestion ? (
-                        <>
-                          View Summary <Check size={12} />
-                        </>
-                      ) : (
-                        <>
-                          Next Question <ArrowRight size={12} />
-                        </>
-                      )}
-                    </button>
-                  </div>
-                </div>
-              )}
+              </div>
             </div>
           )}
 

@@ -18,6 +18,13 @@ export interface InterviewQuestion {
   tags: string[]
 }
 
+// During the interview, we only store Q&A — no feedback yet
+export interface InterviewQA {
+  question: InterviewQuestion
+  answer: string
+}
+
+// After batch evaluation, feedback is attached
 export interface AnswerFeedback {
   score: number // 1-10
   strengths: string[]
@@ -25,8 +32,22 @@ export interface AnswerFeedback {
   modelAnswer: string
 }
 
+// A complete exchange = Q + A + Feedback (used in summary)
 export interface InterviewExchange {
   question: InterviewQuestion
   answer: string
   feedback: AnswerFeedback
+}
+
+// Batch evaluation response from /api/ai/interview
+export interface BatchEvaluationResult {
+  evaluations: {
+    questionIndex: number
+    score: number
+    strengths: string[]
+    improvements: string[]
+    modelAnswer: string
+  }[]
+  overallScore: number
+  summary: string
 }

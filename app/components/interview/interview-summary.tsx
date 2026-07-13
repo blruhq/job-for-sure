@@ -41,7 +41,8 @@ export function InterviewSummary({ exchanges, onRestart }: InterviewSummaryProps
 
   // De-duplicate and get top 3 by frequency or just unique list
   const getTopItems = (items: string[], max = 3) => {
-    const counts = items.reduce((acc, item) => {
+    const valid = items.filter((s) => s && typeof s === 'string' && s.trim().length > 0)
+    const counts = valid.reduce((acc, item) => {
       acc[item] = (acc[item] || 0) + 1
       return acc
     }, {} as Record<string, number>)
@@ -155,6 +156,66 @@ export function InterviewSummary({ exchanges, onRestart }: InterviewSummaryProps
             )}
           </div>
         </div>
+
+        {/* Question-by-Question Breakdown */}
+        {exchanges.length > 0 && (
+          <div className="mb-6">
+            <h3 className="label-mono mb-3 text-foreground font-semibold text-xs">
+              Question-by-Question Breakdown
+            </h3>
+            <div className="space-y-3">
+              {exchanges.map((exchange, idx) => (
+                <div key={idx} className="rounded-md border border-border bg-background p-3.5 space-y-2">
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-[9px] font-mono uppercase bg-muted text-muted-foreground px-1.5 py-0.5 rounded">
+                        Q{idx + 1}
+                      </span>
+                      <span className="text-[9px] font-mono text-muted-foreground">
+                        {exchange.question.category}
+                      </span>
+                    </div>
+                    <span className={`text-[10px] font-bold font-mono ${
+                      exchange.feedback.score >= 7 ? 'text-success' :
+                      exchange.feedback.score >= 5 ? 'text-warn' : 'text-destructive'
+                    }`}>
+                      {exchange.feedback.score}/10
+                    </span>
+                  </div>
+                  <p className="text-[11px] text-foreground font-medium leading-relaxed">
+                    {exchange.question.question}
+                  </p>
+                  <div>
+                    <span className="text-[9px] font-mono uppercase text-success font-semibold">Strengths</span>
+                    <ul className="space-y-0.5 mt-0.5">
+                      {(exchange.feedback.strengths || []).map((str, i) => (
+                        <li key={i} className="text-[10px] text-muted-foreground flex items-start gap-1">
+                          <span className="text-success">+</span> {str}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                  <div>
+                    <span className="text-[9px] font-mono uppercase text-warn font-semibold">To Improve</span>
+                    <ul className="space-y-0.5 mt-0.5">
+                      {(exchange.feedback.improvements || []).map((imp, i) => (
+                        <li key={i} className="text-[10px] text-muted-foreground flex items-start gap-1">
+                          <span className="text-warn">-</span> {imp}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                  <div>
+                    <span className="text-[9px] font-mono uppercase text-primary font-semibold">Model Answer</span>
+                    <p className="text-[10px] text-muted-foreground italic mt-0.5 bg-muted/20 p-2 rounded border border-border/40">
+                      &quot;{exchange.feedback.modelAnswer}&quot;
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* Actions */}
         <div className="flex gap-2">

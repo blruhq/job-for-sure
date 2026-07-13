@@ -179,6 +179,55 @@ describe('Interview API Route', () => {
       )
     })
 
+    it('batch-evaluates all answers when action: batch-evaluate is requested', async () => {
+      mockGetSessionUser.mockResolvedValue({ id: 'u1', email: 'test@mail.com', name: 'Test' })
+      mockGenerateObjectWithFailover.mockResolvedValue({
+        evaluations: [
+          {
+            questionIndex: 0,
+            score: 7,
+            strengths: ['Clear explanation'],
+            improvements: ['Add more detail'],
+            modelAnswer: 'Ideal answer here',
+          },
+          {
+            questionIndex: 1,
+            score: 8,
+            strengths: ['Good structure'],
+            improvements: ['Quantify results'],
+            modelAnswer: 'Another ideal answer',
+          },
+        ],
+        overallScore: 7.5,
+        summary: 'Solid performance with room for growth.',
+      })
+
+      const req = new NextRequest('http://localhost/api/ai/interview', {
+        method: 'POST',
+        body: JSON.stringify({
+          action: 'batch-evaluate',
+          target: { company: 'Stripe', role: 'Engineer' },
+          difficulty: 'senior',
+          qaPairs: [
+            { question: 'Explain React reconciliation', answer: 'It compares virtual DOM trees.' },
+            { question: 'Design a URL shortener', answer: 'Use a hash function and store mappings.' },
+          ],
+        }),
+      })
+
+      const res = await POST(req)
+      expect(res.status).toBe(200)
+      const json = await res.json()
+      expect(json.evaluations).toHaveLength(2)
+      expect(json.overallScore).toBe(7.5)
+      expect(json.summary).toBeDefined()
+      expect(mockGenerateObjectWithFailover).toHaveBeenCalledWith(
+        expect.objectContaining({
+          system: expect.stringContaining('expert interview evaluation panel'),
+        })
+      )
+    })
+
     it('saves session when action: save is requested', async () => {
       mockGetSessionUser.mockResolvedValue({ id: 'u1', email: 'test@mail.com', name: 'Test' })
       mockValues.mockResolvedValue({ success: true })

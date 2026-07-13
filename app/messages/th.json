@@ -188,6 +188,13 @@
     "senior": "ระดับอาวุโส",
     "companyPlaceholder": "ชื่อบริษัท",
     "rolePlaceholder": "ชื่อตำแหน่ง",
-    "selectProfilePlaceholder": "-- เลือกโปรไฟล์ --"
+    "selectProfilePlaceholder": "-- เลือกโปรไฟล์ --",
+    "speak": "พูด",
+    "stopListening": "หยุดฟัง",
+    "listening": "กำลังฟัง...",
+    "finishAndEvaluate": "เสร็จและประเมิน",
+    "evaluatingTitle": "กำลังประเมินการสัมภาษณ์",
+    "evaluatingDesc": "กำลังวิเคราะห์คำตอบของคุณ...",
+    "questionBreakdown": "รายละเอียดทีละคำถาม"
   }
 }
