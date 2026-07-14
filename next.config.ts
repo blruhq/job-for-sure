@@ -1,7 +1,7 @@
 import createNextIntlPlugin from 'next-intl/plugin';
 import type { NextConfig } from 'next'
 
-const withNextIntl = createNextIntlPlugin('./app/i18n/request.ts');
+const withNextIntl = createNextIntlPlugin('./src/app/i18n/request.ts');
 
 const nextConfig: NextConfig = {
   serverExternalPackages: ['mammoth', '@react-pdf/renderer', 'unpdf'],
