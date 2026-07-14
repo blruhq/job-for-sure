@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef, useCallback } from 'react'
+import { useLocale } from 'next-intl'
 import { Brain, User, AlertCircle, Sparkles, Check, ArrowRight, Loader2, Mic, MicOff, RotateCcw } from 'lucide-react'
 import type { InterviewConfig, InterviewQuestion, AnswerFeedback, InterviewExchange } from '~/types/interview'
 import type { Resume } from '~/types/resume'
@@ -23,8 +24,10 @@ export function InterviewSession({ config, resume, onEnd }: InterviewSessionProp
   // Speech recognition state
   const [isListening, setIsListening] = useState(false)
   const [speechSupported, setSpeechSupported] = useState(false)
+  const [speechError, setSpeechError] = useState<string | null>(null)
   const recognitionRef = useRef<any>(null)
   const answerRef = useRef('')
+  const locale = useLocale()
 
   const bottomRef = useRef<HTMLDivElement>(null)
 
@@ -38,76 +41,99 @@ export function InterviewSession({ config, resume, onEnd }: InterviewSessionProp
   }
 
   // ── Speech Recognition Setup ──
+  const speechLang = locale === 'th' ? 'th-TH' : 'en-US'
+
+  const createRecognition = useCallback(() => {
+    if (typeof window === 'undefined') return null
+    const SpeechRecognition =
+      (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition
+    if (!SpeechRecognition) return null
+
+    const recognition = new SpeechRecognition()
+    recognition.continuous = true
+    recognition.interimResults = true
+    recognition.lang = speechLang
+
+    recognition.onresult = (event: any) => {
+      let finalTranscript = ''
+
+      for (let i = event.resultIndex; i < event.results.length; i++) {
+        const transcript = event.results[i][0].transcript
+        if (event.results[i].isFinal) {
+          finalTranscript += transcript
+        }
+      }
+
+      if (finalTranscript) {
+        const base = answerRef.current
+        const newAnswer = base + (base && !base.endsWith(' ') ? ' ' : '') + finalTranscript
+        setCurrentAnswer(newAnswer)
+      }
+    }
+
+    recognition.onerror = (event: any) => {
+      console.warn('Speech recognition error:', event.error)
+      setIsListening(false)
+      recognitionRef.current = null // mark instance as dead
+      if (event.error === 'not-allowed') {
+        setSpeechError('Microphone access blocked. Allow microphone permission in your browser and try again.')
+      } else if (event.error === 'no-speech') {
+        setSpeechError('No speech detected. Try speaking louder or check your microphone.')
+      } else {
+        setSpeechError(`Speech recognition error: ${event.error}`)
+      }
+    }
+
+    recognition.onend = () => {
+      setIsListening(false)
+    }
+
+    return recognition
+  }, [speechLang])
+
+  // Detect browser support once
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const SpeechRecognition =
         (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition
-      if (SpeechRecognition) {
-        setSpeechSupported(true)
-        const recognition = new SpeechRecognition()
-        recognition.continuous = true
-        recognition.interimResults = true
-        recognition.lang = ''
-
-        recognition.onresult = (event: any) => {
-          let interimTranscript = ''
-          let finalTranscript = ''
-
-          for (let i = event.resultIndex; i < event.results.length; i++) {
-            const transcript = event.results[i][0].transcript
-            if (event.results[i].isFinal) {
-              finalTranscript += transcript
-            } else {
-              interimTranscript += transcript
-            }
-          }
-
-          if (finalTranscript) {
-            const base = answerRef.current
-            const newAnswer = base + (base && !base.endsWith(' ') ? ' ' : '') + finalTranscript
-            setCurrentAnswer(newAnswer)
-          }
-        }
-
-        recognition.onerror = (event: any) => {
-          console.warn('Speech recognition error:', event.error)
-          setIsListening(false)
-        }
-
-        recognition.onend = () => {
-          setIsListening(false)
-        }
-
-        recognitionRef.current = recognition
-      }
+      setSpeechSupported(!!SpeechRecognition)
     }
+  }, [])
 
+  // Cleanup on unmount
+  useEffect(() => {
     return () => {
       if (recognitionRef.current) {
-        try {
-          recognitionRef.current.stop()
-        } catch {
-          // already stopped
-        }
+        try { recognitionRef.current.stop() } catch { /* already stopped */ }
       }
     }
   }, [])
 
   const toggleListening = useCallback(() => {
-    if (!recognitionRef.current) return
+    // Create a fresh instance if none exists (or previous one errored)
+    if (!recognitionRef.current) {
+      recognitionRef.current = createRecognition()
+    }
+    if (!recognitionRef.current) {
+      setSpeechError('Speech recognition is not supported in this browser.')
+      return
+    }
 
     if (isListening) {
-      recognitionRef.current.stop()
+      try { recognitionRef.current.stop() } catch { /* already stopped */ }
       setIsListening(false)
     } else {
       try {
         recognitionRef.current.start()
         setIsListening(true)
+        setSpeechError(null) // clear any previous speech error
       } catch (err) {
         console.warn('Failed to start speech recognition:', err)
+        recognitionRef.current = null // dead instance, recreate next time
+        setSpeechError('Failed to start speech recognition. Try again.')
       }
     }
-  }, [isListening])
+  }, [isListening, createRecognition])
 
   // Load first question on mount
   useEffect(() => {
@@ -447,6 +473,14 @@ export function InterviewSession({ config, resume, onEnd }: InterviewSessionProp
                       isListening ? 'border-primary ring-2 ring-primary/20' : 'border-border'
                     }`}
                   />
+                  {/* Speech error message */}
+                  {speechError && (
+                    <div className="flex items-start gap-2 rounded-sm border border-destructive/20 bg-destructive/5 p-2.5">
+                      <AlertCircle className="shrink-0 mt-0.5 text-destructive" size={12} />
+                      <p className="text-[10px] leading-relaxed text-destructive/90">{speechError}</p>
+                    </div>
+                  )}
+
                   <div className="flex items-center justify-between gap-2">
                     {/* Mic Button */}
                     <div className="flex items-center gap-2">
