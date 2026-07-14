@@ -35,6 +35,7 @@ import {
   ASHBY_FETCH_LIMIT,
 } from './companies'
 import { parseLocation, isRemoteRegionCompatible, getMacroRegion } from './geo'
+import { expandQueryTerms } from './role-synonyms'
 
 const SEARCH_TIMEOUT_MS = 15_000 // per-source timeout
 
@@ -302,10 +303,9 @@ function deduplicateJobs(jobs: JobResult[]): JobResult[] {
 }
 
 export function filterByQuery(jobs: JobResult[], query: string, location?: string): JobResult[] {
-  const queryTerms = query
-    .toLowerCase()
-    .split(/\s+/)
-    .filter((t) => t.length > 2)
+  // Expand query with role synonyms (English + Thai) for broader matching.
+  // "Junior Software Engineer" also matches "developer", "โปรแกรมเมอร์", etc.
+  const queryTerms = expandQueryTerms(query)
 
   // Parse user location into structured country/macro-region
   const userParsed = parseLocation(location)

@@ -9,6 +9,7 @@
 
 import * as cheerio from 'cheerio'
 import type { JobResult } from './types'
+import { getBroadSearchTerm } from './role-synonyms'
 
 const BASE_URL = 'https://www.jobbkk.com'
 
@@ -45,7 +46,10 @@ export async function fetchJobbKK(
   opts?: { signal?: AbortSignal },
 ): Promise<{ jobs: JobResult[]; error?: string }> {
   try {
-    const url = buildSearchUrl(query, _location)
+    // Use the broadest search term — "Junior Software Engineer" → "developer"
+    // Thai companies post with short titles, so specific queries miss most jobs.
+    const broadQuery = getBroadSearchTerm(query)
+    const url = buildSearchUrl(broadQuery, _location)
 
     const res = await fetch(url, {
       signal: opts?.signal,
