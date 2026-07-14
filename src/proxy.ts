@@ -1,7 +1,7 @@
 import { NextResponse, type NextRequest } from 'next/server'
 import { getSessionCookie } from 'better-auth/cookies'
 import createMiddleware from 'next-intl/middleware'
-import { routing } from './src/app/i18n/routing'
+import { routing } from './app/i18n/routing'
 
 const intlMiddleware = createMiddleware(routing)
 

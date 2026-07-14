@@ -26,7 +26,7 @@ export default defineConfig({
         'src/app/lib/job-sources/cache.ts',
         'src/app/lib/job-sources/scoring.ts',
         'src/app/lib/job-sources/index.ts',
-        'proxy.ts',
+        'src/proxy.ts',
       ],
     },
   },

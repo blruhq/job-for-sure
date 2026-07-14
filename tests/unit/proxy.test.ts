@@ -28,7 +28,7 @@ vi.mock('better-auth/cookies', () => ({
   getSessionCookie: mockGetSessionCookie,
 }))
 
-import { proxy, config } from '../../proxy'
+import { proxy, config } from '../../src/proxy'
 
 function makeRequest(pathname: string) {
   const url = `https://example.com${pathname}`
