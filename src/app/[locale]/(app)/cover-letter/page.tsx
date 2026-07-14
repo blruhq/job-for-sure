@@ -274,14 +274,14 @@ export default function StandaloneCoverLetterPage() {
           {/* 1. Resume selection */}
           <div className="space-y-2">
             <label className="label-mono block">{t('selectProfile')}</label>
-            <div className="flex gap-2">
+            <div className="flex gap-2 flex-wrap">
               <select
                 value={selectedResumeId}
                 onChange={(e) => {
                   setSelectedResumeId(e.target.value)
                   if (e.target.value !== 'none') setActiveResumeId(e.target.value)
                 }}
-                className="flex-1 cursor-pointer rounded-xs border border-border bg-background px-2.5 py-1.5 text-[11px] outline-none focus:border-primary"
+                className="min-w-0 flex-1 cursor-pointer rounded-xs border border-border bg-background px-2.5 py-1.5 text-[11px] outline-none focus:border-primary"
               >
                 <option value="none">{t('selectProfilePlaceholder')}</option>
                 {resumes.map((r) => (
