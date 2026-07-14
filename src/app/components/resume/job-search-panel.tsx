@@ -14,6 +14,8 @@ import { companyColor, companyLogo } from '~/lib/company-data'
 import type { Resume } from '~/types/resume'
 import type { ScoredJob, SearchResult, JobSource, JobResult } from '~/lib/job-sources/types'
 import { countryToFlag } from '~/lib/job-sources/geo'
+import { JobDetailModal } from './job-detail-modal'
+import { getCards, setCards } from '~/lib/client-cache'
 
 // ═══════════════════════════════════════════════════════════════
 // JobSearchPanel — real job search from 9+ free sources.
@@ -31,6 +33,7 @@ const SOURCE_NAMES: Record<JobSource, string> = {
   adzuna: 'Adzuna',
   jsearch: 'JSearch',
   jobbkk: 'JobbKK',
+  'linkedin-guest': 'LinkedIn',
   linkedin: 'LinkedIn (Apify)',
   indeed: 'Indeed (Apify)',
   jobsdb: 'JobsDB (Apify)',
@@ -95,6 +98,16 @@ export function JobSearchPanel({ resume }: { resume: Resume }) {
   const searchRunRef = useRef(0) // track latest search to avoid stale merges
   const resultsRef = useRef<ScoredJob[]>([]) // mirror for closures
 
+  // ── Detail modal ──
+  const [modalJob, setModalJob] = useState<ScoredJob | null>(null)
+  const [modalOpen, setModalOpen] = useState(false)
+
+  // ── Fake "+N more" tease count for paid sources (v1: faked, v1.5: real) ──
+  // Deterministic per search so it doesn't jump around on re-render.
+  const paidTeaseCount = useMemo(() => {
+    return 15 + (query.length % 25) // 15–39 range, stable per query
+  }, [query])
+
   // Keep resultsRef in sync with state (for use in callbacks without stale closures)
   useEffect(() => { resultsRef.current = results }, [results])
 
@@ -106,46 +119,16 @@ export function JobSearchPanel({ resume }: { resume: Resume }) {
     return [...existing, ...added].sort((a, b) => b.score - a.score)
   }, [])
 
-  // ── SessionStorage cache for search results ──
-  // Survives page navigation within the same tab. Dies on tab close (correct —
-  // job results go stale quickly). Full descriptions are always stored here
-  // since they come from fresh API responses, not the Redis cache.
-  const SESSION_TTL_MS = 30 * 60 * 1000 // 30 minutes
+  // ── localStorage cache for search results ──
+  // 6h TTL (upgraded from 30-min sessionStorage). Survives tab close + browser restart.
+  // Cards in localStorage, JDs in IndexedDB (see client-cache.ts).
 
-  function getSessionKey(q: string, loc: string): string {
-    return `jfs_search_${resume.id}_${q.toLowerCase().trim()}_${loc.toLowerCase().trim()}`
+  function saveSearchToCache(q: string, loc: string, data: { jobs: ScoredJob[]; total: number; descriptionsIncluded?: boolean }) {
+    setCards(q, loc, resume.id, data)
   }
 
-  function saveSearchToSession(q: string, loc: string, data: { jobs: ScoredJob[]; total: number; descriptionsIncluded?: boolean }) {
-    try {
-      sessionStorage.setItem(getSessionKey(q, loc), JSON.stringify({
-        jobs: data.jobs,
-        total: data.total,
-        descriptionsIncluded: data.descriptionsIncluded ?? true,
-        timestamp: Date.now(),
-      }))
-    } catch {
-      // sessionStorage full or unavailable — silently skip
-    }
-  }
-
-  function loadSearchFromSession(q: string, loc: string): { jobs: ScoredJob[]; total: number; descriptionsIncluded: boolean } | null {
-    try {
-      const raw = sessionStorage.getItem(getSessionKey(q, loc))
-      if (!raw) return null
-      const data = JSON.parse(raw)
-      if (Date.now() - data.timestamp > SESSION_TTL_MS) {
-        sessionStorage.removeItem(getSessionKey(q, loc))
-        return null
-      }
-      return {
-        jobs: data.jobs as ScoredJob[],
-        total: data.total as number,
-        descriptionsIncluded: data.descriptionsIncluded ?? true,
-      }
-    } catch {
-      return null
-    }
+  function loadSearchFromCache(q: string, loc: string): { jobs: ScoredJob[]; total: number; descriptionsIncluded: boolean } | null {
+    return getCards(q, loc, resume.id)
   }
 
   const handleSearch = useCallback(async (q?: string, loc?: string, fresh?: boolean) => {
@@ -185,7 +168,7 @@ export function JobSearchPanel({ resume }: { resume: Resume }) {
       setCached(fastData.cached)
       // Cache in sessionStorage for instant back-nav within same tab session.
       // This stores full descriptions (unlike Redis cache which strips them).
-      saveSearchToSession(searchQuery, loc ?? location ?? '', {
+      saveSearchToCache(searchQuery, loc ?? location ?? '', {
         jobs: fastData.jobs,
         total: fastData.total,
         descriptionsIncluded: fastData.descriptionsIncluded,
@@ -230,7 +213,7 @@ export function JobSearchPanel({ resume }: { resume: Resume }) {
 
     const q = query
     const loc = location ?? ''
-    const cached = loadSearchFromSession(q, loc)
+    const cached = loadSearchFromCache(q, loc)
     if (cached && cached.jobs.length > 0) {
       setResults(cached.jobs)
       setSearched(true)
@@ -373,6 +356,22 @@ export function JobSearchPanel({ resume }: { resume: Resume }) {
     notify({ message: 'Fetching fresh results (bypassing cache)…', type: 'info' })
   }
 
+  // ── Open detail modal for a job ──
+  const handleOpenDetail = (job: ScoredJob) => {
+    setModalJob(job)
+    setModalOpen(true)
+  }
+
+  const handleCloseDetail = () => {
+    setModalOpen(false)
+  }
+
+  // ── Bookmark from modal ──
+  const handleModalBookmark = () => {
+    if (!modalJob) return
+    handleBookmark(modalJob)
+  }
+
   // ── Load paid sources (LinkedIn/Indeed via Apify) — user-initiated ──
   const handleLoadPaid = useCallback(async () => {
     if (paidLoading || paidLoaded) return
@@ -396,7 +395,7 @@ export function JobSearchPanel({ resume }: { resume: Resume }) {
       const merged = mergeResults(resultsRef.current, data.jobs)
       setResults(merged)
       // Update sessionStorage to include paid source results
-      saveSearchToSession(query, location ?? '', {
+      saveSearchToCache(query, location ?? '', {
         jobs: merged,
         total: data.total,
         descriptionsIncluded: data.descriptionsIncluded,
@@ -588,11 +587,31 @@ export function JobSearchPanel({ resume }: { resume: Resume }) {
       {/* Results */}
       <div className="flex-1 overflow-y-auto p-4 md:p-6">
         {loading && (
-          <div className="flex flex-col items-center justify-center py-16 gap-3">
-            <Loader2 size={20} className="animate-spin text-primary" />
-            <div className="font-mono text-[11px] text-muted-foreground">
-              Fetching jobs from multiple sources…
+          <div className="flex flex-col gap-3">
+            <div className="mb-1 font-mono text-[11px] text-muted-foreground animate-pulse">
+              Searching 11 sources…
             </div>
+            {Array.from({ length: 8 }).map((_, i) => (
+              <div key={i} className="rounded-sm border border-border bg-card p-4 animate-pulse">
+                <div className="flex items-start justify-between gap-2">
+                  <div className="flex-1 space-y-1.5">
+                    <div className="h-3.5 w-2/3 rounded-xs bg-muted" />
+                    <div className="h-2.5 w-1/3 rounded-xs bg-muted/70" />
+                  </div>
+                  <div className="h-5 w-12 rounded-xs bg-muted" />
+                </div>
+                <div className="mt-2.5 flex gap-1.5">
+                  <div className="h-4 w-20 rounded-xs bg-muted/60" />
+                  <div className="h-4 w-14 rounded-xs bg-muted/60" />
+                  <div className="h-4 w-16 rounded-xs bg-muted/60" />
+                </div>
+                <div className="mt-2 flex gap-1">
+                  <div className="h-3 w-16 rounded-xs bg-success-soft" />
+                  <div className="h-3 w-12 rounded-xs bg-success-soft" />
+                  <div className="h-3 w-20 rounded-xs bg-success-soft" />
+                </div>
+              </div>
+            ))}
           </div>
         )}
 
@@ -618,10 +637,32 @@ export function JobSearchPanel({ resume }: { resume: Resume }) {
 
         {!loading && filtered.length > 0 && (
           <>
-            <div className="mb-3 text-[11px] text-muted-foreground">
-              {filtered.length} real job{filtered.length !== 1 ? 's' : ''}
-              {displayedJobs.length < filtered.length && ` · showing ${displayedJobs.length}`}
-              {' · '}scored against your {resume.skills.length} skills
+            <div className="mb-3 flex flex-wrap items-center gap-x-2 gap-y-1 text-[11px] text-muted-foreground">
+              <span>
+                {filtered.length} real job{filtered.length !== 1 ? 's' : ''}
+                {displayedJobs.length < filtered.length && ` · showing ${displayedJobs.length}`}
+              </span>
+              <span>·</span>
+              <span>scored against your {resume.skills.length} skills</span>
+              {sourceCount > 0 && (
+                <>
+                  <span>·</span>
+                  <span>
+                    Results from {sourceCount} of 11 sources
+                  </span>
+                </>
+              )}
+              {cached && (
+                <>
+                  <span>·</span>
+                  <button
+                    onClick={handleRefresh}
+                    className="flex cursor-pointer items-center gap-0.5 text-primary hover:underline"
+                  >
+                    <RefreshCw size={9} /> Cached — refresh
+                  </button>
+                </>
+              )}
             </div>
 
             <div className="flex flex-col gap-3">
@@ -633,6 +674,7 @@ export function JobSearchPanel({ resume }: { resume: Resume }) {
                   onBookmark={() => handleBookmark(job)}
                   onAts={() => handleAts(job)}
                   onInterview={() => handleInterview(job)}
+                  onClick={() => handleOpenDetail(job)}
                 />
               ))}
             </div>
@@ -651,8 +693,14 @@ export function JobSearchPanel({ resume }: { resume: Resume }) {
             {/* Paid sources button (only when no more free jobs to load) */}
             {!hasMore && !paidLoaded && (
               <div className="mt-4 flex flex-col items-center gap-2 border-t border-border pt-4">
-                <p className="text-[11px] text-muted-foreground">
-                  Want jobs from more sources?
+                <p className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
+                  <Briefcase size={12} className="text-primary" />
+                  <span>
+                    <span className="font-semibold text-primary">
+                      +{paidTeaseCount} more jobs
+                    </span>{' '}
+                    from LinkedIn, Indeed &amp; JobsDB
+                  </span>
                 </p>
                 <button
                   onClick={handleLoadPaid}
@@ -664,7 +712,7 @@ export function JobSearchPanel({ resume }: { resume: Resume }) {
                   ) : (
                     <Briefcase size={12} />
                   )}
-                  {paidLoading ? 'Loading…' : 'Search LinkedIn, Indeed & JobsDB'}
+                  {paidLoading ? 'Loading…' : 'Unlock paid sources'}
                 </button>
               </div>
             )}
@@ -679,6 +727,16 @@ export function JobSearchPanel({ resume }: { resume: Resume }) {
           </>
         )}
       </div>
+
+      {/* Detail Modal */}
+      <JobDetailModal
+        job={modalJob}
+        resume={resume}
+        open={modalOpen}
+        onClose={handleCloseDetail}
+        bookmarked={modalJob ? isBookmarked(modalJob.id) : false}
+        onBookmark={handleModalBookmark}
+      />
     </div>
   )
 }
@@ -687,15 +745,19 @@ export function JobSearchPanel({ resume }: { resume: Resume }) {
 // SUB-COMPONENTS
 // ═══════════════════════════════════════════════════════════════
 
-function JobCard({ job, bookmarked, onBookmark, onAts, onInterview }: {
+function JobCard({ job, bookmarked, onBookmark, onAts, onInterview, onClick }: {
   job: ScoredJob
   bookmarked: boolean
   onBookmark: () => void
   onAts: () => void
   onInterview: () => void
+  onClick: () => void
 }) {
   return (
-    <div className="rounded-sm border border-border bg-card p-4 transition-colors hover:border-primary">
+    <div
+      className="cursor-pointer rounded-sm border border-border bg-card p-4 transition-colors hover:border-primary"
+      onClick={onClick}
+    >
       <div className="mb-0.5 flex items-start justify-between gap-2">
         <div className="min-w-0 flex-1">
           <span className="text-[13px] font-semibold">{job.title}</span>
@@ -765,38 +827,21 @@ function JobCard({ job, bookmarked, onBookmark, onAts, onInterview }: {
         </div>
       )}
 
-      {/* Actions */}
-      <div className="mt-3 flex items-center justify-end gap-2 border-t border-border/50 pt-3">
+      {/* Footer: quick bookmark + "click for details" hint */}
+      <div className="mt-3 flex items-center justify-between border-t border-border/50 pt-2.5">
+        <span className="font-mono text-[10px] text-muted-foreground/60">
+          Click for details &amp; AI tools
+        </span>
         <button
-          onClick={onBookmark}
+          onClick={(e) => { e.stopPropagation(); onBookmark() }}
           className={cn(
             'flex cursor-pointer items-center gap-1 rounded-xs border px-2 py-1 text-[11px] transition-all hover:scale-[1.02] active:scale-[0.98]',
             bookmarked ? 'border-primary bg-primary text-primary-foreground' : 'border-border bg-card hover:border-primary hover:text-primary',
           )}
         >
           <Bookmark size={11} fill={bookmarked ? 'currentColor' : 'none'} />
-          {bookmarked ? 'Bookmarked' : 'Bookmark'}
+          {bookmarked ? 'Saved' : 'Save'}
         </button>
-        <button
-          onClick={onAts}
-          className="flex cursor-pointer items-center gap-1 rounded-xs border border-border bg-card px-2 py-1 text-[11px] transition-colors hover:border-primary hover:text-primary"
-        >
-          <span>🎯 ATS Fit</span>
-        </button>
-        <button
-          onClick={onInterview}
-          className="flex cursor-pointer items-center gap-1 rounded-xs border border-border bg-card px-2 py-1 text-[11px] transition-colors hover:border-primary hover:text-primary"
-        >
-          <Brain size={11} /> Interview
-        </button>
-        <a
-          href={job.url}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="flex cursor-pointer items-center gap-1 rounded-xs bg-primary px-2 py-1 text-[11px] font-medium text-primary-foreground transition-all hover:opacity-90 hover:scale-[1.02] active:scale-[0.98]"
-        >
-          Apply <ExternalLink size={10} />
-        </a>
       </div>
     </div>
   )

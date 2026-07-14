@@ -14,7 +14,8 @@ export type JobSource =
   | 'adzuna'
   | 'jsearch'
   | 'jobbkk'
-  | 'linkedin'
+  | 'linkedin-guest' // Free LinkedIn guest endpoint (list only, no descriptions)
+  | 'linkedin'       // Paid Apify LinkedIn (full data)
   | 'indeed'
   | 'jobsdb'
 

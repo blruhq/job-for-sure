@@ -11,6 +11,7 @@ import { notify } from '~/lib/toast'
 import { companyColor, companyLogo } from '~/lib/company-data'
 import type { Resume } from '~/types/resume'
 import type { ScoredJob, SearchResult, JobSource } from '~/lib/job-sources/types'
+import { JobDetailModal } from '~/components/resume/job-detail-modal'
 
 const SOURCE_SHORT: Record<JobSource, string> = {
   greenhouse: 'Greenhouse',
@@ -23,6 +24,7 @@ const SOURCE_SHORT: Record<JobSource, string> = {
   adzuna: 'Adzuna',
   jsearch: 'JSearch',
   jobbkk: 'JobbKK',
+  'linkedin-guest': 'LinkedIn',
   linkedin: 'LinkedIn',
   indeed: 'Indeed',
   jobsdb: 'JobsDB',
@@ -42,6 +44,10 @@ export function JobPreview({ resume, onDismiss, onLoadComplete }: { resume: Resu
   const [loading, setLoading] = useState(true)
   const [total, setTotal] = useState(0)
   const [error, setError] = useState(false)
+
+  // ── Detail modal ──
+  const [modalJob, setModalJob] = useState<ScoredJob | null>(null)
+  const [modalOpen, setModalOpen] = useState(false)
 
   const fetchJobs = useCallback(async () => {
     setLoading(true)
@@ -145,7 +151,8 @@ export function JobPreview({ resume, onDismiss, onLoadComplete }: { resume: Resu
             return (
               <div
                 key={key}
-                className="rounded-sm border border-border bg-background p-2.5 transition-colors hover:border-primary/40"
+                className="cursor-pointer rounded-sm border border-border bg-background p-2.5 transition-colors hover:border-primary/40"
+                onClick={() => { setModalJob(job); setModalOpen(true) }}
               >
                 <div className="flex items-start justify-between gap-2">
                   <div className="min-w-0 flex-1">
@@ -195,7 +202,7 @@ export function JobPreview({ resume, onDismiss, onLoadComplete }: { resume: Resu
                 </div>
 
                 {/* Actions */}
-                <div className="mt-2 flex items-center gap-1.5">
+                <div className="mt-2 flex items-center gap-1.5" onClick={(e) => e.stopPropagation()}>
                   <button
                     onClick={() => {
                       if (bm) {
@@ -246,14 +253,12 @@ export function JobPreview({ resume, onDismiss, onLoadComplete }: { resume: Resu
                   >
                     <Brain size={9} /> Interview
                   </button>
-                  <a
-                    href={job.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
+                  <button
+                    onClick={() => { setModalJob(job); setModalOpen(true) }}
                     className="ml-auto flex cursor-pointer items-center gap-0.5 rounded-xs bg-primary px-1.5 py-0.5 text-[10px] font-medium text-primary-foreground transition-all hover:opacity-90"
                   >
-                    Apply <ExternalLink size={8} />
-                  </a>
+                    Details <ChevronRight size={8} />
+                  </button>
                 </div>
               </div>
             )
@@ -271,6 +276,38 @@ export function JobPreview({ resume, onDismiss, onLoadComplete }: { resume: Resu
         )}
 
       </div>
+
+      {/* Detail Modal */}
+      <JobDetailModal
+        job={modalJob}
+        resume={resume}
+        open={modalOpen}
+        onClose={() => setModalOpen(false)}
+        bookmarked={modalJob ? isBookmarked(modalJob.id) : false}
+        onBookmark={() => {
+          if (!modalJob) return
+          const j = modalJob
+          if (isBookmarked(j.id)) {
+            toggleBookmark(j.id)
+          } else {
+            bookmarkJob({
+              key: j.id,
+              logo: companyLogo(j.company),
+              color: companyColor(j.company),
+              company: j.company,
+              title: j.title,
+              loc: j.location,
+              score: j.score,
+              level: j.score >= 75 ? 'high' : 'mid',
+              time: 'just now',
+              url: j.url,
+              resume: resume.id,
+              addedAt: new Date().toISOString(),
+            })
+            notify({ message: `Bookmarked: ${j.title}`, type: 'success' })
+          }
+        }}
+      />
     </div>
   )
 }

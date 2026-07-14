@@ -26,6 +26,7 @@ import { fetchJobbKK } from './jobbkk'
 import { fetchApifyLinkedIn } from './apify-linkedin'
 import { fetchApifyIndeed } from './apify-indeed'
 import { fetchApifyJobsDB } from './apify-jobsdb'
+import { fetchLinkedInGuest } from './linkedin-guest'
 import { rankJobs, inferExperienceLevel } from './scoring'
 import { getCached, setCached, cacheKey } from './cache'
 import {
@@ -47,6 +48,7 @@ const SEARCH_TIMEOUT_MS = 15_000 // per-source timeout
 const FAST_FREE_SOURCES: JobSource[] = [
   'remoteok', 'himalayas', 'remotive',
   'themuse', 'arbeitnow', 'adzuna', 'jsearch', 'jobbkk',
+  'linkedin-guest',
 ]
 const SLOW_FREE_SOURCES: JobSource[] = ['greenhouse', 'ashby']
 const BUDGET_SOURCES: JobSource[] = []
@@ -141,6 +143,10 @@ export async function searchJobs(params: SearchParams): Promise<SearchResult> {
   if (sources.includes('jobbkk')) {
     fetchers.push(fetchJobbKK(query, location))
     fetcherSources.push('jobbkk')
+  }
+  if (sources.includes('linkedin-guest')) {
+    fetchers.push(fetchLinkedInGuest(query, location))
+    fetcherSources.push('linkedin-guest')
   }
   if (sources.includes('linkedin')) {
     fetchers.push(fetchApifyLinkedIn(query, location))
