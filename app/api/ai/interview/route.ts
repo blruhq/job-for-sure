@@ -269,7 +269,7 @@ async function handleSave(body: unknown, userId: string) {
     role,
     type,
     difficulty,
-    score: String(score),
+    score: typeof score === 'number' ? score : parseFloat(String(score)) || 5,
     exchanges,
   })
   return NextResponse.json({ success: true, id })

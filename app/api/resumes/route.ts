@@ -45,7 +45,7 @@ export const POST = withAuth(async (req, { user }) => {
   const resume = {
     id: id || crypto.randomUUID(),
     userId: user.id,
-    data: JSON.stringify(data),
+    data: data,
     isBase: isBase ?? true,
     createdAt: new Date(),
     updatedAt: new Date(),

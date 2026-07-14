@@ -5,43 +5,8 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1783664931682,
-      "tag": "0000_massive_scarlet_witch",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "7",
-      "when": 1783715232615,
-      "tag": "0001_nifty_cable",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "7",
-      "when": 1783753350222,
-      "tag": "0002_happy_captain_universe",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "7",
-      "when": 1783814400000,
-      "tag": "0003_rename_pipeline_to_applications",
-      "breakpoints": true
-    },
-    {
-      "idx": 4,
-      "version": "7",
-      "when": 1784121600000,
-      "tag": "0004_soft_delete",
-      "breakpoints": true
-    },
-    {
-      "idx": 5,
-      "version": "7",
-      "when": 1783926528655,
-      "tag": "0005_tense_miracleman",
+      "when": 1784007850985,
+      "tag": "0000_loose_iron_patriot",
       "breakpoints": true
     }
   ]

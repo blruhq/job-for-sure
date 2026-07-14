@@ -114,6 +114,7 @@ export const ChatContextSchema = z.object({
 
 export const PipelineJobSchema = z.object({
   key: z.string().max(200),
+  applicationId: z.string().max(100).optional(),
   logo: z.string().max(2048).optional(),
   color: z.string().max(20).optional(),
   company: z.string().max(300),
@@ -131,4 +132,30 @@ export const ApplicationBoardSchema = z.object({
   applied: z.array(PipelineJobSchema).max(500).optional(),
   interviewing: z.array(PipelineJobSchema).max(500).optional(),
   offers: z.array(PipelineJobSchema).max(500).optional(),
+  rejected: z.array(PipelineJobSchema).max(500).optional(),
 }).passthrough()
+
+// ── Application record schemas (for individual-record API) ──
+
+export const CreateApplicationSchema = z.object({
+  sourceKey: z.string().max(200),
+  company: z.string().max(300),
+  jobTitle: z.string().max(300),
+  jobUrl: z.string().max(2048).optional(),
+  location: z.string().max(200).optional(),
+  salary: z.string().max(200).optional(),
+  logoUrl: z.string().max(2048).optional(),
+  color: z.string().max(20).optional(),
+  level: z.string().max(10).optional(),
+  matchScore: z.number().optional(),
+  resumeId: z.string().max(100).nullable().optional(),
+  status: z.string().max(20).optional(),
+})
+
+export const ReorderApplicationSchema = z.object({
+  updates: z.array(z.object({
+    id: z.string().max(100),
+    status: z.string().max(20),
+    position: z.number(),
+  })).max(500),
+})

@@ -43,6 +43,16 @@ export function withAuth<P = Record<string, string>>(
       }
       userId = user.id
 
+      // 1b. Origin check — defense against CSRF on custom API routes
+      const method = nextReq.method.toUpperCase()
+      if (method !== 'GET' && method !== 'HEAD' && method !== 'OPTIONS') {
+        const origin = nextReq.headers.get('origin')
+        const host = nextReq.headers.get('host')
+        if (origin && host && !origin.includes(host)) {
+          return NextResponse.json({ error: 'Cross-origin request blocked' }, { status: 403 })
+        }
+      }
+
       // 2. Rate limit (fail-open)
       if (opts?.rateLimitType === 'ai') {
         const limited = await checkRateLimit(user.id)

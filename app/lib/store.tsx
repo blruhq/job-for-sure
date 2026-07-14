@@ -5,6 +5,66 @@ import type { ApplicationBoard, PipelineJob, Resume } from '~/types/resume'
 import { notify } from '~/lib/toast'
 import { EMPTY_APPLICATIONS } from '~/lib/constants'
 
+// ── DB application record shape (from GET /api/applications) ──
+interface ApplicationRecord {
+  id: string
+  sourceKey: string
+  company: string
+  jobTitle: string
+  jobUrl: string | null
+  location: string | null
+  salary: string | null
+  logoUrl: string | null
+  color: string | null
+  level: string | null
+  status: string
+  position: number
+  matchScore: number | null
+  resumeId: string | null
+  notes: string | null
+  appliedAt: string | null
+  createdAt: string
+  updatedAt: string
+}
+
+function mapAppToJob(app: ApplicationRecord): PipelineJob {
+  const timeLabels: Record<string, string> = {
+    bookmarked: 'saved',
+    applied: 'just now',
+    interviewing: 'scheduled',
+    offered: 'received',
+    rejected: 'rejected',
+  }
+  return {
+    key: app.sourceKey,
+    applicationId: app.id,
+    logo: app.logoUrl || '',
+    color: app.color || '',
+    company: app.company,
+    title: app.jobTitle,
+    loc: app.location || '',
+    score: app.matchScore || 0,
+    level: (app.level === 'high' ? 'high' : 'mid'),
+    time: timeLabels[app.status] || 'saved',
+    url: app.jobUrl || '',
+    resume: app.resumeId || '',
+  }
+}
+
+function groupByStatus(apps: ApplicationRecord[]): ApplicationBoard {
+  const board: ApplicationBoard = { ...EMPTY_APPLICATIONS }
+  const sorted = [...apps].sort((a, b) => {
+    if (a.position !== b.position) return a.position - b.position
+    return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+  })
+  for (const app of sorted) {
+    const job = mapAppToJob(app)
+    const col = app.status as keyof ApplicationBoard
+    if (col in board) board[col].push(job)
+  }
+  return board
+}
+
 // ═══════════════════════════════════════════════════════════════
 // CONTEXT TYPE
 // ═══════════════════════════════════════════════════════════════
@@ -101,22 +161,15 @@ export function AppStoreProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     async function load() {
       try {
-        const [resumeList, boardData] = await Promise.all([
-          apiGet<Array<{ id: string; data: string }>>('/api/resumes'),
-          apiGet<ApplicationBoard>('/api/applications').catch(() => EMPTY_APPLICATIONS),
+        const [resumeList, appList] = await Promise.all([
+          apiGet<Array<{ id: string; data: Resume }>>('/api/resumes'),
+          apiGet<ApplicationRecord[]>('/api/applications').catch(() => []),
         ])
 
-        const parsed = resumeList.map((r) => {
-          try {
-            const dataObj = typeof r.data === 'string' ? JSON.parse(r.data) : r.data
-            return { ...dataObj, id: r.id } as Resume
-          }
-          catch { return null }
-        }).filter(Boolean) as Resume[]
-
+        const parsed = resumeList.map((r) => ({ ...r.data, id: r.id }) as Resume)
         setResumes(parsed)
         if (parsed.length > 0) setActiveResumeIdState(parsed[0].id)
-        setApplications(boardData)
+        setApplications(groupByStatus(appList))
       } catch {
         // Not authenticated or no data — start empty
       } finally {
@@ -133,6 +186,7 @@ export function AppStoreProvider({ children }: { children: ReactNode }) {
   }, [])
 
   const addResume = useCallback((resume: Resume) => {
+    if (!hydratedRef.current) return
     setResumes(prev => [...prev, resume])
     setActiveResumeIdState(resume.id)
     apiPost('/api/resumes', { id: resume.id, data: resume }).catch((err) => {
@@ -155,15 +209,12 @@ export function AppStoreProvider({ children }: { children: ReactNode }) {
   }, [])
 
   const deleteResume = useCallback(async (id: string) => {
-    // Capture current state BEFORE mutation (no side effects inside updater)
-    const oldResumes = resumes
+    const oldResumes = resumesRef.current
     const oldActiveId = activeResumeId
 
-    // Compute next state synchronously
-    const next = resumes.filter(r => r.id !== id)
+    const next = oldResumes.filter(r => r.id !== id)
     setResumes(next)
 
-    // Update active ID based on computed state
     if (activeResumeId === id) {
       setActiveResumeIdState(next.length > 0 ? next[0].id : null)
     }
@@ -176,7 +227,7 @@ export function AppStoreProvider({ children }: { children: ReactNode }) {
       if (oldActiveId !== null) setActiveResumeIdState(oldActiveId)
       notify({ message: 'Failed to delete resume. Changes rolled back.', type: 'error' })
     }
-  }, [resumes, activeResumeId])
+  }, [activeResumeId])
 
   const getResume = useCallback((id: string) => resumes.find(r => r.id === id), [resumes])
 
@@ -186,95 +237,140 @@ export function AppStoreProvider({ children }: { children: ReactNode }) {
   const resumesRef = useRef(resumes)
   resumesRef.current = resumes
 
+  // ── Hydration ref — prevents mutations before initial load completes ──
+  const hydratedRef = useRef(false)
+  hydratedRef.current = hydrated
+
   // ── Ref mirror of applications for rollback without side effects in updater ──
   const applicationsRef = useRef(applications)
   applicationsRef.current = applications
 
-  // ── Applications actions with Rollback ──
-  // FIX: Previous version fired apiPost inside the setApplications updater,
-  // which double-fired in React StrictMode and caused stale closures on rollback.
-  // Now: compute next state purely, update state, THEN persist outside the updater.
-  const updateApplicationsAndPersist = useCallback((updater: (prev: ApplicationBoard) => ApplicationBoard) => {
-    const prev = applicationsRef.current
-    const next = updater(prev)
+  const bookmarkJob = useCallback((job: PipelineJob) => {
+    if (applicationsRef.current.bookmark.some(j => j.key === job.key)) return
 
-    // Only proceed if the updater actually changed something
-    if (next === prev) return
+    const optimisticJob: PipelineJob = { ...job, time: 'saved' }
+    setApplications(prev => ({
+      ...prev,
+      bookmark: [...prev.bookmark, optimisticJob],
+    }))
 
-    // Optimistically update UI
-    setApplications(next)
-
-    // Persist outside the state updater — safe for StrictMode
-    apiPost('/api/applications', next).catch((err) => {
-      console.error(err)
-      setApplications(prev) // Rollback to snapshot
-      notify({ message: 'Failed to update application board. Changes rolled back.', type: 'error' })
+    apiPost('/api/applications', {
+      sourceKey: job.key,
+      company: job.company,
+      jobTitle: job.title,
+      jobUrl: job.url || undefined,
+      location: job.loc || undefined,
+      logoUrl: job.logo || undefined,
+      color: job.color || undefined,
+      level: job.level || undefined,
+      matchScore: job.score || undefined,
+      resumeId: job.resume || undefined,
+      status: 'bookmarked',
+    }).then((res) => {
+      const created = res as { id: string }
+      setApplications(prev => ({
+        ...prev,
+        bookmark: prev.bookmark.map(j =>
+          j.key === job.key ? { ...j, applicationId: created.id } : j
+        ),
+      }))
+    }).catch(() => {
+      setApplications(applicationsRef.current)
+      notify({ message: 'Failed to bookmark job.', type: 'error' })
     })
   }, [])
 
-  const bookmarkJob = useCallback((job: PipelineJob) => {
-    updateApplicationsAndPersist(prev => {
-      if (prev.bookmark.some(j => j.key === job.key)) return prev
-      return { ...prev, bookmark: [...prev.bookmark, job] }
-    })
-  }, [updateApplicationsAndPersist])
-
   const toggleBookmark = useCallback((key: string) => {
-    updateApplicationsAndPersist(prev => {
-      const exists = prev.bookmark.some(j => j.key === key)
-      return exists
-        ? { ...prev, bookmark: prev.bookmark.filter(j => j.key !== key) }
-        : prev
-    })
-  }, [updateApplicationsAndPersist])
+    const existing = applicationsRef.current.bookmark.find(j => j.key === key)
+    if (!existing) return
+
+    setApplications(prev => ({
+      ...prev,
+      bookmark: prev.bookmark.filter(j => j.key !== key),
+    }))
+
+    if (existing.applicationId) {
+      apiDelete(`/api/applications/${existing.applicationId}`).catch(() => {
+        setApplications(applicationsRef.current)
+        notify({ message: 'Failed to remove bookmark.', type: 'error' })
+      })
+    }
+  }, [])
 
   const isBookmarked = useCallback((key: string) => {
     return applications.bookmark.some(j => j.key === key)
   }, [applications])
 
   const moveJob = useCallback((jobKey: string, fromCol: keyof ApplicationBoard, toCol: keyof ApplicationBoard, toIndex?: number) => {
-    updateApplicationsAndPersist(prev => {
-      // Same column — reorder within
-      if (fromCol === toCol) {
-        const items = [...prev[fromCol]]
-        const idx = items.findIndex(j => j.key === jobKey)
-        if (idx === -1) return prev
-        const [job] = items.splice(idx, 1)
-        const target = typeof toIndex === 'number' && toIndex >= 0 && toIndex <= items.length
-          ? toIndex
-          : 0
-        items.splice(target, 0, job)
-        return { ...prev, [fromCol]: items }
-      }
+    const prev = applicationsRef.current
+    const from = [...prev[fromCol]]
+    const to = fromCol === toCol ? from : [...prev[toCol]]
 
-      // Cross-column move
-      const from = [...prev[fromCol]]
-      const to = [...prev[toCol]]
-      const idx = from.findIndex(j => j.key === jobKey)
-      if (idx === -1) return prev
-      const [job] = from.splice(idx, 1)
-      job.time = toCol === 'applied' ? 'just now' : toCol === 'interviewing' ? 'scheduled' : toCol === 'offers' ? 'received' : 'saved'
+    const idx = from.findIndex(j => j.key === jobKey)
+    if (idx === -1) return
 
-      if (typeof toIndex === 'number' && toIndex >= 0 && toIndex <= to.length) {
-        to.splice(toIndex, 0, job)
-      } else {
-        to.unshift(job)
-      }
+    const [job] = from.splice(idx, 1)
 
-      return { ...prev, [fromCol]: from, [toCol]: to }
+    if (toCol === 'applied') job.time = 'just now'
+    else if (toCol === 'interviewing') job.time = 'scheduled'
+    else if (toCol === 'offers') job.time = 'received'
+    else if (toCol === 'rejected') job.time = 'rejected'
+    else job.time = 'saved'
+
+    const target = typeof toIndex === 'number' && toIndex >= 0 && toIndex <= to.length
+      ? toIndex
+      : 0
+    to.splice(target, 0, job)
+
+    const next = fromCol === toCol
+      ? { ...prev, [fromCol]: to }
+      : { ...prev, [fromCol]: from, [toCol]: to }
+    setApplications(next)
+
+    const updates: Array<{ id: string; status: string; position: number }> = []
+    to.forEach((j, i) => {
+      if (j.applicationId) updates.push({ id: j.applicationId, status: toCol, position: i })
     })
-  }, [updateApplicationsAndPersist])
+    if (fromCol !== toCol) {
+      from.forEach((j, i) => {
+        if (j.applicationId) updates.push({ id: j.applicationId, status: fromCol, position: i })
+      })
+    }
+
+    if (updates.length > 0) {
+      apiPost('/api/applications/reorder', { updates }).catch(() => {
+        setApplications(applicationsRef.current)
+        notify({ message: 'Failed to move application.', type: 'error' })
+      })
+    }
+  }, [])
 
   const removeJob = useCallback((jobKey: string, fromCol: keyof ApplicationBoard) => {
-    updateApplicationsAndPersist(prev => {
-      const arr = prev[fromCol].filter(j => j.key !== jobKey)
-      return { ...prev, [fromCol]: arr }
-    })
-  }, [updateApplicationsAndPersist])
+    const prev = applicationsRef.current
+    const job = prev[fromCol].find(j => j.key === jobKey)
+    if (!job) return
+
+    setApplications(prev => ({
+      ...prev,
+      [fromCol]: prev[fromCol].filter(j => j.key !== jobKey),
+    }))
+
+    if (job.applicationId) {
+      apiDelete(`/api/applications/${job.applicationId}`).catch(() => {
+        setApplications(applicationsRef.current)
+        notify({ message: 'Failed to remove application.', type: 'error' })
+      })
+    }
+  }, [])
 
   const clearApplications = useCallback(() => {
-    updateApplicationsAndPersist(() => EMPTY_APPLICATIONS)
-  }, [updateApplicationsAndPersist])
+    const prev = applicationsRef.current
+    setApplications(EMPTY_APPLICATIONS)
+    apiDelete('/api/applications').catch(() => {
+      setApplications(prev)
+      notify({ message: 'Failed to clear applications.', type: 'error' })
+    })
+  }, [])
 
   const toggleSidebar = useCallback(() => setSidebarCollapsed(prev => !prev), [])
 

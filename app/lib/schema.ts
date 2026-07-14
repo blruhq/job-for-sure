@@ -1,5 +1,5 @@
 import { relations } from "drizzle-orm";
-import { pgTable, text, timestamp, boolean, jsonb, index } from "drizzle-orm/pg-core";
+import { pgTable, pgEnum, text, timestamp, boolean, jsonb, integer, numeric, index } from "drizzle-orm/pg-core";
 
 // ═══════════════════════════════════════════════════════════════
 // BETTER AUTH TABLES
@@ -79,31 +79,33 @@ export const verification = pgTable(
   (table) => [index("verification_identifier_idx").on(table.identifier)],
 );
 
-// ═══════════════════════════════════════════════════════════════
-// AUTH RELATIONS
-// ═══════════════════════════════════════════════════════════════
-
 export const userRelations = relations(user, ({ many }) => ({
   sessions: many(session),
   accounts: many(account),
 }));
 
 export const sessionRelations = relations(session, ({ one }) => ({
-  user: one(user, {
-    fields: [session.userId],
-    references: [user.id],
-  }),
+  user: one(user, { fields: [session.userId], references: [user.id] }),
 }));
 
 export const accountRelations = relations(account, ({ one }) => ({
-  user: one(user, {
-    fields: [account.userId],
-    references: [user.id],
-  }),
+  user: one(user, { fields: [account.userId], references: [user.id] }),
 }));
 
 // ═══════════════════════════════════════════════════════════════
-// APPLICATION TABLES
+// APPLICATION STATUS ENUM
+// ═══════════════════════════════════════════════════════════════
+
+export const applicationStatus = pgEnum("application_status", [
+  "bookmarked",
+  "applied",
+  "interviewing",
+  "offered",
+  "rejected",
+]);
+
+// ═══════════════════════════════════════════════════════════════
+// RESUMES
 // ═══════════════════════════════════════════════════════════════
 
 export const resumes = pgTable("resumes", {
@@ -112,11 +114,19 @@ export const resumes = pgTable("resumes", {
     .notNull()
     .references(() => user.id, { onDelete: "cascade" }),
   data: jsonb("data").notNull(),
-  isBase: boolean("is_base").default(true),
-  createdAt: timestamp("created_at").defaultNow(),
-  updatedAt: timestamp("updated_at").defaultNow(),
+  isBase: boolean("is_base").default(true).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().$onUpdate(() => new Date()).notNull(),
   deletedAt: timestamp("deleted_at"),
 }, (table) => [index("resumes_userId_idx").on(table.userId)]);
+
+export const resumeRelations = relations(resumes, ({ one }) => ({
+  user: one(user, { fields: [resumes.userId], references: [user.id] }),
+}));
+
+// ═══════════════════════════════════════════════════════════════
+// TAILORED RESUMES
+// ═══════════════════════════════════════════════════════════════
 
 export const tailoredResumes = pgTable("tailored_resumes", {
   id: text("id").primaryKey(),
@@ -127,27 +137,58 @@ export const tailoredResumes = pgTable("tailored_resumes", {
   jobUrl: text("job_url"),
   jobData: jsonb("job_data"),
   data: jsonb("data").notNull(),
-  createdAt: timestamp("created_at").defaultNow(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().$onUpdate(() => new Date()).notNull(),
+  deletedAt: timestamp("deleted_at"),
 }, (table) => [index("tailored_resumes_userId_idx").on(table.userId)]);
+
+export const tailoredResumesRelations = relations(tailoredResumes, ({ one }) => ({
+  user: one(user, { fields: [tailoredResumes.userId], references: [user.id] }),
+  baseResume: one(resumes, { fields: [tailoredResumes.baseResumeId], references: [resumes.id] }),
+}));
+
+// ═══════════════════════════════════════════════════════════════
+// APPLICATIONS (individual records — replaces applications_data blob)
+// ═══════════════════════════════════════════════════════════════
 
 export const applications = pgTable("applications", {
   id: text("id").primaryKey(),
   userId: text("user_id")
     .notNull()
     .references(() => user.id, { onDelete: "cascade" }),
+  sourceKey: text("source_key").notNull(),
   company: text("company").notNull(),
   jobTitle: text("job_title").notNull(),
   jobUrl: text("job_url"),
-  status: text("status").default("bookmarked"),
+  location: text("location"),
+  salary: text("salary"),
+  logoUrl: text("logo_url"),
+  color: text("color"),
+  level: text("level"),
+  status: applicationStatus("status").default("bookmarked").notNull(),
+  position: integer("position").default(0).notNull(),
+  matchScore: integer("match_score"),
+  resumeId: text("resume_id").references(() => resumes.id, { onDelete: "set null" }),
   tailoredResumeId: text("tailored_resume_id").references(() => tailoredResumes.id, { onDelete: "set null" }),
+  coverLetterId: text("cover_letter_id").references(() => coverLetters.id, { onDelete: "set null" }),
   notes: text("notes"),
   appliedAt: timestamp("applied_at"),
-  createdAt: timestamp("created_at").defaultNow(),
-  updatedAt: timestamp("updated_at").defaultNow(),
-}, (table) => [index("applications_userId_idx").on(table.userId)]);
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().$onUpdate(() => new Date()).notNull(),
+  deletedAt: timestamp("deleted_at"),
+}, (table) => [
+  index("applications_userId_idx").on(table.userId),
+  index("applications_userId_status_idx").on(table.userId, table.status),
+]);
+
+export const applicationsRelations = relations(applications, ({ one }) => ({
+  user: one(user, { fields: [applications.userId], references: [user.id] }),
+  resume: one(resumes, { fields: [applications.resumeId], references: [resumes.id] }),
+  tailoredResume: one(tailoredResumes, { fields: [applications.tailoredResumeId], references: [tailoredResumes.id] }),
+}));
 
 // ═══════════════════════════════════════════════════════════════
-// APPLICATION RELATIONS
+// USER PREFERENCES
 // ═══════════════════════════════════════════════════════════════
 
 export const userPreferences = pgTable("user_preferences", {
@@ -157,23 +198,17 @@ export const userPreferences = pgTable("user_preferences", {
   emailNotifications: boolean("email_notifications").default(true).notNull(),
   weeklyDigest: boolean("weekly_digest").default(false).notNull(),
   marketingEmails: boolean("marketing_emails").default(false).notNull(),
-  updatedAt: timestamp("updated_at").defaultNow(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().$onUpdate(() => new Date()).notNull(),
 });
 
-export const applicationsData = pgTable("applications_data", {
-  userId: text("user_id")
-    .primaryKey()
-    .references(() => user.id, { onDelete: "cascade" }),
-  data: jsonb("data").notNull(),
-  updatedAt: timestamp("updated_at").defaultNow(),
-});
-
-export const resumeRelations = relations(resumes, ({ one }) => ({
-  user: one(user, {
-    fields: [resumes.userId],
-    references: [user.id],
-  }),
+export const userPreferencesRelations = relations(userPreferences, ({ one }) => ({
+  user: one(user, { fields: [userPreferences.userId], references: [user.id] }),
 }));
+
+// ═══════════════════════════════════════════════════════════════
+// INTERVIEW SESSIONS
+// ═══════════════════════════════════════════════════════════════
 
 export const interviewSessions = pgTable("interview_sessions", {
   id: text("id").primaryKey(),
@@ -183,23 +218,17 @@ export const interviewSessions = pgTable("interview_sessions", {
   resumeId: text("resume_id").references(() => resumes.id, { onDelete: "set null" }),
   company: text("company").notNull(),
   role: text("role").notNull(),
-  type: text("type").notNull(), // behavioral | technical | mixed
-  difficulty: text("difficulty").notNull(), // entry | mid | senior
-  score: text("score").notNull(), // average score, e.g. "8.2"
-  exchanges: jsonb("exchanges").notNull(), // JSON array of InterviewExchange
+  type: text("type").notNull(),
+  difficulty: text("difficulty").notNull(),
+  score: numeric("score", { precision: 3, scale: 1, mode: 'number' }).notNull(),
+  exchanges: jsonb("exchanges").notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   deletedAt: timestamp("deleted_at"),
 }, (table) => [index("interview_sessions_userId_idx").on(table.userId)]);
 
 export const interviewSessionsRelations = relations(interviewSessions, ({ one }) => ({
-  user: one(user, {
-    fields: [interviewSessions.userId],
-    references: [user.id],
-  }),
-  resume: one(resumes, {
-    fields: [interviewSessions.resumeId],
-    references: [resumes.id],
-  }),
+  user: one(user, { fields: [interviewSessions.userId], references: [user.id] }),
+  resume: one(resumes, { fields: [interviewSessions.resumeId], references: [resumes.id] }),
 }));
 
 // ═══════════════════════════════════════════════════════════════
@@ -217,57 +246,11 @@ export const coverLetters = pgTable("cover_letters", {
   content: text("content").notNull(),
   jdText: text("jd_text"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
-  updatedAt: timestamp("updated_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow().$onUpdate(() => new Date()).notNull(),
   deletedAt: timestamp("deleted_at"),
 }, (table) => [index("cover_letters_userId_idx").on(table.userId)]);
 
 export const coverLettersRelations = relations(coverLetters, ({ one }) => ({
-  user: one(user, {
-    fields: [coverLetters.userId],
-    references: [user.id],
-  }),
-  resume: one(resumes, {
-    fields: [coverLetters.resumeId],
-    references: [resumes.id],
-  }),
-}));
-
-// ═══════════════════════════════════════════════════════════════
-// MISSING RELATIONS (previously had FK but no relations definition)
-// ═══════════════════════════════════════════════════════════════
-
-export const userPreferencesRelations = relations(userPreferences, ({ one }) => ({
-  user: one(user, {
-    fields: [userPreferences.userId],
-    references: [user.id],
-  }),
-}));
-
-export const applicationsDataRelations = relations(applicationsData, ({ one }) => ({
-  user: one(user, {
-    fields: [applicationsData.userId],
-    references: [user.id],
-  }),
-}));
-
-export const tailoredResumesRelations = relations(tailoredResumes, ({ one }) => ({
-  user: one(user, {
-    fields: [tailoredResumes.userId],
-    references: [user.id],
-  }),
-  baseResume: one(resumes, {
-    fields: [tailoredResumes.baseResumeId],
-    references: [resumes.id],
-  }),
-}));
-
-export const applicationsRelations = relations(applications, ({ one }) => ({
-  user: one(user, {
-    fields: [applications.userId],
-    references: [user.id],
-  }),
-  tailoredResume: one(tailoredResumes, {
-    fields: [applications.tailoredResumeId],
-    references: [tailoredResumes.id],
-  }),
+  user: one(user, { fields: [coverLetters.userId], references: [user.id] }),
+  resume: one(resumes, { fields: [coverLetters.resumeId], references: [resumes.id] }),
 }));

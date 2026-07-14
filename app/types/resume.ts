@@ -98,6 +98,7 @@ export interface Resume {
 
 export interface PipelineJob {
   key: string
+  applicationId?: string
   logo: string
   color: string
   company: string
@@ -115,6 +116,7 @@ export interface ApplicationBoard {
   applied: PipelineJob[]
   interviewing: PipelineJob[]
   offers: PipelineJob[]
+  rejected: PipelineJob[]
 }
 
 export type ApplicationColumnId = keyof ApplicationBoard
@@ -126,67 +128,6 @@ export interface ChatMessage {
   content: string
   kind?: 'text' | 'matches' | 'resume' | 'form' | 'entry'
   data?: unknown
-}
-
-// ── Legacy types for API route compatibility ──
-export interface Education {
-  institution: string
-  degree: string
-  field: string
-  startDate: string
-  endDate: string
-  gpa?: string
-}
-
-export interface Experience {
-  company: string
-  role: string
-  location: string
-  startDate: string
-  endDate: string
-  bullets: string[]
-}
-
-export interface Skill {
-  name: string
-  level: 'beginner' | 'intermediate' | 'advanced' | 'expert'
-}
-
-export interface Project {
-  name: string
-  description: string
-  techStack: string[]
-  link?: string
-}
-
-export interface Activity {
-  organization: string
-  role: string
-  description: string
-}
-
-export interface Language {
-  name: string
-  proficiency: 'basic' | 'conversational' | 'fluent' | 'native'
-}
-
-export interface ResumeData {
-  id: string
-  userId: string
-  name: string
-  email: string
-  phone: string
-  location: string
-  summary: string
-  education: Education[]
-  experience: Experience[]
-  skills: Skill[]
-  projects: Project[]
-  extracurricular: Activity[]
-  languages: Language[]
-  templateId: string
-  createdAt: string
-  updatedAt: string
 }
 
 export interface JobDescription {

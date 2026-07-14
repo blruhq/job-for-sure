@@ -1,5 +1,5 @@
 import { db } from '~/lib/db'
-import { user, resumes, tailoredResumes, applicationsData, interviewSessions } from '~/lib/schema'
+import { user, resumes, tailoredResumes, applications, interviewSessions } from '~/lib/schema'
 import { coverLetters } from '~/lib/schema'
 import { auth } from '~/lib/auth'
 import { headers } from 'next/headers'
@@ -20,7 +20,7 @@ export default async function AdminPage() {
   const [userCount] = await db.select({ total: count() }).from(user)
   const [resumeCount] = await db.select({ total: count() }).from(resumes)
   const [tailoredCount] = await db.select({ total: count() }).from(tailoredResumes)
-  const [applicationCount] = await db.select({ total: count() }).from(applicationsData)
+  const [applicationCount] = await db.select({ total: count() }).from(applications)
   const [interviewCount] = await db.select({ total: count() }).from(interviewSessions)
   let coverLetterCount = { total: 0 }
   try {

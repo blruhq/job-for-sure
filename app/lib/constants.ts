@@ -9,6 +9,7 @@ export const EMPTY_APPLICATIONS: ApplicationBoard = {
   applied: [],
   interviewing: [],
   offers: [],
+  rejected: [],
 }
 
 /**

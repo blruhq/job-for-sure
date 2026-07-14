@@ -25,7 +25,7 @@ import {
 import { useSortable, SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 
-const COLUMN_IDS: ApplicationColumnId[] = ['bookmark', 'applied', 'interviewing', 'offers']
+const COLUMN_IDS: ApplicationColumnId[] = ['bookmark', 'applied', 'interviewing', 'offers', 'rejected']
 
 // ── Collision detection: pointerWithin first (responsive column entry),
 //    fall back to closestCorners for card-level precision ──
@@ -39,7 +39,8 @@ const COLUMNS: { id: ApplicationColumnId; labelKey: string; dot: string; next: A
   { id: 'bookmark', labelKey: 'bookmark', dot: '#9F9E98', next: 'applied' },
   { id: 'applied', labelKey: 'applied', dot: '#5B6ABF', next: 'interviewing' },
   { id: 'interviewing', labelKey: 'interviewing', dot: '#D4A316', next: 'offers' },
-  { id: 'offers', labelKey: 'offers', dot: '#2B5F45', next: null },
+  { id: 'offers', labelKey: 'offers', dot: '#2B5F45', next: 'rejected' },
+  { id: 'rejected', labelKey: 'rejected', dot: '#B53A3A', next: null },
 ]
 
 // ── Sortable job card wrapper (draggable + droppable within column) ──
@@ -123,7 +124,7 @@ export function ApplicationsView() {
   )
 
   // ── All jobs for filter ──
-  const allJobs = [...applications.bookmark, ...applications.applied, ...applications.interviewing, ...applications.offers]
+  const allJobs = [...applications.bookmark, ...applications.applied, ...applications.interviewing, ...applications.offers, ...applications.rejected]
   const resumeNames = ['all', ...new Set(allJobs.map((j) => j.resume).filter(Boolean))]
 
   const filterJobs = (jobs: PipelineJob[]) => filter === 'all' ? jobs : jobs.filter((j) => j.resume === filter)

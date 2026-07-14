@@ -6,6 +6,7 @@ import { db } from '~/lib/db'
 import { resumes } from '~/lib/schema'
 import { withAuth } from '~/lib/with-auth'
 import { eq, and, isNull } from 'drizzle-orm'
+import type { Resume } from '~/types/resume'
 
 export const runtime = 'nodejs'
 
@@ -33,7 +34,7 @@ export const GET = withAuth(async (request, { user }) => {
 
   if (!row) return NextResponse.json({ error: 'Resume not found' }, { status: 404 })
 
-  const resume = typeof row.data === 'string' ? JSON.parse(row.data) : row.data
+  const resume = row.data as Resume
 
   // Generate PDF stream based on type
   const doc = type === 'cover-letter'
