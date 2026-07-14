@@ -1,5 +1,4 @@
 import type { Metadata } from 'next'
-import { Inter, JetBrains_Mono, Instrument_Serif, Kanit } from 'next/font/google'
 import { ThemeProvider } from '~/components/layout/theme-provider'
 import '../globals.css'
 import { Toaster } from 'sonner'
@@ -7,33 +6,6 @@ import { NextIntlClientProvider } from 'next-intl'
 import { getMessages } from 'next-intl/server'
 import { notFound } from 'next/navigation'
 import { routing } from '~/i18n/routing'
-
-const inter = Inter({
-  variable: '--font-inter',
-  subsets: ['latin'],
-  display: 'swap',
-})
-
-const jetbrainsMono = JetBrains_Mono({
-  variable: '--font-jetbrains-mono',
-  subsets: ['latin'],
-  display: 'swap',
-})
-
-const instrumentSerif = Instrument_Serif({
-  variable: '--font-instrument-serif',
-  subsets: ['latin'],
-  weight: ['400'],
-  style: ['normal', 'italic'],
-  display: 'swap',
-})
-
-const kanit = Kanit({
-  variable: '--font-kanit',
-  subsets: ['thai', 'latin-ext'],
-  weight: ['300', '400', '500', '600'],
-  display: 'swap',
-})
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://jobforsure.app'),
@@ -81,19 +53,11 @@ export default async function LocaleLayout({
   const messages = await getMessages()
 
   return (
-    <html
-      lang={locale}
-      className={`${inter.variable} ${jetbrainsMono.variable} ${instrumentSerif.variable}${locale === 'th' ? ` ${kanit.variable}` : ''}`}
-      suppressHydrationWarning
-    >
-      <body className="min-h-screen bg-background text-foreground antialiased">
-        <NextIntlClientProvider messages={messages}>
-          <ThemeProvider>
-            {children}
-            <Toaster position="bottom-center" richColors />
-          </ThemeProvider>
-        </NextIntlClientProvider>
-      </body>
-    </html>
+    <NextIntlClientProvider messages={messages}>
+      <ThemeProvider>
+        {children}
+        <Toaster position="bottom-center" richColors />
+      </ThemeProvider>
+    </NextIntlClientProvider>
   )
 }
