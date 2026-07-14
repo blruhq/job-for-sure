@@ -2,6 +2,8 @@
 
 **Job For Sure** is an AI-powered job application helper. Users upload/parse resumes, track applications, prepare for interviews with AI mock sessions, generate tailored cover letters, and find tech jobs via scraped boards.
 
+> **📖 Glossary**: See [`docs/glossary.md`](docs/glossary.md) for definitions of every entity, page, button, flow, and domain term. When a user references "the ATS thing", "tailored resume", "Co-Pilot", or any feature by name, check the glossary first.
+
 ## Tech Stack
 
 | Layer | Technology |
