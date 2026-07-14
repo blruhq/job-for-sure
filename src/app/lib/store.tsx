@@ -27,6 +27,21 @@ interface ApplicationRecord {
   updatedAt: string
 }
 
+function columnToStatus(col: keyof ApplicationBoard): 'bookmarked' | 'applied' | 'interviewing' | 'offered' | 'rejected' {
+  if (col === 'bookmark') return 'bookmarked'
+  if (col === 'offers') return 'offered'
+  return col as 'applied' | 'interviewing' | 'rejected'
+}
+
+function statusToColumn(status: string): keyof ApplicationBoard | null {
+  if (status === 'bookmarked') return 'bookmark'
+  if (status === 'offered') return 'offers'
+  if (['applied', 'interviewing', 'rejected'].includes(status)) {
+    return status as keyof ApplicationBoard
+  }
+  return null
+}
+
 function mapAppToJob(app: ApplicationRecord): PipelineJob {
   const timeLabels: Record<string, string> = {
     bookmarked: 'saved',
@@ -52,15 +67,21 @@ function mapAppToJob(app: ApplicationRecord): PipelineJob {
 }
 
 function groupByStatus(apps: ApplicationRecord[]): ApplicationBoard {
-  const board: ApplicationBoard = { ...EMPTY_APPLICATIONS }
+  const board: ApplicationBoard = {
+    bookmark: [],
+    applied: [],
+    interviewing: [],
+    offers: [],
+    rejected: [],
+  }
   const sorted = [...apps].sort((a, b) => {
     if (a.position !== b.position) return a.position - b.position
     return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
   })
   for (const app of sorted) {
     const job = mapAppToJob(app)
-    const col = app.status as keyof ApplicationBoard
-    if (col in board) board[col].push(job)
+    const col = statusToColumn(app.status)
+    if (col && col in board) board[col].push(job)
   }
   return board
 }
@@ -348,11 +369,11 @@ export function AppStoreProvider({ children }: { children: ReactNode }) {
 
     const updates: Array<{ id: string; status: string; position: number }> = []
     to.forEach((j, i) => {
-      if (j.applicationId) updates.push({ id: j.applicationId, status: toCol, position: i })
+      if (j.applicationId) updates.push({ id: j.applicationId, status: columnToStatus(toCol), position: i })
     })
     if (fromCol !== toCol) {
       from.forEach((j, i) => {
-        if (j.applicationId) updates.push({ id: j.applicationId, status: fromCol, position: i })
+        if (j.applicationId) updates.push({ id: j.applicationId, status: columnToStatus(fromCol), position: i })
       })
     }
 
