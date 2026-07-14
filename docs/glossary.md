@@ -23,6 +23,7 @@
 13. [API Routes](#13-api-routes)
 14. [Domain Terms](#14-domain-terms)
 15. [Infrastructure Terms](#15-infrastructure-terms)
+16. [UI Component Breakdown (Visual & Properties Map)](#16-ui-component-breakdown-visual--properties-map)
 
 ---
 
@@ -627,6 +628,174 @@ All under `app/api/`. All AI routes use `withAuth` + failover wrappers.
 | **Optimistic Update** | UI state updates immediately, then API call persists. On failure, state rolls back and shows error toast. Pattern used throughout `useAppStore`. | `app/lib/store.tsx` |
 | **withAuth** | Server-side auth wrapper for API routes. Reads session cookie via headers, returns 401 if invalid. | `app/lib/with-auth.ts` |
 | **Upstash Cache** | Redis cache for job search results. Key: `query::location`. TTL: 6 hours. Re-scored per user on cache hit (since scores are user-specific). | `app/lib/job-sources/index.ts` |
+
+---
+
+## 16. UI Component Breakdown (Visual & Properties Map)
+
+This section maps out key layout and card components. Each subsection outlines the visual layout, components, HTML elements, styles, and data properties.
+
+### 16.1 Job Card (`JobCard`)
+
+Component: `app/components/resume/job-search-panel.tsx` → `JobCard`
+Rendered: Inside Job Search Panel and as preview cards in chat matches.
+
+#### Visual Wireframe
+```
+┌────────────────────────────────────────────────────────┐
+│  [Job Title]                             [Score Badge] │
+│  [Company Name]                                        │
+│                                                        │
+│  [Location Tag] [Source Tag] [Salary Tag] [Date Tag]  │
+│  [Exp Level Tag] [Visa Support Badge]                  │
+│                                                        │
+│  [✓ Matched Skill 1] [✓ Matched Skill 2] ...           │
+│  ────────────────────────────────────────────────────  │
+│  [Bookmark Button] [🎯 ATS Fit] [🧠 Interview] [Apply] │
+└────────────────────────────────────────────────────────┘
+```
+
+#### Properties and Styling Details
+
+*   **Job Title**: Renders `job.title` in `text-[13px] font-semibold`.
+*   **Company Name**: Renders `job.company` in `text-xs text-muted-foreground`.
+*   **Score Badge**: Displays `job.score%` matching score. Styled dynamically using `cn()`:
+    *   **High Match ($\ge 75\%$)**: `bg-success-soft text-success` (Green)
+    *   **Medium Match ($\ge 50\%$)**: `bg-warn-soft text-[var(--warn)]` (Yellow/Orange)
+    *   **Low Match ($< 50\%$)**: `bg-muted text-muted-foreground` (Gray)
+*   **Metadata Tags Row**: Flex-row rendering list of tags:
+    *   **Location**: `job.location`
+    *   **Source**: Normalizes through `SOURCE_NAMES[job.source]` (e.g. "RemoteOK", "Greenhouse", "greenhouse" $\rightarrow$ "Greenhouse")
+    *   **Salary**: Shows `job.salary` if present.
+    *   **Posted Date**: Runs through `formatPostedDate(job.postedAt)`.
+    *   **Experience Level**: Inferred `job.experienceLevel` (`entry`/`mid`/`senior`), shown with capitalization.
+    *   **Visa Support Badge**: Conditional badge when `job.visaSponsorship` is true. Styled in `bg-accent-soft text-primary` with a Plane icon.
+*   **Matched Skills**: Maps `job.matchedSkills` showing green checkmark pill badges: `✓ {skill}` in `bg-success-soft text-success`. Limit of 8 items.
+*   **Action Buttons Footer**:
+    *   **Bookmark Button**: Toggles bookmark.
+        *   *Bookmarked state*: `border-primary bg-primary text-primary-foreground`, displays solid Bookmark icon, text "Bookmarked".
+        *   *Default state*: `border-border bg-card hover:border-primary hover:text-primary`, outline Bookmark icon, text "Bookmark".
+    *   **🎯 ATS Fit Button**: Redirects user to ATS Optimizer page with the JD contents pre-loaded.
+    *   **🧠 Interview Button**: Redirects user to Interview Practice page with the company, role, and JD context preset.
+    *   **Apply Button**: Anchors `job.url` in a new tab (`_blank`). Styled in primary accent colors with an external link icon.
+
+---
+
+### 16.2 Sidebar (`Sidebar`)
+
+Component: `app/components/layout/sidebar.tsx`
+
+#### Visual Wireframe (Expanded State)
+```
+┌────────────────────────────────────────────────────────┐
+│  [HOME Section Label]                                  │
+│  └─ Career Coach Nav Link                              │
+│                                                        │
+│  [MY RESUMES Section Label]                            │
+│  ├─ [Active Resume (Selected dot · Name · Score%)]     │
+│  ├─ [Inactive Resume 2 (Dot · Name · Score%)] [Delete] │
+│  └─ + New Resume Button                                │
+│                                                        │
+│  [JOBS Section Label]                                  │
+│  └─ Job Tracker Nav Link                  [Badge Count]│
+│                                                        │
+│  [PRACTICE Section Label]                              │
+│  └─ Interview Practice Nav Link                        │
+│                                                        │
+│  [TOOLS Section Label]                                 │
+│  ├─ ATS Optimizer Nav Link                             │
+│  └─ Cover Letter Nav Link                              │
+│                                                        │
+│  [ACCOUNT Section Label]                               │
+│  ├─ Settings Nav Link                                  │
+│  └─ Admin Nav Link (Visible conditionally)             │
+└────────────────────────────────────────────────────────┘
+```
+
+#### States and Interactions
+
+*   **Collapsed State ($c$)**:
+    *   Controlled by store variable `sidebarCollapsed` (`toggleSidebar` action).
+    *   Switches width from `w-[var(--sidebar-width)]` (240px) to `w-[var(--sidebar-collapsed-width)]` (56px).
+    *   Labels fade out, icons are centered.
+    *   **Hover popovers**: The Resumes section collapses into a single `FileText` icon. Hovering triggers a `<PreviewCard>` popup containing the scrolling resume list and "+ New Resume" shortcut.
+    *   **Nav links tooltips**: Tooltips appear on hover for each menu item when collapsed.
+*   **Active Link Indication**: Uses path matching. Active links are styled with `bg-sidebar-active text-foreground font-semibold`. Icons use `text-primary`. Inactive links are `text-muted-foreground hover:bg-sidebar-hover`.
+*   **Nav Link Badge Counts**: Displays next to the Job Tracker link showing total pipeline count (Bookmark + Applied + Interviewing + Offers). In collapsed mode, appears as a small red notification dot.
+*   **Admin Visibility**: Sends a fetch call to `/api/auth/is-admin` on layout mount. If user returns `isAdmin: true`, the Shield icon "Admin" route is visible at the bottom.
+*   **Delete Resume Trigger**: Hovering over a resume list item displays a Trash icon. Clicking opens a `<ConfirmDialog>` modal verifying deletion before issuing a database call.
+
+---
+
+### 16.3 User Menu (`UserMenu`)
+
+Component: `app/components/layout/user-menu.tsx`
+Location: Renders in layout topbar.
+
+#### Visual Wireframe
+```
+       ┌──────┐
+       │ [AB] │  ← Circular Avatar Trigger (Initials)
+       └─┬────┘
+         ▼ (Popup Menu)
+┌──────────────────────┐
+│  John Doe            │ ← user.name
+│  john@doe.com        │ ← user.email
+│  ──────────────────  │
+│  [⚙ Settings]        │
+│  [↳ Sign out]        │
+└──────────────────────┘
+```
+
+#### Properties and Logic
+
+*   **Avatar Initials**: Generated from `user.name`. Splits on space and takes the first character of the first and last name (e.g., "John Doe" $\rightarrow$ "JD"). If the name lacks a space, takes the first letter of the name or first letter of email. Styled inside a circular bubble as a `<Menu.Trigger>`.
+*   **User Info Headers**: Displays the user's name and email in the dropdown top compartment for context.
+*   **Menu Items**: Uses `@base-ui/react/menu` primitives.
+    *   **Settings Link**: Navigates to `/settings`.
+    *   **Sign Out Link**: Performs client-side `authClient.signOut()` and redirects to `/login`.
+
+---
+
+### 16.4 Onboarding Upload Modal & Wizard (`UploadModal`)
+
+Components: `app/components/layout/upload-modal.tsx`, `app/components/chat/build-wizard.tsx`
+Triggered by: "+ New Resume" sidebar clicks, or clicking "Build Your Resume First" buttons.
+
+#### Visual Wireframe
+```
+┌────────────────────────────────────────────────────────┐
+│  Add a Resume                                      [X] │
+├────────────────────────────────────────────────────────┤
+│                                                        │
+│  ┌──────────────────────────────────────────────────┐  │
+│  │                  [Upload Icon]                   │  │
+│  │       Drop your file here or click to browse     │  │
+│  │             PDF · DOCX · TXT · MD (max 5MB)      │  │
+│  └──────────────────────────────────────────────────┘  │
+│                                                        │
+│                       ─ OR ─                           │
+│                                                        │
+│  ┌──────────────────────────────────────────────────┐  │
+│  │  [File Icon]    Build with AI                    │  │
+│  │                 Answer questions · Takes 5 min   │  │
+│  └──────────────────────────────────────────────────┘  │
+└────────────────────────────────────────────────────────┘
+```
+
+#### Interactions
+
+*   **Drag & Drop File Zone**:
+    *   `onDragOver`/`onDragLeave` triggers border highlighted state `border-primary bg-primary/5`.
+    *   Checks file sizes ($\le 5\text{MB}$) and matches acceptable MIME types.
+    *   On upload, sets `parsing` state to true, replacing drop content with a spinning loader and text: "Parsing your resume...".
+*   **Build with AI Trigger**:
+    *   Clicking launches `<BuildWizard>` modal.
+    *   Step-by-step form:
+        1. Select Template (Minimalist/Modern/Classic/Executive/Photo).
+        2. Enter Target Role (Required).
+        3. Enter Industry (Optional).
+    *   Completing the form triggers redirect to `/chat` with `mode: "build"`.
 
 ---
 
