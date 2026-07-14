@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef, useCallback, useMemo, useDeferredValue } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { ArrowLeft, Wand2, Download, Trash2, Plus, X, PlusCircle, Lightbulb, GripVertical, ChevronDown, ChevronUp, Sparkles } from 'lucide-react'
 import {
   DndContext,
@@ -339,6 +339,7 @@ export function ResumeDetail({ resumeId }: { resumeId: string }) {
   const router = useRouter()
   const { getResume, addResume, setActiveResumeId, deleteResume, updateResume, pendingTailor: storePendingTailor, setPendingTailor, addVariantResume } = useAppStore()
   const [tab, setTab] = useState<'jobs' | 'view' | 'editor' | 'cover-letter'>('jobs')
+  const searchParams = useSearchParams()
   const [galleryOpen, setGalleryOpen] = useState(false)
   const [showDeleteDialog, setShowDeleteDialog] = useState(false)
   const [deleting, setDeleting] = useState(false)
@@ -408,6 +409,14 @@ export function ResumeDetail({ resumeId }: { resumeId: string }) {
       }))
     }
   }, [tab, resume])
+
+  // ── Auto-switch to editor tab when arriving with ?mode=review ──
+  useEffect(() => {
+    const mode = searchParams.get('mode')
+    if (mode === 'review' && storePendingTailor) {
+      setTab('editor')
+    }
+  }, [searchParams, storePendingTailor])
 
   // Determine which sections can still be added (not already in use)
   const availableSections: SectionKey[] = (() => {

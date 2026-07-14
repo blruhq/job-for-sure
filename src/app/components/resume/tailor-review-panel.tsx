@@ -1,7 +1,7 @@
 'use client'
 
 import { useMemo } from 'react'
-import { Check, X, ChevronDown, ChevronRight } from 'lucide-react'
+import { Check } from 'lucide-react'
 import { cn } from '~/lib/utils'
 import { useAppStore } from '~/lib/store'
 import type { Resume, PendingTailor, TailorChange } from '~/types/resume'
