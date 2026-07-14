@@ -75,10 +75,21 @@ export function InterviewSession({ config, resume, onEnd }: InterviewSessionProp
       console.warn('Speech recognition error:', event.error)
       setIsListening(false)
       recognitionRef.current = null // mark instance as dead
+
+      // 'aborted' fires when user clicks Stop — silent, no error message
+      if (event.error === 'aborted') return
+
       if (event.error === 'not-allowed') {
         setSpeechError('Microphone access blocked. Allow microphone permission in your browser and try again.')
       } else if (event.error === 'no-speech') {
         setSpeechError('No speech detected. Try speaking louder or check your microphone.')
+      } else if (event.error === 'network') {
+        setSpeechError(
+          'Speech recognition unavailable — ad blockers, VPNs, or network issues can block it. ' +
+          'Try disabling ad blockers for this site, or type your answer instead.'
+        )
+      } else if (event.error === 'language-not-supported') {
+        setSpeechError(`Speech recognition does not support "${speechLang}". Try English.`)
       } else {
         setSpeechError(`Speech recognition error: ${event.error}`)
       }
