@@ -38,8 +38,8 @@ function formatDate(isoString: string): string {
   if (diffDays < 7) return `Added ${diffDays}d ago`
   if (diffDays < 30) return `Added ${Math.floor(diffDays / 7)}w ago`
 
-  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
-  return `Added ${months[date.getMonth()]} ${date.getDate()}`
+  const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
+  return `Added ${months[date.getMonth()]} ${date.getDate()}, ${date.getFullYear()}`
 }
 
 const COLUMN_IDS: ApplicationColumnId[] = ['bookmark', 'applied', 'interviewing', 'offers', 'rejected']
@@ -277,6 +277,7 @@ export function ApplicationsView() {
   function InlineAddForm({ colId }: { colId: ApplicationColumnId }) {
     const [title, setTitle] = useState('')
     const [company, setCompany] = useState('')
+    const [loc, setLoc] = useState('')
     const [date, setDate] = useState(new Date().toISOString().split('T')[0])
 
     const handleCancel = () => {
@@ -295,7 +296,7 @@ export function ApplicationsView() {
         key: `manual-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
         company: trimmedCompany,
         title: trimmedTitle,
-        loc: '',
+        loc: loc.trim(),
         score: 0,
         level: 'mid',
         time: 'saved',
@@ -334,6 +335,17 @@ export function ApplicationsView() {
             if (e.key === 'Escape') handleCancel()
           }}
           placeholder="Company *"
+          className="w-full rounded-xs border border-border bg-background px-2 py-1.5 text-[11px] outline-none focus:border-primary placeholder:text-muted-foreground/50"
+        />
+        <input
+          type="text"
+          value={loc}
+          onChange={(e) => setLoc(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' && !e.shiftKey) handleSave()
+            if (e.key === 'Escape') handleCancel()
+          }}
+          placeholder="Location"
           className="w-full rounded-xs border border-border bg-background px-2 py-1.5 text-[11px] outline-none focus:border-primary placeholder:text-muted-foreground/50"
         />
         <div className="flex items-center gap-2">

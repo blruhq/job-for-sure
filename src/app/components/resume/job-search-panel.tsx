@@ -861,7 +861,8 @@ function formatPostedDate(iso: string): string {
     if (days === 1) return 'yesterday'
     if (days < 7) return `${days}d ago`
     if (days < 30) return `${Math.floor(days / 7)}w ago`
-    return `${Math.floor(days / 30)}mo ago`
+    const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
+    return `${months[date.getMonth()]} ${date.getDate()}, ${date.getFullYear()}`
   } catch {
     return ''
   }

@@ -282,7 +282,9 @@ function formatDate(iso: string): string {
     if (days === 1) return '1d ago'
     if (days < 7) return `${days}d ago`
     if (days < 30) return `${Math.floor(days / 7)}w ago`
-    return `${Math.floor(days / 30)}mo ago`
+    const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
+    const d = new Date(iso)
+    return `${months[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()}`
   } catch {
     return ''
   }
