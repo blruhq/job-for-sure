@@ -295,7 +295,9 @@ async function scrapeGreenhouse(url: string): Promise<ScrapeResult> {
 }
 
 async function scrapeJobDb(url: string): Promise<ScrapeResult> {
-  // JobsDB (SEEK family) uses Cloudflare WAF — send browser-like headers
+  // JobsDB (SEEK family) uses Cloudflare WAF.
+  // Even with browser headers, Node.js fetch is detected by TLS fingerprint.
+  // Try the request, but expect to fail.
   const browserHeaders: Record<string, string> = {
     'User-Agent':
       'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36',
@@ -337,10 +339,13 @@ async function scrapeJobDb(url: string): Promise<ScrapeResult> {
       $('[class*="job-body"]').text().trim()
 
     if (!title && !description) {
-      // Page probably didn't render (Cloudflare challenge) — fall through to error
-      throw new Error(
-        'JobsDB blocked the request. Try pasting the job description manually.'
-      )
+      // Page probably didn't render (Cloudflare challenge)
+      return {
+        success: false,
+        source: 'jobdb',
+        error:
+          'JobsDB blocked the automated request (Cloudflare WAF). Please paste the job description manually.',
+      }
     }
 
     return {
@@ -356,13 +361,15 @@ async function scrapeJobDb(url: string): Promise<ScrapeResult> {
       },
     }
   } catch (err) {
+    const message = err instanceof Error ? err.message : ''
+    const is403 = message.includes('403') || message.includes('Forbidden')
+
     return {
       success: false,
       source: 'jobdb',
-      error:
-        err instanceof Error
-          ? err.message
-          : 'JobsDB is not accessible via automated scraping. Please paste the job description manually.',
+      error: is403
+        ? 'JobsDB uses Cloudflare security and blocks automated scraping. Open the link in your browser and paste the job description here instead.'
+        : message || 'Failed to scrape this JobsDB posting.',
     }
   }
 }
