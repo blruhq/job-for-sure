@@ -277,13 +277,9 @@ export function JobPreview({ resume, onDismiss, onLoadComplete }: { resume: Resu
 
 function formatDate(iso: string): string {
   try {
-    const days = Math.floor((Date.now() - new Date(iso).getTime()) / (1000 * 60 * 60 * 24))
-    if (days <= 0) return 'today'
-    if (days === 1) return '1d ago'
-    if (days < 7) return `${days}d ago`
-    if (days < 30) return `${Math.floor(days / 7)}w ago`
-    const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
     const d = new Date(iso)
+    if (isNaN(d.getTime())) return ''
+    const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
     return `${months[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()}`
   } catch {
     return ''

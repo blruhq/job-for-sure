@@ -854,13 +854,7 @@ function FilterRadio({ checked, onChange, label }: {
 function formatPostedDate(iso: string): string {
   try {
     const date = new Date(iso)
-    const now = new Date()
-    const diffMs = now.getTime() - date.getTime()
-    const days = Math.floor(diffMs / (1000 * 60 * 60 * 24))
-    if (days <= 0) return 'today'
-    if (days === 1) return 'yesterday'
-    if (days < 7) return `${days}d ago`
-    if (days < 30) return `${Math.floor(days / 7)}w ago`
+    if (isNaN(date.getTime())) return ''
     const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
     return `${months[date.getMonth()]} ${date.getDate()}, ${date.getFullYear()}`
   } catch {

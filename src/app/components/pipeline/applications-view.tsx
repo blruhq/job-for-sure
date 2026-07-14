@@ -28,16 +28,7 @@ import { CSS } from '@dnd-kit/utilities'
 // ── Date formatting helper ──
 function formatDate(isoString: string): string {
   const date = new Date(isoString)
-  const now = new Date()
-  const diffMs = now.getTime() - date.getTime()
-  const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24))
-
   if (isNaN(date.getTime())) return ''
-  if (diffDays === 0) return 'Added today'
-  if (diffDays === 1) return 'Added yesterday'
-  if (diffDays < 7) return `Added ${diffDays}d ago`
-  if (diffDays < 30) return `Added ${Math.floor(diffDays / 7)}w ago`
-
   const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
   return `Added ${months[date.getMonth()]} ${date.getDate()}, ${date.getFullYear()}`
 }
