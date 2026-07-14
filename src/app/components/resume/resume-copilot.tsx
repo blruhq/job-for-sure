@@ -57,12 +57,10 @@ export function ResumeCopilot({ resume }: { resume: Resume }) {
   ]
 
   return (
-    <div className="flex w-full lg:w-[35%] lg:min-w-[280px] lg:max-w-[360px] flex-col border-t lg:border-t-0 lg:border-l border-border bg-card">
-      {/* Header */}
-      <div className="flex shrink-0 items-center gap-2 border-b border-border/50 bg-card px-4 py-2.5">
-        <div className="flex h-6 w-6 items-center justify-center rounded-sm bg-primary text-[10px] font-bold text-primary-foreground">AI</div>
-        <span className="text-xs font-semibold">AI Co-Pilot</span>
-        <span className="ml-auto rounded-xs bg-success-soft px-1.5 py-px font-mono text-[9px] font-semibold text-success">
+    <div className="flex flex-1 flex-col overflow-hidden">
+      {/* Status indicator (header is in the drawer wrapper) */}
+      <div className="flex shrink-0 items-center justify-end gap-2 px-4 pt-2">
+        <span className="rounded-xs bg-success-soft px-1.5 py-px font-mono text-[9px] font-semibold text-success">
           {isStreaming ? 'Thinking…' : 'Active'}
         </span>
       </div>

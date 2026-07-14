@@ -1,8 +1,8 @@
 'use client'
 
-import { useState, useEffect, useRef, useCallback } from 'react'
+import { useState, useEffect, useRef, useCallback, useMemo, useDeferredValue } from 'react'
 import { useRouter } from 'next/navigation'
-import { ArrowLeft, Wand2, Download, Trash2, Plus, X, PlusCircle, Lightbulb, GripVertical, ChevronDown, ChevronUp } from 'lucide-react'
+import { ArrowLeft, Wand2, Download, Trash2, Plus, X, PlusCircle, Lightbulb, GripVertical, ChevronDown, ChevronUp, Sparkles } from 'lucide-react'
 import {
   DndContext,
   PointerSensor,
@@ -28,10 +28,11 @@ import { ConfirmDialog } from '~/components/ui/confirm-dialog'
 import { ResumeCopilot } from '~/components/resume/resume-copilot'
 import { CoverLetterEditor } from '~/components/resume/cover-letter-editor'
 import { JobSearchPanel } from '~/components/resume/job-search-panel'
-import type { ResumeEducation, ResumeProject, ResumeExperience, ResumeCertification, ResumeLanguage, ResumeCustomSection } from '~/types/resume'
+import type { Resume, ResumeEducation, ResumeProject, ResumeExperience, ResumeCertification, ResumeLanguage, ResumeCustomSection } from '~/types/resume'
 import { TemplateGallery } from '~/components/resume/templates/template-gallery'
 import { DEFAULT_TEMPLATE, getTemplateMeta } from '~/components/resume/templates/registry'
 import { ResumePreview } from '~/components/resume/resume-preview'
+import { TailorReviewPanel } from '~/components/resume/tailor-review-panel'
 
 // ── Helpers ──
 
@@ -336,7 +337,7 @@ function SortableSection({ id, children }: { id: string; children: React.ReactNo
 
 export function ResumeDetail({ resumeId }: { resumeId: string }) {
   const router = useRouter()
-  const { getResume, addResume, setActiveResumeId, deleteResume, updateResume } = useAppStore()
+  const { getResume, addResume, setActiveResumeId, deleteResume, updateResume, pendingTailor: storePendingTailor, setPendingTailor, addVariantResume } = useAppStore()
   const [tab, setTab] = useState<'jobs' | 'view' | 'editor' | 'cover-letter'>('jobs')
   const [galleryOpen, setGalleryOpen] = useState(false)
   const [showDeleteDialog, setShowDeleteDialog] = useState(false)
@@ -734,6 +735,53 @@ export function ResumeDetail({ resumeId }: { resumeId: string }) {
     editLanguages, editCustomSections,
   ])
 
+  // ── Live resume for real-time PDF preview ──
+  const liveResume: Resume = useMemo(() => ({
+    ...(resume as Resume),
+    name: editName,
+    persona: editPersona,
+    role: editRole,
+    email: editEmail,
+    phone: editPhone,
+    location: editLocation,
+    github: editGithub,
+    summary: editSummary,
+    skills: editSkillsArr,
+    experience: editExperiences,
+    education: editEducations,
+    projects: editProjectsArr,
+    certifications: editCertifications,
+    languages: editLanguages,
+    customSections: editCustomSections,
+  }), [
+    resume,
+    editName, editPersona, editRole, editEmail, editPhone, editLocation, editGithub,
+    editSummary, editSkillsArr, editExperiences, editEducations, editProjectsArr,
+    editCertifications, editLanguages, editCustomSections,
+  ])
+
+  // Debounce the preview with useDeferredValue — keeps typing responsive
+  // The PDF re-renders ~200-500ms, so we let React schedule it during idle
+  const deferredResume = useDeferredValue(liveResume)
+
+  // ── Co-Pilot drawer state ──
+  const [copilotOpen, setCopilotOpen] = useState(false)
+
+  // ── Tailor review mode ──
+  const isReviewMode = storePendingTailor !== null && storePendingTailor.baseResumeId === resumeId
+
+  const handleApplyTailor = (variant: Resume) => {
+    addVariantResume(variant)
+    setPendingTailor(null)
+    setActiveResumeId(variant.id)
+    notify({ message: 'Tailored variant created!', type: 'success' })
+  }
+
+  const handleCancelTailor = () => {
+    setPendingTailor(null)
+    notify({ message: 'Tailoring cancelled. Your resume is unchanged.', type: 'info' })
+  }
+
   const handleAddSection = useCallback((section: SectionKey) => {
     if (section === 'certifications') {
       setEditCertifications((prev) => [...prev, { name: '', issuer: '', date: '' }])
@@ -744,6 +792,51 @@ export function ResumeDetail({ resumeId }: { resumeId: string }) {
     }
     setShowAddSectionPicker(false)
   }, [])
+
+  // ── Review mode: compute previewed resume from accepted changes ──
+  // MUST be before early return (hooks rule)
+  const reviewPreviewResume = useMemo(() => {
+    if (!storePendingTailor) return resume as Resume
+    const { baseResume, optimized, changes, accepted } = storePendingTailor
+    let result: Resume = { ...baseResume }
+    for (const change of changes) {
+      if (!accepted.has(change.id)) continue
+      switch (change.field) {
+        case 'summary':
+          result = { ...result, summary: change.after }
+          break
+        case 'role':
+          result = { ...result, role: change.after }
+          break
+        case 'skill-add':
+          result = { ...result, skills: [...(result.skills || []), change.after] }
+          break
+        case 'skill-remove':
+          result = { ...result, skills: (result.skills || []).filter(s => s !== change.before) }
+          break
+        case 'bullet': {
+          if (change.anchor?.experienceIndex === undefined || change.anchor?.bulletIndex === undefined) break
+          const expIdx = change.anchor.experienceIndex
+          const bulletIdx = change.anchor.bulletIndex
+          const experiences = [...(result.experience || [])]
+          if (expIdx < experiences.length) {
+            const exp = { ...experiences[expIdx] }
+            const bullets = [...(exp.bullets || [])]
+            if (bulletIdx < bullets.length) {
+              bullets[bulletIdx] = change.after
+            } else {
+              bullets.push(change.after)
+            }
+            exp.bullets = bullets
+            experiences[expIdx] = exp
+          }
+          result = { ...result, experience: experiences }
+          break
+        }
+      }
+    }
+    return result
+  }, [storePendingTailor])
 
   if (!resume) {
     return (
@@ -772,7 +865,6 @@ export function ResumeDetail({ resumeId }: { resumeId: string }) {
       customSections: editCustomSections,
     })
     notify({ message: 'Resume saved', type: 'success' })
-    setTab('jobs')
   }
 
   const handleOptimize = async () => {
@@ -901,11 +993,39 @@ export function ResumeDetail({ resumeId }: { resumeId: string }) {
           </div>
         )}
 
-        {/* ── Tab 3: Resume Editor ── */}
-        {tab === 'editor' && (
+        {/* ── Tab 3: Tailor Review Mode ── */}
+        {tab === 'editor' && isReviewMode && (
           <div className="flex w-full flex-col lg:flex-row">
-            {/* Form editor */}
-            <div className="flex w-full lg:w-[65%] flex-col gap-3 overflow-y-auto border-r border-border p-4 md:p-6">
+            {/* Change list panel (left) */}
+            <div className="w-full lg:w-[45%] overflow-y-auto border-r border-border">
+              <TailorReviewPanel onApply={handleApplyTailor} onCancel={handleCancelTailor} />
+            </div>
+            {/* Live PDF with accepted changes (right) */}
+            <div className="hidden lg:flex w-[55%] min-w-[350px] flex-col bg-muted/30">
+              <div className="flex-1 min-h-0">
+                <ResumePreview resume={reviewPreviewResume} />
+              </div>
+            </div>
+            {/* Mobile fallback */}
+            <div className="lg:hidden border-t border-border">
+              <details className="group">
+                <summary className="flex cursor-pointer items-center justify-between px-4 py-2 text-[11px] font-medium text-muted-foreground hover:text-foreground list-none">
+                  <span>Preview PDF (with accepted changes)</span>
+                  <ChevronDown size={14} className="transition-transform group-open:rotate-180" />
+                </summary>
+                <div className="h-[500px] border-t border-border">
+                  <ResumePreview resume={reviewPreviewResume} />
+                </div>
+              </details>
+            </div>
+          </div>
+        )}
+
+        {/* ── Tab 4: Resume Editor ── */}
+        {tab === 'editor' && !isReviewMode && (
+          <div className="flex w-full flex-col lg:flex-row">
+            {/* Form editor (left) */}
+            <div className="flex w-full lg:w-[55%] flex-col gap-3 overflow-y-auto border-r border-border p-4 md:p-6">
               {/* Toolbar */}
               <div className="flex items-center justify-between rounded-sm border border-border bg-card p-2 px-3">
                 <div className="flex gap-2">
@@ -924,6 +1044,16 @@ export function ResumeDetail({ resumeId }: { resumeId: string }) {
                     <Wand2 size={11} /> {optimizing ? 'Optimizing…' : 'AI Optimize'}
                   </button>
                 </div>
+                {/* Co-Pilot toggle button */}
+                <button
+                  onClick={() => setCopilotOpen(true)}
+                  className={cn(
+                    'flex cursor-pointer items-center gap-1 rounded-sm border border-border bg-card px-2.5 py-1 text-[11px] hover:bg-muted',
+                    copilotOpen && 'opacity-50',
+                  )}
+                >
+                  <Sparkles size={11} /> Co-Pilot
+                </button>
               </div>
 
               {/* Form body */}
@@ -984,9 +1114,57 @@ export function ResumeDetail({ resumeId }: { resumeId: string }) {
               </div>
             </div>
 
-            {/* AI Co-Pilot sidebar */}
-            <ResumeCopilot resume={resume} />
+            {/* Live PDF preview (right) — hidden on mobile */}
+            <div className="hidden lg:flex w-[45%] min-w-[350px] flex-col bg-muted/30">
+              <div className="flex-1 min-h-0">
+                <ResumePreview resume={deferredResume} />
+              </div>
+            </div>
+
+            {/* Mobile PDF toggle (visible below lg) */}
+            <div className="lg:hidden border-t border-border">
+              <details className="group">
+                <summary className="flex cursor-pointer items-center justify-between px-4 py-2 text-[11px] font-medium text-muted-foreground hover:text-foreground list-none">
+                  <span>Preview PDF</span>
+                  <ChevronDown size={14} className="transition-transform group-open:rotate-180" />
+                </summary>
+                <div className="h-[500px] border-t border-border">
+                  <ResumePreview resume={deferredResume} />
+                </div>
+              </details>
+            </div>
           </div>
+        )}
+
+        {/* ── Co-Pilot Drawer (overlay, slides over the PDF) ── */}
+        {tab === 'editor' && copilotOpen && (
+          <>
+            {/* Backdrop */}
+            <div
+              className="fixed inset-0 z-40 bg-black/20 lg:hidden"
+              onClick={() => setCopilotOpen(false)}
+            />
+            {/* Drawer */}
+            <div className="fixed right-0 top-0 z-50 h-full w-full max-w-[380px] shadow-2xl animate-in slide-in-from-right duration-200">
+              <div className="relative flex h-full flex-col bg-card">
+                {/* Drawer header with close */}
+                <div className="flex shrink-0 items-center justify-between border-b border-border bg-card px-4 py-2.5">
+                  <div className="flex items-center gap-2">
+                    <div className="flex h-6 w-6 items-center justify-center rounded-sm bg-primary text-[10px] font-bold text-primary-foreground">AI</div>
+                    <span className="text-xs font-semibold">AI Co-Pilot</span>
+                  </div>
+                  <button
+                    onClick={() => setCopilotOpen(false)}
+                    className="cursor-pointer rounded-xs p-1 text-muted-foreground hover:bg-muted hover:text-foreground"
+                  >
+                    <X size={14} />
+                  </button>
+                </div>
+                {/* Co-Pilot content — reuse the component but without its own outer wrapper */}
+                <ResumeCopilot resume={resume as Resume} />
+              </div>
+            </div>
+          </>
         )}
 
         {/* ── Tab 4: Cover Letter ── */}

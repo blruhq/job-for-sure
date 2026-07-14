@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from '~/i18n/routing'
-import { Trash2, Link2 } from 'lucide-react'
+import { Trash2, Link2, RefreshCw } from 'lucide-react'
 import { cn } from '~/lib/utils'
 import { useAppStore } from '~/lib/store'
 import { notify } from '~/lib/toast'
@@ -113,10 +113,12 @@ function JobCardContent({ job }: { job: PipelineJob }) {
 export function ApplicationsView() {
   const router = useRouter()
   const t = useTranslations('applications')
-  const { applications, moveJob, removeJob, clearApplications } = useAppStore()
+  const { applications, moveJob, removeJob, clearApplications, bookmarkJob } = useAppStore()
   const [filter, setFilter] = useState('all')
   const [dragOverCol, setDragOverCol] = useState<ApplicationColumnId | null>(null)
   const [activeJob, setActiveJob] = useState<PipelineJob | null>(null)
+  const [pasteUrl, setPasteUrl] = useState('')
+  const [scraping, setScraping] = useState(false)
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
@@ -192,30 +194,116 @@ export function ApplicationsView() {
     setDragOverCol(colId)
   }
 
+  const handlePasteUrl = async () => {
+    const url = pasteUrl.trim()
+    if (!url) return
+
+    // Basic URL validation
+    let parsedUrl: URL
+    try {
+      parsedUrl = new URL(url)
+    } catch {
+      notify({ message: 'Please enter a valid URL', type: 'error' })
+      return
+    }
+
+    setScraping(true)
+    try {
+      const res = await fetch('/api/scrape', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url }),
+      })
+      if (!res.ok) throw new Error('Scrape failed')
+      const data = await res.json()
+
+      if (data.success && data.job) {
+        bookmarkJob({
+          key: `${parsedUrl.hostname}-${Date.now()}`,
+          company: data.job.company || 'Unknown Company',
+          title: data.job.title || 'Unknown Position',
+          loc: data.job.location || '',
+          score: 0,
+          level: 'mid' as const,
+          time: 'saved',
+          url: url,
+          logo: '',
+          color: '',
+          resume: '',
+        })
+        notify({ message: `Added "${data.job.title}" at ${data.job.company}`, type: 'success' })
+        setPasteUrl('')
+      } else {
+        // Scrape failed — show helpful error
+        notify({
+          message: data.error || 'Could not scrape this page. Try pasting the job details manually.',
+          type: 'error',
+        })
+      }
+    } catch {
+      notify({ message: 'Failed to scrape URL. Please try again.', type: 'error' })
+    } finally {
+      setScraping(false)
+    }
+  }
+
   return (
     <div className="flex h-full w-full flex-col bg-background">
       {/* ── Header ── */}
-      <div className="flex items-center justify-between border-b border-border px-4 py-2.5 shrink-0">
-        <div className="flex items-center gap-3">
-          <h1 className="text-sm font-semibold text-foreground">
-            {total} {t('bookmark').toLowerCase() === 'bookmark' ? 'Jobs' : 'งาน'}
-          </h1>
-          <div className="flex items-center gap-1.5">
-            <span className="text-[10px] text-muted-foreground font-mono">
-              {t('resume')}
-            </span>
-            <select
-              value={filter}
-              onChange={(e) => setFilter(e.target.value)}
-              className="cursor-pointer rounded-xs border border-border bg-background px-2 py-1 text-[11px] outline-none focus:border-primary"
-            >
-              {resumeNames.map((name) => (
-                <option key={name} value={name}>
-                  {name === 'all' ? t('all') : name}
-                </option>
-              ))}
-            </select>
+      <div className="flex flex-col gap-2 border-b border-border px-4 py-2.5 shrink-0">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <h1 className="text-sm font-semibold text-foreground">
+              {total} {t('bookmark').toLowerCase() === 'bookmark' ? 'Jobs' : 'งาน'}
+            </h1>
+            <div className="flex items-center gap-1.5">
+              <span className="text-[10px] text-muted-foreground font-mono">
+                {t('resume')}
+              </span>
+              <select
+                value={filter}
+                onChange={(e) => setFilter(e.target.value)}
+                className="cursor-pointer rounded-xs border border-border bg-background px-2 py-1 text-[11px] outline-none focus:border-primary"
+              >
+                {resumeNames.map((name) => (
+                  <option key={name} value={name}>
+                    {name === 'all' ? t('all') : name}
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
+        </div>
+        {/* Paste URL input */}
+        <div className="flex items-center gap-1.5">
+          <input
+            type="url"
+            value={pasteUrl}
+            onChange={(e) => setPasteUrl(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' && !scraping) handlePasteUrl()
+            }}
+            placeholder="Paste a job URL (Indeed, Greenhouse, JobsDB...) and press Enter"
+            disabled={scraping}
+            className="flex-1 rounded-xs border border-border bg-background px-2.5 py-1.5 text-[11px] outline-none focus:border-primary placeholder:text-muted-foreground/50 disabled:opacity-50"
+          />
+          <button
+            onClick={handlePasteUrl}
+            disabled={scraping || !pasteUrl.trim()}
+            className="flex shrink-0 cursor-pointer items-center gap-1 rounded-xs bg-primary px-3 py-1.5 text-[11px] font-medium text-primary-foreground transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            {scraping ? (
+              <>
+                <RefreshCw size={11} className="animate-spin" />
+                Scraping...
+              </>
+            ) : (
+              <>
+                <Link2 size={11} />
+                Add
+              </>
+            )}
+          </button>
         </div>
       </div>
 

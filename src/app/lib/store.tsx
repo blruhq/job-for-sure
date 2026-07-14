@@ -1,7 +1,7 @@
 'use client'
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
-import type { ApplicationBoard, PipelineJob, Resume } from '~/types/resume'
+import type { ApplicationBoard, PipelineJob, Resume, PendingTailor } from '~/types/resume'
 import { notify } from '~/lib/toast'
 import { EMPTY_APPLICATIONS } from '~/lib/constants'
 
@@ -99,6 +99,12 @@ interface AppStore {
   // Hydration
   hydrated: boolean
   loading: boolean
+
+  // Tailor review mode
+  pendingTailor: PendingTailor | null
+  setPendingTailor: (pending: PendingTailor | null) => void
+  toggleAcceptedChange: (changeId: string) => void
+  addVariantResume: (resume: Resume) => void
 }
 
 const AppCtx = createContext<AppStore | null>(null)
@@ -150,6 +156,7 @@ export function AppStoreProvider({ children }: { children: ReactNode }) {
   const [applications, setApplications] = useState<ApplicationBoard>(EMPTY_APPLICATIONS)
   const [targetCompanyKey, setTargetCompanyKey] = useState<string>('none')
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
+  const [pendingTailor, setPendingTailorState] = useState<PendingTailor | null>(null)
 
   useEffect(() => {
     if (typeof window !== 'undefined' && window.innerWidth < 768) {
@@ -386,6 +393,31 @@ export function AppStoreProvider({ children }: { children: ReactNode }) {
 
   const toggleSidebar = useCallback(() => setSidebarCollapsed(prev => !prev), [])
 
+  const setPendingTailor = useCallback((pending: PendingTailor | null) => {
+    setPendingTailorState(pending)
+  }, [])
+
+  const toggleAcceptedChange = useCallback((changeId: string) => {
+    setPendingTailorState(prev => {
+      if (!prev) return prev
+      const next = new Set(prev.accepted)
+      if (next.has(changeId)) next.delete(changeId)
+      else next.add(changeId)
+      return { ...prev, accepted: next }
+    })
+  }, [])
+
+  const addVariantResume = useCallback((resume: Resume) => {
+    if (!hydratedRef.current) return
+    setResumes(prev => [...prev, resume])
+    setActiveResumeIdState(resume.id)
+    apiPost('/api/resumes', { id: resume.id, data: resume, isBase: false }).catch((err) => {
+      console.error(err)
+      setResumes(curr => curr.filter(r => r.id !== resume.id))
+      notify({ message: 'Failed to save variant. Changes rolled back.', type: 'error' })
+    })
+  }, [])
+
   const value = useMemo<AppStore>(() => ({
     resumes,
     activeResumeId,
@@ -408,6 +440,10 @@ export function AppStoreProvider({ children }: { children: ReactNode }) {
     toggleSidebar,
     hydrated,
     loading,
+    pendingTailor,
+    setPendingTailor,
+    toggleAcceptedChange,
+    addVariantResume,
   }), [
     resumes, activeResumeId, activeResume, applications,
     hydrated, loading, targetCompanyKey, sidebarCollapsed,
@@ -415,6 +451,7 @@ export function AppStoreProvider({ children }: { children: ReactNode }) {
     getResume, bookmarkJob, toggleBookmark, isBookmarked,
     moveJob, removeJob, clearApplications, setTargetCompanyKey,
     toggleSidebar,
+    pendingTailor, setPendingTailor, toggleAcceptedChange, addVariantResume,
   ])
 
   return <AppCtx.Provider value={value}>{children}</AppCtx.Provider>

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { Link, useRouter, usePathname } from '~/i18n/routing'
 import { MessageSquare, KanbanSquare, CheckSquare, Settings, Plus, Brain, Mail, Shield, Trash2, FileText } from 'lucide-react'
 import { cn } from '~/lib/utils'
@@ -127,6 +127,19 @@ export function Sidebar() {
   const c = sidebarCollapsed
   const totalPipeline = applications.bookmark.length + applications.applied.length + applications.interviewing.length + applications.offers.length
 
+  // ── Group resumes: base resumes + their variants ──
+  const baseResumes = resumes.filter(r => !r.isVariant)
+  const variantsByBase = useMemo(() => {
+    const map: Record<string, typeof resumes> = {}
+    for (const r of resumes) {
+      if (r.isVariant && r.baseResumeId) {
+        if (!map[r.baseResumeId]) map[r.baseResumeId] = []
+        map[r.baseResumeId].push(r)
+      }
+    }
+    return map
+  }, [resumes])
+
   const handleNewResume = () => {
     setUploadModalOpen(true)
   }
@@ -165,24 +178,44 @@ export function Sidebar() {
                     {resumes.length === 0 && (
                       <div className="px-2 py-3 text-xs text-muted-foreground text-center">{t('noResumes')}</div>
                     )}
-                    <div className="max-h-[200px] overflow-y-auto">
-                      {resumes.map((r) => (
-                        <button
-                          key={r.id}
-                          onClick={() => {
-                            setActiveResumeId(r.id)
-                            router.push(`/resume/${r.id}`)
-                          }}
-                          className={cn(
-                            'flex w-full items-center gap-2 rounded-sm px-2 py-1.5 text-xs transition-colors',
-                            r.id === activeResumeId ? 'bg-sidebar-active font-semibold text-foreground' : 'text-muted-foreground hover:bg-sidebar-hover hover:text-foreground',
-                          )}
-                        >
-                          <span className={cn('h-2 w-2 rounded-full border-2 shrink-0', r.id === activeResumeId ? 'border-primary bg-primary' : 'border-muted-foreground')} />
-                          <span className="flex-1 truncate text-left">{r.name}</span>
-                          <span className="font-mono text-[10px] font-semibold text-success shrink-0">{r.score}%</span>
-                        </button>
-                      ))}
+                    <div className="max-h-[240px] overflow-y-auto">
+                      {baseResumes.map((r) => {
+                        const variants = variantsByBase[r.id] || []
+                        return (
+                          <div key={r.id}>
+                            <button
+                              onClick={() => {
+                                setActiveResumeId(r.id)
+                                router.push(`/resume/${r.id}`)
+                              }}
+                              className={cn(
+                                'flex w-full items-center gap-2 rounded-sm px-2 py-1.5 text-xs transition-colors',
+                                r.id === activeResumeId ? 'bg-sidebar-active font-semibold text-foreground' : 'text-muted-foreground hover:bg-sidebar-hover hover:text-foreground',
+                              )}
+                            >
+                              <span className={cn('h-2 w-2 rounded-full border-2 shrink-0', r.id === activeResumeId ? 'border-primary bg-primary' : 'border-muted-foreground')} />
+                              <span className="flex-1 truncate text-left">{r.name}</span>
+                              <span className="font-mono text-[10px] font-semibold text-success shrink-0">{r.score}%</span>
+                            </button>
+                            {variants.map((v) => (
+                              <button
+                                key={v.id}
+                                onClick={() => {
+                                  setActiveResumeId(v.id)
+                                  router.push(`/resume/${v.id}`)
+                                }}
+                                className={cn(
+                                  'flex w-full items-center gap-2 rounded-sm px-2 py-1 text-[11px] transition-colors pl-5',
+                                  v.id === activeResumeId ? 'bg-sidebar-active font-semibold text-foreground' : 'text-muted-foreground hover:bg-sidebar-hover hover:text-foreground',
+                                )}
+                              >
+                                <span className="text-[9px] shrink-0">└</span>
+                                <span className="flex-1 truncate text-left">{v.variantLabel || v.name}</span>
+                              </button>
+                            ))}
+                          </div>
+                        )
+                      })}
                     </div>
                     <button
                       onClick={handleNewResume}
@@ -203,46 +236,90 @@ export function Sidebar() {
               {t('resumes')}
             </div>
             {/* SCROLLABLE RESUME LIST — max-height prevents pushing tools down */}
-            <div className="max-h-[160px] overflow-y-auto scrollbar-thin">
-              {resumes.map((r) => (
-                <div
-                  key={r.id}
-                  className={cn(
-                    'group flex items-center gap-1 rounded-sm transition-colors border-l-2',
-                    r.id === activeResumeId && pathname === `/resume/${r.id}`
-                      ? 'bg-sidebar-active border-l-primary'
-                      : 'hover:bg-sidebar-hover border-l-transparent',
-                    'px-2 py-1',
-                  )}
-                >
-                  <button
-                    onClick={() => {
-                      setActiveResumeId(r.id)
-                      router.push(`/resume/${r.id}`)
-                    }}
-                    className="flex cursor-pointer items-center gap-2 text-xs flex-1 min-w-0"
-                  >
-                    <span
+            <div className="max-h-[200px] overflow-y-auto scrollbar-thin">
+              {baseResumes.map((r) => {
+                const variants = variantsByBase[r.id] || []
+                return (
+                  <div key={r.id}>
+                    {/* Base resume */}
+                    <div
                       className={cn(
-                        'h-2 w-2 shrink-0 rounded-full border-2 transition-all',
-                        r.id === activeResumeId ? 'border-primary bg-primary' : 'border-muted-foreground',
+                        'group flex items-center gap-1 rounded-sm transition-colors border-l-2',
+                        r.id === activeResumeId && pathname === `/resume/${r.id}`
+                          ? 'bg-sidebar-active border-l-primary'
+                          : 'hover:bg-sidebar-hover border-l-transparent',
+                        'px-2 py-1',
                       )}
-                    />
-                    <span className="flex-1 truncate text-left font-medium">{r.name}</span>
-                    <span className="font-mono text-[10px] font-semibold text-success">{r.score}%</span>
-                  </button>
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      setDeleteTarget({ id: r.id, name: r.name })
-                    }}
-                    className="shrink-0 opacity-0 group-hover:opacity-100 cursor-pointer rounded-xs p-1 text-muted-foreground hover:text-red-500 hover:bg-red-500/10 transition-all"
-                    title="Delete resume"
-                  >
-                    <Trash2 size={12} />
-                  </button>
-                </div>
-              ))}
+                    >
+                      <button
+                        onClick={() => {
+                          setActiveResumeId(r.id)
+                          router.push(`/resume/${r.id}`)
+                        }}
+                        className="flex cursor-pointer items-center gap-2 text-xs flex-1 min-w-0"
+                      >
+                        <span
+                          className={cn(
+                            'h-2 w-2 shrink-0 rounded-full border-2 transition-all',
+                            r.id === activeResumeId ? 'border-primary bg-primary' : 'border-muted-foreground',
+                          )}
+                        />
+                        <span className="flex-1 truncate text-left font-medium">{r.name}</span>
+                        <span className="font-mono text-[10px] font-semibold text-success">{r.score}%</span>
+                      </button>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          setDeleteTarget({ id: r.id, name: r.name })
+                        }}
+                        className="shrink-0 opacity-0 group-hover:opacity-100 cursor-pointer rounded-xs p-1 text-muted-foreground hover:text-red-500 hover:bg-red-500/10 transition-all"
+                        title="Delete resume"
+                      >
+                        <Trash2 size={12} />
+                      </button>
+                    </div>
+                    {/* Variants under this base */}
+                    {variants.map((v) => (
+                      <div
+                        key={v.id}
+                        className={cn(
+                          'group flex items-center gap-1 rounded-sm transition-colors border-l-2 ml-3',
+                          v.id === activeResumeId && pathname === `/resume/${v.id}`
+                            ? 'bg-sidebar-active border-l-primary/50'
+                            : 'hover:bg-sidebar-hover border-l-transparent',
+                          'px-2 py-0.5',
+                        )}
+                      >
+                        <button
+                          onClick={() => {
+                            setActiveResumeId(v.id)
+                            router.push(`/resume/${v.id}`)
+                          }}
+                          className="flex cursor-pointer items-center gap-2 text-xs flex-1 min-w-0"
+                        >
+                          <span className="shrink-0 text-[9px] text-muted-foreground">└</span>
+                          <span className="flex-1 truncate text-left text-[11px] text-muted-foreground">
+                            {v.variantLabel || v.name}
+                          </span>
+                          {v.score > 0 && (
+                            <span className="font-mono text-[9px] font-semibold text-success/70">{v.score}%</span>
+                          )}
+                        </button>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            setDeleteTarget({ id: v.id, name: v.variantLabel || v.name })
+                          }}
+                          className="shrink-0 opacity-0 group-hover:opacity-100 cursor-pointer rounded-xs p-0.5 text-muted-foreground hover:text-red-500 hover:bg-red-500/10 transition-all"
+                          title="Delete variant"
+                        >
+                          <Trash2 size={10} />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )
+              })}
             </div>
             {/* Add resume — opens modal */}
             <button

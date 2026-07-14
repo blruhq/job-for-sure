@@ -94,6 +94,9 @@ export interface Resume {
   template?: ResumeTemplate
   coverLetter?: string
   coverLetterJD?: string
+  baseResumeId?: string       // ID of parent resume if this is a tailored variant
+  isVariant?: boolean         // True if this resume is a tailored variant (not a base)
+  variantLabel?: string       // Display label, e.g. "Tailored for Google — SWE"
 }
 
 export interface PipelineJob {
@@ -137,4 +140,38 @@ export interface JobDescription {
   description: string
   requirements: string[]
   qualifications: string[]
+}
+
+// ── Tailor review mode ──
+
+export type TailorChangeField = 'summary' | 'skill-add' | 'skill-remove' | 'bullet' | 'role'
+
+export interface TailorChange {
+  id: string
+  field: TailorChangeField
+  label: string               // Human-readable label, e.g. "Summary", "Experience bullet 2"
+  anchor?: {
+    experienceIndex?: number
+    bulletIndex?: number
+  }
+  before: string
+  after: string
+  rationale?: string
+}
+
+export interface TailorResult {
+  optimized: Resume           // Fully-optimized resume (all changes applied)
+  changes: TailorChange[]     // Individual changes for review
+}
+
+export interface PendingTailor {
+  baseResumeId: string        // The original resume being tailored
+  baseResume: Resume          // Snapshot of original before changes
+  optimized: Resume           // Fully-optimized version from AI
+  changes: TailorChange[]     // Individual changes
+  accepted: Set<string>       // IDs of accepted changes (Set<TailorChange.id>)
+  jobContext?: {              // Optional job info for labeling the variant
+    company?: string
+    title?: string
+  }
 }

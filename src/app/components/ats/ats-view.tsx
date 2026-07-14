@@ -26,7 +26,7 @@ interface AnalysisResult {
 export function AtsView() {
   const router = useRouter()
   const t = useTranslations('ats')
-  const { resumes, activeResumeId, setActiveResumeId, updateResume, addResume } = useAppStore()
+  const { resumes, activeResumeId, setActiveResumeId, updateResume, addResume, setPendingTailor } = useAppStore()
   const [jdText, setJdText] = useState('')
   const [analysisLoading, setAnalysisLoading] = useState(false)
   const [analysisResult, setAnalysisResult] = useState<AnalysisResult | null>(null)
@@ -111,12 +111,11 @@ export function AtsView() {
         }),
       })
       if (!res.ok) throw new Error('Tailoring failed')
-      const { optimized } = await res.json()
+      const { optimized, changes } = await res.json()
 
-      const newResume: Resume = {
+      // Build the optimized resume object (preserving fields AI doesn't touch)
+      const optimizedResume: Resume = {
         ...resume,
-        id: String(Date.now()),
-        name: `${resume.name} (${hasAnalysedJd ? 'Tailored' : 'Optimized'})`,
         summary: optimized.summary,
         skills: optimized.skills,
         experience: optimized.experience?.map((e: any, idx: number) => {
@@ -128,13 +127,24 @@ export function AtsView() {
             bullets: e.bullets || original?.bullets || [],
           }
         }) || resume.experience || [],
-        updated: 'just now',
       }
 
-      addResume(newResume)
-      setActiveResumeId(newResume.id)
-      notify({ message: 'Successfully tailored resume! Redirecting to editor...', type: 'success' })
-      router.push(`/resume/${newResume.id}`)
+      // Store the pending tailor result and navigate to editor in review mode
+      const acceptedIds = new Set<string>(changes.map((c: any) => c.id))
+      setPendingTailor({
+        baseResumeId: resume.id,
+        baseResume: resume,
+        optimized: optimizedResume,
+        changes: changes,
+        accepted: acceptedIds,
+        jobContext: {
+          company: 'Target Company',
+          title: 'Target Position',
+        },
+      })
+
+      notify({ message: 'AI tailored your resume. Review the changes.', type: 'success' })
+      router.push(`/resume/${resume.id}?mode=review`)
     } catch (err) {
       console.error('[tailor] Error:', err)
       notify({ message: 'Failed to tailor resume. Please try again.', type: 'error' })
