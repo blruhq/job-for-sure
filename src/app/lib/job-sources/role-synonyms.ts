@@ -141,6 +141,132 @@ const ROLE_GROUPS: RoleGroup[] = [
     terms: ['customer service', 'customer support', 'customer success', 'client relations', 'call center'],
     broadSearch: 'customer service',
   },
+
+  // ── 3D, Animation & VFX ──
+  {
+    terms: ['3d artist', '3d modeler', '3d designer', '3d animator', '3d generalist', 'animator', 'motion graphics', 'motion designer', 'vfx artist', 'visual effects', 'character animator', 'cg artist'],
+    broadSearch: '3d',
+  },
+
+  // ── Creative Direction & Illustration ──
+  {
+    terms: ['art director', 'creative director', 'creative lead', 'illustrator', 'visual designer', 'brand designer'],
+    broadSearch: 'creative',
+  },
+
+  // ── Video, Film & Photography ──
+  {
+    terms: ['video editor', 'videographer', 'video producer', 'photographer', 'photo editor', 'film producer', 'camera operator', 'media producer'],
+    broadSearch: 'video',
+  },
+
+  // ── Game Development ──
+  {
+    terms: ['game designer', 'game developer', 'level designer', 'unity developer', 'unreal developer', 'gameplay programmer', 'game artist'],
+    broadSearch: 'game',
+  },
+
+  // ── Education & Training ──
+  {
+    terms: ['teacher', 'tutor', 'instructor', 'lecturer', 'trainer', 'teaching assistant', 'education coordinator', 'curriculum designer'],
+    broadSearch: 'teacher',
+  },
+
+  // ── Legal ──
+  {
+    terms: ['lawyer', 'attorney', 'paralegal', 'legal counsel', 'legal advisor', 'legal assistant', 'compliance officer'],
+    broadSearch: 'legal',
+  },
+
+  // ── Healthcare & Medical ──
+  {
+    terms: ['nurse', 'pharmacist', 'doctor', 'physician', 'medical technician', 'medical assistant', 'therapist', 'dentist', 'healthcare assistant', 'radiologist'],
+    broadSearch: 'medical',
+  },
+
+  // ── Hospitality & Tourism ──
+  {
+    terms: ['chef', 'cook', 'bartender', 'barista', 'waiter', 'waitress', 'hotel manager', 'tour guide', 'restaurant manager', 'housekeeper', 'receptionist'],
+    broadSearch: 'hospitality',
+  },
+
+  // ── Architecture & Interior Design ──
+  {
+    terms: ['architect', 'interior designer', 'landscape architect', 'urban planner', 'cad designer', 'draftsman', 'site inspector'],
+    broadSearch: 'architect',
+  },
+
+  // ── Real Estate ──
+  {
+    terms: ['real estate agent', 'property manager', 'real estate consultant', 'leasing agent', 'property consultant', 'real estate'],
+    broadSearch: 'real estate',
+  },
+
+  // ── Transportation ──
+  {
+    terms: ['driver', 'pilot', 'dispatcher', 'delivery driver', 'truck driver', 'flight attendant', 'courier'],
+    broadSearch: 'driver',
+  },
+
+  // ── Consulting ──
+  {
+    terms: ['management consultant', 'strategy consultant', 'business consultant', 'advisory', 'consultant'],
+    broadSearch: 'consultant',
+  },
+
+  // ── Events ──
+  {
+    terms: ['event planner', 'event coordinator', 'event manager', 'wedding planner', 'conference organizer'],
+    broadSearch: 'event',
+  },
+
+  // ── Translation & Localization ──
+  {
+    terms: ['translator', 'interpreter', 'localization specialist', 'subtitler', 'linguist'],
+    broadSearch: 'translator',
+  },
+
+  // ── Skilled Trades ──
+  {
+    terms: ['electrician', 'plumber', 'mechanic', 'carpenter', 'welder', 'technician', 'maintenance worker', 'machine operator'],
+    broadSearch: 'technician',
+  },
+
+  // ── Research & Academia ──
+  {
+    terms: ['researcher', 'research assistant', 'research analyst', 'scientist', 'lab technician', 'academic'],
+    broadSearch: 'research',
+  },
+
+  // ── Fashion & Textile ──
+  {
+    terms: ['fashion designer', 'textile designer', 'fashion stylist', 'pattern maker', 'merchandiser', 'garment technician'],
+    broadSearch: 'fashion',
+  },
+
+  // ── Music & Audio ──
+  {
+    terms: ['music producer', 'sound engineer', 'audio engineer', 'musician', 'composer', 'sound designer', 'audio technician'],
+    broadSearch: 'music',
+  },
+
+  // ── Insurance ──
+  {
+    terms: ['insurance agent', 'underwriter', 'claims adjuster', 'insurance broker', 'actuary', 'risk analyst'],
+    broadSearch: 'insurance',
+  },
+
+  // ── Quality, Safety & Inspection ──
+  {
+    terms: ['safety officer', 'quality control', 'quality inspector', 'compliance auditor', 'ehs officer', 'qc inspector'],
+    broadSearch: 'safety',
+  },
+
+  // ── Supply Chain & Procurement ──
+  {
+    terms: ['procurement officer', 'purchasing manager', 'buyer', 'supply chain analyst', 'inventory manager', 'sourcing specialist'],
+    broadSearch: 'procurement',
+  },
 ]
 
 // ── Thai translations for role keywords ─────────────────────
@@ -183,6 +309,56 @@ const THAI_ROLE_MAP: Record<string, string[]> = {
   'business':       ['ธุรกิจ'],
   'service':        ['บริการ'],
   'customer':       ['ลูกค้า'],
+  // ── Expanded translations ──
+  'creative':       ['สร้างสรรค์', 'ครีเอทีฟ'],
+  'video':          ['วิดีโอ'],
+  'photographer':   ['ช่างภาพ', 'ถ่ายภาพ'],
+  'animator':       ['อนิเมเตอร์', 'แอนิเมชัน'],
+  'teacher':        ['ครู', 'อาจารย์', 'ผู้สอน'],
+  'instructor':     ['ผู้สอน', 'ครูฝึกสอน'],
+  'trainer':        ['ผู้ฝึกอบรม', 'เทรนเนอร์'],
+  'legal':          ['กฎหมาย', 'นิติกร'],
+  'lawyer':         ['ทนายความ', 'ทนาย'],
+  'attorney':       ['ทนายความ'],
+  'medical':        ['การแพทย์', 'แพทย์'],
+  'nurse':          ['พยาบาล'],
+  'pharmacist':     ['เภสัชกร'],
+  'doctor':         ['แพทย์', 'หมอ'],
+  'dentist':        ['ทันตแพทย์', 'หมอฟัน'],
+  'hospitality':    ['บริการ', 'การท่องเที่ยว', 'โรงแรม'],
+  'chef':           ['พ่อครัว', 'แม่ครัว'],
+  'cook':           ['พ่อครัว', 'แม่ครัว', 'ครัว'],
+  'hotel':          ['โรงแรม'],
+  'restaurant':     ['ร้านอาหาร'],
+  'tour':           ['ท่องเที่ยว', 'ไกด์'],
+  'architect':      ['สถาปนิก'],
+  'interior':       ['ตกแต่งภายใน', 'ออกแบบภายใน'],
+  'real estate':    ['อสังหาริมทรัพย์'],
+  'property':       ['ทรัพย์สิน', 'อสังหา'],
+  'driver':         ['พนักงานขับรถ', 'คนขับ'],
+  'pilot':          ['นักบิน'],
+  'consultant':     ['ที่ปรึกษา'],
+  'event':          ['อีเวนต์', 'จัดงาน'],
+  'translator':     ['นักแปล', 'ล่าม'],
+  'interpreter':    ['ล่าม', 'แปล'],
+  'technician':     ['ช่างเทคนิค', 'ช่าง'],
+  'electrician':    ['ช่างไฟ', 'ช่างไฟฟ้า'],
+  'plumber':        ['ช่างประปา'],
+  'mechanic':       ['ช่างยนต์', 'ช่างซ่อม'],
+  'research':       ['วิจัย', 'นักวิจัย'],
+  'researcher':     ['นักวิจัย'],
+  'fashion':        ['แฟชั่น', 'เสื้อผ้า'],
+  'music':          ['ดนตรี', 'เสียง'],
+  'audio':          ['เสียง', 'audio'],
+  'insurance':      ['ประกัน', 'ประกันภัย'],
+  'safety':         ['ความปลอดภัย', 'ปลอดภัย'],
+  'quality':        ['คุณภาพ'],
+  'game':           ['เกม', 'เกมม์'],
+  'procurement':    ['จัดซื้อ', 'จัดซื้อจัดจ้าง'],
+  'purchasing':     ['จัดซื้อ', 'น่าซื้อ'],
+  'buyer':          ['พนักงานจัดซื้อ', 'นักซื้อ'],
+  'inventory':      ['สินค้าคงคลัง', 'คลังสินค้า'],
+  'logistics':      ['โลจิสติกส์', 'การขนส่ง'],
 }
 
 // ── Expand query into all related keywords ───────────────────
