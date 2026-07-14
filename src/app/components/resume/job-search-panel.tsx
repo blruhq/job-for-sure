@@ -209,16 +209,7 @@ export function JobSearchPanel({ resume }: { resume: Resume }) {
         if (runId !== searchRunRef.current) return
         if (fullRes.ok) {
           const fullData: SearchResult = await fullRes.json()
-          setResults(prev => {
-            const merged = mergeResults(prev, fullData.jobs)
-            // Update sessionStorage with merged results (includes slow sources)
-            saveSearchToSession(searchQuery, loc ?? location ?? '', {
-              jobs: merged,
-              total: fullData.total,
-              descriptionsIncluded: fullData.descriptionsIncluded,
-            })
-            return merged
-          })
+          setResults(prev => mergeResults(prev, fullData.jobs))
         }
       } catch {
         // Silent fail — fast results are already showing
