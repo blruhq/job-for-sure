@@ -113,7 +113,7 @@ function JobCardContent({ job }: { job: PipelineJob }) {
 export function ApplicationsView() {
   const router = useRouter()
   const t = useTranslations('applications')
-  const { applications, moveJob, removeJob, clearApplications, bookmarkJob } = useAppStore()
+  const { applications, moveJob, removeJob, clearApplications, bookmarkJob, resumes } = useAppStore()
   const [filter, setFilter] = useState('all')
   const [dragOverCol, setDragOverCol] = useState<ApplicationColumnId | null>(null)
   const [activeJob, setActiveJob] = useState<PipelineJob | null>(null)
@@ -127,7 +127,7 @@ export function ApplicationsView() {
 
   // ── All jobs for filter ──
   const allJobs = [...applications.bookmark, ...applications.applied, ...applications.interviewing, ...applications.offers, ...applications.rejected]
-  const resumeNames = ['all', ...new Set(allJobs.map((j) => j.resume).filter(Boolean))]
+  const resumeIds = ['all', ...new Set(allJobs.map((j) => j.resume).filter(Boolean))]
 
   const filterJobs = (jobs: PipelineJob[]) => filter === 'all' ? jobs : jobs.filter((j) => j.resume === filter)
 
@@ -265,9 +265,9 @@ export function ApplicationsView() {
                 onChange={(e) => setFilter(e.target.value)}
                 className="cursor-pointer rounded-xs border border-border bg-background px-2 py-1 text-[11px] outline-none focus:border-primary"
               >
-                {resumeNames.map((name) => (
-                  <option key={name} value={name}>
-                    {name === 'all' ? t('all') : name}
+                {resumeIds.map((id) => (
+                  <option key={id} value={id}>
+                    {id === 'all' ? t('all') : resumes.find(r => r.id === id)?.name || id}
                   </option>
                 ))}
               </select>

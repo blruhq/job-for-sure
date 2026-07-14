@@ -212,7 +212,7 @@ export function JobPreview({ resume, onDismiss, onLoadComplete }: { resume: Resu
                           level: job.score >= 75 ? 'high' : 'mid',
                           time: 'just now',
                           url: job.url,
-                          resume: resume.role,
+                          resume: resume.id,
                         })
                         notify({ message: `Bookmarked: ${job.title}`, type: 'success' })
                       }
