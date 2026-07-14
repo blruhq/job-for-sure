@@ -60,4 +60,6 @@ export interface SearchResult {
   cached: boolean
   fetchedAt: string
   sources: { source: JobSource; count: number; error?: string }[]
+  /** True if descriptions are included in the response, false if truncated for cache savings */
+  descriptionsIncluded?: boolean
 }

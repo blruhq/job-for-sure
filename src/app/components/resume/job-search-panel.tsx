@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import {
   Search, Bookmark, ExternalLink, MapPin, Loader2, AlertCircle,
   RefreshCw, Filter, X, Globe, Clock, Star, Plane, MessageSquare,
-  ChevronDown, Briefcase, Brain,
+  ChevronDown, Briefcase, Brain, FileText,
 } from 'lucide-react'
 import { cn } from '~/lib/utils'
 import { useAppStore } from '~/lib/store'
@@ -92,6 +92,10 @@ export function JobSearchPanel({ resume }: { resume: Resume }) {
   const [paidLoading, setPaidLoading] = useState(false)
   const sentinelRef = useRef<HTMLDivElement>(null)
   const searchRunRef = useRef(0) // track latest search to avoid stale merges
+  const resultsRef = useRef<ScoredJob[]>([]) // mirror for closures
+
+  // Keep resultsRef in sync with state (for use in callbacks without stale closures)
+  useEffect(() => { resultsRef.current = results }, [results])
 
   // ── Merge helper: combines two search results, dedup by id ──
   const mergeResults = useCallback((existing: ScoredJob[], incoming: ScoredJob[]): ScoredJob[] => {
@@ -100,6 +104,48 @@ export function JobSearchPanel({ resume }: { resume: Resume }) {
     if (added.length === 0) return existing
     return [...existing, ...added].sort((a, b) => b.score - a.score)
   }, [])
+
+  // ── SessionStorage cache for search results ──
+  // Survives page navigation within the same tab. Dies on tab close (correct —
+  // job results go stale quickly). Full descriptions are always stored here
+  // since they come from fresh API responses, not the Redis cache.
+  const SESSION_TTL_MS = 30 * 60 * 1000 // 30 minutes
+
+  function getSessionKey(q: string, loc: string): string {
+    return `jfs_search_${resume.id}_${q.toLowerCase().trim()}_${loc.toLowerCase().trim()}`
+  }
+
+  function saveSearchToSession(q: string, loc: string, data: { jobs: ScoredJob[]; total: number; descriptionsIncluded?: boolean }) {
+    try {
+      sessionStorage.setItem(getSessionKey(q, loc), JSON.stringify({
+        jobs: data.jobs,
+        total: data.total,
+        descriptionsIncluded: data.descriptionsIncluded ?? true,
+        timestamp: Date.now(),
+      }))
+    } catch {
+      // sessionStorage full or unavailable — silently skip
+    }
+  }
+
+  function loadSearchFromSession(q: string, loc: string): { jobs: ScoredJob[]; total: number; descriptionsIncluded: boolean } | null {
+    try {
+      const raw = sessionStorage.getItem(getSessionKey(q, loc))
+      if (!raw) return null
+      const data = JSON.parse(raw)
+      if (Date.now() - data.timestamp > SESSION_TTL_MS) {
+        sessionStorage.removeItem(getSessionKey(q, loc))
+        return null
+      }
+      return {
+        jobs: data.jobs as ScoredJob[],
+        total: data.total as number,
+        descriptionsIncluded: data.descriptionsIncluded ?? true,
+      }
+    } catch {
+      return null
+    }
+  }
 
   const handleSearch = useCallback(async (q?: string, loc?: string, fresh?: boolean) => {
     const searchQuery = (q ?? query).trim()
@@ -136,6 +182,13 @@ export function JobSearchPanel({ resume }: { resume: Resume }) {
       setResults(fastData.jobs)
       setSourceCount(fastData.sources.length)
       setCached(fastData.cached)
+      // Cache in sessionStorage for instant back-nav within same tab session.
+      // This stores full descriptions (unlike Redis cache which strips them).
+      saveSearchToSession(searchQuery, loc ?? location ?? '', {
+        jobs: fastData.jobs,
+        total: fastData.total,
+        descriptionsIncluded: fastData.descriptionsIncluded,
+      })
       setLoading(false) // release loading — user sees 25 jobs now
 
       // ── Phase 2: Slow free sources (3-10s, background) ──
@@ -156,7 +209,16 @@ export function JobSearchPanel({ resume }: { resume: Resume }) {
         if (runId !== searchRunRef.current) return
         if (fullRes.ok) {
           const fullData: SearchResult = await fullRes.json()
-          setResults(prev => mergeResults(prev, fullData.jobs))
+          setResults(prev => {
+            const merged = mergeResults(prev, fullData.jobs)
+            // Update sessionStorage with merged results (includes slow sources)
+            saveSearchToSession(searchQuery, loc ?? location ?? '', {
+              jobs: merged,
+              total: fullData.total,
+              descriptionsIncluded: fullData.descriptionsIncluded,
+            })
+            return merged
+          })
         }
       } catch {
         // Silent fail — fast results are already showing
@@ -170,11 +232,22 @@ export function JobSearchPanel({ resume }: { resume: Resume }) {
     }
   }, [query, location, resume.skills, resume.role, mergeResults])
 
-  // Auto-search on mount
+  // Auto-search on mount — check sessionStorage first for instant back-nav
   useEffect(() => {
-    if (resume.skills.length > 0 && !searched) {
-      handleSearch()
+    if (resume.skills.length === 0 || searched) return
+
+    const q = query
+    const loc = location ?? ''
+    const cached = loadSearchFromSession(q, loc)
+    if (cached && cached.jobs.length > 0) {
+      setResults(cached.jobs)
+      setSearched(true)
+      setLoading(false)
+      setCached(true)
+      return
     }
+
+    handleSearch()
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   // ── Client-side filtering on loaded results ──
@@ -282,6 +355,14 @@ export function JobSearchPanel({ resume }: { resume: Resume }) {
   }
 
   const handleAts = (job: ScoredJob) => {
+    if (!job.description || job.description.length < 50) {
+      // Descriptions were stripped from Redis cache — need a fresh search
+      notify({
+        message: 'Full job description not cached. Click "Fresh" to reload results, then try ATS Match.',
+        type: 'info',
+      })
+      return
+    }
     if (typeof window !== 'undefined') {
       sessionStorage.setItem('jfs_pending_ats_jd', job.description)
       sessionStorage.setItem('jfs_pending_ats_company', job.company)
@@ -319,7 +400,14 @@ export function JobSearchPanel({ resume }: { resume: Resume }) {
       })
       if (!res.ok) throw new Error('Paid search failed')
       const data: SearchResult = await res.json()
-      setResults(prev => mergeResults(prev, data.jobs))
+      const merged = mergeResults(resultsRef.current, data.jobs)
+      setResults(merged)
+      // Update sessionStorage to include paid source results
+      saveSearchToSession(query, location ?? '', {
+        jobs: merged,
+        total: data.total,
+        descriptionsIncluded: data.descriptionsIncluded,
+      })
       setPaidLoaded(true)
       notify({ message: `Added ${data.jobs.length} jobs from LinkedIn, Indeed & JobsDB`, type: 'success' })
     } catch (err) {

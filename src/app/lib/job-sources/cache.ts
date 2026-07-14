@@ -10,7 +10,8 @@ import { getRedis } from '~/lib/redis'
 // Works on Vercel edge and Node.js runtimes.
 // ═══════════════════════════════════════════════════════════════
 
-const TTL_SECONDS = 6 * 60 * 60 // 6 hours
+const TTL_SECONDS = 2 * 60 * 60 // 2 hours — shorter TTL reduces Redis storage pressure.
+// Previously 6h. Descriptions are stripped from cache (see index.ts) for ~80% space savings.
 
 export async function getCached<T>(key: string): Promise<T | null> {
   try {

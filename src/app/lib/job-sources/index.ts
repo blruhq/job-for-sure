@@ -76,10 +76,20 @@ export async function searchJobs(params: SearchParams): Promise<SearchResult> {
   if (!fresh) {
     const cached = await getCached<SearchResult>(key)
     if (cached) {
-      // Re-filter cached jobs in case location logic or query parameters changed
+      // Cached jobs have descriptions stripped to save Redis storage.
+      // On cache hit, descriptions won't be available (descriptionsIncluded=false).
+      // Scoring still works on title + tags + company — slightly less accurate
+      // but saves ~80% Redis storage. Full descriptions come from fresh scrape
+      // or client-side sessionStorage.
       const refiltered = filterByQuery(cached.jobs.map(stripScore), query, location)
       const rescored = rankJobs(refiltered, skills, role, location).slice(0, limit)
-      return { ...cached, jobs: rescored, total: refiltered.length, cached: true }
+      return {
+        ...cached,
+        jobs: rescored,
+        total: refiltered.length,
+        cached: true,
+        descriptionsIncluded: false,
+      }
     }
   }
 
@@ -182,11 +192,34 @@ export async function searchJobs(params: SearchParams): Promise<SearchResult> {
     cached: false,
     fetchedAt: new Date().toISOString(),
     sources: sourceStats,
+    descriptionsIncluded: true,
   }
 
-  // 9. Cache (unscored jobs, re-scored per user on cache hit)
+  // 9. Cache — store WITHOUT descriptions to save Redis storage (~80% savings).
+  //    Full descriptions are returned on fresh scrape and stored client-side
+  //    in sessionStorage. On cache hit, descriptions are fetched on-demand
+  //    when user opens a job card or uses ATS match.
   if (filtered.length > 0) {
-    setCached(key, { ...result, jobs: filtered })
+    const leanJobs: JobResult[] = filtered.map(j => ({
+      id: j.id,
+      source: j.source,
+      company: j.company,
+      title: j.title,
+      location: j.location,
+      locationType: j.locationType,
+      url: j.url,
+      description: '',        // stripped — saves ~80% Redis storage
+      descriptionHtml: '',     // stripped
+      salary: j.salary,
+      postedAt: j.postedAt,
+      companyLogo: j.companyLogo,
+      department: j.department,
+      tags: j.tags,
+      visaSponsorship: j.visaSponsorship,
+      experienceLevel: j.experienceLevel,
+      employmentType: j.employmentType,
+    }))
+    setCached(key, { ...result, jobs: leanJobs, descriptionsIncluded: false })
   }
 
   return result

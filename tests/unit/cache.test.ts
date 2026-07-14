@@ -75,7 +75,7 @@ describe('cache', () => {
       expect(mockSet).toHaveBeenCalledWith(
         'jfs:cache:test-key',
         { foo: 'bar' },
-        { ex: 21600 }, // 6 hours
+        { ex: 7200 }, // 2 hours
       )
     })
 
