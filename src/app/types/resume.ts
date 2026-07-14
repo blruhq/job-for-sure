@@ -112,6 +112,7 @@ export interface PipelineJob {
   time: string
   url: string
   resume: string
+  addedAt: string
 }
 
 export interface ApplicationBoard {

@@ -1,8 +1,8 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { useRouter } from '~/i18n/routing'
-import { Trash2, Link2, RefreshCw } from 'lucide-react'
+import { Trash2, Link2, RefreshCw, Plus, CalendarDays } from 'lucide-react'
 import { cn } from '~/lib/utils'
 import { useAppStore } from '~/lib/store'
 import { notify } from '~/lib/toast'
@@ -24,6 +24,23 @@ import {
 } from '@dnd-kit/core'
 import { useSortable, SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
+
+// ── Date formatting helper ──
+function formatDate(isoString: string): string {
+  const date = new Date(isoString)
+  const now = new Date()
+  const diffMs = now.getTime() - date.getTime()
+  const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24))
+
+  if (isNaN(date.getTime())) return ''
+  if (diffDays === 0) return 'Added today'
+  if (diffDays === 1) return 'Added yesterday'
+  if (diffDays < 7) return `Added ${diffDays}d ago`
+  if (diffDays < 30) return `Added ${Math.floor(diffDays / 7)}w ago`
+
+  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+  return `Added ${months[date.getMonth()]} ${date.getDate()}`
+}
 
 const COLUMN_IDS: ApplicationColumnId[] = ['bookmark', 'applied', 'interviewing', 'offers', 'rejected']
 
@@ -87,6 +104,7 @@ function DroppableColumn({ colId, isOver, children }: { colId: ApplicationColumn
 
 // ── Card content (used in both card and overlay) ──
 function JobCardContent({ job }: { job: PipelineJob }) {
+  const dateText = job.addedAt ? formatDate(job.addedAt) : ''
   return (
     <>
       <div className="flex items-start justify-between gap-1">
@@ -106,6 +124,11 @@ function JobCardContent({ job }: { job: PipelineJob }) {
       <div className="mt-1.5 flex items-center gap-2 text-[9px] text-muted-foreground">
         {job.loc && <span className="truncate">{job.loc}</span>}
       </div>
+      {dateText && (
+        <div className="mt-1 text-[9px] text-muted-foreground/60">
+          {dateText}
+        </div>
+      )}
     </>
   )
 }
@@ -119,6 +142,8 @@ export function ApplicationsView() {
   const [activeJob, setActiveJob] = useState<PipelineJob | null>(null)
   const [pasteUrl, setPasteUrl] = useState('')
   const [scraping, setScraping] = useState(false)
+  const [addingToCol, setAddingToCol] = useState<ApplicationColumnId | null>(null)
+  const addTitleRef = useRef<HTMLInputElement>(null)
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
@@ -230,6 +255,7 @@ export function ApplicationsView() {
           logo: '',
           color: '',
           resume: '',
+          addedAt: new Date().toISOString(),
         })
         notify({ message: `Added "${data.job.title}" at ${data.job.company}`, type: 'success' })
         setPasteUrl('')
@@ -245,6 +271,97 @@ export function ApplicationsView() {
     } finally {
       setScraping(false)
     }
+  }
+
+  // ── Inline add form for a column ──
+  function InlineAddForm({ colId }: { colId: ApplicationColumnId }) {
+    const [title, setTitle] = useState('')
+    const [company, setCompany] = useState('')
+    const [date, setDate] = useState(new Date().toISOString().split('T')[0])
+
+    const handleCancel = () => {
+      setAddingToCol(null)
+    }
+
+    const handleSave = () => {
+      const trimmedTitle = title.trim()
+      const trimmedCompany = company.trim()
+      if (!trimmedTitle || !trimmedCompany) {
+        notify({ message: 'Job title and company are required.', type: 'error' })
+        return
+      }
+
+      bookmarkJob({
+        key: `manual-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+        company: trimmedCompany,
+        title: trimmedTitle,
+        loc: '',
+        score: 0,
+        level: 'mid',
+        time: 'saved',
+        url: '',
+        logo: '',
+        color: '',
+        resume: '',
+        addedAt: new Date(date + 'T12:00:00').toISOString(),
+      })
+
+      notify({ message: `Added "${trimmedTitle}" at ${trimmedCompany}`, type: 'success' })
+      setAddingToCol(null)
+    }
+
+    return (
+      <div className="mt-1.5 flex flex-col gap-2 rounded-xs border border-border bg-card p-2.5">
+        <input
+          ref={addTitleRef}
+          type="text"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' && !e.shiftKey) handleSave()
+            if (e.key === 'Escape') handleCancel()
+          }}
+          placeholder="Job title *"
+          autoFocus
+          className="w-full rounded-xs border border-border bg-background px-2 py-1.5 text-[11px] outline-none focus:border-primary placeholder:text-muted-foreground/50"
+        />
+        <input
+          type="text"
+          value={company}
+          onChange={(e) => setCompany(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' && !e.shiftKey) handleSave()
+            if (e.key === 'Escape') handleCancel()
+          }}
+          placeholder="Company *"
+          className="w-full rounded-xs border border-border bg-background px-2 py-1.5 text-[11px] outline-none focus:border-primary placeholder:text-muted-foreground/50"
+        />
+        <div className="flex items-center gap-2">
+          <CalendarDays size={11} className="text-muted-foreground shrink-0" />
+          <input
+            type="date"
+            value={date}
+            onChange={(e) => setDate(e.target.value)}
+            className="flex-1 rounded-xs border border-border bg-background px-2 py-1 text-[10px] outline-none focus:border-primary text-muted-foreground"
+          />
+        </div>
+        <div className="flex items-center justify-end gap-1.5 mt-0.5">
+          <button
+            onClick={handleCancel}
+            className="rounded-xs px-2.5 py-1 text-[10px] text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+          >
+            Cancel
+          </button>
+          <button
+            onClick={handleSave}
+            disabled={!title.trim() || !company.trim()}
+            className="rounded-xs bg-primary px-2.5 py-1 text-[10px] font-medium text-primary-foreground transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer"
+          >
+            Add
+          </button>
+        </div>
+      </div>
+    )
   }
 
   return (
@@ -353,15 +470,11 @@ export function ApplicationsView() {
 
                 {/* Job Cards */}
                 <div className="flex flex-col gap-1.5 p-2 overflow-y-auto">
-                  {jobs.length === 0 && (
-                    <div className="px-2 py-4 text-center">
-                      <p className="text-[11px] text-muted-foreground">{t('noApplications')}</p>
-                      <button
-                        onClick={() => router.push('/chat')}
-                        className="mt-2 text-[10px] text-primary hover:underline cursor-pointer"
-                      >
-                        {t('addJobs')}
-                      </button>
+                  {jobs.length === 0 && !(addingToCol === col.id) && (
+                    <div className="px-2 py-6 text-center">
+                      <p className="text-[10px] text-muted-foreground/50">
+                        {t('noApplications')}
+                      </p>
                     </div>
                   )}
 
@@ -395,6 +508,22 @@ export function ApplicationsView() {
                       </DraggableJobCard>
                     ))}
                   </SortableContext>
+
+                  {/* Inline Add Button / Form */}
+                  {addingToCol === col.id ? (
+                    <InlineAddForm colId={col.id} />
+                  ) : (
+                    <button
+                      onClick={() => {
+                        setAddingToCol(col.id)
+                        setTimeout(() => addTitleRef.current?.focus(), 50)
+                      }}
+                      className="flex cursor-pointer items-center gap-1 rounded-xs px-2 py-1.5 text-[10px] text-muted-foreground hover:text-foreground hover:bg-accent/50 transition-colors"
+                    >
+                      <Plus size={12} />
+                      Add Job
+                    </button>
+                  )}
                 </div>
               </DroppableColumn>
             )

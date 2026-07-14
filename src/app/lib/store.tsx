@@ -63,6 +63,7 @@ function mapAppToJob(app: ApplicationRecord): PipelineJob {
     time: timeLabels[app.status] || 'saved',
     url: app.jobUrl || '',
     resume: app.resumeId || '',
+    addedAt: app.createdAt,
   }
 }
 
@@ -287,7 +288,7 @@ export function AppStoreProvider({ children }: { children: ReactNode }) {
     if (applicationsRef.current.bookmark.some(j => j.key === job.key)) return
 
     const prev = applicationsRef.current
-    const optimisticJob: PipelineJob = { ...job, time: 'saved' }
+    const optimisticJob: PipelineJob = { ...job, time: 'saved', addedAt: new Date().toISOString() }
     setApplications(prevApps => ({
       ...prevApps,
       bookmark: [...prevApps.bookmark, optimisticJob],

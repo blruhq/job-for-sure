@@ -349,6 +349,7 @@ export function JobSearchPanel({ resume }: { resume: Resume }) {
         time: 'just now',
         url: job.url,
         resume: resume.id,
+        addedAt: new Date().toISOString(),
       })
       notify({ message: `Bookmarked: ${job.title} at ${job.company}`, type: 'success' })
     }

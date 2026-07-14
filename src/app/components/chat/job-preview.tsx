@@ -213,6 +213,7 @@ export function JobPreview({ resume, onDismiss, onLoadComplete }: { resume: Resu
                           time: 'just now',
                           url: job.url,
                           resume: resume.id,
+                          addedAt: new Date().toISOString(),
                         })
                         notify({ message: `Bookmarked: ${job.title}`, type: 'success' })
                       }
