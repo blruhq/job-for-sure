@@ -60,6 +60,22 @@ const FREE_SOURCES: JobSource[] = [
 // All sources (used when includePaid is true or explicit sources given)
 const ALL_SOURCES: JobSource[] = [...FREE_SOURCES, ...PAID_SOURCES]
 
+// ── Silent auto-retry wrapper ─────────────────────────────────
+// If a source returns 0 jobs with an error, wait 500ms and retry once.
+// Most transient failures (network blip, rate-limit) resolve on retry.
+// If still failing, give up — fail-open, other sources compensate.
+async function withRetry(
+  fn: () => Promise<{ jobs: JobResult[]; error?: string }>,
+): Promise<{ jobs: JobResult[]; error?: string }> {
+  const first = await fn()
+  // Success or has jobs → use it
+  if (first.jobs.length > 0 || !first.error) return first
+  // Had error with 0 jobs → retry once after 500ms
+  await new Promise(r => setTimeout(r, 500))
+  const second = await fn()
+  return second
+}
+
 export async function searchJobs(params: SearchParams): Promise<SearchResult> {
   const {
     query,
@@ -97,71 +113,71 @@ export async function searchJobs(params: SearchParams): Promise<SearchResult> {
     }
   }
 
-  // 2. Fetch from all enabled sources in parallel
-  const fetchers: Promise<{ jobs: JobResult[]; error?: string }>[] = []
+  // 2. Fetch from all enabled sources in parallel (lazy thunks for retry)
+  const fetchers: Array<() => Promise<{ jobs: JobResult[]; error?: string }>> = []
   const fetcherSources: JobSource[] = []
 
   // No-key sources (always try)
   if (sources.includes('remoteok')) {
-    fetchers.push(fetchRemoteOKJobs(query))
+    fetchers.push(() => fetchRemoteOKJobs(query))
     fetcherSources.push('remoteok')
   }
   if (sources.includes('himalayas')) {
-    fetchers.push(fetchHimalayas(query))
+    fetchers.push(() => fetchHimalayas(query))
     fetcherSources.push('himalayas')
   }
   if (sources.includes('remotive')) {
-    fetchers.push(fetchRemotive(query))
+    fetchers.push(() => fetchRemotive(query))
     fetcherSources.push('remotive')
   }
   if (sources.includes('themuse')) {
-    fetchers.push(fetchTheMuse(query))
+    fetchers.push(() => fetchTheMuse(query))
     fetcherSources.push('themuse')
   }
   if (sources.includes('arbeitnow')) {
-    fetchers.push(fetchArbeitnow(query))
+    fetchers.push(() => fetchArbeitnow(query))
     fetcherSources.push('arbeitnow')
   }
   if (sources.includes('greenhouse')) {
-    fetchers.push(fetchGreenhouseJobs(query))
+    fetchers.push(() => fetchGreenhouseJobs(query))
     fetcherSources.push('greenhouse')
   }
   if (sources.includes('ashby')) {
-    fetchers.push(fetchAshbyJobs(query))
+    fetchers.push(() => fetchAshbyJobs(query))
     fetcherSources.push('ashby')
   }
 
   // Key-gated sources (auto-activate when env vars present)
   if (sources.includes('adzuna')) {
-    fetchers.push(fetchAdzuna(query, location))
+    fetchers.push(() => fetchAdzuna(query, location))
     fetcherSources.push('adzuna')
   }
   if (sources.includes('jsearch')) {
-    fetchers.push(fetchJSearch(query, location))
+    fetchers.push(() => fetchJSearch(query, location))
     fetcherSources.push('jsearch')
   }
   if (sources.includes('jobbkk')) {
-    fetchers.push(fetchJobbKK(query, location))
+    fetchers.push(() => fetchJobbKK(query, location))
     fetcherSources.push('jobbkk')
   }
   if (sources.includes('linkedin-guest')) {
-    fetchers.push(fetchLinkedInGuest(query, location))
+    fetchers.push(() => fetchLinkedInGuest(query, location))
     fetcherSources.push('linkedin-guest')
   }
   if (sources.includes('linkedin')) {
-    fetchers.push(fetchApifyLinkedIn(query, location))
+    fetchers.push(() => fetchApifyLinkedIn(query, location))
     fetcherSources.push('linkedin')
   }
   if (sources.includes('indeed')) {
-    fetchers.push(fetchApifyIndeed(query, location))
+    fetchers.push(() => fetchApifyIndeed(query, location))
     fetcherSources.push('indeed')
   }
   if (sources.includes('jobsdb')) {
-    fetchers.push(fetchApifyJobsDB(query, location))
+    fetchers.push(() => fetchApifyJobsDB(query, location))
     fetcherSources.push('jobsdb')
   }
 
-  const results = await Promise.allSettled(fetchers)
+  const results = await Promise.allSettled(fetchers.map(f => withRetry(f)))
 
   // 3. Collect
   const allJobs: JobResult[] = []

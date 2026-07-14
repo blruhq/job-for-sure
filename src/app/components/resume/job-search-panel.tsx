@@ -16,6 +16,7 @@ import type { ScoredJob, SearchResult, JobSource, JobResult } from '~/lib/job-so
 import { countryToFlag } from '~/lib/job-sources/geo'
 import { JobDetailModal } from './job-detail-modal'
 import { getCards, setCards } from '~/lib/client-cache'
+import { expandQueryTerms } from '~/lib/job-sources/role-synonyms'
 
 // ═══════════════════════════════════════════════════════════════
 // JobSearchPanel — real job search from 9+ free sources.
@@ -102,6 +103,16 @@ export function JobSearchPanel({ resume }: { resume: Resume }) {
   const [modalJob, setModalJob] = useState<ScoredJob | null>(null)
   const [modalOpen, setModalOpen] = useState(false)
 
+  // ── SWR Background Refresh states ──
+  const [newJobs, setNewJobs] = useState<ScoredJob[]>([])
+  const [backgroundRefreshing, setBackgroundRefreshing] = useState(false)
+
+  // Thai synonyms for the query translation pill
+  const thaiSynonyms = useMemo(() => {
+    const terms = expandQueryTerms(query)
+    return terms.filter(t => /[\u0e00-\u0e7f]/.test(t))
+  }, [query])
+
   // ── Fake "+N more" tease count for paid sources (v1: faked, v1.5: real) ──
   // Deterministic per search so it doesn't jump around on re-render.
   const paidTeaseCount = useMemo(() => {
@@ -130,6 +141,93 @@ export function JobSearchPanel({ resume }: { resume: Resume }) {
   function loadSearchFromCache(q: string, loc: string): { jobs: ScoredJob[]; total: number; descriptionsIncluded: boolean } | null {
     return getCards(q, loc, resume.id)
   }
+
+  // ── SWR Background Refresh ──
+  const backgroundRefresh = useCallback(async (searchQuery: string, loc: string) => {
+    setBackgroundRefreshing(true)
+    try {
+      const fastRes = await fetch('/api/jobs/search', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          query: searchQuery,
+          location: loc.trim() || undefined,
+          skills: resume.skills,
+          role: resume.role,
+          sources: FAST_FREE_SOURCES,
+          limit: 100,
+          fresh: true, // force bypass server-side cache
+        }),
+      })
+
+      if (!fastRes.ok) throw new Error('Background search failed')
+      const fastData: SearchResult = await fastRes.json()
+
+      // Find new jobs not currently in results state
+      const existingIds = new Set(resultsRef.current.map(j => j.id))
+      const freshNewJobs = fastData.jobs.filter(j => !existingIds.has(j.id))
+
+      if (freshNewJobs.length > 0) {
+        setNewJobs(prev => {
+          const prevIds = new Set(prev.map(j => j.id))
+          const added = freshNewJobs.filter(j => !prevIds.has(j.id))
+          return [...prev, ...added].sort((a, b) => b.score - a.score)
+        })
+      }
+
+      // Phase 2: Slow sources in background
+      try {
+        const fullRes = await fetch('/api/jobs/search', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            query: searchQuery,
+            location: loc.trim() || undefined,
+            skills: resume.skills,
+            role: resume.role,
+            sources: FULL_FREE_SOURCES,
+            limit: 100,
+            fresh: true,
+          }),
+        })
+        if (fullRes.ok) {
+          const fullData: SearchResult = await fullRes.json()
+          const currentIds = new Set([
+            ...resultsRef.current.map(j => j.id),
+            ...newJobs.map(j => j.id),
+            ...freshNewJobs.map(j => j.id),
+          ])
+          const slowNewJobs = fullData.jobs.filter(j => !currentIds.has(j.id))
+          if (slowNewJobs.length > 0) {
+            setNewJobs(prev => {
+              const prevIds = new Set(prev.map(j => j.id))
+              const added = slowNewJobs.filter(j => !prevIds.has(j.id))
+              return [...prev, ...added].sort((a, b) => b.score - a.score)
+            })
+          }
+        }
+      } catch {
+        // silent fail
+      }
+    } catch (err) {
+      console.error('[job-search-bg] Background refresh failed:', err)
+    } finally {
+      setBackgroundRefreshing(false)
+    }
+  }, [resume.skills, resume.role, newJobs])
+
+  const handleShowNewJobs = useCallback(() => {
+    if (newJobs.length === 0) return
+    setResults(prev => {
+      const merged = mergeResults(newJobs, prev)
+      saveSearchToCache(query, location || '', {
+        jobs: merged,
+        total: merged.length,
+      })
+      return merged
+    })
+    setNewJobs([])
+  }, [newJobs, query, location, mergeResults])
 
   const handleSearch = useCallback(async (q?: string, loc?: string, fresh?: boolean) => {
     const searchQuery = (q ?? query).trim()
@@ -219,6 +317,12 @@ export function JobSearchPanel({ resume }: { resume: Resume }) {
       setSearched(true)
       setLoading(false)
       setCached(true)
+
+      // SWR: If cache is older than 30 minutes, trigger background refresh silently
+      const age = Date.now() - (cached as any).timestamp
+      if (age > 30 * 60 * 1000) {
+        backgroundRefresh(q, loc)
+      }
       return
     }
 
@@ -502,8 +606,19 @@ export function JobSearchPanel({ resume }: { resume: Resume }) {
             icon={<Plane size={11} />}
             label="Visa Sponsor"
           />
-
         </div>
+
+        {/* Synonym pill (cross-lingual explanation) */}
+        {thaiSynonyms.length > 0 && (
+          <div className="mt-2.5 flex flex-wrap items-center gap-1.5 text-[10px] text-muted-foreground bg-muted/30 px-2 py-1 rounded-sm border border-border/50">
+            <span className="font-medium text-foreground">Including Thai results for:</span>
+            {thaiSynonyms.slice(0, 5).map(syn => (
+              <span key={syn} className="rounded-xs bg-muted px-1.5 py-0.5 font-mono text-[9px] text-foreground/80">
+                {syn}
+              </span>
+            ))}
+          </div>
+        )}
 
         {/* Expanded filter panel */}
         {showFilters && (
@@ -544,18 +659,6 @@ export function JobSearchPanel({ resume }: { resume: Resume }) {
                   checked={filters.experience.has(e)}
                   onChange={() => setFilters((f) => ({ ...f, experience: toggleSet(f.experience, e) }))}
                   label={e.charAt(0).toUpperCase() + e.slice(1)}
-                />
-              ))}
-            </FilterGroup>
-
-            {/* Source */}
-            <FilterGroup label="Source">
-              {(Object.keys(SOURCE_NAMES) as JobSource[]).map((s) => (
-                <FilterCheckbox
-                  key={s}
-                  checked={filters.sourceFilter.has(s)}
-                  onChange={() => setFilters((f) => ({ ...f, sourceFilter: toggleSourceSet(f.sourceFilter, s) }))}
-                  label={SOURCE_NAMES[s]}
                 />
               ))}
             </FilterGroup>
@@ -657,13 +760,31 @@ export function JobSearchPanel({ resume }: { resume: Resume }) {
                   <span>·</span>
                   <button
                     onClick={handleRefresh}
-                    className="flex cursor-pointer items-center gap-0.5 text-primary hover:underline"
+                    disabled={backgroundRefreshing}
+                    className="flex cursor-pointer items-center gap-0.5 text-primary hover:underline disabled:opacity-50"
                   >
-                    <RefreshCw size={9} /> Cached — refresh
+                    {backgroundRefreshing ? (
+                      <span className="flex items-center gap-1">
+                        <Loader2 size={9} className="animate-spin text-primary" /> Refreshing…
+                      </span>
+                    ) : (
+                      <span className="flex items-center gap-0.5">
+                        <RefreshCw size={9} /> Cached — refresh
+                      </span>
+                    )}
                   </button>
                 </>
               )}
             </div>
+
+            {newJobs.length > 0 && (
+              <button
+                onClick={handleShowNewJobs}
+                className="mb-3 flex w-full cursor-pointer items-center justify-center gap-1.5 rounded-sm border border-primary/30 bg-accent-soft py-2 text-[11px] font-semibold text-primary transition-all hover:bg-primary hover:text-primary-foreground animate-pulse"
+              >
+                🆕 {newJobs.length} new job{newJobs.length !== 1 ? 's' : ''} found since you searched · Show fresh results
+              </button>
+            )}
 
             <div className="flex flex-col gap-3">
               {displayedJobs.map((job) => (
