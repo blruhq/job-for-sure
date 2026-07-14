@@ -152,7 +152,7 @@ export async function scrapeJob(url: string): Promise<ScrapeResult> {
   try {
     if (domain.includes('indeed')) return scrapeIndeed(url)
     if (domain.includes('greenhouse')) return scrapeGreenhouse(url)
-    if (domain.includes('jobdb')) return scrapeJobDb(url)
+    if (domain.includes('jobsdb')) return scrapeJobDb(url)
     if (domain.includes('linkedin')) return scrapeLinkedIn(url)
 
     // Generic fallback: try to extract whatever we can
@@ -178,7 +178,7 @@ function extractDomain(url: string): string {
 const MAX_SCRAPE_BYTES = 2 * 1024 * 1024 // 2MB — prevent OOM from huge pages
 const MAX_REDIRECTS = 3
 
-async function fetchHTML(url: string): Promise<string> {
+async function fetchHTML(url: string, customHeaders?: Record<string, string>): Promise<string> {
   let currentUrl = url
   for (let i = 0; i <= MAX_REDIRECTS; i++) {
     await validateUrl(currentUrl)
@@ -187,6 +187,7 @@ async function fetchHTML(url: string): Promise<string> {
       headers: {
         'User-Agent': 'JobForSure-Bot/1.0 (+https://jobforsure.app)',
         Accept: 'text/html,application/xhtml+xml',
+        ...customHeaders,
       },
       signal: AbortSignal.timeout(10_000),
       redirect: 'manual',
@@ -294,24 +295,75 @@ async function scrapeGreenhouse(url: string): Promise<ScrapeResult> {
 }
 
 async function scrapeJobDb(url: string): Promise<ScrapeResult> {
-  const html = await fetchHTML(url)
-  const $ = cheerio.load(html)
+  // JobsDB (SEEK family) uses Cloudflare WAF — send browser-like headers
+  const browserHeaders: Record<string, string> = {
+    'User-Agent':
+      'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36',
+    Accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
+    'Accept-Language': 'en-US,en;q=0.9,th;q=0.8',
+    'Cache-Control': 'no-cache',
+    Pragma: 'no-cache',
+    'Sec-Fetch-Dest': 'document',
+    'Sec-Fetch-Mode': 'navigate',
+    'Sec-Fetch-Site': 'none',
+    'Sec-Fetch-User': '?1',
+    'Upgrade-Insecure-Requests': '1',
+  }
 
-  const title = $('h1').first().text().trim() || $('.job-title').text().trim()
-  const company = $('.company-name').text().trim() || $('.employer').text().trim()
-  const description = $('.job-description').text().trim() || $('.description').text().trim()
+  try {
+    const html = await fetchHTML(url, browserHeaders)
+    const $ = cheerio.load(html)
 
-  return {
-    success: true,
-    source: 'jobdb',
-    job: {
-      title: title || 'Unknown Position',
-      company: company || 'Unknown Company',
-      location: 'Remote',
-      description: description || 'No description available.',
-      requirements: extractRequirements(description),
-      qualifications: [],
-    },
+    // SEEK/JobsDB uses data-automation attributes
+    const title =
+      $('[data-automation="job-detail-title"]').text().trim() ||
+      $('h1[data-automation*="title"]').text().trim() ||
+      $('h1').first().text().trim()
+
+    const company =
+      $('[data-automation="advertiser-name"]').text().trim() ||
+      $('[data-automation="job-detail-company"]').text().trim() ||
+      $('[class*="company"]').first().text().trim() ||
+      $('[class*="employer"]').first().text().trim()
+
+    const location =
+      $('[data-automation="job-detail-location"]').text().trim() ||
+      $('[class*="location"]').first().text().trim()
+
+    const description =
+      $('[data-automation="job-detail-description"]').text().trim() ||
+      $('#job-description').text().trim() ||
+      $('[class*="description"]').text().trim() ||
+      $('[class*="job-body"]').text().trim()
+
+    if (!title && !description) {
+      // Page probably didn't render (Cloudflare challenge) — fall through to error
+      throw new Error(
+        'JobsDB blocked the request. Try pasting the job description manually.'
+      )
+    }
+
+    return {
+      success: true,
+      source: 'jobdb',
+      job: {
+        title: title || 'Unknown Position',
+        company: company || 'Unknown Company',
+        location: location || 'Remote',
+        description: description || 'No description available.',
+        requirements: extractRequirements(description),
+        qualifications: [],
+      },
+    }
+  } catch (err) {
+    return {
+      success: false,
+      source: 'jobdb',
+      error:
+        err instanceof Error
+          ? err.message
+          : 'JobsDB is not accessible via automated scraping. Please paste the job description manually.',
+    }
   }
 }
 
