@@ -23,7 +23,9 @@ export interface JobResult {
   source: JobSource
   company: string
   title: string
-  location: string
+  location: string         // display string (free text from source)
+  country?: string         // ISO 3166-1 alpha-2 code (e.g., "TH", "US")
+  region?: string          // UN M49 region (e.g., "Asia", "Europe")
   locationType: 'remote' | 'hybrid' | 'onsite' | 'unknown'
   url: string              // real apply link on the ORIGINAL source
   description: string      // full JD text (HTML stripped for scoring, raw kept separately)

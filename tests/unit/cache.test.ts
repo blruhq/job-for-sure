@@ -27,22 +27,22 @@ describe('cache', () => {
   describe('cacheKey', () => {
     it('generates key from query + location', () => {
       const key = cacheKey('React Developer', 'Bangkok')
-      expect(key).toBe('react developer::bangkok')
+      expect(key).toBe('v2:react developer::bangkok')
     })
 
     it('handles undefined location', () => {
       const key = cacheKey('React Developer')
-      expect(key).toBe('react developer::')
+      expect(key).toBe('v2:react developer::')
     })
 
     it('includes sorted sources in key', () => {
       const key = cacheKey('React', undefined, ['greenhouse', 'ashby'])
-      expect(key).toBe('react::-ashby,greenhouse')
+      expect(key).toBe('v2:react::-ashby,greenhouse')
     })
 
     it('normalizes case', () => {
       const key = cacheKey('  REACT  ', '  BANGKOK  ')
-      expect(key).toBe('react::bangkok')
+      expect(key).toBe('v2:react::bangkok')
     })
   })
 

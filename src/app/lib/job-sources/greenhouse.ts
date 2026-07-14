@@ -6,6 +6,7 @@
 // ═══════════════════════════════════════════════════════════════
 
 import type { JobResult } from './types'
+import { parseLocation } from './geo'
 
 interface GreenhouseJob {
   id: number
@@ -57,13 +58,18 @@ export async function fetchGreenhouseCompany(
       (m) => m.name.toLowerCase().includes('salary') || m.name.toLowerCase().includes('compensation'),
     )
 
+    const locName = job.location?.name || 'Unknown'
+    const parsed = parseLocation(locName)
+
     return {
       id: `greenhouse:${job.id}`,
       source: 'greenhouse' as const,
       company: companyName,
       title: job.title,
-      location: job.location?.name || 'Unknown',
-      locationType: detectLocationType(job.location?.name || ''),
+      location: locName,
+      country: parsed.country,
+      region: parsed.region,
+      locationType: detectLocationType(locName),
       url: job.absolute_url,
       description: description.slice(0, 8000),
       descriptionHtml,

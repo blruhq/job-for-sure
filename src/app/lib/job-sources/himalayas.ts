@@ -9,6 +9,7 @@
 // ═══════════════════════════════════════════════════════════════
 
 import type { JobResult } from './types'
+import { parseLocation } from './geo'
 
 interface HimalayasJob {
   guid?: string
@@ -56,6 +57,7 @@ export async function fetchHimalayas(
       const description = descriptionHtml.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim()
       const location = (job.locationRestrictions || []).join(', ') || 'Remote'
       const salary = formatSalary(job.minSalary, job.maxSalary, job.salaryPeriod, job.currency)
+      const parsed = parseLocation(location)
 
       return {
         id: `himalayas:${job.guid || job.id || Math.random()}`,
@@ -63,6 +65,8 @@ export async function fetchHimalayas(
         company: job.companyName || 'Unknown',
         title: job.title || 'Unknown',
         location,
+        country: parsed.country,
+        region: parsed.region,
         locationType: detectLocationType(location),
         url: job.applicationLink || job.externalLink || `https://himalayas.app/jobs/${job.companySlug || ''}`,
         description: description.slice(0, 8000),

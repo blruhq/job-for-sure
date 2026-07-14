@@ -8,6 +8,7 @@
 // ═══════════════════════════════════════════════════════════════
 
 import type { JobResult } from './types'
+import { parseLocation } from './geo'
 
 interface RemotiveJob {
   id: number
@@ -46,13 +47,17 @@ export async function fetchRemotive(
     const jobs: JobResult[] = (data.jobs || []).map((job) => {
       const descriptionHtml = job.description || ''
       const description = descriptionHtml.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim()
+      const location = job.candidate_required_location || 'Remote'
+      const parsed = parseLocation(location)
 
       return {
         id: `remotive:${job.id}`,
         source: 'remotive' as const,
         company: job.company_name || 'Unknown',
         title: job.title || 'Unknown',
-        location: job.candidate_required_location || 'Remote',
+        location,
+        country: parsed.country,
+        region: parsed.region,
         locationType: 'remote' as const,
         url: job.url || `https://remotive.com/remote-jobs/${job.id}`,
         description: description.slice(0, 8000),

@@ -14,6 +14,7 @@
 // ═══════════════════════════════════════════════════════════════
 
 import type { JobResult } from './types'
+import { parseLocation } from './geo'
 
 interface AdzunaJob {
   id: string
@@ -88,6 +89,10 @@ export async function fetchAdzuna(
       const locationParts = job.location?.area || [job.location?.display_name || 'Unspecified']
       const locationStr = job.location?.display_name || locationParts.join(', ')
 
+      // Extract country from area array (first element is typically country)
+      const countryArea = job.location?.area?.[0]
+      const parsed = parseLocation(countryArea || locationStr)
+
       // Salary
       let salary: string | undefined
       if (job.salary_min && job.salary_max) {
@@ -108,6 +113,8 @@ export async function fetchAdzuna(
         company: job.company?.display_name || 'Unknown',
         title: job.title,
         location: locationStr,
+        country: parsed.country,
+        region: parsed.region,
         locationType: detectLocationType(locationStr),
         url: job.redirect_url || 'https://www.adzuna.com',
         description: (job.description || '').slice(0, 8000),

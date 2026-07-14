@@ -152,37 +152,60 @@ describe('inferExperienceLevel', () => {
   })
 })
 
-describe('filterByQuery token-based location matching', () => {
-  const jobs: JobResult[] = [
-    makeJob({ id: '1', title: 'React Developer', location: 'Bangkok', locationType: 'onsite' }),
-    makeJob({ id: '2', title: 'React Developer', location: 'Thailand', locationType: 'onsite' }),
-    makeJob({ id: '3', title: 'React Developer', location: 'Bangkok, Thailand', locationType: 'onsite' }),
-    makeJob({ id: '4', title: 'React Developer', location: 'Singapore', locationType: 'onsite' }),
-    makeJob({ id: '5', title: 'React Developer', location: 'Remote', locationType: 'remote' }),
-  ]
+describe('filterByQuery country-code location matching', () => {
+  it('matches Thai-script jobs when country code is set (the core fix)', () => {
+    // This is the exact bug we fixed: JobbKK jobs have Thai-script locations
+    // that can never match English text, but country:'TH' makes them visible.
+    const jobs: JobResult[] = [
+      makeJob({ id: 'th1', title: 'React Developer', location: 'กรุงเทพมหานคร เขตบางนา', country: 'TH', locationType: 'onsite' }),
+      makeJob({ id: 'th2', title: 'React Developer', location: 'นนทบุรี', country: 'TH', locationType: 'onsite' }),
+      makeJob({ id: 'us1', title: 'React Developer', location: 'San Francisco, CA', country: 'US', locationType: 'onsite' }),
+    ]
 
-  it('matches Bangkok and Thailand bidirectionally when location is Bangkok, Thailand', () => {
     const results = filterByQuery(jobs, 'React', 'Bangkok, Thailand')
     const ids = results.map(r => r.id)
-    // Should keep Bangkok (id 1), Thailand (id 2), Bangkok, Thailand (id 3), and Remote (id 5)
-    expect(ids).toContain('1')
-    expect(ids).toContain('2')
-    expect(ids).toContain('3')
-    expect(ids).toContain('5')
-    // Should discard Singapore (id 4)
-    expect(ids).not.toContain('4')
+
+    expect(ids).toContain('th1')  // Thai Bangkok — country TH matches
+    expect(ids).toContain('th2')  // Thai Nonthaburi — country TH matches
+    expect(ids).not.toContain('us1') // US job — country mismatch
   })
 
-  it('matches correctly when location has single token Bangkok', () => {
+  it('falls back to text matching when jobs lack country field', () => {
+    const jobs: JobResult[] = [
+      makeJob({ id: '1', title: 'React Developer', location: 'Bangkok', locationType: 'onsite' }),
+      makeJob({ id: '2', title: 'React Developer', location: 'Thailand', locationType: 'onsite' }),
+      makeJob({ id: '3', title: 'React Developer', location: 'Bangkok, Thailand', locationType: 'onsite' }),
+      makeJob({ id: '4', title: 'React Developer', location: 'Singapore', locationType: 'onsite' }),
+      makeJob({ id: '5', title: 'React Developer', location: 'Remote', locationType: 'remote' }),
+    ]
+
+    const results = filterByQuery(jobs, 'React', 'Bangkok, Thailand')
+    const ids = results.map(r => r.id)
+
+    expect(ids).toContain('1')  // Bangkok
+    expect(ids).toContain('2')  // Thailand
+    expect(ids).toContain('3')  // Bangkok, Thailand
+    expect(ids).toContain('5')  // Remote (permissive)
+    expect(ids).not.toContain('4') // Singapore — no text match
+  })
+
+  it('handles city-only search via text-match fallback', () => {
+    const jobs: JobResult[] = [
+      makeJob({ id: '1', title: 'React Developer', location: 'Bangkok', locationType: 'onsite' }),
+      makeJob({ id: '2', title: 'React Developer', location: 'Thailand', locationType: 'onsite' }),
+      makeJob({ id: '3', title: 'React Developer', location: 'Singapore', locationType: 'onsite' }),
+    ]
+
+    // "Bangkok" alone doesn't parse to a country → text-match fallback
     const results = filterByQuery(jobs, 'React', 'Bangkok')
     const ids = results.map(r => r.id)
-    expect(ids).toContain('1')
-    expect(ids).toContain('3')
-    expect(ids).not.toContain('2')
-    expect(ids).not.toContain('4')
+
+    expect(ids).toContain('1')  // Bangkok
+    expect(ids).not.toContain('2') // Thailand (no "bangkok" in string)
+    expect(ids).not.toContain('3') // Singapore
   })
 
-  it('handles remote job geographical restriction filtering correctly', () => {
+  it('filters remote jobs by region compatibility for Thai users', () => {
     const remoteJobs: JobResult[] = [
       makeJob({ id: 'r1', title: 'React Developer', location: 'Remote - USA', locationType: 'remote' }),
       makeJob({ id: 'r2', title: 'React Developer', location: 'Remote - Canada', locationType: 'remote' }),
@@ -196,13 +219,13 @@ describe('filterByQuery token-based location matching', () => {
 
     const results = filterByQuery(remoteJobs, 'React', 'Bangkok, Thailand')
     const ids = results.map(r => r.id)
-    
-    // Should keep r4 (APAC), r5 (Global), and r7 (Thailand)
+
+    // Keep APAC, Global, and Thailand-remote
     expect(ids).toContain('r4')
     expect(ids).toContain('r5')
     expect(ids).toContain('r7')
-    
-    // Should discard r1 (USA), r2 (Canada), r3 (UK), r6 (Europe), r8 (u.s.a.)
+
+    // Drop US, Canada, UK, Europe, USA
     expect(ids).not.toContain('r1')
     expect(ids).not.toContain('r2')
     expect(ids).not.toContain('r3')

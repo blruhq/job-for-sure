@@ -7,6 +7,7 @@
 // ═══════════════════════════════════════════════════════════════
 
 import type { JobResult, ScoredJob } from './types'
+import { parseLocation } from './geo'
 
 // Normalize a skill for matching: lowercase, strip version numbers
 // and common suffixes so "React.js" matches "React", "Node.js" matches "Node"
@@ -73,23 +74,43 @@ export function scoreJob(
   }
 
   // Location Proximity Bonus: City (+20), Country (+10), Global (+0)
+  // Uses structured country field when available (reliable across scripts/languages),
+  // falls back to text matching for sources without country data.
   let locationBonus = 0
   if (location) {
-    const locLower = location.toLowerCase().trim()
-    const jobLocLower = job.location.toLowerCase().replace(/\./g, '')
-    const tokens = locLower
-      .split(/[\s,]+/)
-      .map((t) => t.trim())
-      .filter((t) => t.length > 1)
+    const userParsed = parseLocation(location)
+    const userCountry = userParsed.country
+    const userCity = userParsed.city?.toLowerCase()
 
-    if (tokens.length > 0) {
-      const cityToken = tokens[0]
-      const countryToken = tokens[tokens.length - 1]
-
-      if (jobLocLower.includes(cityToken)) {
+    // 1. Country match via ISO code (reliable — works across Thai/English scripts)
+    if (userCountry && job.country && job.country === userCountry) {
+      locationBonus = 10
+    }
+    // 2. City text match (bonus on top of country match)
+    if (userCity) {
+      const jobLocLower = job.location.toLowerCase()
+      if (jobLocLower.includes(userCity)) {
         locationBonus = 20
-      } else if (jobLocLower.includes(countryToken)) {
-        locationBonus = 10
+      }
+    }
+    // 3. Fallback: if no structured country data, try text matching
+    if (locationBonus === 0 && !job.country) {
+      const locLower = location.toLowerCase().trim()
+      const jobLocLower = job.location.toLowerCase().replace(/\./g, '')
+      const tokens = locLower
+        .split(/[\s,]+/)
+        .map((t) => t.trim())
+        .filter((t) => t.length > 1)
+
+      if (tokens.length > 0) {
+        const cityToken = tokens[0]
+        const countryToken = tokens[tokens.length - 1]
+
+        if (jobLocLower.includes(cityToken)) {
+          locationBonus = 20
+        } else if (jobLocLower.includes(countryToken)) {
+          locationBonus = 10
+        }
       }
     }
   }

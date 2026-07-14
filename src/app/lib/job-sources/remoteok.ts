@@ -7,6 +7,7 @@
 // ═══════════════════════════════════════════════════════════════
 
 import type { JobResult } from './types'
+import { parseLocation } from './geo'
 
 interface RemoteOKJob {
   slug: string
@@ -50,6 +51,7 @@ export async function fetchRemoteOK(
       const descriptionHtml = job.description || ''
       const description = descriptionHtml.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim()
       const location = job.location || 'Remote'
+      const parsed = parseLocation(location)
 
       // Build salary string from min/max if available
       let salary: string | undefined
@@ -65,6 +67,8 @@ export async function fetchRemoteOK(
         company: job.company!,
         title: job.position!,
         location,
+        country: parsed.country,
+        region: parsed.region,
         locationType: 'remote' as const, // RemoteOK is remote-only by definition
         url: job.url || `https://remoteok.com/l/${job.slug}`,
         description: description.slice(0, 8000),

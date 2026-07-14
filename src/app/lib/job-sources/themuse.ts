@@ -9,6 +9,7 @@
 // ═══════════════════════════════════════════════════════════════
 
 import type { JobResult } from './types'
+import { parseLocation } from './geo'
 
 interface MuseJob {
   id: string
@@ -51,6 +52,7 @@ export async function fetchTheMuse(
       const description = descriptionHtml.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim()
       const locations = (job.locations || []).map((l) => l.name).join(', ') || 'Unspecified'
       const levels = (job.levels || []).map((l) => l.name).join(', ')
+      const parsed = parseLocation(locations)
 
       return {
         id: `themuse:${job.id}`,
@@ -58,6 +60,8 @@ export async function fetchTheMuse(
         company: job.company?.name || 'Unknown',
         title: job.name,
         location: locations,
+        country: parsed.country,
+        region: parsed.region,
         locationType: detectLocationType(locations),
         url: job.refs?.landing_page || `https://www.themuse.com/jobs/${job.id}`,
         description: description.slice(0, 8000),

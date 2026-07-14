@@ -113,7 +113,9 @@ export async function fetchJobbKK(
         company: company || 'Unknown Company',
         title,
         location: location || 'Thailand',
-        locationType: 'onsite', // JobbKK is primarily Thai onsite roles
+        country: 'TH',           // JobbKK is a Thailand-only board
+        region: 'Asia',
+        locationType: 'onsite',  // JobbKK is primarily Thai onsite roles
         url,
         description: description.slice(0, 8000),
         salary: salary && salary !== 'ตามตกลง' ? salary : undefined,

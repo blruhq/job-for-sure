@@ -13,6 +13,7 @@ import { notify } from '~/lib/toast'
 import { companyColor, companyLogo } from '~/lib/company-data'
 import type { Resume } from '~/types/resume'
 import type { ScoredJob, SearchResult, JobSource, JobResult } from '~/lib/job-sources/types'
+import { countryToFlag } from '~/lib/job-sources/geo'
 
 // ═══════════════════════════════════════════════════════════════
 // JobSearchPanel — real job search from 9+ free sources.
@@ -712,9 +713,22 @@ function JobCard({ job, bookmarked, onBookmark, onAts, onInterview }: {
 
       {/* Tags row */}
       <div className="my-1.5 flex flex-wrap gap-1.5">
+        {/* Location with flag + work policy */}
         <span className="rounded-xs border border-border bg-background px-1.5 py-0.5 text-[11px] text-muted-foreground">
+          {job.country && <span className="mr-0.5">{countryToFlag(job.country)}</span>}
           {job.location}
         </span>
+        {job.locationType && job.locationType !== 'unknown' && (
+          <span className={cn(
+            'rounded-xs border px-1.5 py-0.5 text-[11px]',
+            job.locationType === 'remote'
+              ? 'border-primary/30 bg-accent-soft text-primary'
+              : 'border-border bg-background text-muted-foreground'
+          )}>
+            {job.locationType === 'remote' && <Globe size={9} className="mr-0.5 inline" />}
+            {job.locationType === 'remote' ? 'Remote' : job.locationType === 'hybrid' ? 'Hybrid' : 'On-site'}
+          </span>
+        )}
         <span className="rounded-xs border border-border bg-background px-1.5 py-0.5 text-[11px] uppercase text-muted-foreground">
           {SOURCE_NAMES[job.source] || job.source}
         </span>

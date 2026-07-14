@@ -11,6 +11,7 @@
 // ═══════════════════════════════════════════════════════════════
 
 import type { JobResult } from './types'
+import { parseLocation } from './geo'
 
 interface ArbeitnowJob {
   slug: string
@@ -59,6 +60,7 @@ export async function fetchArbeitnow(
         const descriptionHtml = job.description || ''
         const description = descriptionHtml.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim()
         const location = job.location || (job.remote ? 'Remote' : 'Unspecified')
+        const parsed = parseLocation(location)
 
         return {
           id: `arbeitnow:${job.slug}`,
@@ -66,6 +68,8 @@ export async function fetchArbeitnow(
           company: job.company_name || 'Unknown',
           title: job.title || 'Unknown',
           location,
+          country: parsed.country,
+          region: parsed.region,
           locationType: job.remote ? 'remote' as const : detectLocationType(location),
           url: job.url || `https://www.arbeitnow.com/jobs/${job.slug}`,
           description: description.slice(0, 8000),

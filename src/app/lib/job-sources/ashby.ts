@@ -6,6 +6,7 @@
 // ═══════════════════════════════════════════════════════════════
 
 import type { JobResult } from './types'
+import { parseLocation } from './geo'
 
 interface AshbyJob {
   id: string
@@ -52,6 +53,7 @@ export async function fetchAshbyCompany(
     const descriptionHtml = job.descriptionHtml || ''
     const description = descriptionHtml.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim()
     const location = job.location || job.locationName || 'Unknown'
+    const parsed = parseLocation(location)
 
     return {
       id: `ashby:${job.id}`,
@@ -59,6 +61,8 @@ export async function fetchAshbyCompany(
       company: companyName,
       title: job.title,
       location,
+      country: parsed.country,
+      region: parsed.region,
       locationType: detectLocationType(location),
       url: job.jobUrl || job.externalLink || `https://app.ashbyhq.com/posting-api/job-board/${slug}`,
       description: description.slice(0, 8000),

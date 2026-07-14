@@ -34,6 +34,7 @@ import {
   GREENHOUSE_FETCH_LIMIT,
   ASHBY_FETCH_LIMIT,
 } from './companies'
+import { parseLocation, isRemoteRegionCompatible, getMacroRegion } from './geo'
 
 const SEARCH_TIMEOUT_MS = 15_000 // per-source timeout
 
@@ -206,6 +207,8 @@ export async function searchJobs(params: SearchParams): Promise<SearchResult> {
       company: j.company,
       title: j.title,
       location: j.location,
+      country: j.country,
+      region: j.region,
       locationType: j.locationType,
       url: j.url,
       description: '',        // stripped — saves ~80% Redis storage
@@ -304,46 +307,50 @@ export function filterByQuery(jobs: JobResult[], query: string, location?: strin
     .split(/\s+/)
     .filter((t) => t.length > 2)
 
-  const locationLower = location?.toLowerCase().trim()
+  // Parse user location into structured country/macro-region
+  const userParsed = parseLocation(location)
+  const userCountry = userParsed.country
+
+  // Determine if location filtering should be active
+  const hasLocationFilter = location && location.trim()
+    && location.toLowerCase() !== 'remote'
+    && location.toLowerCase() !== 'anywhere'
+
+  // Pre-compute user text tokens for fallback matching
+  const userTokens = hasLocationFilter
+    ? (location || '').toLowerCase()
+        .split(/[\s,]+/)
+        .map(t => t.trim())
+        .filter(t => t.length > 1)
+    : []
 
   return jobs.filter((job) => {
+    // ── 1. Query keyword matching (unchanged) ──
     if (queryTerms.length > 0) {
       const haystack = `${job.title} ${job.description.slice(0, 2000)} ${(job.tags || []).join(' ')} ${job.department || ''}`.toLowerCase()
       const matchesQuery = queryTerms.some((term) => haystack.includes(term))
       if (!matchesQuery) return false
     }
 
-    if (locationLower && locationLower !== 'remote' && locationLower !== 'anywhere') {
-      const jobLoc = job.location.toLowerCase().replace(/\./g, '')
-      const locationTokens = locationLower
-        .split(/[\s,]+/)
-        .map((t) => t.trim())
-        .filter((t) => t.length > 1)
-
-      if (job.locationType !== 'remote') {
-        const matchesLocation = locationTokens.some((token) => jobLoc.includes(token))
-        if (!matchesLocation) return false
+    // ── 2. Location filtering ──
+    // Replaces the old hardcoded TH/US/EU token-substring hack.
+    // Strategy: country-code matching when possible, text-match fallback otherwise.
+    if (hasLocationFilter) {
+      if (job.locationType === 'remote') {
+        // Remote jobs: use region compatibility if we parsed user's country,
+        // otherwise permissive (can't determine region from city-only input).
+        if (userCountry && !isRemoteRegionCompatible(userCountry, job.location)) return false
       } else {
-        // 1. Direct match (e.g. user location token matches job location exactly)
-        const directMatch = locationTokens.some((token) => jobLoc.includes(token))
-        if (!directMatch) {
-          // 2. APAC / Asia region matching for users in Thailand
-          const isUserInThailand = locationTokens.some(t => t === 'thailand' || t === 'bangkok')
-          const isApacJob = jobLoc.includes('apac') || jobLoc.includes('asia') || jobLoc.includes('global') || jobLoc.includes('worldwide') || jobLoc.includes('anywhere')
-          
-          if (!(isUserInThailand && isApacJob)) {
-            // 3. Check for restricted regions that do not match the user
-            const restrictedKeywords = [
-              'us', 'usa', 'united states', 'canada', 'europe', 'uk', 'united kingdom', 
-              'germany', 'france', 'london', 'latam', 'americas', 'emea', 'north america', 'south america'
-            ]
-            const isRestricted = restrictedKeywords.some((region) => {
-              const regex = new RegExp(`\\b${region}\\b`, 'i')
-              return regex.test(jobLoc)
-            })
-
-            if (isRestricted) return false
-          }
+        // Non-remote (onsite/hybrid): try country-code match first
+        if (userCountry && job.country) {
+          // Both sides have country data → compare ISO codes
+          if (job.country !== userCountry) return false
+        } else {
+          // At least one side lacks country data → text-match fallback
+          // (handles city names, Thai script when country is unknown, etc.)
+          const jobLoc = job.location.toLowerCase()
+          const matchesLocation = userTokens.some(token => jobLoc.includes(token))
+          if (!matchesLocation) return false
         }
       }
     }

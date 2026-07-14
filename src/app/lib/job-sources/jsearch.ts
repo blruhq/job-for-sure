@@ -19,6 +19,7 @@
 // ═══════════════════════════════════════════════════════════════
 
 import type { JobResult } from './types'
+import { parseLocation } from './geo'
 
 interface JSearchJob {
   employer_name?: string
@@ -102,6 +103,9 @@ export async function fetchJSearch(
       const locParts = [job.job_city, job.job_state, job.job_country].filter(Boolean)
       const locationStr = locParts.join(', ') || job.job_location || (job.job_is_remote ? 'Remote' : 'Unspecified')
 
+      // Extract structured country from job_country field
+      const parsed = parseLocation(job.job_country || locationStr)
+
       // Salary
       let salary: string | undefined
       if (job.job_min_salary && job.job_max_salary) {
@@ -115,6 +119,8 @@ export async function fetchJSearch(
         company: job.employer_name || 'Unknown',
         title: job.job_title || 'Unknown',
         location: locationStr,
+        country: parsed.country,
+        region: parsed.region,
         locationType: job.job_is_remote ? 'remote' : detectLocationType(locationStr),
         url: job.job_apply_link || 'https://www.google.com/search?q=' + encodeURIComponent(`${job.job_title} ${job.employer_name}`),
         description,
