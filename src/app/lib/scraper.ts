@@ -367,13 +367,159 @@ async function scrapeJobDb(url: string): Promise<ScrapeResult> {
   }
 }
 
+const LINKEDIN_BROWSER_HEADERS: Record<string, string> = {
+  'User-Agent':
+    'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36',
+  Accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
+  'Accept-Language': 'en-US,en;q=0.9',
+  'Cache-Control': 'no-cache',
+  Pragma: 'no-cache',
+  'Sec-Fetch-Dest': 'document',
+  'Sec-Fetch-Mode': 'navigate',
+  'Sec-Fetch-Site': 'none',
+  'Sec-Fetch-User': '?1',
+  'Upgrade-Insecure-Requests': '1',
+}
+
+/**
+ * Extract numeric job ID from a LinkedIn job URL.
+ * Handles www.linkedin.com, country-prefixed (th.linkedin.com), etc.
+ */
+function extractLinkedInJobId(url: string): string | null {
+  const match = url.match(/jobs\/view\/(\d+)/)
+  return match ? match[1] : null
+}
+
+/**
+ * Try LinkedIn's guest job API — returns HTML without authentication.
+ * Endpoint: /jobs-guest/jobs/api/jobPosting/{id}
+ */
+async function scrapeLinkedInGuestApi(
+  jobId: string,
+  originalUrl: string,
+): Promise<ScrapeResult | null> {
+  const apiUrl = `https://www.linkedin.com/jobs-guest/jobs/api/jobPosting/${jobId}`
+
+  const html = await fetchHTML(apiUrl, LINKEDIN_BROWSER_HEADERS)
+  if (!html || html.length < 100) return null
+
+  const $ = cheerio.load(html)
+
+  const title =
+    $('.top-card-layout__title').text().trim() ||
+    $('.topcard__title').text().trim() ||
+    $('h1').first().text().trim()
+
+  const company =
+    $('.top-card-layout__company-name').text().trim() ||
+    $('.topcard__org-name-link').text().trim() ||
+    $('.topcard__flavor--company-name').text().trim()
+
+  const location =
+    $('.top-card-layout__location').text().trim() ||
+    $('.topcard__flavor--bullet').first().text().trim()
+
+  // Description lives inside show-more-less-html or .description__text
+  const description =
+    $('.show-more-less-html__markup').text().trim() ||
+    $('.description__text').text().trim()
+
+  if (!title && !description) {
+    return null // guest API returned junk
+  }
+
+  // Also try to extract criteria (seniority, function, etc.)
+  const criteria: string[] = []
+  $('.description__job-criteria-item').each((_, el) => {
+    const text = $(el).text().trim()
+    if (text) criteria.push(text)
+  })
+
+  const fullDescription = [description, ...criteria].filter(Boolean).join('\n\n')
+
+  return {
+    success: true,
+    source: 'linkedin',
+    job: {
+      title: title || 'Unknown Position',
+      company: company || extractDomain(originalUrl).split('.')[0] || 'LinkedIn',
+      location: location || 'Remote',
+      description: fullDescription || 'No description available.',
+      requirements: extractRequirements(fullDescription),
+      qualifications: [],
+    },
+  }
+}
+
+/**
+ * Fallback: try to find an external apply URL from the LinkedIn page shell.
+ * LinkedIn's HTML shell often includes the external ATS link in meta tags
+ * or data attributes, even when the main content is JS-rendered.
+ *
+ * Once found, we delegate to scrapeJob() for that URL.
+ */
+async function scrapeLinkedInExternalFallback(
+  url: string,
+): Promise<ScrapeResult | null> {
+  // Fetch the main LinkedIn page (may still be blocked, but worth trying)
+  const html = await fetchHTML(url, LINKEDIN_BROWSER_HEADERS)
+  if (!html || html.length < 100) return null
+
+  const $ = cheerio.load(html)
+
+  // Look for the external apply URL in common locations
+  const externalUrl =
+    $('meta[name="apply-url"]').attr('content') ||
+    $('meta[property="linkedin:applyUrl"]').attr('content') ||
+    $('[data-external-activate]').attr('href') ||
+    $('a[data-tracking-control-name*="external"]').attr('href') ||
+    $('a[href*="jobs.lever.co"]').first().attr('href') ||
+    $('a[href*="greenhouse.io"]').first().attr('href') ||
+    $('a[href*="ashbyhq.com"]').first().attr('href') ||
+    $('a[href*":"apply"]').first().attr('href')
+
+  // Find any external job board URL in the page
+  const externalRegex = /https?:\/\/(?:jobs\.lever\.co|boards\.greenhouse\.io|jobs\.ashbyhq\.com|jobs\.workable\.com|apply\.workable\.com)\/[^\s"']+/g
+  const matchFromText = html.match(externalRegex)
+  const resolvedExternal = externalUrl || (matchFromText ? matchFromText[0] : null)
+
+  if (!resolvedExternal || resolvedExternal.includes('linkedin.com')) {
+    return null // no external URL found, or it points back to LinkedIn
+  }
+
+  // Delegate to scrapeJob for the external URL
+  // (this re-enters the dispatch — greenhouse/lever/generic will handle it)
+  return scrapeJob(resolvedExternal)
+}
+
 async function scrapeLinkedIn(url: string): Promise<ScrapeResult> {
-  // LinkedIn blocks most scrapers. Return a helpful error.
+  const jobId = extractLinkedInJobId(url)
+
+  // --- Strategy 1: Guest API (no auth, works for most postings) ---
+  if (jobId) {
+    try {
+      const guestResult = await scrapeLinkedInGuestApi(jobId, url)
+      if (guestResult) return guestResult
+    } catch {
+      // fall through
+    }
+  }
+
+  // --- Strategy 2: Find external ATS URL (Lever, Greenhouse, Ashby) ---
+  try {
+    const externalResult = await scrapeLinkedInExternalFallback(url)
+    if (externalResult) return externalResult
+  } catch {
+    // fall through
+  }
+
+  // --- Strategy 3: Give up with helpful message ---
   return {
     success: false,
     source: 'linkedin',
     error:
-      "LinkedIn requires a paid API (Proxycurl or Bright Data) for job scraping. Please paste the job description manually, or use an Indeed/Greenhouse link.",
+      "LinkedIn requires authentication for scraping. We tried the guest API and looked for an external apply link but couldn't get the job content. " +
+      "Please paste the job description manually, or if this is a Lever/Greenhouse posting, use that URL directly.",
   }
 }
 
