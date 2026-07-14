@@ -149,13 +149,13 @@ export const CreateApplicationSchema = z.object({
   level: z.string().max(10).optional(),
   matchScore: z.number().optional(),
   resumeId: z.string().max(100).nullable().optional(),
-  status: z.string().max(20).optional(),
+  status: z.enum(['bookmarked', 'applied', 'interviewing', 'offered', 'rejected']).optional(),
 })
 
 export const ReorderApplicationSchema = z.object({
   updates: z.array(z.object({
     id: z.string().max(100),
-    status: z.string().max(20),
+    status: z.enum(['bookmarked', 'applied', 'interviewing', 'offered', 'rejected']),
     position: z.number(),
   })).max(500),
 })

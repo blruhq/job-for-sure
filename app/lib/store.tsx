@@ -44,7 +44,7 @@ function mapAppToJob(app: ApplicationRecord): PipelineJob {
     title: app.jobTitle,
     loc: app.location || '',
     score: app.matchScore || 0,
-    level: (app.level === 'high' ? 'high' : 'mid'),
+    level: (app.level as 'high' | 'mid') || 'mid',
     time: timeLabels[app.status] || 'saved',
     url: app.jobUrl || '',
     resume: app.resumeId || '',
@@ -166,7 +166,10 @@ export function AppStoreProvider({ children }: { children: ReactNode }) {
           apiGet<ApplicationRecord[]>('/api/applications').catch(() => []),
         ])
 
-        const parsed = resumeList.map((r) => ({ ...r.data, id: r.id }) as Resume)
+        const parsed = resumeList.map((r) => {
+          const dataObj = typeof r.data === 'string' ? JSON.parse(r.data) : r.data
+          return { ...dataObj, id: r.id } as Resume
+        })
         setResumes(parsed)
         if (parsed.length > 0) setActiveResumeIdState(parsed[0].id)
         setApplications(groupByStatus(appList))
@@ -248,10 +251,11 @@ export function AppStoreProvider({ children }: { children: ReactNode }) {
   const bookmarkJob = useCallback((job: PipelineJob) => {
     if (applicationsRef.current.bookmark.some(j => j.key === job.key)) return
 
+    const prev = applicationsRef.current
     const optimisticJob: PipelineJob = { ...job, time: 'saved' }
-    setApplications(prev => ({
-      ...prev,
-      bookmark: [...prev.bookmark, optimisticJob],
+    setApplications(prevApps => ({
+      ...prevApps,
+      bookmark: [...prevApps.bookmark, optimisticJob],
     }))
 
     apiPost('/api/applications', {
@@ -268,14 +272,14 @@ export function AppStoreProvider({ children }: { children: ReactNode }) {
       status: 'bookmarked',
     }).then((res) => {
       const created = res as { id: string }
-      setApplications(prev => ({
-        ...prev,
-        bookmark: prev.bookmark.map(j =>
+      setApplications(prevApps => ({
+        ...prevApps,
+        bookmark: prevApps.bookmark.map(j =>
           j.key === job.key ? { ...j, applicationId: created.id } : j
         ),
       }))
     }).catch(() => {
-      setApplications(applicationsRef.current)
+      setApplications(prev)
       notify({ message: 'Failed to bookmark job.', type: 'error' })
     })
   }, [])
@@ -284,14 +288,15 @@ export function AppStoreProvider({ children }: { children: ReactNode }) {
     const existing = applicationsRef.current.bookmark.find(j => j.key === key)
     if (!existing) return
 
-    setApplications(prev => ({
-      ...prev,
-      bookmark: prev.bookmark.filter(j => j.key !== key),
+    const prev = applicationsRef.current
+    setApplications(prevApps => ({
+      ...prevApps,
+      bookmark: prevApps.bookmark.filter(j => j.key !== key),
     }))
 
     if (existing.applicationId) {
       apiDelete(`/api/applications/${existing.applicationId}`).catch(() => {
-        setApplications(applicationsRef.current)
+        setApplications(prev)
         notify({ message: 'Failed to remove bookmark.', type: 'error' })
       })
     }
@@ -339,7 +344,7 @@ export function AppStoreProvider({ children }: { children: ReactNode }) {
 
     if (updates.length > 0) {
       apiPost('/api/applications/reorder', { updates }).catch(() => {
-        setApplications(applicationsRef.current)
+        setApplications(prev)
         notify({ message: 'Failed to move application.', type: 'error' })
       })
     }
@@ -350,14 +355,14 @@ export function AppStoreProvider({ children }: { children: ReactNode }) {
     const job = prev[fromCol].find(j => j.key === jobKey)
     if (!job) return
 
-    setApplications(prev => ({
-      ...prev,
-      [fromCol]: prev[fromCol].filter(j => j.key !== jobKey),
+    setApplications(prevApps => ({
+      ...prevApps,
+      [fromCol]: prevApps[fromCol].filter(j => j.key !== jobKey),
     }))
 
     if (job.applicationId) {
       apiDelete(`/api/applications/${job.applicationId}`).catch(() => {
-        setApplications(applicationsRef.current)
+        setApplications(prev)
         notify({ message: 'Failed to remove application.', type: 'error' })
       })
     }

@@ -93,7 +93,7 @@ test.describe('ATS Optimizer Flow', () => {
       await route.fulfill({
         status: 200,
         contentType: 'application/json',
-        body: JSON.stringify({ bookmark: [], applied: [], interviewing: [], offers: [] }),
+        body: JSON.stringify([]),
       })
     })
 

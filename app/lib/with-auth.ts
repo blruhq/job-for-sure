@@ -48,8 +48,15 @@ export function withAuth<P = Record<string, string>>(
       if (method !== 'GET' && method !== 'HEAD' && method !== 'OPTIONS') {
         const origin = nextReq.headers.get('origin')
         const host = nextReq.headers.get('host')
-        if (origin && host && !origin.includes(host)) {
-          return NextResponse.json({ error: 'Cross-origin request blocked' }, { status: 403 })
+        if (origin && host) {
+          try {
+            const originHost = new URL(origin).host
+            if (originHost !== host) {
+              return NextResponse.json({ error: 'Cross-origin request blocked' }, { status: 403 })
+            }
+          } catch {
+            return NextResponse.json({ error: 'Invalid origin' }, { status: 400 })
+          }
         }
       }
 

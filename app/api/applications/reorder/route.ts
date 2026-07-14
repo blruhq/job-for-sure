@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server'
 import { db } from '~/lib/db'
 import { applications } from '~/lib/schema'
 import { withAuth } from '~/lib/with-auth'
-import { eq, and, inArray } from 'drizzle-orm'
+import { eq, and, inArray, isNull } from 'drizzle-orm'
 import { ReorderApplicationSchema } from '~/lib/schemas'
 
 // POST /api/applications/reorder — batch update status + position
@@ -19,7 +19,13 @@ export const POST = withAuth(async (req, { user }) => {
   const owned = await db
     .select({ id: applications.id })
     .from(applications)
-    .where(and(eq(applications.userId, user.id), inArray(applications.id, ids)))
+    .where(
+      and(
+        eq(applications.userId, user.id),
+        inArray(applications.id, ids),
+        isNull(applications.deletedAt),
+      ),
+    )
 
   const ownedIds = new Set(owned.map((o) => o.id))
 
