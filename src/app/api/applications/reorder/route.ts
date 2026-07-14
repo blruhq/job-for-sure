@@ -30,10 +30,10 @@ export const POST = withAuth(async (req, { user }) => {
 
   const ownedIds = new Set(owned.map((o) => o.id))
 
-  for (const update of updates) {
+  const updatePromises = updates.map(async (update) => {
     if (!ownedIds.has(update.id)) {
       console.log(`[Reorder API] Skipping update for ${update.id} - not owned or deleted`)
-      continue
+      return
     }
     console.log(`[Reorder API] Updating application ${update.id} to status: ${update.status}, position: ${update.position}`)
     await db
@@ -44,7 +44,9 @@ export const POST = withAuth(async (req, { user }) => {
         updatedAt: new Date(),
       })
       .where(eq(applications.id, update.id))
-  }
+  })
+
+  await Promise.all(updatePromises)
 
   return NextResponse.json({ success: true })
 }, { rateLimitType: 'general', route: '/api/applications/reorder' })
