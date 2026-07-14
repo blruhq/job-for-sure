@@ -166,10 +166,17 @@ export function AppStoreProvider({ children }: { children: ReactNode }) {
           apiGet<ApplicationRecord[]>('/api/applications').catch(() => []),
         ])
 
-        const parsed = resumeList.map((r) => {
-          const dataObj = typeof r.data === 'string' ? JSON.parse(r.data) : r.data
-          return { ...dataObj, id: r.id } as Resume
-        })
+        const parsed = resumeList
+          .map((r) => {
+            try {
+              const dataObj = typeof r.data === 'string' ? JSON.parse(r.data) : r.data
+              return { ...dataObj, id: r.id } as Resume
+            } catch (err) {
+              console.error(`[store] Failed to parse resume data for id ${r.id}:`, err)
+              return null
+            }
+          })
+          .filter((r): r is Resume => r !== null)
         setResumes(parsed)
         if (parsed.length > 0) setActiveResumeIdState(parsed[0].id)
         setApplications(groupByStatus(appList))
