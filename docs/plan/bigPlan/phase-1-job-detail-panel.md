@@ -8,33 +8,53 @@
 
 Currently every feature (Tailor Resume, Cover Letter, Interview Practice, ATS Match) lives on a SEPARATE PAGE. Users must navigate to each page, manually select a resume, type the company name, type the role, paste the JD. This is 5-6 steps per tool, per job.
 
-The Job Detail Panel is a **slide-over panel** that opens when a user clicks any job card (from search results OR Kanban tracker). It shows everything about that job in ONE place, with action buttons that are **pre-filled from the job data**. One click per action. Zero typing.
+The Job Detail Panel is a **slide-over panel** that opens when a user clicks any job card — from chat inline cards, search results, OR Kanban tracker. It shows everything about that job in ONE place, with action buttons that are **pre-filled from the job data**. One click per action. Zero typing.
 
 This is the **connector hub** — the single most impactful component to build.
+
+**IMPORTANT — REPLACE EXISTING JobDetailModal:**
+
+There is currently a `src/app/components/resume/job-detail-modal.tsx` that opens when clicking inline job cards in the chat. This is a SIMPLER version of the same concept. It has JD text + action buttons but NO Smart Overview, NO intelligence links, NO timeline, NO notes.
+
+When building the unified `JobDetailPanel`, **DELETE `job-detail-modal.tsx`** and replace ALL usages with the new panel. The new panel is a strict superset — everything the modal does, the panel does better.
+
+Files that currently import `JobDetailModal`:
+- `src/app/components/chat/job-preview.tsx` (line 14: `import { JobDetailModal } from '~/components/resume/job-detail-modal'`)
 
 ## Architecture
 
 ```
-┌─────────────────────────────────────────────────────┐
-│                                                     │
-│  SEARCH RESULTS    KANBAN TRACKER                   │
-│       │                  │                          │
-│       │ click card       │ click card               │
-│       │                  │                          │
-│       └────────┬─────────┘                          │
-│                │                                    │
-│                ▼                                    │
-│      JobDetailPanel (slide-over)                    │
-│      ┌────────────────────────────┐                 │
-│      │ Context-aware:             │                 │
-│      │  - from search → "Save" btn │                 │
-│      │  - from kanban → timeline  │                 │
-│      │  - always: JD, actions,    │                 │
-│      │    intelligence links       │                 │
-│      └────────────────────────────┘                 │
-│                                                     │
-└─────────────────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────────┐
+│                                                         │
+│  THREE ENTRY POINTS — ONE PANEL                         │
+│                                                         │
+│  CHAT inline cards   SEARCH RESULTS   KANBAN TRACKER    │
+│  (job-preview.tsx)   (job-search-      (applications-    │
+│   click card          panel.tsx)        view.tsx)        │
+│       │                   │                  │          │
+│       │ click card        │ click card       │ click     │
+│       │                   │                  │          │
+│       └───────┬───────────┴──────────────────┘          │
+│               │                                         │
+│               ▼                                         │
+│     JobDetailPanel (slide-over)                         │
+│     ┌────────────────────────────────────┐              │
+│     │ Context-aware (mode prop):         │              │
+│     │  - from chat/search → "Save" btn   │              │
+│     │  - from tracker → timeline+notes   │              │
+│     │  - ALWAYS: overview, JD, actions,  │              │
+│     │    intelligence links               │              │
+│     └────────────────────────────────────┘              │
+│                                                         │
+│  The existing JobDetailModal is DELETED.                │
+│  All three entry points use the SAME panel.             │
+│                                                         │
+└─────────────────────────────────────────────────────────┘
 ```
+
+The panel accepts a `mode` prop:
+- `'search'` — from chat inline cards or search results (job not yet saved to tracker, shows "Save" button)
+- `'tracker'` — from Kanban board (job already saved, shows timeline + notes + status)
 
 ## Files to Create
 
@@ -163,6 +183,92 @@ onClick={() => setSelectedJob(job)}
 
 Same pattern — clicking a job in search results opens the panel with `mode="search"`.
 
+### 7. `src/app/components/chat/job-preview.tsx` (EDIT — replace JobDetailModal with JobDetailPanel)
+
+This is the inline job preview that appears in chat when a user uploads a resume. Currently it imports `JobDetailModal`. Replace it with the unified `JobDetailPanel`.
+
+**Step 1:** Remove the old import:
+```tsx
+// DELETE this line:
+import { JobDetailModal } from '~/components/resume/job-detail-modal'
+
+// ADD this line:
+import { JobDetailPanel } from '~/components/pipeline/job-detail-panel'
+```
+
+**Step 2:** Replace the modal state + render:
+
+```tsx
+// OLD (DELETE):
+const [modalJob, setModalJob] = useState<ScoredJob | null>(null)
+const [modalOpen, setModalOpen] = useState(false)
+// ...
+{modalOpen && (
+  <JobDetailModal job={modalJob} resume={resume} open={modalOpen} ... />
+)}
+
+// NEW (ADD):
+const [panelJob, setPanelJob] = useState<PipelineJob | null>(null)
+// ...
+{panelJob && (
+  <JobDetailPanel
+    job={panelJob}
+    mode="search"
+    onClose={() => setPanelJob(null)}
+  />
+)}
+```
+
+**Step 3:** Update card click handler:
+```tsx
+// OLD:
+onClick={() => { setModalJob(job); setModalOpen(true) }}
+
+// NEW:
+onClick={() => { setPanelJob(scoredJobToPipelineJob(job)) }}
+```
+
+**Step 4:** Add a converter function (ScoredJob → PipelineJob):
+```tsx
+// ScoredJob (from job search) and PipelineJob (from tracker) have different shapes.
+// Convert before passing to the panel:
+function scoredJobToPipelineJob(job: ScoredJob): PipelineJob {
+  return {
+    key: job.id,
+    logo: '',
+    color: '',
+    company: job.company,
+    title: job.title,
+    loc: job.location,
+    score: job.score,
+    level: job.score >= 75 ? 'high' : 'mid',
+    time: 'new',
+    url: job.url,
+    resume: '',
+    addedAt: new Date().toISOString(),
+    salary: job.salary || '',
+    jobData: {
+      description: job.description || '',
+      matchedSkills: job.matchedSkills || [],
+      missingSkills: job.missingSkills || [],
+      source: job.source,
+      remote: job.remote,
+      tags: job.tags,
+    },
+  }
+}
+```
+
+### 8. `src/app/components/resume/job-detail-modal.tsx` (DELETE)
+
+After all imports are replaced (steps 5-7), **DELETE this file entirely**. The unified `JobDetailPanel` replaces it.
+
+Verify no other files import it before deleting:
+```bash
+grep -r "job-detail-modal" src/app/
+# Should return ZERO results after replacing all imports
+```
+
 ## Action Button Implementation Details
 
 ### Tailor Resume button:
@@ -270,7 +376,12 @@ Manual tests:
 ## Acceptance Criteria
 
 - [ ] Panel slides in from right on card click
-- [ ] Panel works from BOTH search results and Kanban
+- [ ] Panel works from ALL THREE entry points:
+  - [ ] Chat inline job cards (job-preview.tsx)
+  - [ ] Search results (job-search-panel.tsx)
+  - [ ] Kanban tracker (applications-view.tsx)
+- [ ] OLD `job-detail-modal.tsx` is DELETED
+- [ ] ZERO remaining imports of `job-detail-modal` anywhere in codebase
 - [ ] JD text displayed (from jobData)
 - [ ] Match score + skill gaps displayed
 - [ ] 4 action buttons work (Tailor, Cover Letter, Interview, Apply)
@@ -279,7 +390,7 @@ Manual tests:
 - [ ] Status dropdown works (tracker mode)
 - [ ] Timeline shows events (tracker mode)
 - [ ] Notes auto-save (tracker mode)
-- [ ] "Save to Tracker" button works (search mode)
+- [ ] "Save to Tracker" button works (search + chat mode)
 - [ ] Close on X click and overlay click
 - [ ] `npx tsc --noEmit` passes
 - [ ] `pnpm lint` passes
