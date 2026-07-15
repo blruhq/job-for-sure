@@ -44,6 +44,7 @@ const SOURCE_NAMES: Record<JobSource, string> = {
 const FAST_FREE_SOURCES: JobSource[] = [
   'remoteok', 'himalayas', 'remotive',
   'themuse', 'arbeitnow', 'adzuna', 'jsearch', 'jobbkk',
+  'linkedin-guest',
 ]
 const FULL_FREE_SOURCES: JobSource[] = [
   'greenhouse', 'ashby',
