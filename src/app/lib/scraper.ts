@@ -391,9 +391,10 @@ const LINKEDIN_BROWSER_HEADERS: Record<string, string> = {
 /**
  * Extract numeric job ID from a LinkedIn job URL.
  * Handles www.linkedin.com, country-prefixed (th.linkedin.com), etc.
+ * Supports both slugged and non-slugged view URLs.
  */
 function extractLinkedInJobId(url: string): string | null {
-  const match = url.match(/jobs\/view\/(\d+)/)
+  const match = url.match(/jobs\/view\/(?:.*-)?(\d+)/)
   return match ? match[1] : null
 }
 

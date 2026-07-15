@@ -36,10 +36,11 @@ const BROWSER_HEADERS: Record<string, string> = {
  * Extract the numeric LinkedIn job ID from a URL.
  * Examples:
  *   /jobs/view/4403633204/?refId=...  →  "4403633204"
+ *   /jobs/view/slug-name-4403633204   →  "4403633204"
  *   https://linkedin.com/jobs/view/123 →  "123"
  */
 function extractJobId(url: string): string | null {
-  const match = url.match(/\/jobs\/view\/(\d+)/)
+  const match = url.match(/\/jobs\/view\/(?:.*-)?(\d+)/)
   return match ? match[1] : null
 }
 
