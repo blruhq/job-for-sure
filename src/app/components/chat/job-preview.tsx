@@ -28,6 +28,7 @@ const SOURCE_SHORT: Record<JobSource, string> = {
   linkedin: 'LinkedIn',
   indeed: 'Indeed',
   jobsdb: 'JobsDB',
+  'jobsdb-rest': 'JobsDB',
 }
 
 // ═══════════════════════════════════════════════════════════════

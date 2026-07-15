@@ -81,7 +81,7 @@ describe('scraper SSRF protection', () => {
     const result = await scrapeJob('https://linkedin.com/jobs/view/123')
     expect(result.success).toBe(false)
     expect(result.source).toBe('linkedin')
-    expect(result.error).toContain('LinkedIn requires a paid API')
+    expect(result.error).toContain('LinkedIn requires authentication')
   })
 
   it('returns error for malformed URL', async () => {

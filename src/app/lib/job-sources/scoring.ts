@@ -121,6 +121,7 @@ export function scoreJob(
     ...job,
     score: Math.min(100, Math.max(0, score)),
     matchedSkills,
+    isLocal: locationBonus > 0,
   }
 }
 
@@ -132,7 +133,16 @@ export function rankJobs(
 ): ScoredJob[] {
   return jobs
     .map((job) => scoreJob(job, skills, role, location))
-    .sort((a, b) => b.score - a.score)
+    .sort(compareJobs)
+}
+
+// Comparator: local jobs first, then by score descending.
+// Use this everywhere ScoredJob arrays are sorted to keep ordering consistent.
+export function compareJobs(a: ScoredJob, b: ScoredJob): number {
+  const aLocal = a.isLocal ? 1 : 0
+  const bLocal = b.isLocal ? 1 : 0
+  if (aLocal !== bLocal) return bLocal - aLocal
+  return b.score - a.score
 }
 
 // ── Experience inference (from job title keywords) ────────────

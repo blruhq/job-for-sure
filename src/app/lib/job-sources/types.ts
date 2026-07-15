@@ -18,6 +18,7 @@ export type JobSource =
   | 'linkedin'       // Paid Apify LinkedIn (full data)
   | 'indeed'
   | 'jobsdb'
+  | 'jobsdb-rest'
 
 export interface JobResult {
   id: string               // unique: `{source}:{nativeId}`
@@ -44,6 +45,7 @@ export interface JobResult {
 export interface ScoredJob extends JobResult {
   score: number            // 0-100, keyword overlap with user skills
   matchedSkills: string[]  // which of the user's skills appear in this JD
+  isLocal?: boolean        // true if job is in user's country/city (used for local-first sorting)
 }
 
 export interface SearchParams {
@@ -54,7 +56,6 @@ export interface SearchParams {
   sources?: JobSource[]    // defaults to all available
   limit?: number           // default 30
   fresh?: boolean          // bypass cache, fetch fresh
-  includePaid?: boolean    // include Apify LinkedIn/Indeed (costs $)
 }
 
 export interface SearchResult {

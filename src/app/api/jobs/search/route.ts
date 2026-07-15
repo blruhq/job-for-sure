@@ -15,7 +15,6 @@ const SearchBody = z.object({
   sources: z.array(z.string()).optional(),
   limit: z.number().int().min(1).max(100).optional(),
   fresh: z.boolean().optional(),
-  includePaid: z.boolean().optional(),
 })
 
 export const POST = withAuth(async (req, { user }) => {
@@ -27,7 +26,7 @@ export const POST = withAuth(async (req, { user }) => {
     )
   }
 
-  const { query, location, skills, role, sources, limit, fresh, includePaid } = body.data
+  const { query, location, skills, role, sources, limit, fresh } = body.data
 
   const result = await searchJobs({
     query: query.trim(),
@@ -37,7 +36,6 @@ export const POST = withAuth(async (req, { user }) => {
     sources: sources as JobSource[] | undefined,
     limit: limit || 30,
     fresh: fresh || false,
-    includePaid: includePaid || false,
   })
 
   await captureServerEvent(user.id, 'job_searched', { query, location })

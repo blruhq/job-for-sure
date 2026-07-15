@@ -6,7 +6,8 @@
 //
 // TWO endpoints (we only use #1 here):
 //   1. LIST:   /jobs-guest/jobs/api/seeMoreJobPostings/search
-//      → 25 job cards per page (title, company, location, URL, date)
+//      → 25 job cards per page. We fetch 2 pages (50 jobs total).
+//      → Title, company, location, URL, date, salary (when available)
 //      → NO job descriptions — fetched on-demand via /api/jobs/detail
 //
 //   2. DETAIL: /jobs-guest/jobs/api/jobPosting/{jobId}
@@ -24,12 +25,27 @@ import { parseLocation } from './geo'
 
 const GUEST_SEARCH_URL = 'https://www.linkedin.com/jobs-guest/jobs/api/seeMoreJobPostings/search'
 
-// LinkedIn requires browser-like headers or it returns 999/403.
-const BROWSER_HEADERS: Record<string, string> = {
-  'User-Agent':
-    'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36',
-  Accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
-  'Accept-Language': 'en-US,en;q=0.9',
+// Pool of realistic browser User-Agents. Picked randomly per request
+// to prevent UA-based fingerprinting by LinkedIn's anti-bot system.
+const USER_AGENTS = [
+  'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36',
+  'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+  'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.4 Safari/605.1.15',
+  'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:125.0) Gecko/20100101 Firefox/125.0',
+  'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36',
+]
+
+function getRandomUA(): string {
+  return USER_AGENTS[Math.floor(Math.random() * USER_AGENTS.length)]
+}
+
+// Base headers (User-Agent is added per-request via getRandomUA())
+function makeBrowserHeaders(): Record<string, string> {
+  return {
+    'User-Agent': getRandomUA(),
+    Accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
+    'Accept-Language': 'en-US,en;q=0.9',
+  }
 }
 
 /**
@@ -57,8 +73,9 @@ function detectLocationType(location: string): JobResult['locationType'] {
 }
 
 /**
- * Fetch up to 25 job cards from LinkedIn's guest search endpoint.
+ * Fetch up to 50 job cards from LinkedIn's guest search endpoint.
  *
+ * Fetches 2 pages (start=0 and start=25) to double the result count.
  * This is a LIST-ONLY call. Descriptions are intentionally NOT fetched
  * here — they're loaded on-demand when the user clicks a card in the
  * detail modal (see /api/jobs/detail/route.ts).
@@ -69,24 +86,58 @@ export async function fetchLinkedInGuest(
   opts?: { signal?: AbortSignal },
 ): Promise<{ jobs: JobResult[]; error?: string }> {
   try {
+    // ── Page 1 (start=0) ──
+    const page1 = await fetchLinkedInGuestPage(query, location, 0, opts)
+    if (page1.jobs.length === 0) {
+      return page1
+    }
+
+    // ── Page 2 (start=25) — only if page 1 was full (25 jobs) ──
+    if (page1.jobs.length >= 25) {
+      await new Promise((r) => setTimeout(r, 300))
+      const page2 = await fetchLinkedInGuestPage(query, location, 25, opts)
+      if (page2.jobs.length > 0) {
+        const seen = new Set(page1.jobs.map((j) => j.id))
+        const unique = page2.jobs.filter((j) => !seen.has(j.id))
+        return { jobs: [...page1.jobs, ...unique] }
+      }
+    }
+
+    return page1
+  } catch (err) {
+    return {
+      jobs: [],
+      error: err instanceof Error ? err.message : 'LinkedIn guest fetch failed',
+    }
+  }
+}
+
+/**
+ * Fetch a single page of job cards from LinkedIn's guest search endpoint.
+ * Internal helper — called by fetchLinkedInGuest.
+ */
+async function fetchLinkedInGuestPage(
+  query: string,
+  location: string | undefined,
+  start: number,
+  opts?: { signal?: AbortSignal },
+): Promise<{ jobs: JobResult[]; error?: string }> {
+  try {
     const params = new URLSearchParams()
-    // LinkedIn handles multi-word queries well — pass raw query.
-    // Strip very long queries to avoid URL length issues.
     params.set('keywords', query.slice(0, 200))
     if (location && location.trim()) {
       params.set('location', location.trim())
     }
-    params.set('start', '0')
+    params.set('start', String(start))
 
     const url = `${GUEST_SEARCH_URL}?${params.toString()}`
 
     const res = await fetch(url, {
       signal: opts?.signal,
-      headers: BROWSER_HEADERS,
-      redirect: 'manual', // LinkedIn may redirect to auth — treat as failure
+      headers: makeBrowserHeaders(),
+      redirect: 'manual',
     })
 
-    // 3xx = redirect to login/auth wall — not a real result
     if (res.status >= 300) {
       return { jobs: [], error: `LinkedIn guest: redirected (${res.status})` }
     }
@@ -97,7 +148,6 @@ export async function fetchLinkedInGuest(
 
     const html = await res.text()
 
-    // Empty or near-empty response = rate-limited or blocked
     if (!html || html.length < 100) {
       return { jobs: [], error: 'LinkedIn guest: empty response (likely rate-limited)' }
     }
@@ -105,51 +155,44 @@ export async function fetchLinkedInGuest(
     const $ = cheerio.load(html)
     const jobs: JobResult[] = []
 
-    // ── Parse job cards ──
-    // LinkedIn card selectors are fragile — use multiple fallbacks.
-    // The guest API consistently returns <li> elements with these patterns.
     $('li').each((_i, el) => {
       const card = $(el)
 
-      // ── URL + Job ID ──
       const link =
         card.find('a.base-card__full-link').first() ||
         card.find('a[href*="/jobs/view/"]').first()
       const href = link.attr('href') || ''
-      if (!href) return // not a job card
+      if (!href) return
 
-      const cleanUrl = href.split('?')[0] // strip tracking params
+      const cleanUrl = href.split('?')[0]
       const jobId = extractJobId(href)
-      if (!jobId) return // can't use without ID
+      if (!jobId) return
 
-      // ── Title ──
       const title =
         card.find('h3.base-search-card__title').text().trim() ||
         card.find('h3').first().text().trim() ||
         ''
       if (!title) return
 
-      // ── Company ──
       const company =
         card.find('h4.base-search-card__subtitle').text().trim() ||
         card.find('h4').first().text().trim() ||
         ''
 
-      // ── Location ──
       const locationText =
         card.find('.job-search-card__location').text().trim() ||
         card.find('.job-card-container__metadata-item').text().trim() ||
         card.find('[class*="location"]').first().text().trim() ||
         ''
 
-      // ── Posted date ──
       const timeEl = card.find('time').first()
       const postedAt = timeEl.attr('datetime') || timeEl.attr('title') || undefined
 
-      // ── Normalize location using geo.ts ──
-      const parsed = parseLocation(locationText || 'Remote')
+      const salary =
+        card.find('.job-search-card__salary-info').text().trim().replace(/\s+/g, ' ') ||
+        undefined
 
-      // ── Determine work policy ──
+      const parsed = parseLocation(locationText || 'Remote')
       const locationType = detectLocationType(locationText)
 
       jobs.push({
@@ -162,19 +205,18 @@ export async function fetchLinkedInGuest(
         region: parsed.region,
         locationType,
         url: cleanUrl.startsWith('http') ? cleanUrl : `https://www.linkedin.com${cleanUrl}`,
-        // Intentionally empty — fetched on-demand via detail endpoint
         description: '',
         descriptionHtml: '',
+        salary: salary || undefined,
         postedAt,
       })
     })
 
     return { jobs }
   } catch (err) {
-    // Fail-open: LinkedIn is flaky, other sources compensate
     return {
       jobs: [],
-      error: err instanceof Error ? err.message : 'LinkedIn guest fetch failed',
+      error: err instanceof Error ? err.message : 'LinkedIn guest page fetch failed',
     }
   }
 }
@@ -194,7 +236,7 @@ export async function fetchLinkedInGuestDetail(
 
     const res = await fetch(url, {
       signal: opts?.signal,
-      headers: BROWSER_HEADERS,
+      headers: makeBrowserHeaders(),
       redirect: 'manual',
     })
 

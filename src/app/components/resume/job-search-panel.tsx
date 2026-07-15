@@ -5,9 +5,10 @@ import { useRouter } from 'next/navigation'
 import {
   Search, Bookmark, ExternalLink, MapPin, Loader2, AlertCircle,
   RefreshCw, Filter, X, Globe, Clock, Star, Plane, MessageSquare,
-  ChevronDown, Briefcase, Brain, FileText,
+  ChevronDown, Brain, FileText,
 } from 'lucide-react'
 import { cn } from '~/lib/utils'
+import { compareJobs } from '~/lib/job-sources/scoring'
 import { useAppStore } from '~/lib/store'
 import { notify } from '~/lib/toast'
 import { companyColor, companyLogo } from '~/lib/company-data'
@@ -38,6 +39,7 @@ const SOURCE_NAMES: Record<JobSource, string> = {
   linkedin: 'LinkedIn (Apify)',
   indeed: 'Indeed (Apify)',
   jobsdb: 'JobsDB (Apify)',
+  'jobsdb-rest': 'JobsDB',
 }
 
 // Source tiers used by the search flow (see plan)
@@ -47,10 +49,8 @@ const FAST_FREE_SOURCES: JobSource[] = [
   'linkedin-guest',
 ]
 const FULL_FREE_SOURCES: JobSource[] = [
-  'greenhouse', 'ashby',
+  'greenhouse', 'ashby', 'indeed', 'jobsdb-rest',
 ]
-const PAID_SOURCES: JobSource[] = ['linkedin', 'indeed', 'jobsdb']
-
 // ── Filter state ──
 interface Filters {
   remoteOnly: boolean
@@ -94,8 +94,6 @@ export function JobSearchPanel({ resume }: { resume: Resume }) {
 
   // ── Infinite scroll & paid sources ──
   const [displayLimit, setDisplayLimit] = useState(25)
-  const [paidLoaded, setPaidLoaded] = useState(false)
-  const [paidLoading, setPaidLoading] = useState(false)
   const sentinelRef = useRef<HTMLDivElement>(null)
   const searchRunRef = useRef(0) // track latest search to avoid stale merges
   const resultsRef = useRef<ScoredJob[]>([]) // mirror for closures
@@ -114,12 +112,6 @@ export function JobSearchPanel({ resume }: { resume: Resume }) {
     return terms.filter(t => /[\u0e00-\u0e7f]/.test(t))
   }, [query])
 
-  // ── Fake "+N more" tease count for paid sources (v1: faked, v1.5: real) ──
-  // Deterministic per search so it doesn't jump around on re-render.
-  const paidTeaseCount = useMemo(() => {
-    return 15 + (query.length % 25) // 15–39 range, stable per query
-  }, [query])
-
   // Keep resultsRef in sync with state (for use in callbacks without stale closures)
   useEffect(() => { resultsRef.current = results }, [results])
 
@@ -128,7 +120,7 @@ export function JobSearchPanel({ resume }: { resume: Resume }) {
     const seen = new Set(existing.map(j => j.id))
     const added = incoming.filter(j => !seen.has(j.id))
     if (added.length === 0) return existing
-    return [...existing, ...added].sort((a, b) => b.score - a.score)
+    return [...existing, ...added].sort(compareJobs)
   }, [])
 
   // ── localStorage cache for search results ──
@@ -172,7 +164,7 @@ export function JobSearchPanel({ resume }: { resume: Resume }) {
         setNewJobs(prev => {
           const prevIds = new Set(prev.map(j => j.id))
           const added = freshNewJobs.filter(j => !prevIds.has(j.id))
-          return [...prev, ...added].sort((a, b) => b.score - a.score)
+          return [...prev, ...added].sort(compareJobs)
         })
       }
 
@@ -203,7 +195,7 @@ export function JobSearchPanel({ resume }: { resume: Resume }) {
             setNewJobs(prev => {
               const prevIds = new Set(prev.map(j => j.id))
               const added = slowNewJobs.filter(j => !prevIds.has(j.id))
-              return [...prev, ...added].sort((a, b) => b.score - a.score)
+              return [...prev, ...added].sort(compareJobs)
             })
           }
         }
@@ -238,8 +230,6 @@ export function JobSearchPanel({ resume }: { resume: Resume }) {
     setLoading(true)
     setSearched(true)
     setResults([])
-    setPaidLoaded(false)
-    setPaidLoading(false)
     setDisplayLimit(25)
     setSourceCount(0)
 
@@ -274,7 +264,9 @@ export function JobSearchPanel({ resume }: { resume: Resume }) {
       })
       setLoading(false) // release loading — user sees 25 jobs now
 
-      // ── Phase 2: Slow free sources (3-10s, background) ──
+      // ── Phase 2: Slow sources (3-15s, background) ──
+      // Results go into newJobs (banner) instead of silently re-sorting.
+      // This prevents scroll disruption when Greenhouse/Ashby/Indeed/JobsDB arrive.
       try {
         const fullRes = await fetch('/api/jobs/search', {
           method: 'POST',
@@ -292,7 +284,16 @@ export function JobSearchPanel({ resume }: { resume: Resume }) {
         if (runId !== searchRunRef.current) return
         if (fullRes.ok) {
           const fullData: SearchResult = await fullRes.json()
-          setResults(prev => mergeResults(prev, fullData.jobs))
+          // Find new jobs not already in results
+          const existingIds = new Set(resultsRef.current.map(j => j.id))
+          const freshNew = fullData.jobs.filter(j => !existingIds.has(j.id))
+          if (freshNew.length > 0) {
+            setNewJobs(prev => {
+              const prevIds = new Set(prev.map(j => j.id))
+              const added = freshNew.filter(j => !prevIds.has(j.id))
+              return [...prev, ...added].sort(compareJobs)
+            })
+          }
         }
       } catch {
         // Silent fail — fast results are already showing
@@ -477,44 +478,6 @@ export function JobSearchPanel({ resume }: { resume: Resume }) {
     handleBookmark(modalJob)
   }
 
-  // ── Load paid sources (LinkedIn/Indeed via Apify) — user-initiated ──
-  const handleLoadPaid = useCallback(async () => {
-    if (paidLoading || paidLoaded) return
-    setPaidLoading(true)
-    try {
-      const res = await fetch('/api/jobs/search', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          query,
-          location: location.trim() || undefined,
-          skills: resume.skills,
-          role: resume.role,
-          sources: PAID_SOURCES,
-          includePaid: true,
-          limit: 50,
-        }),
-      })
-      if (!res.ok) throw new Error('Paid search failed')
-      const data: SearchResult = await res.json()
-      const merged = mergeResults(resultsRef.current, data.jobs)
-      setResults(merged)
-      // Update sessionStorage to include paid source results
-      saveSearchToCache(query, location ?? '', {
-        jobs: merged,
-        total: data.total,
-        descriptionsIncluded: data.descriptionsIncluded,
-      })
-      setPaidLoaded(true)
-      notify({ message: `Added ${data.jobs.length} jobs from LinkedIn, Indeed & JobsDB`, type: 'success' })
-    } catch (err) {
-      console.error('[job-search-paid] Error:', err)
-      notify({ message: 'LinkedIn/Indeed/JobsDB search failed. They may be rate-limited.', type: 'error' })
-    } finally {
-      setPaidLoading(false)
-    }
-  }, [query, location, resume.skills, resume.role, paidLoading, paidLoaded, mergeResults])
-
   // ═══════════════════════════════════════════════════════════════
   // RENDER
   // ═══════════════════════════════════════════════════════════════
@@ -693,7 +656,7 @@ export function JobSearchPanel({ resume }: { resume: Resume }) {
         {loading && (
           <div className="flex flex-col gap-3">
             <div className="mb-1 font-mono text-[11px] text-muted-foreground animate-pulse">
-              Searching 11 sources…
+              Searching 13 sources…
             </div>
             {Array.from({ length: 8 }).map((_, i) => (
               <div key={i} className="rounded-sm border border-border bg-card p-4 animate-pulse">
@@ -752,7 +715,7 @@ export function JobSearchPanel({ resume }: { resume: Resume }) {
                 <>
                   <span>·</span>
                   <span>
-                    Results from {sourceCount} of 11 sources
+                    Results from {sourceCount} of 13 sources
                   </span>
                 </>
               )}
@@ -812,40 +775,7 @@ export function JobSearchPanel({ resume }: { resume: Resume }) {
               </div>
             )}
 
-            {/* Paid sources button (only when no more free jobs to load) */}
-            {!hasMore && !paidLoaded && (
-              <div className="mt-4 flex flex-col items-center gap-2 border-t border-border pt-4">
-                <p className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
-                  <Briefcase size={12} className="text-primary" />
-                  <span>
-                    <span className="font-semibold text-primary">
-                      +{paidTeaseCount} more jobs
-                    </span>{' '}
-                    from LinkedIn, Indeed &amp; JobsDB
-                  </span>
-                </p>
-                <button
-                  onClick={handleLoadPaid}
-                  disabled={paidLoading}
-                  className="flex cursor-pointer items-center gap-1.5 rounded-sm border border-primary/40 bg-accent-soft px-3 py-2 text-[11px] font-medium text-primary transition-all hover:bg-primary hover:text-primary-foreground disabled:opacity-50"
-                >
-                  {paidLoading ? (
-                    <Loader2 size={12} className="animate-spin" />
-                  ) : (
-                    <Briefcase size={12} />
-                  )}
-                  {paidLoading ? 'Loading…' : 'Unlock paid sources'}
-                </button>
-              </div>
-            )}
 
-            {/* Paid loaded confirmation */}
-            {paidLoaded && (
-              <div className="mt-4 flex items-center justify-center gap-1.5 rounded-sm border border-border bg-card px-3 py-2 text-[11px] text-muted-foreground">
-                <Briefcase size={12} className="text-primary" />
-                LinkedIn, Indeed &amp; JobsDB jobs loaded
-              </div>
-            )}
           </>
         )}
       </div>

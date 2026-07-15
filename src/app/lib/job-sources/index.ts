@@ -23,9 +23,9 @@ import { fetchArbeitnow } from './arbeitnow'
 import { fetchAdzuna } from './adzuna'
 import { fetchJSearch } from './jsearch'
 import { fetchJobbKK } from './jobbkk'
-import { fetchApifyLinkedIn } from './apify-linkedin'
 import { fetchApifyIndeed } from './apify-indeed'
 import { fetchApifyJobsDB } from './apify-jobsdb'
+import { fetchJobsDBRest } from './jobsdb-rest'
 import { fetchLinkedInGuest } from './linkedin-guest'
 import { rankJobs, inferExperienceLevel } from './scoring'
 import { getCached, setCached, cacheKey } from './cache'
@@ -52,13 +52,11 @@ const FAST_FREE_SOURCES: JobSource[] = [
 ]
 const SLOW_FREE_SOURCES: JobSource[] = ['greenhouse', 'ashby']
 const BUDGET_SOURCES: JobSource[] = []
-const PAID_SOURCES: JobSource[] = ['linkedin', 'indeed', 'jobsdb']
+// Apify sources: 'linkedin' dropped (use free linkedin-guest instead).
+// 'indeed' still uses Apify. 'jobsdb' replaced by free 'jobsdb-rest'.
 const FREE_SOURCES: JobSource[] = [
   ...FAST_FREE_SOURCES, ...SLOW_FREE_SOURCES, ...BUDGET_SOURCES,
 ]
-
-// All sources (used when includePaid is true or explicit sources given)
-const ALL_SOURCES: JobSource[] = [...FREE_SOURCES, ...PAID_SOURCES]
 
 // ── Silent auto-retry wrapper ─────────────────────────────────
 // If a source returns 0 jobs with an error, wait 500ms and retry once.
@@ -85,11 +83,10 @@ export async function searchJobs(params: SearchParams): Promise<SearchResult> {
     sources: rawSources,
     limit = 30,
     fresh = false,
-    includePaid = false,
   } = params
 
-  // Resolve sources: default to free sources unless includePaid is true
-  const sources = rawSources ?? (includePaid ? ALL_SOURCES : FREE_SOURCES)
+  // Resolve sources: default to all free+api sources
+  const sources = rawSources ?? FREE_SOURCES
 
   // 1. Check cache (unless fresh=true)
   const key = cacheKey(query, location, sources)
@@ -164,10 +161,6 @@ export async function searchJobs(params: SearchParams): Promise<SearchResult> {
     fetchers.push(() => fetchLinkedInGuest(query, location))
     fetcherSources.push('linkedin-guest')
   }
-  if (sources.includes('linkedin')) {
-    fetchers.push(() => fetchApifyLinkedIn(query, location))
-    fetcherSources.push('linkedin')
-  }
   if (sources.includes('indeed')) {
     fetchers.push(() => fetchApifyIndeed(query, location))
     fetcherSources.push('indeed')
@@ -175,6 +168,10 @@ export async function searchJobs(params: SearchParams): Promise<SearchResult> {
   if (sources.includes('jobsdb')) {
     fetchers.push(() => fetchApifyJobsDB(query, location))
     fetcherSources.push('jobsdb')
+  }
+  if (sources.includes('jobsdb-rest')) {
+    fetchers.push(() => fetchJobsDBRest(query, location))
+    fetcherSources.push('jobsdb-rest')
   }
 
   const results = await Promise.allSettled(fetchers.map(f => withRetry(f)))
@@ -309,7 +306,7 @@ async function fetchAshbyJobs(query: string): Promise<{ jobs: JobResult[]; error
 // ── Helpers ──────────────────────────────────────────────────
 
 function stripScore(job: ScoredJob): JobResult {
-  const { score: _score, matchedSkills: _matched, ...rest } = job
+  const { score: _score, matchedSkills: _matched, isLocal: _local, ...rest } = job
   return rest
 }
 

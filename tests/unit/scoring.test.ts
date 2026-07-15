@@ -89,6 +89,7 @@ describe('scoreJob', () => {
     const result = scoreJob(job, ['React', 'Node'], undefined, 'Bangkok, Thailand')
     // Coverage: 2/2 = 80 + Title match: 0 + Location match: +20 (Bangkok) = 100
     expect(result.score).toBe(100)
+    expect(result.isLocal).toBe(true)
   })
 
   it('adds country-level proximity bonus (+10) when only country matches', () => {
@@ -96,6 +97,7 @@ describe('scoreJob', () => {
     const result = scoreJob(job, ['React', 'Node'], undefined, 'Bangkok, Thailand')
     // Coverage: 2/2 = 80 + Location match: +10 (Thailand) = 90
     expect(result.score).toBe(90)
+    expect(result.isLocal).toBe(true)
   })
 
   it('adds no proximity bonus (0) for non-matching locations', () => {
@@ -103,6 +105,13 @@ describe('scoreJob', () => {
     const result = scoreJob(job, ['React', 'Node'], undefined, 'Bangkok, Thailand')
     // Coverage: 2/2 = 80 + Location match: +0 = 80
     expect(result.score).toBe(80)
+    expect(result.isLocal).toBe(false)
+  })
+
+  it('sets isLocal=false when user has no location', () => {
+    const job = makeJob({ location: 'Bangkok, Thailand', description: 'React Node' })
+    const result = scoreJob(job, ['React', 'Node'], undefined, undefined)
+    expect(result.isLocal).toBe(false)
   })
 })
 
@@ -117,6 +126,19 @@ describe('rankJobs', () => {
     expect(ranked[0].id).toBe('3') // 3/3 = 80
     expect(ranked[1].id).toBe('2') // 2/3 = 53
     expect(ranked[2].id).toBe('1') // 0/3 = 0
+  })
+
+  it('sorts local jobs before international jobs regardless of score', () => {
+    const jobs = [
+      makeJob({ id: 'intl-hi', description: 'React TypeScript Go', title: 'Dev', location: 'San Francisco, CA', country: 'US', locationType: 'onsite' }),
+      makeJob({ id: 'local-lo', description: 'React', title: 'Dev', location: 'Bangkok, Thailand', country: 'TH', locationType: 'onsite' }),
+    ]
+    // local-lo has lower score (27 vs 80) but should rank FIRST because it's local
+    const ranked = rankJobs(jobs, ['React', 'TypeScript', 'Go'], undefined, 'Bangkok, Thailand')
+    expect(ranked[0].id).toBe('local-lo')
+    expect(ranked[0].isLocal).toBe(true)
+    expect(ranked[1].id).toBe('intl-hi')
+    expect(ranked[1].isLocal).toBe(false)
   })
 
   it('returns empty array for empty input', () => {
