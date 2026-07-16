@@ -14,6 +14,7 @@ import { countryToFlag } from '~/lib/job-sources/geo'
 import { Timeline } from './timeline'
 import { JobNotes } from './job-notes'
 import type { PipelineJob } from '~/types/resume'
+import { SmartOverview } from './smart-overview'
 
 // ═══════════════════════════════════════════════════════════════
 // JobDetailPanel — slide-over panel showing everything about a job.
@@ -279,6 +280,27 @@ export function JobDetailPanel({
             </div>
           )}
 
+          {/* ── Smart AI Overview ── */}
+          {description && description.length >= 50 && (
+            <SmartOverview
+              job={{
+                company: job.company,
+                title: job.title,
+                loc: job.loc,
+                url: job.url,
+                score: job.score,
+                salary: job.salary,
+                jobData: job.jobData,
+              }}
+              resumeData={activeResume as unknown as Record<string, unknown> | null}
+              homeLocation={undefined}
+              matchScore={job.score}
+              matchedSkills={matchedSkills}
+              missingSkills={missingSkills}
+              applicationId={job.applicationId}
+            />
+          )}
+
           {/* Matched Skills */}
           {matchedSkills.length > 0 && (
             <div>
@@ -317,13 +339,16 @@ export function JobDetailPanel({
             </div>
           )}
 
-          {/* JD Text */}
-          <div>
-            <div className="label-mono mb-1.5">Job Description</div>
-            <div className="whitespace-pre-wrap text-[13px] leading-relaxed text-foreground/90">
+          {/* JD Text (collapsible) */}
+          <details className="group">
+            <summary className="label-mono cursor-pointer list-none text-muted-foreground hover:text-foreground transition-colors">
+              <span className="group-open:hidden">&#9654; Show full job description</span>
+              <span className="hidden group-open:inline">&#9660; Hide job description</span>
+            </summary>
+            <div className="mt-2 whitespace-pre-wrap text-[13px] leading-relaxed text-foreground/90">
               {description || 'No description available.'}
             </div>
-          </div>
+          </details>
 
           {/* Tracker mode extras */}
           {mode === 'tracker' && (
