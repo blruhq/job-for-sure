@@ -928,11 +928,17 @@ export function ResumeDetail({ resumeId }: { resumeId: string }) {
         customSections: editCustomSections,
         sectionOrder,
         sectionVisibility,
-      } })
-      setSaveStatus('saved')
-
-      // Reset to idle after 3s
-      setTimeout(() => setSaveStatus('idle'), 3000)
+      } }, {
+        onSuccess: () => {
+          lastSavedSnapshotRef.current = snapshot
+          setSaveStatus('saved')
+          setTimeout(() => setSaveStatus('idle'), 3000)
+        },
+        onError: () => {
+          setSaveStatus('idle')
+          notify({ message: 'Autosave failed. Your local changes are preserved.', type: 'error' })
+        },
+      })
     }, 1500)
 
     return () => {

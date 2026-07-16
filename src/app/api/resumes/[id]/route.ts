@@ -46,7 +46,17 @@ export const PATCH = withAuth(async (req, { user, params }) => {
   const updates: Record<string, unknown> = {
     updatedAt: new Date(),
   }
-  if (body.data.data !== undefined) updates.data = body.data.data
+  if (body.data.data !== undefined) {
+    // Merge incoming fields into existing data — never replace the entire blob
+    const [existing] = await db
+      .select({ data: resumes.data })
+      .from(resumes)
+      .where(eq(resumes.id, id))
+      .limit(1)
+
+    const existingData = (existing?.data ?? {}) as Record<string, unknown>
+    updates.data = { ...existingData, ...body.data.data }
+  }
   if (body.data.isBase !== undefined) updates.isBase = body.data.isBase
 
   const [updated] = await db
