@@ -35,10 +35,10 @@ import { DEFAULT_TEMPLATE, getTemplateMeta } from '~/components/resume/templates
 import { ResumePreview } from '~/components/resume/resume-preview'
 import { TailorReviewPanel } from '~/components/resume/tailor-review-panel'
 import { ResizableGroup, ResizablePanel, ResizableHandle, useDefaultLayout } from '~/components/ui/resizable'
+import { useResumeEditor, ALL_EDITOR_SECTIONS, type EditorSectionId, type SectionKey } from '~/lib/resume-editor-store'
+import { useStore } from 'zustand'
 
 // ── Helpers ──
-
-type SectionKey = 'projects' | 'certifications' | 'languages' | 'custom'
 
 const SECTION_LABELS: Record<SectionKey, string> = {
   projects: 'Projects',
@@ -300,10 +300,6 @@ function SectionSuggestionBanner({
 // EDITOR SECTION SORTING
 // ═══════════════════════════════════════════════════════════════
 
-type EditorSectionId = 'basic' | 'summary' | 'skills' | 'experience' | 'education' | 'projects' | 'certifications' | 'languages' | 'custom'
-
-const ALL_EDITOR_SECTIONS: EditorSectionId[] = ['basic', 'summary', 'skills', 'experience', 'education', 'projects', 'certifications', 'languages', 'custom']
-
 function SortableSection({
   id,
   isVisible = true,
@@ -381,77 +377,39 @@ export function ResumeDetail({ resumeId }: { resumeId: string }) {
 
   const resume = getResume(resumeId)
 
-  // ── Editor form state ──
-  const [editName, setEditName] = useState(resume?.name ?? '')
-  const [editPersona, setEditPersona] = useState(resume?.persona ?? '')
-  const [editEmail, setEditEmail] = useState(resume?.email ?? '')
-  const [editLocation, setEditLocation] = useState(resume?.location ?? '')
-  const [editPhone, setEditPhone] = useState(resume?.phone ?? '')
-  const [editGithub, setEditGithub] = useState(resume?.github ?? '')
-  const [editRole, setEditRole] = useState(resume?.role ?? '')
-  const [editSummary, setEditSummary] = useState(resume?.summary ?? '')
-  const [editSkillsArr, setEditSkillsArr] = useState<string[]>(resume?.skills ?? [])
-  const [editExperiences, setEditExperiences] = useState<ResumeExperience[]>(resume?.experience ?? [])
-  const [editEducations, setEditEducations] = useState<ResumeEducation[]>(resume?.education ?? [])
-  const [editProjectsArr, setEditProjectsArr] = useState<ResumeProject[]>(resume?.projects ?? [])
-  const [editCertifications, setEditCertifications] = useState<ResumeCertification[]>(resume?.certifications ?? [])
-  const [editLanguages, setEditLanguages] = useState<ResumeLanguage[]>(resume?.languages ?? [])
-  const [editCustomSections, setEditCustomSections] = useState<ResumeCustomSection[]>(resume?.customSections ?? [])
-  const [optimizing, setOptimizing] = useState(false)
-  const [suggestions, setSuggestions] = useState<SectionKey[]>([])
-  const [suggestionDismissed, setSuggestionDismissed] = useState(false)
-  const [showAddSectionPicker, setShowAddSectionPicker] = useState(false)
-  const suggestionAnalysed = useRef(false)
-  const [sectionOrder, setSectionOrder] = useState<EditorSectionId[]>(resume?.sectionOrder as EditorSectionId[] ?? [...ALL_EDITOR_SECTIONS])
-  const [sectionVisibility, setSectionVisibility] = useState<Record<string, boolean>>(resume?.sectionVisibility ?? {})
-  const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved'>('idle')
+  // ── Zustand editor store ──
+  const store = useResumeEditor(resumeId, resume)
+
+  // Subscribe to all editor state (the store is the single source of truth)
+  const {
+    name, setName,
+    persona, setPersona,
+    role, setRole,
+    email, setEmail,
+    phone, setPhone,
+    location, setLocation,
+    github, setGithub,
+    summary, setSummary,
+    skills, setSkills,
+    experience, setExperience,
+    education, setEducation,
+    projects, setProjects,
+    certifications, setCertifications,
+    languages, setLanguages,
+    customSections, setCustomSections,
+    sectionOrder, setSectionOrder,
+    sectionVisibility,
+    saveStatus, setSaveStatus,
+    suggestions, setSuggestions,
+    suggestionDismissed, setSuggestionDismissed,
+    showAddSectionPicker, setShowAddSectionPicker,
+    optimizing, setOptimizing,
+    toggleSectionVisibility,
+  } = useStore(store!)
+
   const [mobileView, setMobileView] = useState<'edit' | 'preview'>('edit')
 
-  const lastSavedSnapshotRef = useRef<string>('')
-  const lastSyncedId = useRef<string | null>(null)
-
-  // ── Re-sync editor state when resume data loads (hydration fix) ──
-  useEffect(() => {
-    if (!hydrated || !resume || lastSyncedId.current === resume.id) return
-    lastSyncedId.current = resume.id
-    setEditName(resume.name ?? '')
-    setEditPersona(resume.persona ?? '')
-    setEditEmail(resume.email ?? '')
-    setEditLocation(resume.location ?? '')
-    setEditPhone(resume.phone ?? '')
-    setEditGithub(resume.github ?? '')
-    setEditRole(resume.role ?? '')
-    setEditSummary(resume.summary ?? '')
-    setEditSkillsArr(resume.skills ?? [])
-    setEditExperiences(resume.experience ?? [])
-    setEditEducations(resume.education ?? [])
-    setEditProjectsArr(resume.projects ?? [])
-    setEditCertifications(resume.certifications ?? [])
-    setEditLanguages(resume.languages ?? [])
-    setEditCustomSections(resume.customSections ?? [])
-    setSectionOrder(resume.sectionOrder as EditorSectionId[] ?? [...ALL_EDITOR_SECTIONS])
-    setSectionVisibility(resume.sectionVisibility ?? {})
-
-    lastSavedSnapshotRef.current = JSON.stringify({
-      name: resume.name ?? '',
-      persona: resume.persona ?? '',
-      role: resume.role ?? '',
-      email: resume.email ?? '',
-      phone: resume.phone ?? '',
-      location: resume.location ?? '',
-      github: resume.github ?? '',
-      summary: resume.summary ?? '',
-      skills: resume.skills ?? [],
-      experience: resume.experience ?? [],
-      education: resume.education ?? [],
-      projects: resume.projects ?? [],
-      certifications: resume.certifications ?? [],
-      languages: resume.languages ?? [],
-      customSections: resume.customSections ?? [],
-      sectionOrder: resume.sectionOrder ?? [...ALL_EDITOR_SECTIONS],
-      sectionVisibility: resume.sectionVisibility ?? {},
-    })
-  }, [hydrated, resume])
+  const suggestionAnalysed = useRef(false)
 
   const sectionSensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
@@ -467,22 +425,15 @@ export function ResumeDetail({ resumeId }: { resumeId: string }) {
     setSectionOrder(arrayMove(sectionOrder, oldIndex, newIndex))
   }
 
-  const toggleSectionVisibility = useCallback((sectionId: EditorSectionId) => {
-    setSectionVisibility(prev => ({
-      ...prev,
-      [sectionId]: prev[sectionId] === false ? true : false,
-    }))
-  }, [])
-
   // ── Editor sections: visible filtered by sectionOrder ──
   const visibleEditorSections = sectionOrder.filter((id) => {
     switch (id) {
       case 'basic': case 'summary': case 'skills': case 'experience': case 'education':
         return true
-      case 'projects': return editProjectsArr.length > 0
-      case 'certifications': return editCertifications.length > 0
-      case 'languages': return editLanguages.length > 0
-      case 'custom': return editCustomSections.length > 0
+      case 'projects': return projects.length > 0
+      case 'certifications': return certifications.length > 0
+      case 'languages': return languages.length > 0
+      case 'custom': return customSections.length > 0
       default: return false
     }
   })
@@ -499,7 +450,7 @@ export function ResumeDetail({ resumeId }: { resumeId: string }) {
         return false
       }))
     }
-  }, [tab, resume])
+  }, [tab, resume, setSuggestions])
 
   // ── Auto-switch to editor tab when arriving with ?mode=review ──
   useEffect(() => {
@@ -513,9 +464,9 @@ export function ResumeDetail({ resumeId }: { resumeId: string }) {
   const availableSections: SectionKey[] = (() => {
     if (!resume) return []
     const has: Record<string, boolean> = {}
-    if (editProjectsArr.length > 0) has.projects = true
-    if (editCertifications.length > 0) has.certifications = true
-    if (editLanguages.length > 0) has.languages = true
+    if (projects.length > 0) has.projects = true
+    if (certifications.length > 0) has.certifications = true
+    if (languages.length > 0) has.languages = true
     const list = (['projects', 'certifications', 'languages'] as SectionKey[]).filter((s) => !has[s])
     // Always allow adding custom sections
     list.push('custom')
@@ -531,37 +482,37 @@ export function ResumeDetail({ resumeId }: { resumeId: string }) {
             <div className="flex gap-3">
               <div className="flex-1">
                 <label className="label-mono mb-1 block">Resume Name</label>
-                <input value={editName} onChange={(e) => setEditName(e.target.value)} className="w-full rounded-xs border border-border bg-background px-2.5 py-1.5 text-[11px] outline-none focus:border-primary" />
+                <input value={name} onChange={(e) => setName(e.target.value)} className="w-full rounded-xs border border-border bg-background px-2.5 py-1.5 text-[11px] outline-none focus:border-primary" />
               </div>
               <div className="flex-1">
                 <label className="label-mono mb-1 block">Full Name</label>
-                <input value={editPersona} onChange={(e) => setEditPersona(e.target.value)} className="w-full rounded-xs border border-border bg-background px-2.5 py-1.5 text-[11px] outline-none focus:border-primary" />
+                <input value={persona} onChange={(e) => setPersona(e.target.value)} className="w-full rounded-xs border border-border bg-background px-2.5 py-1.5 text-[11px] outline-none focus:border-primary" />
               </div>
             </div>
             <div className="flex gap-3 mt-3">
               <div className="flex-1">
                 <label className="label-mono mb-1 block">Email</label>
-                <input value={editEmail} onChange={(e) => setEditEmail(e.target.value)} className="w-full rounded-xs border border-border bg-background px-2.5 py-1.5 text-[11px] outline-none focus:border-primary" />
+                <input value={email} onChange={(e) => setEmail(e.target.value)} className="w-full rounded-xs border border-border bg-background px-2.5 py-1.5 text-[11px] outline-none focus:border-primary" />
               </div>
               <div className="flex-1">
                 <label className="label-mono mb-1 block">Phone</label>
-                <input value={editPhone} onChange={(e) => setEditPhone(e.target.value)} placeholder="+1 555-0123" className="w-full rounded-xs border border-border bg-background px-2.5 py-1.5 text-[11px] outline-none focus:border-primary" />
+                <input value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="+1 555-0123" className="w-full rounded-xs border border-border bg-background px-2.5 py-1.5 text-[11px] outline-none focus:border-primary" />
               </div>
             </div>
             <div className="flex gap-3 mt-3">
               <div className="flex-1">
                 <label className="label-mono mb-1 block">Location</label>
-                <input value={editLocation} onChange={(e) => setEditLocation(e.target.value)} className="w-full rounded-xs border border-border bg-background px-2.5 py-1.5 text-[11px] outline-none focus:border-primary" />
+                <input value={location} onChange={(e) => setLocation(e.target.value)} className="w-full rounded-xs border border-border bg-background px-2.5 py-1.5 text-[11px] outline-none focus:border-primary" />
               </div>
               <div className="flex-1">
                 <label className="label-mono mb-1 block">GitHub / Portfolio</label>
-                <input value={editGithub} onChange={(e) => setEditGithub(e.target.value)} placeholder="https://github.com/..." className="w-full rounded-xs border border-border bg-background px-2.5 py-1.5 text-[11px] outline-none focus:border-primary" />
+                <input value={github} onChange={(e) => setGithub(e.target.value)} placeholder="https://github.com/..." className="w-full rounded-xs border border-border bg-background px-2.5 py-1.5 text-[11px] outline-none focus:border-primary" />
               </div>
             </div>
             <div className="flex gap-3 mt-3">
               <div className="flex-1">
                 <label className="label-mono mb-1 block">Headline / Target Role</label>
-                <input value={editRole} onChange={(e) => setEditRole(e.target.value)} placeholder="e.g. Software Engineer (shown under your name on PDF)" className="w-full rounded-xs border border-border bg-background px-2.5 py-1.5 text-[11px] outline-none focus:border-primary" />
+                <input value={role} onChange={(e) => setRole(e.target.value)} placeholder="e.g. Software Engineer (shown under your name on PDF)" className="w-full rounded-xs border border-border bg-background px-2.5 py-1.5 text-[11px] outline-none focus:border-primary" />
               </div>
             </div>
           </>
@@ -570,21 +521,21 @@ export function ResumeDetail({ resumeId }: { resumeId: string }) {
         return (
           <div>
             <label className="label-mono mb-1 block">Professional Summary</label>
-            <textarea value={editSummary} onChange={(e) => setEditSummary(e.target.value)} rows={3} className="w-full resize-y rounded-xs border border-border bg-background px-2.5 py-1.5 text-[11px] outline-none focus:border-primary" />
+            <textarea value={summary} onChange={(e) => setSummary(e.target.value)} rows={3} className="w-full resize-y rounded-xs border border-border bg-background px-2.5 py-1.5 text-[11px] outline-none focus:border-primary" />
           </div>
         )
       case 'skills':
         return (
           <div>
             <label className="label-mono mb-1 block">Skills</label>
-            <TagInput tags={editSkillsArr} onChange={setEditSkillsArr} placeholder="Type a skill and press Enter" />
+            <TagInput tags={skills} onChange={setSkills} placeholder="Type a skill and press Enter" />
           </div>
         )
       case 'experience':
         return (
           <EditableList<ResumeExperience>
-            items={editExperiences}
-            onChange={setEditExperiences}
+            items={experience}
+            onChange={setExperience}
             label="Work Experience"
             createNew={() => ({ company: '', role: '', dates: '', bullets: [] })}
             renderItem={(exp, _i, update) => (
@@ -619,8 +570,8 @@ export function ResumeDetail({ resumeId }: { resumeId: string }) {
       case 'education':
         return (
           <EditableList<ResumeEducation>
-            items={editEducations}
-            onChange={setEditEducations}
+            items={education}
+            onChange={setEducation}
             label="Education"
             createNew={() => ({ institution: '', degree: '', field: '', dates: '' })}
             renderItem={(edu, _i, update) => (
@@ -652,8 +603,8 @@ export function ResumeDetail({ resumeId }: { resumeId: string }) {
       case 'projects':
         return (
           <EditableList<ResumeProject>
-            items={editProjectsArr}
-            onChange={setEditProjectsArr}
+            items={projects}
+            onChange={setProjects}
             label="Projects"
             createNew={() => ({ name: '', description: '', techStack: [], link: '' })}
             renderItem={(proj, _i, update) => (
@@ -692,8 +643,8 @@ export function ResumeDetail({ resumeId }: { resumeId: string }) {
       case 'certifications':
         return (
           <EditableList<ResumeCertification>
-            items={editCertifications}
-            onChange={setEditCertifications}
+            items={certifications}
+            onChange={setCertifications}
             label="Certifications"
             createNew={() => ({ name: '', issuer: '', date: '' })}
             renderItem={(cert, _i, update) => (
@@ -719,8 +670,8 @@ export function ResumeDetail({ resumeId }: { resumeId: string }) {
       case 'languages':
         return (
           <EditableList<ResumeLanguage>
-            items={editLanguages}
-            onChange={setEditLanguages}
+            items={languages}
+            onChange={setLanguages}
             label="Languages"
             createNew={() => ({ name: '', proficiency: '' })}
             renderItem={(lang, _i, update) => (
@@ -751,8 +702,8 @@ export function ResumeDetail({ resumeId }: { resumeId: string }) {
       case 'custom':
         return (
           <EditableList<ResumeCustomSection>
-            items={editCustomSections}
-            onChange={setEditCustomSections}
+            items={customSections}
+            onChange={setCustomSections}
             label="Custom Sections"
             createNew={() => ({ title: 'New Section', type: 'bullets' as const, items: [], bullets: [] })}
             renderItem={(sec, _i, update) => (
@@ -829,37 +780,36 @@ export function ResumeDetail({ resumeId }: { resumeId: string }) {
         )
     }
   }, [
-    editName, editPersona, editEmail, editPhone, editLocation, editGithub,
-    editSummary, editSkillsArr,
-    editExperiences, editEducations, editProjectsArr, editCertifications,
-    editLanguages, editCustomSections,
+    name, persona, email, phone, location, github,
+    role, summary, skills,
+    experience, education, projects, certifications,
+    languages, customSections,
   ])
 
   // ── Live resume for real-time PDF preview ──
   const liveResume: Resume = useMemo(() => ({
     ...(resume as Resume),
-    name: editName,
-    persona: editPersona,
-    role: editRole,
-    email: editEmail,
-    phone: editPhone,
-    location: editLocation,
-    github: editGithub,
-    summary: editSummary,
-    skills: editSkillsArr,
-    experience: editExperiences,
-    education: editEducations,
-    projects: editProjectsArr,
-    certifications: editCertifications,
-    languages: editLanguages,
-    customSections: editCustomSections,
+    name,
+    persona,
+    role,
+    email,
+    phone,
+    location,
+    github,
+    summary,
+    skills,
+    experience,
+    education,
+    projects,
+    certifications,
+    languages,
+    customSections,
     sectionOrder,
     sectionVisibility,
   }), [
-    resume,
-    editName, editPersona, editRole, editEmail, editPhone, editLocation, editGithub,
-    editSummary, editSkillsArr, editExperiences, editEducations, editProjectsArr,
-    editCertifications, editLanguages, editCustomSections,
+    resume, name, persona, email, phone, location, github,
+    role, summary, skills, experience, education,
+    projects, certifications, languages, customSections,
     sectionOrder, sectionVisibility,
   ])
 
@@ -870,87 +820,60 @@ export function ResumeDetail({ resumeId }: { resumeId: string }) {
   // ── Tailor review mode ──
   const isReviewMode = storePendingTailor !== null && storePendingTailor.baseResumeId === resumeId
 
-  // ── Debounced autosave ──
-  const autosaveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
-
+  // ── Debounced autosave via store subscription ──
   useEffect(() => {
-    if (!hydrated || !resume || isReviewMode) return
+    if (!hydrated || !resume || !store) return
 
-    // Serialize current state to detect changes
-    const snapshot = JSON.stringify({
-      name: editName,
-      persona: editPersona,
-      role: editRole,
-      email: editEmail,
-      phone: editPhone,
-      location: editLocation,
-      github: editGithub,
-      summary: editSummary,
-      skills: editSkillsArr,
-      experience: editExperiences,
-      education: editEducations,
-      projects: editProjectsArr,
-      certifications: editCertifications,
-      languages: editLanguages,
-      customSections: editCustomSections,
-      sectionOrder,
-      sectionVisibility,
+    let timer: ReturnType<typeof setTimeout> | null = null
+
+    const unsub = store.subscribe((state) => {
+      // Only trigger when editor fields actually change
+      if (!state.hasUnsavedChanges()) return
+      if (isReviewMode || state.optimizing) return
+
+      // Debounce 1.5s
+      if (timer) clearTimeout(timer)
+      state.setSaveStatus('saving')
+
+      timer = setTimeout(() => {
+        const s = store.getState()
+        updateResume({ id: resume.id, data: {
+          name: s.name,
+          persona: s.persona,
+          role: s.role,
+          email: s.email,
+          phone: s.phone,
+          location: s.location,
+          github: s.github,
+          summary: s.summary,
+          skills: s.skills,
+          experience: s.experience,
+          education: s.education,
+          projects: s.projects,
+          certifications: s.certifications,
+          languages: s.languages,
+          customSections: s.customSections,
+          sectionOrder: s.sectionOrder,
+          sectionVisibility: s.sectionVisibility,
+        } }, {
+          onSuccess: () => {
+            store.getState().markSaved()
+            store.getState().setSaveStatus('saved')
+            setTimeout(() => store.getState().setSaveStatus('idle'), 3000)
+          },
+          onError: () => {
+            store.getState().setSaveStatus('idle')
+            notify({ message: 'Autosave failed. Your local changes are preserved.', type: 'error' })
+          },
+        })
+      }, 1500)
     })
 
-    // No changes since last save
-    if (snapshot === lastSavedSnapshotRef.current) return
-
-    // Mark as dirty/saving
-    if (saveStatus === 'idle') setSaveStatus('saving')
-
-    // Clear previous timer
-    if (autosaveTimerRef.current) clearTimeout(autosaveTimerRef.current)
-
-    // Debounce: save 1.5s after last change
-    autosaveTimerRef.current = setTimeout(() => {
-      lastSavedSnapshotRef.current = snapshot
-      setSaveStatus('saving')
-      updateResume({ id: resume.id, data: {
-        name: editName,
-        persona: editPersona,
-        role: editRole,
-        email: editEmail,
-        phone: editPhone,
-        location: editLocation,
-        github: editGithub,
-        summary: editSummary,
-        skills: editSkillsArr,
-        experience: editExperiences,
-        education: editEducations,
-        projects: editProjectsArr,
-        certifications: editCertifications,
-        languages: editLanguages,
-        customSections: editCustomSections,
-        sectionOrder,
-        sectionVisibility,
-      } }, {
-        onSuccess: () => {
-          lastSavedSnapshotRef.current = snapshot
-          setSaveStatus('saved')
-          setTimeout(() => setSaveStatus('idle'), 3000)
-        },
-        onError: () => {
-          setSaveStatus('idle')
-          notify({ message: 'Autosave failed. Your local changes are preserved.', type: 'error' })
-        },
-      })
-    }, 1500)
-
     return () => {
-      if (autosaveTimerRef.current) clearTimeout(autosaveTimerRef.current)
+      unsub()
+      if (timer) clearTimeout(timer)
     }
-  }, [
-    hydrated, resume, isReviewMode,
-    editName, editPersona, editRole, editEmail, editPhone, editLocation, editGithub,
-    editSummary, editSkillsArr, editExperiences, editEducations, editProjectsArr,
-    editCertifications, editLanguages, editCustomSections,
-    sectionOrder, sectionVisibility,
-  ])
+  }, [hydrated, resume?.id, store, isReviewMode, updateResume])
 
   // ── Co-Pilot drawer state ──
   const [copilotOpen, setCopilotOpen] = useState(false)
@@ -969,16 +892,16 @@ export function ResumeDetail({ resumeId }: { resumeId: string }) {
 
   const handleAddSection = useCallback((section: SectionKey) => {
     if (section === 'projects') {
-      setEditProjectsArr((prev) => [...prev, { name: '', description: '', techStack: [], link: '' }])
+      setProjects([...projects, { name: '', description: '', techStack: [], link: '' }])
     } else if (section === 'certifications') {
-      setEditCertifications((prev) => [...prev, { name: '', issuer: '', date: '' }])
+      setCertifications([...certifications, { name: '', issuer: '', date: '' }])
     } else if (section === 'languages') {
-      setEditLanguages((prev) => [...prev, { name: '', proficiency: '' }])
+      setLanguages([...languages, { name: '', proficiency: '' }])
     } else if (section === 'custom') {
-      setEditCustomSections((prev) => [...prev, { title: 'New Section', type: 'bullets' as const, items: [], bullets: [] }])
+      setCustomSections([...customSections, { title: 'New Section', type: 'bullets' as const, items: [], bullets: [] }])
     }
     setShowAddSectionPicker(false)
-  }, [])
+  }, [projects, certifications, languages, customSections, setProjects, setCertifications, setLanguages, setCustomSections, setShowAddSectionPicker])
 
   // ── Review mode: compute previewed resume from accepted changes ──
   // MUST be before early return (hooks rule)
@@ -1045,24 +968,25 @@ export function ResumeDetail({ resumeId }: { resumeId: string }) {
   }
 
   const saveChanges = () => {
+    const s = store!.getState()
     updateResume({ id: resume.id, data: {
-      name: editName,
-      persona: editPersona,
-      role: editRole,
-      email: editEmail,
-      location: editLocation,
-      phone: editPhone,
-      github: editGithub,
-      summary: editSummary,
-      skills: editSkillsArr,
-      experience: editExperiences,
-      education: editEducations,
-      projects: editProjectsArr,
-      certifications: editCertifications,
-      languages: editLanguages,
-      customSections: editCustomSections,
-      sectionOrder,
-      sectionVisibility,
+      name: s.name,
+      persona: s.persona,
+      role: s.role,
+      email: s.email,
+      location: s.location,
+      phone: s.phone,
+      github: s.github,
+      summary: s.summary,
+      skills: s.skills,
+      experience: s.experience,
+      education: s.education,
+      projects: s.projects,
+      certifications: s.certifications,
+      languages: s.languages,
+      customSections: s.customSections,
+      sectionOrder: s.sectionOrder,
+      sectionVisibility: s.sectionVisibility,
     } })
     notify({ message: 'Resume saved', type: 'success' })
   }
@@ -1070,16 +994,17 @@ export function ResumeDetail({ resumeId }: { resumeId: string }) {
   const handleOptimize = async () => {
     setOptimizing(true)
     try {
+      const s = store!.getState()
       const res = await fetch('/api/ai/tailor', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           resume: {
-            name: editName,
-            persona: editPersona,
-            summary: editSummary,
-            skills: editSkillsArr,
-            experience: editExperiences,
+            name: s.name,
+            persona: s.persona,
+            summary: s.summary,
+            skills: s.skills,
+            experience: s.experience,
           },
           job: 'Optimize this resume for maximum impact in the tech industry. Use strong action verbs, quantify achievements, and ensure the summary is compelling.',
         }),
@@ -1087,8 +1012,8 @@ export function ResumeDetail({ resumeId }: { resumeId: string }) {
       if (!res.ok) throw new Error('Optimization failed')
       const data = await res.json()
       if (data.optimized) {
-        if (data.optimized.summary) setEditSummary(data.optimized.summary)
-        if (data.optimized.skills) setEditSkillsArr(data.optimized.skills)
+        if (data.optimized.summary) setSummary(data.optimized.summary)
+        if (data.optimized.skills) setSkills(data.optimized.skills)
         notify({ message: 'Resume optimized! Review the changes and click Save.', type: 'success' })
       } else {
         throw new Error('No optimized content returned')
