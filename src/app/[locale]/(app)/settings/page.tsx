@@ -14,6 +14,7 @@ interface Prefs {
   emailNotifications: boolean
   weeklyDigest: boolean
   marketingEmails: boolean
+  homeLocation: string | null
 }
 
 function useNotify() {
@@ -50,6 +51,8 @@ export default function SettingsPage() {
   const [tab, setTab] = useState<Tab>('profile')
   const [user, setUser] = useState<{ id: string; name: string; email: string } | null>(null)
   const [prefs, setPrefs] = useState<Prefs | null>(null)
+  const [homeLocation, setHomeLocation] = useState('')
+  const [savingHomeLocation, setSavingHomeLocation] = useState(false)
   const [loading, setLoading] = useState(true)
   const { notif, notify } = useNotify()
 
@@ -91,6 +94,7 @@ export default function SettingsPage() {
         if (res.ok) {
           const data = await res.json()
           setPrefs(data)
+          setHomeLocation(data.homeLocation || '')
         }
       } catch { /* ignore */ }
 
@@ -184,6 +188,25 @@ export default function SettingsPage() {
     } catch {
       setPrefs(prefs) // revert
     }
+  }
+
+  const handleSaveHomeLocation = async () => {
+    setSavingHomeLocation(true)
+    try {
+      const res = await fetch('/api/user/preferences', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ homeLocation: homeLocation.trim() || null }),
+      })
+      if (res.ok) {
+        notify('Home location saved', 'success')
+      } else {
+        notify('Failed to save home location', 'error')
+      }
+    } catch {
+      notify('Failed to save home location', 'error')
+    }
+    setSavingHomeLocation(false)
   }
 
   const handleDeleteAccount = async () => {
@@ -290,6 +313,29 @@ export default function SettingsPage() {
                   A verification email will be sent to the new address.
                 </div>
               )}
+            </div>
+
+            {/* Home Location */}
+            <div className="rounded-sm border border-border bg-card p-4">
+              <div className="mb-3 text-xs font-medium">Home Location</div>
+              <div className="flex gap-2">
+                <input
+                  value={homeLocation}
+                  onChange={(e) => setHomeLocation(e.target.value)}
+                  className="flex-1 rounded-sm border border-border bg-background px-3 py-1.5 text-xs outline-none focus:border-foreground/50"
+                  placeholder="e.g. Bangna, Bangkok"
+                />
+                <button
+                  onClick={handleSaveHomeLocation}
+                  disabled={savingHomeLocation}
+                  className="rounded-sm bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground transition-opacity hover:opacity-90 disabled:opacity-50"
+                >
+                  {savingHomeLocation ? <Loader2 size={13} className="animate-spin" /> : 'Save'}
+                </button>
+              </div>
+              <p className="mt-2 text-[10px] text-muted-foreground">
+                Used for commute directions and travel price estimates
+              </p>
             </div>
 
             {/* Change Password */}

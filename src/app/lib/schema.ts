@@ -175,6 +175,7 @@ export const userPreferences = pgTable("user_preferences", {
   emailNotifications: boolean("email_notifications").default(true).notNull(),
   weeklyDigest: boolean("weekly_digest").default(false).notNull(),
   marketingEmails: boolean("marketing_emails").default(false).notNull(),
+  homeLocation: text("home_location"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().$onUpdate(() => new Date()).notNull(),
 });

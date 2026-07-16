@@ -15,6 +15,9 @@ import { Timeline } from './timeline'
 import { JobNotes } from './job-notes'
 import type { PipelineJob } from '~/types/resume'
 import { SmartOverview } from './smart-overview'
+import { AreaIntelligence } from './area-intelligence'
+import { CompanyIntelligence } from './company-intelligence'
+import { extractCity, detectCountry } from '~/lib/area-links'
 
 // ═══════════════════════════════════════════════════════════════
 // JobDetailPanel — slide-over panel showing everything about a job.
@@ -60,6 +63,17 @@ export function JobDetailPanel({
 
   const [status, setStatus] = useState(currentStatus || 'bookmarked')
   const [description, setDescription] = useState<string>('')
+  const [homeLocation, setHomeLocation] = useState<string>('')
+
+  // ── Load home location from user preferences ──
+  useEffect(() => {
+    fetch('/api/user/preferences')
+      .then(res => res.ok ? res.json() : null)
+      .then(data => {
+        if (data?.homeLocation) setHomeLocation(data.homeLocation)
+      })
+      .catch(() => {})
+  }, [])
 
   // ── Extract description from jobData or from job object ──
   useEffect(() => {
@@ -293,13 +307,27 @@ export function JobDetailPanel({
                 jobData: job.jobData,
               }}
               resumeData={activeResume as unknown as Record<string, unknown> | null}
-              homeLocation={undefined}
+              homeLocation={homeLocation}
               matchScore={job.score}
               matchedSkills={matchedSkills}
               missingSkills={missingSkills}
               applicationId={job.applicationId}
             />
           )}
+
+          {/* Area & Company Intelligence */}
+          {homeLocation && (
+            <AreaIntelligence
+              job={{ company: job.company, loc: job.loc, title: job.title }}
+              homeLocation={homeLocation}
+              city={extractCity(job.loc)}
+              countryCode={detectCountry(job.loc)}
+            />
+          )}
+          <CompanyIntelligence
+            company={job.company}
+            countryCode={detectCountry(job.loc)}
+          />
 
           {/* Matched Skills */}
           {matchedSkills.length > 0 && (

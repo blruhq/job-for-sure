@@ -9,6 +9,7 @@ const PrefsBody = z.object({
   emailNotifications: z.boolean().optional(),
   weeklyDigest: z.boolean().optional(),
   marketingEmails: z.boolean().optional(),
+  homeLocation: z.string().optional().nullable(),
 })
 
 export const GET = withAuth(async (_req, { user }) => {
@@ -25,9 +26,10 @@ export const GET = withAuth(async (_req, { user }) => {
       emailNotifications: true,
       weeklyDigest: false,
       marketingEmails: false,
+      homeLocation: '' as string | null,
     }
     await db.insert(userPreferences).values(defaults)
-    prefs = defaults as typeof prefs
+    prefs = defaults as unknown as typeof prefs
   }
 
   return NextResponse.json(prefs)
@@ -39,10 +41,11 @@ export const PUT = withAuth(async (req, { user }) => {
     return NextResponse.json({ error: 'Invalid preferences data' }, { status: 400 })
   }
 
-  const update: Record<string, boolean | Date> = { updatedAt: new Date() }
+  const update: Record<string, boolean | Date | string | null> = { updatedAt: new Date() }
   if (body.data.emailNotifications !== undefined) update.emailNotifications = body.data.emailNotifications
   if (body.data.weeklyDigest !== undefined) update.weeklyDigest = body.data.weeklyDigest
   if (body.data.marketingEmails !== undefined) update.marketingEmails = body.data.marketingEmails
+  if (body.data.homeLocation !== undefined) update.homeLocation = body.data.homeLocation
 
   await db
     .insert(userPreferences)
