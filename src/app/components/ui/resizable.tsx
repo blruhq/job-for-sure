@@ -28,15 +28,15 @@ export function ResizableHandle({ className, ...props }: SeparatorProps) {
   return (
     <Separator
       className={cn(
-        'group relative flex w-6 items-center justify-center transition-colors',
-        'bg-red-500/20 hover:bg-red-500/40',
-        'data-[separator=active]:bg-red-500/60',
+        'group relative flex w-3 items-center justify-center transition-colors cursor-col-resize',
+        'hover:bg-primary/10',
+        'data-[separator=active]:bg-primary/20',
         'hidden lg:flex',
         className,
       )}
       {...props}
     >
-      <div className="h-12 w-1 rounded-full bg-red-500 transition-colors" />
+      <div className="h-10 w-px bg-border transition-colors group-hover:bg-primary/60 group-data-[separator=active]:bg-primary" />
     </Separator>
   )
 }
