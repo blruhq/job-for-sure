@@ -333,7 +333,7 @@ export function JobDetailPanel({
 
               {/* Notes */}
               {job.applicationId && (
-                <JobNotes applicationId={job.applicationId} />
+                <JobNotes applicationId={job.applicationId} initialNotes={job.notes} />
               )}
             </>
           )}

@@ -41,6 +41,8 @@ function groupByStatus(apps: any[]): ApplicationBoard {
       url: app.jobUrl || '',
       resume: app.resumeId || '',
       addedAt: app.createdAt,
+      appliedAt: app.appliedAt,
+      notes: app.notes || '',
       salary: app.salary || '',
       jobData: app.jobData || undefined,
     }

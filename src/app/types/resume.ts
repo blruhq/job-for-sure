@@ -130,6 +130,8 @@ export interface PipelineJob {
   url: string
   resume: string
   addedAt: string
+  appliedAt?: string
+  notes?: string
   salary?: string
   jobData?: Record<string, unknown>
 }

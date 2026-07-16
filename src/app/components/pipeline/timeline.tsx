@@ -30,7 +30,7 @@ export function Timeline({ job, currentStatus }: { job: PipelineJob; currentStat
     events.push({
       icon: <Send size={11} />,
       label: 'Applied',
-      date: job.addedAt, // would ideally use appliedAt from DB; fallback to addedAt
+      date: job.appliedAt || job.addedAt,
       color: 'text-blue-500',
     })
   }
