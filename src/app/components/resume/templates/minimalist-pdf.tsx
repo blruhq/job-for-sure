@@ -2,6 +2,7 @@ import React from 'react'
 import { Document, Page, View, Text, StyleSheet } from '@react-pdf/renderer'
 import type { Resume } from '~/types/resume'
 import { registerFonts, COLORS } from './shared-pdf'
+import { renderPdfSections, type SectionStyleSet } from './render-sections'
 
 registerFonts()
 
@@ -118,146 +119,23 @@ export function MinimalistPDF({ resume }: { resume: Resume }) {
           </Text>
         </View>
 
-        {/* Summary */}
-        {resume.summary && (
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Summary</Text>
-            <Text style={styles.summary}>{resume.summary}</Text>
-          </View>
-        )}
-
-        {/* Education — FIRST for new grads */}
-        {resume.education && resume.education.length > 0 && (
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Education</Text>
-            {resume.education.map((edu, i) => (
-              <View key={i} style={styles.experienceBlock}>
-                <View style={styles.expHeader}>
-                  <Text style={styles.expRole}>{edu.institution}</Text>
-                  <Text style={styles.expDates}>{edu.dates}</Text>
-                </View>
-                <Text style={styles.expCompany}>
-                  {[edu.degree, edu.field].filter(Boolean).join(', ')}
-                </Text>
-              </View>
-            ))}
-          </View>
-        )}
-
-        {/* Skills */}
-        {resume.skills.length > 0 && (
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Skills</Text>
-            <View style={styles.skillsRow}>
-              {resume.skills.map((s, i) => (
-                <Text key={i} style={styles.skill}>{s}</Text>
-              ))}
-            </View>
-          </View>
-        )}
-
-        {/* Experience */}
-        {resume.experience && resume.experience.length > 0 && (
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Experience</Text>
-            {resume.experience.map((exp, i) => (
-              <View key={i} style={styles.experienceBlock}>
-                <View style={styles.expHeader}>
-                  <Text style={styles.expRole}>{exp.role}</Text>
-                  <Text style={styles.expDates}>{exp.dates}</Text>
-                </View>
-                <Text style={styles.expCompany}>{exp.company}</Text>
-                {exp.bullets.map((b, j) => (
-                  <Text key={j} style={styles.bullet}>• {b}</Text>
-                ))}
-              </View>
-            ))}
-          </View>
-        )}
-
-        {/* Projects */}
-        {resume.projects && resume.projects.length > 0 && (
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Projects</Text>
-            {resume.projects.map((proj, i) => (
-              <View key={i} style={styles.experienceBlock}>
-                <View style={styles.expHeader}>
-                  <Text style={styles.expRole}>
-                    {proj.name}{proj.link ? ` (${proj.link})` : ''}
-                  </Text>
-                </View>
-                <Text style={styles.summary}>{proj.description}</Text>
-                {proj.techStack && proj.techStack.length > 0 && (
-                  <Text style={styles.projectTech}>
-                    Tech Stack: {proj.techStack.join(', ')}
-                  </Text>
-                )}
-              </View>
-            ))}
-          </View>
-        )}
-
-        {/* Certifications */}
-        {resume.certifications && resume.certifications.length > 0 && (
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Certifications</Text>
-            {resume.certifications.map((cert, i) => (
-              <View key={i} style={{ marginBottom: 2 }}>
-                <View style={styles.expHeader}>
-                  <Text style={{ fontWeight: 600, fontSize: 9 }}>
-                    {cert.name} ({cert.issuer})
-                  </Text>
-                  <Text style={styles.expDates}>{cert.date}</Text>
-                </View>
-              </View>
-            ))}
-          </View>
-        )}
-
-        {/* Languages */}
-        {resume.languages && resume.languages.length > 0 && (
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Languages</Text>
-            <View style={styles.languagesRow}>
-              {resume.languages.map((lang, i) => (
-                <Text key={i} style={styles.langText}>
-                  {lang.name} ({lang.proficiency})
-                </Text>
-              ))}
-            </View>
-          </View>
-        )}
-
-        {/* Custom Sections */}
-        {resume.customSections && resume.customSections.map((sec, i) => (
-          <View key={i} style={styles.section}>
-            <Text style={styles.sectionTitle}>{sec.title}</Text>
-            {sec.items && sec.items.length > 0 ? (
-              sec.items.map((item, j) => (
-                <View key={j} style={{ marginBottom: 4 }}>
-                  {(item.title || item.subtitle) && (
-                    <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                      <Text style={{ fontSize: 9, fontFamily: 'Inter', fontWeight: 600, color: COLORS.ink }}>
-                        {item.title}{item.subtitle ? ` — ${item.subtitle}` : ''}
-                      </Text>
-                      {item.date ? <Text style={{ fontSize: 8, fontFamily: 'JetBrains Mono', color: COLORS.muted }}>{item.date}</Text> : null}
-                    </View>
-                  )}
-                  {item.description ? (
-                    <Text style={{ fontSize: 9, fontFamily: 'Inter', color: COLORS.muted }}>• {item.description}</Text>
-                  ) : null}
-                  {item.link ? (
-                    <Text style={{ fontSize: 8, color: '#5B6ABF' }}>{item.link}</Text>
-                  ) : null}
-                </View>
-              ))
-            ) : (
-              sec.bullets.map((b, j) => (
-                <Text key={j} style={styles.bullet}>• {b}</Text>
-              ))
-            )}
-          </View>
-        ))}
+        {/* Dynamic sections — order controlled by resume.sectionOrder */}
+        {renderPdfSections(resume, {
+          section: styles.section,
+          sectionTitle: styles.sectionTitle,
+          summary: styles.summary,
+          experienceBlock: styles.experienceBlock,
+          expHeader: styles.expHeader,
+          expRole: styles.expRole,
+          expDates: styles.expDates,
+          expCompany: styles.expCompany,
+          bullet: styles.bullet,
+          skillsRow: styles.skillsRow,
+          skill: styles.skill,
+          languagesRow: styles.languagesRow,
+          langText: styles.langText,
+          projectTech: styles.projectTech,
+        })}
       </Page>
     </Document>
   )

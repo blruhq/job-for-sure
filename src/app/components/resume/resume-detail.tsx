@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback, useMemo, useDeferredValue } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { ArrowLeft, Wand2, Download, Trash2, Plus, X, PlusCircle, Lightbulb, GripVertical, ChevronDown, ChevronUp, Sparkles } from 'lucide-react'
+import { ArrowLeft, Wand2, Download, Trash2, Plus, X, PlusCircle, Lightbulb, GripVertical, ChevronDown, ChevronUp, Sparkles, Eye, EyeOff } from 'lucide-react'
 import {
   DndContext,
   PointerSensor,
@@ -33,6 +33,7 @@ import { TemplateGallery } from '~/components/resume/templates/template-gallery'
 import { DEFAULT_TEMPLATE, getTemplateMeta } from '~/components/resume/templates/registry'
 import { ResumePreview } from '~/components/resume/resume-preview'
 import { TailorReviewPanel } from '~/components/resume/tailor-review-panel'
+import { ResizableGroup, ResizablePanel, ResizableHandle, useDefaultLayout } from '~/components/ui/resizable'
 
 // ── Helpers ──
 
@@ -302,7 +303,17 @@ type EditorSectionId = 'basic' | 'summary' | 'skills' | 'experience' | 'educatio
 
 const ALL_EDITOR_SECTIONS: EditorSectionId[] = ['basic', 'summary', 'skills', 'experience', 'education', 'projects', 'certifications', 'languages', 'custom']
 
-function SortableSection({ id, children }: { id: string; children: React.ReactNode }) {
+function SortableSection({
+  id,
+  isVisible = true,
+  onToggleVisible,
+  children,
+}: {
+  id: string
+  isVisible?: boolean
+  onToggleVisible?: () => void
+  children: React.ReactNode
+}) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id })
 
   return (
@@ -325,9 +336,19 @@ function SortableSection({ id, children }: { id: string; children: React.ReactNo
         >
           <GripVertical size={14} />
         </button>
-        <div className="flex-1 min-w-0">
+        <div className={cn('flex-1 min-w-0 transition-opacity', !isVisible && 'opacity-40')}>
           {children}
         </div>
+        {onToggleVisible && id !== 'basic' && (
+          <button
+            type="button"
+            onClick={onToggleVisible}
+            className="mt-1.5 shrink-0 cursor-pointer text-muted-foreground/50 opacity-0 group-hover/section:opacity-100 transition-all hover:text-foreground"
+            title={isVisible ? 'Hide from PDF' : 'Show in PDF'}
+          >
+            {isVisible ? <Eye size={13} /> : <EyeOff size={13} />}
+          </button>
+        )}
       </div>
     </div>
   )
@@ -337,12 +358,17 @@ function SortableSection({ id, children }: { id: string; children: React.ReactNo
 
 export function ResumeDetail({ resumeId }: { resumeId: string }) {
   const router = useRouter()
-  const { getResume, addResume, setActiveResumeId, deleteResume, updateResume, pendingTailor: storePendingTailor, setPendingTailor, addVariantResume } = useAppStore()
+  const { getResume, addResume, setActiveResumeId, deleteResume, updateResume, pendingTailor: storePendingTailor, setPendingTailor, addVariantResume, hydrated } = useAppStore()
   const [tab, setTab] = useState<'jobs' | 'view' | 'editor' | 'cover-letter'>('jobs')
   const searchParams = useSearchParams()
   const [galleryOpen, setGalleryOpen] = useState(false)
   const [showDeleteDialog, setShowDeleteDialog] = useState(false)
   const [deleting, setDeleting] = useState(false)
+
+  const { defaultLayout, onLayoutChanged } = useDefaultLayout({
+    id: 'resume-editor-panels',
+    storage: typeof window !== 'undefined' ? window.localStorage : undefined,
+  })
 
   const resume = getResume(resumeId)
 
@@ -367,7 +393,56 @@ export function ResumeDetail({ resumeId }: { resumeId: string }) {
   const [suggestionDismissed, setSuggestionDismissed] = useState(false)
   const [showAddSectionPicker, setShowAddSectionPicker] = useState(false)
   const suggestionAnalysed = useRef(false)
-  const [sectionOrder, setSectionOrder] = useState<EditorSectionId[]>([...ALL_EDITOR_SECTIONS])
+  const [sectionOrder, setSectionOrder] = useState<EditorSectionId[]>(resume?.sectionOrder as EditorSectionId[] ?? [...ALL_EDITOR_SECTIONS])
+  const [sectionVisibility, setSectionVisibility] = useState<Record<string, boolean>>(resume?.sectionVisibility ?? {})
+  const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved'>('idle')
+  const [mobileView, setMobileView] = useState<'edit' | 'preview'>('edit')
+
+  const lastSavedSnapshotRef = useRef<string>('')
+  const lastSyncedId = useRef<string | null>(null)
+
+  // ── Re-sync editor state when resume data loads (hydration fix) ──
+  useEffect(() => {
+    if (!hydrated || !resume || lastSyncedId.current === resume.id) return
+    lastSyncedId.current = resume.id
+    setEditName(resume.name ?? '')
+    setEditPersona(resume.persona ?? '')
+    setEditEmail(resume.email ?? '')
+    setEditLocation(resume.location ?? '')
+    setEditPhone(resume.phone ?? '')
+    setEditGithub(resume.github ?? '')
+    setEditRole(resume.role ?? '')
+    setEditSummary(resume.summary ?? '')
+    setEditSkillsArr(resume.skills ?? [])
+    setEditExperiences(resume.experience ?? [])
+    setEditEducations(resume.education ?? [])
+    setEditProjectsArr(resume.projects ?? [])
+    setEditCertifications(resume.certifications ?? [])
+    setEditLanguages(resume.languages ?? [])
+    setEditCustomSections(resume.customSections ?? [])
+    setSectionOrder(resume.sectionOrder as EditorSectionId[] ?? [...ALL_EDITOR_SECTIONS])
+    setSectionVisibility(resume.sectionVisibility ?? {})
+
+    lastSavedSnapshotRef.current = JSON.stringify({
+      name: resume.name ?? '',
+      persona: resume.persona ?? '',
+      role: resume.role ?? '',
+      email: resume.email ?? '',
+      phone: resume.phone ?? '',
+      location: resume.location ?? '',
+      github: resume.github ?? '',
+      summary: resume.summary ?? '',
+      skills: resume.skills ?? [],
+      experience: resume.experience ?? [],
+      education: resume.education ?? [],
+      projects: resume.projects ?? [],
+      certifications: resume.certifications ?? [],
+      languages: resume.languages ?? [],
+      customSections: resume.customSections ?? [],
+      sectionOrder: resume.sectionOrder ?? [...ALL_EDITOR_SECTIONS],
+      sectionVisibility: resume.sectionVisibility ?? {},
+    })
+  }, [hydrated, resume])
 
   const sectionSensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
@@ -382,6 +457,13 @@ export function ResumeDetail({ resumeId }: { resumeId: string }) {
     if (oldIndex === -1 || newIndex === -1) return
     setSectionOrder(arrayMove(sectionOrder, oldIndex, newIndex))
   }
+
+  const toggleSectionVisibility = useCallback((sectionId: EditorSectionId) => {
+    setSectionVisibility(prev => ({
+      ...prev,
+      [sectionId]: prev[sectionId] === false ? true : false,
+    }))
+  }, [])
 
   // ── Editor sections: visible filtered by sectionOrder ──
   const visibleEditorSections = sectionOrder.filter((id) => {
@@ -762,22 +844,101 @@ export function ResumeDetail({ resumeId }: { resumeId: string }) {
     certifications: editCertifications,
     languages: editLanguages,
     customSections: editCustomSections,
+    sectionOrder,
+    sectionVisibility,
   }), [
     resume,
     editName, editPersona, editRole, editEmail, editPhone, editLocation, editGithub,
     editSummary, editSkillsArr, editExperiences, editEducations, editProjectsArr,
     editCertifications, editLanguages, editCustomSections,
+    sectionOrder, sectionVisibility,
   ])
 
   // Debounce the preview with useDeferredValue — keeps typing responsive
   // The PDF re-renders ~200-500ms, so we let React schedule it during idle
   const deferredResume = useDeferredValue(liveResume)
 
-  // ── Co-Pilot drawer state ──
-  const [copilotOpen, setCopilotOpen] = useState(false)
-
   // ── Tailor review mode ──
   const isReviewMode = storePendingTailor !== null && storePendingTailor.baseResumeId === resumeId
+
+  // ── Debounced autosave ──
+  const autosaveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  useEffect(() => {
+    if (!hydrated || !resume || isReviewMode) return
+
+    // Serialize current state to detect changes
+    const snapshot = JSON.stringify({
+      name: editName,
+      persona: editPersona,
+      role: editRole,
+      email: editEmail,
+      phone: editPhone,
+      location: editLocation,
+      github: editGithub,
+      summary: editSummary,
+      skills: editSkillsArr,
+      experience: editExperiences,
+      education: editEducations,
+      projects: editProjectsArr,
+      certifications: editCertifications,
+      languages: editLanguages,
+      customSections: editCustomSections,
+      sectionOrder,
+      sectionVisibility,
+    })
+
+    // No changes since last save
+    if (snapshot === lastSavedSnapshotRef.current) return
+
+    // Mark as dirty/saving
+    if (saveStatus === 'idle') setSaveStatus('saving')
+
+    // Clear previous timer
+    if (autosaveTimerRef.current) clearTimeout(autosaveTimerRef.current)
+
+    // Debounce: save 1.5s after last change
+    autosaveTimerRef.current = setTimeout(() => {
+      lastSavedSnapshotRef.current = snapshot
+      setSaveStatus('saving')
+      updateResume(resume.id, {
+        name: editName,
+        persona: editPersona,
+        role: editRole,
+        email: editEmail,
+        phone: editPhone,
+        location: editLocation,
+        github: editGithub,
+        summary: editSummary,
+        skills: editSkillsArr,
+        experience: editExperiences,
+        education: editEducations,
+        projects: editProjectsArr,
+        certifications: editCertifications,
+        languages: editLanguages,
+        customSections: editCustomSections,
+        sectionOrder,
+        sectionVisibility,
+      })
+      setSaveStatus('saved')
+
+      // Reset to idle after 3s
+      setTimeout(() => setSaveStatus('idle'), 3000)
+    }, 1500)
+
+    return () => {
+      if (autosaveTimerRef.current) clearTimeout(autosaveTimerRef.current)
+    }
+  }, [
+    hydrated, resume, isReviewMode,
+    editName, editPersona, editRole, editEmail, editPhone, editLocation, editGithub,
+    editSummary, editSkillsArr, editExperiences, editEducations, editProjectsArr,
+    editCertifications, editLanguages, editCustomSections,
+    sectionOrder, sectionVisibility,
+  ])
+
+  // ── Co-Pilot drawer state ──
+  const [copilotOpen, setCopilotOpen] = useState(false)
 
   const handleApplyTailor = (variant: Resume) => {
     addVariantResume(variant)
@@ -792,7 +953,9 @@ export function ResumeDetail({ resumeId }: { resumeId: string }) {
   }
 
   const handleAddSection = useCallback((section: SectionKey) => {
-    if (section === 'certifications') {
+    if (section === 'projects') {
+      setEditProjectsArr((prev) => [...prev, { name: '', description: '', techStack: [], link: '' }])
+    } else if (section === 'certifications') {
       setEditCertifications((prev) => [...prev, { name: '', issuer: '', date: '' }])
     } else if (section === 'languages') {
       setEditLanguages((prev) => [...prev, { name: '', proficiency: '' }])
@@ -847,6 +1010,17 @@ export function ResumeDetail({ resumeId }: { resumeId: string }) {
     return result
   }, [storePendingTailor])
 
+  if (!hydrated) {
+    return (
+      <div className="flex flex-1 items-center justify-center text-sm text-muted-foreground">
+        <div className="flex flex-col items-center gap-2">
+          <div className="h-6 w-6 animate-spin rounded-full border-2 border-border border-t-primary" />
+          <span>Loading resume…</span>
+        </div>
+      </div>
+    )
+  }
+
   if (!resume) {
     return (
       <div className="flex flex-1 items-center justify-center text-sm text-muted-foreground">
@@ -872,6 +1046,8 @@ export function ResumeDetail({ resumeId }: { resumeId: string }) {
       certifications: editCertifications,
       languages: editLanguages,
       customSections: editCustomSections,
+      sectionOrder,
+      sectionVisibility,
     })
     notify({ message: 'Resume saved', type: 'success' })
   }
@@ -1032,117 +1208,205 @@ export function ResumeDetail({ resumeId }: { resumeId: string }) {
 
         {/* ── Tab 4: Resume Editor ── */}
         {tab === 'editor' && !isReviewMode && (
-          <div className="flex w-full flex-col lg:flex-row">
-            {/* Form editor (left) */}
-            <div className="flex w-full lg:w-[55%] flex-col gap-3 overflow-y-auto border-r border-border p-4 md:p-6">
-              {/* Toolbar */}
-              <div className="flex items-center justify-between rounded-sm border border-border bg-card p-2 px-3">
-                <div className="flex gap-2">
-                  <button onClick={saveChanges} className="flex items-center gap-1 rounded-sm bg-primary px-2.5 py-1 text-[11px] font-medium text-primary-foreground transition-opacity hover:opacity-90">
-                    <Download size={11} /> Save Changes
-                  </button>
-                  <button onClick={() => {
-                    const copy = { ...resume, id: String(Date.now()), name: `${resume.name} (Copy)`, updated: 'just now' }
-                    addResume(copy)
-                    setActiveResumeId(copy.id)
-                    notify({ message: 'Resume cloned', type: 'success' })
-                  }} className="flex cursor-pointer items-center gap-1 rounded-sm border border-border bg-card px-2.5 py-1 text-[11px] hover:bg-muted">
-                    Save as New
-                  </button>
-                  <button onClick={handleOptimize} disabled={optimizing} className="flex cursor-pointer items-center gap-1 rounded-sm border border-border bg-card px-2.5 py-1 text-[11px] hover:bg-muted disabled:opacity-50">
-                    <Wand2 size={11} /> {optimizing ? 'Optimizing…' : 'AI Optimize'}
-                  </button>
-                </div>
-                {/* Co-Pilot toggle button */}
-                <button
-                  onClick={() => setCopilotOpen(true)}
-                  className={cn(
-                    'flex cursor-pointer items-center gap-1 rounded-sm border border-border bg-card px-2.5 py-1 text-[11px] hover:bg-muted',
-                    copilotOpen && 'opacity-50',
-                  )}
-                >
-                  <Sparkles size={11} /> Co-Pilot
-                </button>
-              </div>
+          <>
+            {/* Mobile tab toggle */}
+            <div className="flex shrink-0 border-b border-border bg-card lg:hidden">
+              <button
+                onClick={() => setMobileView('edit')}
+                className={cn('flex-1 py-2 text-[11px] font-medium transition-all', mobileView === 'edit' ? 'border-b-2 border-primary text-foreground font-semibold' : 'text-muted-foreground')}
+              >
+                ✏️ Edit
+              </button>
+              <button
+                onClick={() => setMobileView('preview')}
+                className={cn('flex-1 py-2 text-[11px] font-medium transition-all', mobileView === 'preview' ? 'border-b-2 border-primary text-foreground font-semibold' : 'text-muted-foreground')}
+              >
+                📄 Preview
+              </button>
+            </div>
 
-              {/* Form body */}
-              <div className="resume-paper flex-1 rounded-xs p-6" style={{ fontFamily: 'var(--font-sans)', fontSize: '12px' }}>
-                <div className="flex flex-col gap-3">
+            {/* Desktop: resizable panels */}
+            <div className="hidden lg:flex flex-1 min-h-0">
+              <ResizableGroup direction="horizontal" defaultLayout={defaultLayout} onLayoutChanged={onLayoutChanged}>
+                {/* Form editor (left) */}
+                <ResizablePanel defaultSize={55} minSize={30} maxSize={80}>
+                  <div className="flex h-full flex-col gap-3 overflow-y-auto p-4 md:p-6">
+                    {/* Toolbar */}
+                    <div className="flex items-center justify-between rounded-sm border border-border bg-card p-2 px-3 shrink-0">
+                      <div className="flex gap-2">
+                        {/* Save status indicator */}
+                        <div className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
+                          {saveStatus === 'saving' && (
+                            <>
+                              <div className="h-2.5 w-2.5 animate-spin rounded-full border border-border border-t-primary" />
+                              <span>Saving…</span>
+                            </>
+                          )}
+                          {saveStatus === 'saved' && (
+                            <>
+                              <div className="h-2 w-2 rounded-full bg-green-500" />
+                              <span className="text-green-600 font-medium">Saved</span>
+                            </>
+                          )}
+                          {saveStatus === 'idle' && (
+                            <>
+                              <div className="h-2 w-2 rounded-full bg-muted-foreground/30" />
+                              <span>Auto-saved</span>
+                            </>
+                          )}
+                        </div>
+                      </div>
+                      <div className="flex gap-2">
+                        <button onClick={() => {
+                          const copy = { ...resume, id: String(Date.now()), name: `${resume.name} (Copy)`, updated: 'just now' }
+                          addResume(copy)
+                          setActiveResumeId(copy.id)
+                          notify({ message: 'Resume cloned', type: 'success' })
+                        }} className="flex cursor-pointer items-center gap-1 rounded-sm border border-border bg-card px-2.5 py-1 text-[11px] hover:bg-muted">
+                          Save as New
+                        </button>
+                        <button onClick={handleOptimize} disabled={optimizing} className="flex cursor-pointer items-center gap-1 rounded-sm border border-border bg-card px-2.5 py-1 text-[11px] hover:bg-muted disabled:opacity-50">
+                          <Wand2 size={11} /> {optimizing ? 'Optimizing…' : 'AI Optimize'}
+                        </button>
+                        <button
+                          onClick={() => setCopilotOpen(true)}
+                          className={cn('flex cursor-pointer items-center gap-1 rounded-sm border border-border bg-card px-2.5 py-1 text-[11px] hover:bg-muted', copilotOpen && 'opacity-50')}
+                        >
+                          <Sparkles size={11} /> Co-Pilot
+                        </button>
+                      </div>
+                    </div>
 
-                  {/* Section suggestion banner */}
-                  {!suggestionDismissed && (
-                    <SectionSuggestionBanner
-                      suggestions={suggestions}
-                      onAdd={handleAddSection}
-                      onDismiss={() => setSuggestionDismissed(true)}
-                    />
-                  )}
+                    {/* Form body */}
+                    <div className="resume-paper flex-1 rounded-xs p-6" style={{ fontFamily: 'var(--font-sans)', fontSize: '12px' }}>
+                      <div className="flex flex-col gap-3">
+                        {/* Section suggestion banner */}
+                        {!suggestionDismissed && (
+                          <SectionSuggestionBanner
+                            suggestions={suggestions}
+                            onAdd={handleAddSection}
+                            onDismiss={() => setSuggestionDismissed(true)}
+                          />
+                        )}
 
-                  {/* ── Sortable sections ── */}
-                  <DndContext sensors={sectionSensors} collisionDetection={pointerWithin} onDragEnd={handleSectionDragEnd}>
-                    <SortableContext items={visibleEditorSections} strategy={verticalListSortingStrategy}>
-                      {visibleEditorSections.map((id) => (
-                        <SortableSection key={id} id={id}>
-                          {renderEditorSection(id)}
-                        </SortableSection>
-                      ))}
-                    </SortableContext>
-                  </DndContext>
+                        {/* Sortable sections */}
+                        <DndContext sensors={sectionSensors} collisionDetection={pointerWithin} onDragEnd={handleSectionDragEnd}>
+                          <SortableContext items={visibleEditorSections} strategy={verticalListSortingStrategy}>
+                            {visibleEditorSections.map((id) => (
+                              <SortableSection
+                                key={id}
+                                id={id}
+                                isVisible={sectionVisibility[id] !== false}
+                                onToggleVisible={() => toggleSectionVisibility(id)}
+                              >
+                                {renderEditorSection(id)}
+                              </SortableSection>
+                            ))}
+                          </SortableContext>
+                        </DndContext>
 
-                  {/* + Add Section button */}
-                  {availableSections.length > 0 && (
-                    <div className="relative border-t border-border/50 pt-3">
-                      <button
-                        type="button"
-                        onClick={() => setShowAddSectionPicker(!showAddSectionPicker)}
-                        className="flex cursor-pointer items-center gap-1 rounded-xs border border-dashed border-border bg-transparent px-3 py-2 text-[11px] text-muted-foreground hover:border-primary hover:text-primary transition-all w-full justify-center"
-                      >
-                        <PlusCircle size={13} /> Add Section
-                      </button>
-                      {showAddSectionPicker && (
-                        <div className="absolute left-0 right-0 top-full z-10 mt-1 rounded-xs border border-border bg-card shadow-lg">
-                          {availableSections.map((s) => (
+                        {/* + Add Section button */}
+                        {availableSections.length > 0 && (
+                          <div className="relative border-t border-border/50 pt-3">
                             <button
-                              key={s}
                               type="button"
-                              onClick={() => {
-                                handleAddSection(s)
-                                setShowAddSectionPicker(false)
-                              }}
-                              className="flex w-full cursor-pointer items-center gap-2 px-3 py-2 text-[11px] text-left text-foreground hover:bg-muted"
+                              onClick={() => setShowAddSectionPicker(!showAddSectionPicker)}
+                              className="flex cursor-pointer items-center gap-1 rounded-xs border border-dashed border-border bg-transparent px-3 py-2 text-[11px] text-muted-foreground hover:border-primary hover:text-primary transition-all w-full justify-center"
                             >
-                              <span>{SECTION_ICONS[s]}</span>
-                              <span>{SECTION_LABELS[s]}</span>
+                              <PlusCircle size={13} /> Add Section
                             </button>
+                            {showAddSectionPicker && (
+                              <div className="absolute left-0 right-0 top-full z-10 mt-1 rounded-xs border border-border bg-card shadow-lg">
+                                {availableSections.map((s) => (
+                                  <button
+                                    key={s}
+                                    type="button"
+                                    onClick={() => { handleAddSection(s); setShowAddSectionPicker(false) }}
+                                    className="flex w-full cursor-pointer items-center gap-2 px-3 py-2 text-[11px] text-left text-foreground hover:bg-muted"
+                                  >
+                                    <span>{SECTION_ICONS[s]}</span>
+                                    <span>{SECTION_LABELS[s]}</span>
+                                  </button>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </ResizablePanel>
+
+                <ResizableHandle />
+
+                {/* Live PDF preview (right) */}
+                <ResizablePanel defaultSize={45} minSize={20} maxSize={70} collapsible={true} collapsedSize={0}>
+                  <div className="h-full bg-muted/30">
+                    <ResumePreview resume={deferredResume} />
+                  </div>
+                </ResizablePanel>
+              </ResizableGroup>
+            </div>
+
+            {/* Mobile: editor OR preview (one at a time) */}
+            <div className="flex-1 overflow-y-auto lg:hidden">
+              {mobileView === 'edit' && (
+                <div className="flex flex-col gap-3 p-4">
+                  {/* Toolbar — simplified for mobile */}
+                  <div className="flex items-center justify-between rounded-sm border border-border bg-card p-2 px-3 shrink-0">
+                    <div className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
+                      {saveStatus === 'saving' && <span>Saving…</span>}
+                      {saveStatus === 'saved' && <span className="text-green-600">Saved</span>}
+                      {saveStatus === 'idle' && <span>Auto-saved</span>}
+                    </div>
+                    <button onClick={handleOptimize} disabled={optimizing} className="flex cursor-pointer items-center gap-1 rounded-sm border border-border bg-card px-2 py-1 text-[11px] hover:bg-muted disabled:opacity-50">
+                      <Wand2 size={11} /> {optimizing ? '…' : 'AI'}
+                    </button>
+                  </div>
+
+                  {/* Form body */}
+                  <div className="resume-paper rounded-xs p-4" style={{ fontFamily: 'var(--font-sans)', fontSize: '12px' }}>
+                    <div className="flex flex-col gap-3">
+                      {!suggestionDismissed && (
+                        <SectionSuggestionBanner suggestions={suggestions} onAdd={handleAddSection} onDismiss={() => setSuggestionDismissed(true)} />
+                      )}
+                      <DndContext sensors={sectionSensors} collisionDetection={pointerWithin} onDragEnd={handleSectionDragEnd}>
+                        <SortableContext items={visibleEditorSections} strategy={verticalListSortingStrategy}>
+                          {visibleEditorSections.map((id) => (
+                            <SortableSection key={id} id={id} isVisible={sectionVisibility[id] !== false} onToggleVisible={() => toggleSectionVisibility(id)}>
+                              {renderEditorSection(id)}
+                            </SortableSection>
                           ))}
+                        </SortableContext>
+                      </DndContext>
+                      {availableSections.length > 0 && (
+                        <div className="relative border-t border-border/50 pt-3">
+                          <button type="button" onClick={() => setShowAddSectionPicker(!showAddSectionPicker)} className="flex cursor-pointer items-center gap-1 rounded-xs border border-dashed border-border bg-transparent px-3 py-2 text-[11px] text-muted-foreground hover:border-primary hover:text-primary transition-all w-full justify-center">
+                            <PlusCircle size={13} /> Add Section
+                          </button>
+                          {showAddSectionPicker && (
+                            <div className="absolute left-0 right-0 top-full z-10 mt-1 rounded-xs border border-border bg-card shadow-lg">
+                              {availableSections.map((s) => (
+                                <button key={s} type="button" onClick={() => { handleAddSection(s); setShowAddSectionPicker(false) }} className="flex w-full cursor-pointer items-center gap-2 px-3 py-2 text-[11px] text-left text-foreground hover:bg-muted">
+                                  <span>{SECTION_ICONS[s]}</span>
+                                  <span>{SECTION_LABELS[s]}</span>
+                                </button>
+                              ))}
+                            </div>
+                          )}
                         </div>
                       )}
                     </div>
-                  )}
+                  </div>
                 </div>
-              </div>
-            </div>
-
-            {/* Live PDF preview (right) — hidden on mobile */}
-            <div className="hidden lg:flex w-[45%] min-w-[350px] flex-col bg-muted/30">
-              <div className="flex-1 min-h-0">
-                <ResumePreview resume={deferredResume} />
-              </div>
-            </div>
-
-            {/* Mobile PDF toggle (visible below lg) */}
-            <div className="lg:hidden border-t border-border">
-              <details className="group">
-                <summary className="flex cursor-pointer items-center justify-between px-4 py-2 text-[11px] font-medium text-muted-foreground hover:text-foreground list-none">
-                  <span>Preview PDF</span>
-                  <ChevronDown size={14} className="transition-transform group-open:rotate-180" />
-                </summary>
-                <div className="h-[500px] border-t border-border">
+              )}
+              {mobileView === 'preview' && (
+                <div className="h-full bg-muted/30 min-h-[600px]">
                   <ResumePreview resume={deferredResume} />
                 </div>
-              </details>
+              )}
             </div>
-          </div>
+          </>
         )}
 
         {/* ── Co-Pilot Drawer (overlay, slides over the PDF) ── */}

@@ -97,7 +97,26 @@ export interface Resume {
   baseResumeId?: string       // ID of parent resume if this is a tailored variant
   isVariant?: boolean         // True if this resume is a tailored variant (not a base)
   variantLabel?: string       // Display label, e.g. "Tailored for Google — SWE"
+  // ── Editor layout state (V2) ──
+  sectionOrder?: string[]              // Ordered section IDs for PDF rendering + editor DnD
+  sectionVisibility?: Record<string, boolean>  // Section ID → visible in PDF. Missing = true.
 }
+
+// Default section order — used when resume.sectionOrder is missing
+export const DEFAULT_SECTION_ORDER: string[] = [
+  'summary',
+  'education',
+  'skills',
+  'experience',
+  'projects',
+  'certifications',
+  'languages',
+  'custom',
+]
+
+// Sections that appear in the editor's left panel but NOT in the PDF body
+// (basic info is always rendered in the PDF header, not as a section)
+export const NON_PDF_SECTIONS = ['basic'] as const
 
 export interface PipelineJob {
   key: string
