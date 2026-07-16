@@ -133,7 +133,7 @@ export function LocationAutocomplete({
   // 4. Handle selection
   const handleSelect = (item: typeof suggestions[number]) => {
     if (item.type === 'remote') {
-      onChange('')
+      onChange('Remote')
       onSelectCountryCode('')
       onSelectRemoteOnly(true)
     } else {
@@ -401,7 +401,7 @@ Right below the state declarations for `query` and `location` (line 85-86):
 ```
 
 ### 3c. Update the fetch body in `handleSearch` (line 238 and line 271)
-Pass the `countryCode` to the API calls:
+Pass the `countryCode` to the API calls and filter out "Remote" string when sending to backend:
 ```typescript
       // ── Phase 1 API Call (around line 238) ──
       const fastRes = await fetch('/api/jobs/search', {
@@ -409,7 +409,7 @@ Pass the `countryCode` to the API calls:
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           query: searchQuery,
-          location: (loc ?? location).trim() || undefined,
+          location: (loc ?? location)?.trim().toLowerCase() === 'remote' ? undefined : (loc ?? location)?.trim() || undefined,
           countryCode: countryCode || undefined, // ← PASS STATE
           skills: resume.skills,
           role: resume.role,
@@ -427,7 +427,7 @@ And similarly for Phase 2 (around line 271):
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           query: searchQuery,
-          location: (loc ?? location).trim() || undefined,
+          location: (loc ?? location)?.trim().toLowerCase() === 'remote' ? undefined : (loc ?? location)?.trim() || undefined,
           countryCode: countryCode || undefined, // ← PASS STATE
           skills: resume.skills,
           role: resume.role,
