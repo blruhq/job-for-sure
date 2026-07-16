@@ -4,8 +4,10 @@ import { useState, useEffect } from 'react'
 import { useRouter } from '~/i18n/routing'
 import Link from 'next/link'
 import { FileText, Brain, KanbanSquare, CheckSquare, MessageSquare, Plus, ArrowRight, Mail } from 'lucide-react'
-import { useAppStore } from '~/lib/store'
+import { useResumes } from '~/hooks/use-resumes'
+import { useApplications } from '~/hooks/use-apps'
 import { Skeleton } from '~/components/ui/skeleton'
+import { EMPTY_APPLICATIONS } from '~/lib/constants'
 import { cn } from '~/lib/utils'
 import { authClient } from '~/lib/auth-client'
 import { useTranslations } from 'next-intl'
@@ -13,7 +15,9 @@ import { useTranslations } from 'next-intl'
 export function DashboardView() {
   const router = useRouter()
   const t = useTranslations('dashboard')
-  const { resumes, applications, loading, hydrated } = useAppStore()
+  const { data: resumes = [], isLoading: resumesLoading } = useResumes()
+  const { data: applicationsData } = useApplications()
+  const applications = applicationsData ?? EMPTY_APPLICATIONS
   const [userName, setUserName] = useState('')
   const [lastInterviewScore, setLastInterviewScore] = useState<number | null>(null)
 
@@ -65,7 +69,7 @@ export function DashboardView() {
   const firstResumeWithCoverLetter = resumes.find((r) => r.coverLetter)
 
   // Loading State
-  if (loading || !hydrated) {
+  if (resumesLoading) {
     return (
       <div className="flex-1 overflow-y-auto p-6 bg-background">
         <div className="mx-auto max-w-[900px] space-y-6">

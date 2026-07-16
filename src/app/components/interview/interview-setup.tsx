@@ -4,7 +4,9 @@ import { useState, useEffect } from 'react'
 import { useRouter } from '~/i18n/routing'
 import { useSearchParams } from 'next/navigation'
 import { Brain, FileText, ArrowRight, Loader2, Sparkles, Clock, Trash2 } from 'lucide-react'
-import { useAppStore } from '~/lib/store'
+import { useActiveResume } from '~/hooks/use-active-resume'
+import { useApplications } from '~/hooks/use-apps'
+import { useUIStore } from '~/hooks/use-ui'
 import { ConfirmDialog } from '~/components/ui/confirm-dialog'
 import { notify } from '~/lib/toast'
 import { useTranslations } from 'next-intl'
@@ -24,7 +26,9 @@ export function InterviewSetup({ onStart, history, loadingHistory, onViewSession
   const [deleting, setDeleting] = useState(false)
   const router = useRouter()
   const searchParams = useSearchParams()
-  const { resumes, activeResumeId, setActiveResumeId, applications } = useAppStore()
+  const { resumes, activeResumeId } = useActiveResume()
+  const setActiveResumeId = useUIStore((s) => s.setActiveResumeId)
+  const { data: applications } = useApplications()
 
   // Find active resume
   const activeResume = resumes.find((r) => r.id === activeResumeId) || resumes[0]
@@ -58,12 +62,12 @@ export function InterviewSetup({ onStart, history, loadingHistory, onViewSession
       setTargetSelect('custom')
       if (companyParam) setCustomCompany(companyParam)
       if (roleParam) setCustomRole(roleParam)
-    } else if (applications.bookmark.length > 0) {
-      setTargetSelect(applications.bookmark[0].key)
+    } else if ((applications?.bookmark?.length ?? 0) > 0) {
+      setTargetSelect(applications?.bookmark[0]?.key ?? 'custom')
     } else {
       setTargetSelect('custom')
     }
-  }, [applications.bookmark, searchParams])
+  }, [applications?.bookmark, searchParams])
 
   if (resumes.length === 0) {
     return (
@@ -96,7 +100,7 @@ export function InterviewSetup({ onStart, history, loadingHistory, onViewSession
       finalCompany = customCompany.trim() || 'General Employer'
       finalRole = customRole.trim() || 'Software Engineer'
     } else {
-      const matchedJob = applications.bookmark.find((j) => j.key === targetSelect)
+      const matchedJob = (applications?.bookmark ?? []).find((j) => j.key === targetSelect)
       if (matchedJob) {
         finalCompany = matchedJob.company
         finalRole = matchedJob.title
@@ -164,14 +168,14 @@ export function InterviewSetup({ onStart, history, loadingHistory, onViewSession
               {/* Target Company/Position Selection */}
               <div>
                 <label className="label-mono mb-1.5 block">{t('targetPosition')}</label>
-                {applications.bookmark.length > 0 ? (
+                {(applications?.bookmark?.length ?? 0) > 0 ? (
                   <div className="space-y-2">
                     <select
                       value={targetSelect}
                       onChange={(e) => setTargetSelect(e.target.value)}
                       className="w-full cursor-pointer rounded-sm border border-border bg-background px-3 py-2 text-xs outline-none focus:border-primary"
                     >
-                      {applications.bookmark.map((job) => (
+                      {(applications?.bookmark ?? []).map((job) => (
                         <option key={job.key} value={job.key}>
                           {job.company} — {job.title} (Match Score: {job.score}%)
                         </option>

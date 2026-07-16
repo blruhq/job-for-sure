@@ -128,25 +128,6 @@ export const resumeRelations = relations(resumes, ({ one }) => ({
 // TAILORED RESUMES
 // ═══════════════════════════════════════════════════════════════
 
-export const tailoredResumes = pgTable("tailored_resumes", {
-  id: text("id").primaryKey(),
-  userId: text("user_id")
-    .notNull()
-    .references(() => user.id, { onDelete: "cascade" }),
-  baseResumeId: text("base_resume_id").references(() => resumes.id, { onDelete: "set null" }),
-  jobUrl: text("job_url"),
-  jobData: jsonb("job_data"),
-  data: jsonb("data").notNull(),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-  updatedAt: timestamp("updated_at").defaultNow().$onUpdate(() => new Date()).notNull(),
-  deletedAt: timestamp("deleted_at"),
-}, (table) => [index("tailored_resumes_userId_idx").on(table.userId)]);
-
-export const tailoredResumesRelations = relations(tailoredResumes, ({ one }) => ({
-  user: one(user, { fields: [tailoredResumes.userId], references: [user.id] }),
-  baseResume: one(resumes, { fields: [tailoredResumes.baseResumeId], references: [resumes.id] }),
-}));
-
 // ═══════════════════════════════════════════════════════════════
 // APPLICATIONS (individual records — replaces applications_data blob)
 // ═══════════════════════════════════════════════════════════════
@@ -169,7 +150,6 @@ export const applications = pgTable("applications", {
   position: integer("position").default(0).notNull(),
   matchScore: integer("match_score"),
   resumeId: text("resume_id").references(() => resumes.id, { onDelete: "set null" }),
-  tailoredResumeId: text("tailored_resume_id").references(() => tailoredResumes.id, { onDelete: "set null" }),
   coverLetterId: text("cover_letter_id").references(() => coverLetters.id, { onDelete: "set null" }),
   notes: text("notes"),
   appliedAt: timestamp("applied_at"),
@@ -184,7 +164,7 @@ export const applications = pgTable("applications", {
 export const applicationsRelations = relations(applications, ({ one }) => ({
   user: one(user, { fields: [applications.userId], references: [user.id] }),
   resume: one(resumes, { fields: [applications.resumeId], references: [resumes.id] }),
-  tailoredResume: one(tailoredResumes, { fields: [applications.tailoredResumeId], references: [tailoredResumes.id] }),
+  coverLetter: one(coverLetters, { fields: [applications.coverLetterId], references: [coverLetters.id] }),
 }));
 
 // ═══════════════════════════════════════════════════════════════

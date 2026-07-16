@@ -1,0 +1,193 @@
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { ApiClient } from '~/lib/api-client'
+import type { PipelineJob, ApplicationBoard } from '~/types/resume'
+import { notify } from '~/lib/toast'
+
+function groupByStatus(apps: any[]): ApplicationBoard {
+  const board: ApplicationBoard = {
+    bookmark: [],
+    applied: [],
+    interviewing: [],
+    offers: [],
+    rejected: [],
+  }
+
+  const sorted = [...apps].sort((a, b) => {
+    if (a.position !== b.position) return a.position - b.position
+    return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+  })
+
+  const timeLabels: Record<string, string> = {
+    bookmarked: 'saved',
+    applied: 'just now',
+    interviewing: 'scheduled',
+    offered: 'received',
+    rejected: 'rejected',
+  }
+
+  for (const app of sorted) {
+    const job: PipelineJob = {
+      key: app.sourceKey,
+      applicationId: app.id,
+      logo: app.logoUrl || '',
+      color: app.color || '',
+      company: app.company,
+      title: app.jobTitle,
+      loc: app.location || '',
+      score: app.matchScore || 0,
+      level: (app.level as 'high' | 'mid') || 'mid',
+      time: timeLabels[app.status] || 'saved',
+      url: app.jobUrl || '',
+      resume: app.resumeId || '',
+      addedAt: app.createdAt,
+    }
+
+    let col: keyof ApplicationBoard = 'bookmark'
+    if (app.status === 'bookmarked') col = 'bookmark'
+    else if (app.status === 'offered') col = 'offers'
+    else if (['applied', 'interviewing', 'rejected'].includes(app.status)) {
+      col = app.status as keyof ApplicationBoard
+    }
+    board[col].push(job)
+  }
+
+  return board
+}
+
+export function useApplications() {
+  return useQuery({
+    queryKey: ['applications'],
+    queryFn: async () => {
+      const apps = await ApiClient.getApplications()
+      return groupByStatus(apps)
+    },
+  })
+}
+
+export function useCreateApplication() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: ApiClient.createApplication,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['applications'] })
+    },
+  })
+}
+
+export function useDeleteApplication() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: ApiClient.deleteApplication,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['applications'] })
+    },
+  })
+}
+
+export function useClearApplications() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: ApiClient.clearApplications,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['applications'] })
+    },
+  })
+}
+
+export function useReorderApplications() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: ApiClient.reorderApplications,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['applications'] })
+    },
+  })
+}
+
+export function useMoveApplication() {
+  const queryClient = useQueryClient()
+  const reorderMutation = useReorderApplications()
+
+  return useMutation({
+    mutationFn: async ({
+      jobKey,
+      fromCol,
+      toCol,
+      toIndex,
+    }: {
+      jobKey: string
+      fromCol: keyof ApplicationBoard
+      toCol: keyof ApplicationBoard
+      toIndex?: number
+    }) => {
+      const previous = queryClient.getQueryData<ApplicationBoard>(['applications'])
+      if (!previous) return
+
+      const from = [...previous[fromCol]]
+      const to = fromCol === toCol ? from : [...previous[toCol]]
+
+      const idx = from.findIndex((j) => j.key === jobKey)
+      if (idx === -1) return
+
+      const [job] = from.splice(idx, 1)
+
+      const statusLabels: Record<string, string> = {
+        bookmark: 'bookmarked',
+        applied: 'applied',
+        interviewing: 'interviewing',
+        offers: 'offered',
+        rejected: 'rejected',
+      }
+      const targetStatus = statusLabels[toCol]
+
+      const target = typeof toIndex === 'number' ? toIndex : 0
+      to.splice(target, 0, job)
+
+      const updates: Array<{ id: string; status: string; position: number }> = []
+      to.forEach((j, i) => {
+        if (j.applicationId) {
+          updates.push({ id: j.applicationId, status: targetStatus, position: i })
+        }
+      })
+      if (fromCol !== toCol) {
+        const sourceStatus = statusLabels[fromCol]
+        from.forEach((j, i) => {
+          if (j.applicationId) {
+            updates.push({ id: j.applicationId, status: sourceStatus, position: i })
+          }
+        })
+      }
+
+      await reorderMutation.mutateAsync({ updates })
+    },
+    onMutate: async ({ jobKey, fromCol, toCol, toIndex }) => {
+      await queryClient.cancelQueries({ queryKey: ['applications'] })
+      const previous = queryClient.getQueryData<ApplicationBoard>(['applications'])
+
+      if (previous) {
+        const next = JSON.parse(JSON.stringify(previous)) as ApplicationBoard
+        const from = next[fromCol]
+        const to = next[toCol]
+
+        const idx = from.findIndex((j) => j.key === jobKey)
+        if (idx !== -1) {
+          const [job] = from.splice(idx, 1)
+          const target = typeof toIndex === 'number' ? toIndex : 0
+          to.splice(target, 0, job)
+          queryClient.setQueryData(['applications'], next)
+        }
+      }
+
+      return { previous }
+    },
+    onError: (err, variables, context) => {
+      if (context?.previous) {
+        queryClient.setQueryData(['applications'], context.previous)
+      }
+      notify({ message: 'Failed to move job.', type: 'error' })
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ['applications'] })
+    },
+  })
+}

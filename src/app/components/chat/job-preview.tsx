@@ -6,7 +6,7 @@ import {
   Bookmark, ExternalLink, Loader2, ChevronRight, MessageSquare, Plane, X, Brain,
 } from 'lucide-react'
 import { cn } from '~/lib/utils'
-import { useAppStore } from '~/lib/store'
+import { useApplications, useCreateApplication, useDeleteApplication } from '~/hooks/use-apps'
 import { notify } from '~/lib/toast'
 import { companyColor, companyLogo } from '~/lib/company-data'
 import type { Resume } from '~/types/resume'
@@ -39,7 +39,20 @@ const SOURCE_SHORT: Record<JobSource, string> = {
 
 export function JobPreview({ resume, onDismiss, onLoadComplete }: { resume: Resume; onDismiss?: () => void; onLoadComplete?: () => void }) {
   const router = useRouter()
-  const { isBookmarked, bookmarkJob, toggleBookmark } = useAppStore()
+  const { data: applications } = useApplications()
+  const { mutateAsync: createBookmark } = useCreateApplication()
+  const { mutateAsync: deleteBookmark } = useDeleteApplication()
+
+  const isBookmarked = (key: string) => applications?.bookmark.some((j) => j.key === key) ?? false
+
+  const bookmarkJob = (job: { key: string; logo?: string; color?: string; company: string; title: string; loc: string; score: number; level: string; time?: string; url: string; resume: string; addedAt?: string }) => {
+    createBookmark({ sourceKey: job.key, company: job.company, jobTitle: job.title, jobUrl: job.url, location: job.loc, level: job.level, matchScore: job.score, resumeId: job.resume, status: 'bookmarked' })
+  }
+
+  const toggleBookmark = (key: string) => {
+    const existing = applications?.bookmark.find((j) => j.key === key)
+    if (existing?.applicationId) deleteBookmark(existing.applicationId)
+  }
 
   const [jobs, setJobs] = useState<ScoredJob[]>([])
   const [loading, setLoading] = useState(true)

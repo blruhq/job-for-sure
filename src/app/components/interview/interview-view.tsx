@@ -5,11 +5,11 @@ import { InterviewSetup } from './interview-setup'
 import { InterviewSession } from './interview-session'
 import { InterviewSummary } from './interview-summary'
 import type { InterviewConfig, InterviewExchange } from '~/types/interview'
-import { useAppStore } from '~/lib/store'
+import { useActiveResume } from '~/hooks/use-active-resume'
 import { notify } from '~/lib/toast'
 
 export function InterviewView() {
-  const { resumes, activeResumeId } = useAppStore()
+  const { resumes, activeResumeId } = useActiveResume()
   const [phase, setPhase] = useState<'setup' | 'session' | 'summary'>('setup')
   const [config, setConfig] = useState<InterviewConfig | null>(null)
   const [exchanges, setExchanges] = useState<InterviewExchange[]>([])

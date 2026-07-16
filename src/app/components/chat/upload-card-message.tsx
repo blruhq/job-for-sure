@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import type { UIMessage } from 'ai'
 import { Briefcase, MapPin, Check, Pencil } from 'lucide-react'
 import { UserMessage } from '@/components/agent-elements/user-message'
-import { useAppStore } from '~/lib/store'
+import { useResumes, useUpdateResume } from '~/hooks/use-resumes'
 import { JobPreview } from '~/components/chat/job-preview'
 
 type UploadCardMessageProps = {
@@ -20,7 +20,8 @@ export const UploadCardMessage = memo(function UploadCardMessage({
   enableImagePreview = true,
 }: UploadCardMessageProps) {
   const router = useRouter()
-  const { resumes, updateResume } = useAppStore()
+  const { data: resumes = [] } = useResumes()
+  const { mutate: updateResume } = useUpdateResume()
 
   // Check for data-upload part
   const uploadPart = (message.parts ?? []).find(
@@ -90,7 +91,7 @@ export const UploadCardMessage = memo(function UploadCardMessage({
               </div>
               <button
                 onClick={() => {
-                  updateResume(resume.id, { role: roleInput, location: locationInput })
+                  updateResume({ id: resume.id, data: { role: roleInput, location: locationInput } })
                   setIsEditing(false)
                 }}
                 disabled={roleInput.trim().length < 2}

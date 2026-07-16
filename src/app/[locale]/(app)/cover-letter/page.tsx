@@ -2,7 +2,9 @@
 
 import { useState, useRef, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { useAppStore } from '~/lib/store'
+import { useActiveResume } from '~/hooks/use-active-resume'
+import { useUpdateResume, useCreateResume } from '~/hooks/use-resumes'
+import { useUIStore } from '~/hooks/use-ui'
 import { createResume } from '~/lib/company-data'
 import { notify } from '~/lib/toast'
 import { Wand2, Download, Copy, Save, Upload, FileText, Loader2, Trash2 } from 'lucide-react'
@@ -12,7 +14,9 @@ import { useTranslations } from 'next-intl'
 export default function StandaloneCoverLetterPage() {
   const router = useRouter()
   const t = useTranslations('coverLetter')
-  const { resumes, activeResumeId, setActiveResumeId, addResume, updateResume } = useAppStore()
+  const { resumes, activeResumeId, setActiveResumeId } = useActiveResume()
+  const { mutate: addResume } = useCreateResume()
+  const { mutate: updateResume } = useUpdateResume()
 
   // Select first resume by default if activeResumeId is not set
   const [selectedResumeId, setSelectedResumeId] = useState(activeResumeId || 'none')
@@ -155,7 +159,7 @@ export default function StandaloneCoverLetterPage() {
         })),
       })
 
-      addResume(resume)
+      addResume({ id: resume.id, data: resume })
       setSelectedResumeId(resume.id)
       setActiveResumeId(resume.id)
       notify({ message: 'Resume uploaded and processed successfully!', type: 'success' })
@@ -196,10 +200,10 @@ export default function StandaloneCoverLetterPage() {
       if (data.letter) {
         setLetterText(data.letter)
         const jdVal = mode === 'jd' ? jdText : `Company: ${company}, Role: ${role}${focus ? `, Focus: ${focus}` : ''}`
-        updateResume(selectedResume.id, {
+        updateResume({ id: selectedResume.id, data: {
           coverLetter: data.letter,
           coverLetterJD: jdVal,
-        })
+        } })
         // Add to saved letters list
         if (data.id) {
           setActiveLetterId(data.id)
@@ -229,10 +233,10 @@ export default function StandaloneCoverLetterPage() {
   const handleSave = () => {
     if (!selectedResume) return
     const jdVal = mode === 'jd' ? jdText : `Company: ${company}, Role: ${role}${focus ? `, Focus: ${focus}` : ''}`
-    updateResume(selectedResume.id, {
+    updateResume({ id: selectedResume.id, data: {
       coverLetter: letterText,
       coverLetterJD: jdVal,
-    })
+    } })
     notify({ message: 'Cover letter saved successfully!', type: 'success' })
   }
 

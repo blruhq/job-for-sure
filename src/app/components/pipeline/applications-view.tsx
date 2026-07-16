@@ -4,7 +4,8 @@ import { useState, useRef } from 'react'
 import { useRouter } from '~/i18n/routing'
 import { Trash2, Link2, RefreshCw, Plus, CalendarDays } from 'lucide-react'
 import { cn } from '~/lib/utils'
-import { useAppStore } from '~/lib/store'
+import { useApplications, useMoveApplication, useDeleteApplication, useClearApplications, useCreateApplication } from '~/hooks/use-apps'
+import { useResumes } from '~/hooks/use-resumes'
 import { notify } from '~/lib/toast'
 import { useTranslations } from 'next-intl'
 import type { ApplicationBoard, ApplicationColumnId, PipelineJob } from '~/types/resume'
@@ -127,7 +128,20 @@ function JobCardContent({ job }: { job: PipelineJob }) {
 export function ApplicationsView() {
   const router = useRouter()
   const t = useTranslations('applications')
-  const { applications, moveJob, removeJob, clearApplications, bookmarkJob, resumes } = useAppStore()
+  const { data: applications } = useApplications()
+  const { mutateAsync: moveJob } = useMoveApplication()
+  const { mutateAsync: removeJobMutation } = useDeleteApplication()
+  const { mutateAsync: clearJobs } = useClearApplications()
+  const { mutateAsync: bookmarkJob } = useCreateApplication()
+  const { data: resumes = [] } = useResumes()
+
+  const removeJob = (jobKey: string) => {
+    const allJobs = [...(applications?.bookmark ?? []), ...(applications?.applied ?? []), ...(applications?.interviewing ?? []), ...(applications?.offers ?? []), ...(applications?.rejected ?? [])]
+    const job = allJobs.find((j) => j.key === jobKey)
+    if (job?.applicationId) removeJobMutation(job.applicationId)
+  }
+
+  const clearApplications = () => clearJobs()
   const [filter, setFilter] = useState('all')
   const [dragOverCol, setDragOverCol] = useState<ApplicationColumnId | null>(null)
   const [activeJob, setActiveJob] = useState<PipelineJob | null>(null)
@@ -142,10 +156,13 @@ export function ApplicationsView() {
   )
 
   // ── All jobs for filter ──
-  const allJobs = [...applications.bookmark, ...applications.applied, ...applications.interviewing, ...applications.offers, ...applications.rejected]
+  const allJobs = [...(applications?.bookmark ?? []), ...(applications?.applied ?? []), ...(applications?.interviewing ?? []), ...(applications?.offers ?? []), ...(applications?.rejected ?? [])]
   const resumeIds = ['all', ...new Set(allJobs.map((j) => j.resume).filter(Boolean))]
 
   const filterJobs = (jobs: PipelineJob[]) => filter === 'all' ? jobs : jobs.filter((j) => j.resume === filter)
+
+  // ── Empty board if applications not loaded ──
+  if (!applications) return null
 
   // ── Stats ──
   const total = allJobs.length
@@ -154,7 +171,7 @@ export function ApplicationsView() {
   // ── Find which column a job belongs to ──
   const findJobColumn = (jobKey: string): ApplicationColumnId | null => {
     for (const colId of COLUMN_IDS) {
-      if (applications[colId].some((j) => j.key === jobKey)) return colId
+      if ((applications?.[colId] ?? []).some((j) => j.key === jobKey)) return colId
     }
     return null
   }
@@ -185,18 +202,18 @@ export function ApplicationsView() {
       const targetCol = findJobColumn(overId)
       if (!targetCol) return
       toCol = targetCol
-      const targetIdx = applications[toCol].findIndex((j) => j.key === overId)
+      const targetIdx = (applications?.[toCol] ?? []).findIndex((j) => j.key === overId)
       toIndex = targetIdx !== -1 ? targetIdx : 0
     }
 
     // Skip if dropped back in the same position (no reorder / no move)
     if (fromCol === toCol) {
-      const currentIdx = applications[fromCol].findIndex((j) => j.key === jobKey)
+      const currentIdx = (applications?.[fromCol] ?? []).findIndex((j) => j.key === jobKey)
       // If dropping on itself or the adjacent position that didn't change, skip
       if (toIndex === currentIdx || toIndex === currentIdx + 1) return
     }
 
-    moveJob(jobKey, fromCol, toCol, toIndex)
+    moveJob({ jobKey, fromCol, toCol, toIndex })
     notify({ message: fromCol !== toCol ? `Moved to ${toCol}` : 'Reordered', type: 'success' })
   }
 
@@ -235,18 +252,12 @@ export function ApplicationsView() {
 
       if (data.success && data.job) {
         bookmarkJob({
-          key: `${parsedUrl.hostname}-${Date.now()}`,
+          sourceKey: `${parsedUrl.hostname}-${Date.now()}`,
           company: data.job.company || 'Unknown Company',
-          title: data.job.title || 'Unknown Position',
-          loc: data.job.location || '',
-          score: 0,
-          level: 'mid' as const,
-          time: 'saved',
-          url: url,
-          logo: '',
-          color: '',
-          resume: '',
-          addedAt: new Date().toISOString(),
+          jobTitle: data.job.title || 'Unknown Position',
+          location: data.job.location || '',
+          jobUrl: url,
+          status: 'bookmarked',
         })
         notify({ message: `Added "${data.job.title}" at ${data.job.company}`, type: 'success' })
         setPasteUrl('')
@@ -284,18 +295,11 @@ export function ApplicationsView() {
       }
 
       bookmarkJob({
-        key: `manual-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+        sourceKey: `manual-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
         company: trimmedCompany,
-        title: trimmedTitle,
-        loc: loc.trim(),
-        score: 0,
-        level: 'mid',
-        time: 'saved',
-        url: '',
-        logo: '',
-        color: '',
-        resume: '',
-        addedAt: new Date(date + 'T12:00:00').toISOString(),
+        jobTitle: trimmedTitle,
+        location: loc.trim(),
+        status: 'bookmarked',
       })
 
       notify({ message: `Added "${trimmedTitle}" at ${trimmedCompany}`, type: 'success' })
@@ -387,7 +391,7 @@ export function ApplicationsView() {
               >
                 {resumeIds.map((id) => (
                   <option key={id} value={id}>
-                    {id === 'all' ? t('all') : resumes.find(r => r.id === id)?.name || id}
+                    {id === 'all' ? t('all') : resumes.find((r: any) => r.id === id)?.name || id}
                   </option>
                 ))}
               </select>
@@ -462,8 +466,8 @@ export function ApplicationsView() {
                     <span className="text-xs font-semibold text-foreground">{t(col.labelKey)}</span>
                     <span className="text-[10px] font-mono text-muted-foreground">{jobs.length}</span>
                   </div>
-                  <button
-                    onClick={() => clearApplications()}
+                    <button
+                      onClick={() => clearJobs()}
                     className="text-[10px] text-muted-foreground hover:text-destructive transition-colors cursor-pointer"
                     title="Clear"
                   >
@@ -500,7 +504,7 @@ export function ApplicationsView() {
                           <button
                             onClick={(e) => {
                               e.stopPropagation()
-                              removeJob(job.key, col.id)
+                              removeJob(job.key)
                               notify({ message: 'Removed from board', type: 'info' })
                             }}
                             className="flex items-center gap-0.5 rounded-xs px-1.5 py-0.5 text-[9px] text-muted-foreground hover:text-destructive transition-colors cursor-pointer"

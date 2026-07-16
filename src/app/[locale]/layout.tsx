@@ -6,6 +6,7 @@ import { NextIntlClientProvider } from 'next-intl'
 import { getMessages } from 'next-intl/server'
 import { notFound } from 'next/navigation'
 import { routing } from '~/i18n/routing'
+import { QueryProvider } from '~/components/layout/query-provider'
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://jobforsure.app'),
@@ -55,7 +56,9 @@ export default async function LocaleLayout({
   return (
     <NextIntlClientProvider messages={messages}>
       <ThemeProvider>
-        {children}
+        <QueryProvider>
+          {children}
+        </QueryProvider>
         <Toaster position="bottom-center" richColors />
       </ThemeProvider>
     </NextIntlClientProvider>

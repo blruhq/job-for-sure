@@ -4,7 +4,10 @@ import { useState, useEffect, useMemo } from 'react'
 import { Link, useRouter, usePathname } from '~/i18n/routing'
 import { MessageSquare, KanbanSquare, CheckSquare, Settings, Plus, Brain, Mail, Shield, Trash2, FileText } from 'lucide-react'
 import { cn } from '~/lib/utils'
-import { useAppStore } from '~/lib/store'
+import { useUIStore } from '~/hooks/use-ui'
+import { useResumes } from '~/hooks/use-resumes'
+import { useApplications } from '~/hooks/use-apps'
+import { useDeleteResume } from '~/hooks/use-resumes'
 import { notify } from '~/lib/toast'
 import { ConfirmDialog } from '~/components/ui/confirm-dialog'
 import { PreviewCard } from '@base-ui/react/preview-card'
@@ -103,7 +106,12 @@ export function Sidebar() {
   const pathname = usePathname()
   const router = useRouter()
   const t = useTranslations('common')
-  const { resumes, activeResumeId, setActiveResumeId, deleteResume, applications, sidebarCollapsed } = useAppStore()
+  const { data: resumes = [] } = useResumes()
+  const activeResumeId = useUIStore((s) => s.activeResumeId)
+  const setActiveResumeId = useUIStore((s) => s.setActiveResumeId)
+  const { mutateAsync: deleteResume } = useDeleteResume()
+  const { data: applications } = useApplications()
+  const c = useUIStore((s) => s.sidebarCollapsed)
   const [isAdmin, setIsAdmin] = useState(false)
   const [deleteTarget, setDeleteTarget] = useState<{ id: string; name: string } | null>(null)
   const [deleting, setDeleting] = useState(false)
@@ -124,8 +132,7 @@ export function Sidebar() {
     checkAdmin()
   }, [])
 
-  const c = sidebarCollapsed
-  const totalPipeline = applications.bookmark.length + applications.applied.length + applications.interviewing.length + applications.offers.length
+  const totalPipeline = (applications?.bookmark.length ?? 0) + (applications?.applied.length ?? 0) + (applications?.interviewing.length ?? 0) + (applications?.offers.length ?? 0)
 
   // ── Group resumes: base resumes + their variants ──
   const baseResumes = resumes.filter(r => !r.isVariant)

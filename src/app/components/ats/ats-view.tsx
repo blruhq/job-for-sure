@@ -4,7 +4,9 @@ import { useState, useMemo, useEffect, useCallback } from 'react'
 import { Wand2, Upload, FileText, ArrowRight, Sparkles, RefreshCw, CheckCircle2, AlertTriangle, AlertCircle } from 'lucide-react'
 import { useRouter } from '~/i18n/routing'
 import { cn } from '~/lib/utils'
-import { useAppStore } from '~/lib/store'
+import { useActiveResume } from '~/hooks/use-active-resume'
+import { useUpdateResume, useCreateResume } from '~/hooks/use-resumes'
+import { useUIStore } from '~/hooks/use-ui'
 import { notify } from '~/lib/toast'
 import { useTranslations } from 'next-intl'
 import type { Resume } from '~/types/resume'
@@ -26,7 +28,10 @@ interface AnalysisResult {
 export function AtsView() {
   const router = useRouter()
   const t = useTranslations('ats')
-  const { resumes, activeResumeId, setActiveResumeId, updateResume, addResume, setPendingTailor } = useAppStore()
+  const { resumes, activeResumeId, activeResume, setActiveResumeId } = useActiveResume()
+  const { mutate: updateResume } = useUpdateResume()
+  const { mutate: addResume } = useCreateResume()
+  const setPendingTailor = useUIStore((s) => s.setPendingTailor)
   const [jdText, setJdText] = useState('')
   const [analysisLoading, setAnalysisLoading] = useState(false)
   const [analysisResult, setAnalysisResult] = useState<AnalysisResult | null>(null)
@@ -34,7 +39,7 @@ export function AtsView() {
   const [pendingTrigger, setPendingTrigger] = useState(false)
   const [hasAnalysedJd, setHasAnalysedJd] = useState(false)
 
-  const resume = resumes.find((r) => r.id === activeResumeId)
+  const resume = activeResume
 
   // ── Fetching analysis from API ──
   const fetchAnalysis = useCallback(async (jd: string) => {
@@ -202,7 +207,7 @@ export function AtsView() {
     })
     
     if (addedCount > 0) {
-      updateResume(resume.id, { skills: nextSkills })
+      updateResume({ id: resume.id, data: { skills: nextSkills } })
       notify({ message: `Injected ${addedCount} missing keyword${addedCount !== 1 ? 's' : ''}`, type: 'success' })
       // Trigger a re-analysis with current state to refresh
       fetchAnalysis(jdText)
@@ -360,7 +365,7 @@ export function AtsView() {
                           if (resume) {
                             const nextSkills = [...resume.skills]
                             if (!nextSkills.some((s) => s.toLowerCase().includes(k.toLowerCase()))) {
-                              updateResume(resume.id, { skills: [...nextSkills, k] })
+                              updateResume({ id: resume.id, data: { skills: [...nextSkills, k] } })
                               notify({ message: `Added "${k}" to your skills`, type: 'success' })
                               fetchAnalysis(jdText)
                             }

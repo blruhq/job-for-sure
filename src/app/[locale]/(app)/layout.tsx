@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { AppStoreProvider, useAppStore } from '~/lib/store'
+import { useUIStore } from '~/hooks/use-ui'
 import { Sidebar } from '~/components/layout/sidebar'
 import { Topbar } from '~/components/layout/navbar'
 import { Skeleton } from '~/components/ui/skeleton'
@@ -71,7 +71,8 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
 }
 
 function AppShell({ children }: { children: React.ReactNode }) {
-  const { sidebarCollapsed, toggleSidebar } = useAppStore()
+  const sidebarCollapsed = useUIStore((s) => s.sidebarCollapsed)
+  const toggleSidebar = useUIStore((s) => s.toggleSidebar)
 
   return (
     <div className="flex h-screen flex-col">
@@ -103,10 +104,8 @@ function AppShell({ children }: { children: React.ReactNode }) {
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   return (
-    <AppStoreProvider>
-      <AuthGuard>
-        <AppShell>{children}</AppShell>
-      </AuthGuard>
-    </AppStoreProvider>
+    <AuthGuard>
+      <AppShell>{children}</AppShell>
+    </AuthGuard>
   )
 }

@@ -22,7 +22,8 @@ import {
 } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import { cn } from '~/lib/utils'
-import { useAppStore } from '~/lib/store'
+import { useResumes, useCreateResume, useUpdateResume, useDeleteResume } from '~/hooks/use-resumes'
+import { useUIStore } from '~/hooks/use-ui'
 import { notify } from '~/lib/toast'
 import { ConfirmDialog } from '~/components/ui/confirm-dialog'
 import { ResumeCopilot } from '~/components/resume/resume-copilot'
@@ -358,7 +359,15 @@ function SortableSection({
 
 export function ResumeDetail({ resumeId }: { resumeId: string }) {
   const router = useRouter()
-  const { getResume, addResume, setActiveResumeId, deleteResume, updateResume, pendingTailor: storePendingTailor, setPendingTailor, addVariantResume, hydrated } = useAppStore()
+  const { data: resumesList = [], isSuccess: hydrated } = useResumes()
+  const { mutate: addResume } = useCreateResume()
+  const { mutate: updateResume } = useUpdateResume()
+  const { mutateAsync: deleteResume } = useDeleteResume()
+  const setActiveResumeId = useUIStore((s) => s.setActiveResumeId)
+  const storePendingTailor = useUIStore((s) => s.pendingTailor)
+  const setPendingTailor = useUIStore((s) => s.setPendingTailor)
+
+  const getResume = (id: string) => resumesList.find((r) => r.id === id)
   const [tab, setTab] = useState<'jobs' | 'view' | 'editor' | 'cover-letter'>('jobs')
   const searchParams = useSearchParams()
   const [galleryOpen, setGalleryOpen] = useState(false)
@@ -901,7 +910,7 @@ export function ResumeDetail({ resumeId }: { resumeId: string }) {
     autosaveTimerRef.current = setTimeout(() => {
       lastSavedSnapshotRef.current = snapshot
       setSaveStatus('saving')
-      updateResume(resume.id, {
+      updateResume({ id: resume.id, data: {
         name: editName,
         persona: editPersona,
         role: editRole,
@@ -919,7 +928,7 @@ export function ResumeDetail({ resumeId }: { resumeId: string }) {
         customSections: editCustomSections,
         sectionOrder,
         sectionVisibility,
-      })
+      } })
       setSaveStatus('saved')
 
       // Reset to idle after 3s
@@ -941,7 +950,7 @@ export function ResumeDetail({ resumeId }: { resumeId: string }) {
   const [copilotOpen, setCopilotOpen] = useState(false)
 
   const handleApplyTailor = (variant: Resume) => {
-    addVariantResume(variant)
+    addResume({ id: variant.id, data: variant, isBase: false })
     setPendingTailor(null)
     setActiveResumeId(variant.id)
     notify({ message: 'Tailored variant created!', type: 'success' })
@@ -1030,7 +1039,7 @@ export function ResumeDetail({ resumeId }: { resumeId: string }) {
   }
 
   const saveChanges = () => {
-    updateResume(resume.id, {
+    updateResume({ id: resume.id, data: {
       name: editName,
       persona: editPersona,
       role: editRole,
@@ -1048,7 +1057,7 @@ export function ResumeDetail({ resumeId }: { resumeId: string }) {
       customSections: editCustomSections,
       sectionOrder,
       sectionVisibility,
-    })
+    } })
     notify({ message: 'Resume saved', type: 'success' })
   }
 
@@ -1162,7 +1171,7 @@ export function ResumeDetail({ resumeId }: { resumeId: string }) {
                       value={resume?.template || DEFAULT_TEMPLATE}
                       onChange={(template) => {
                         if (resume) {
-                          updateResume(resume.id, { template })
+                          updateResume({ id: resume.id, data: { template } })
                           setGalleryOpen(false)
                         }
                       }}
@@ -1259,7 +1268,7 @@ export function ResumeDetail({ resumeId }: { resumeId: string }) {
                       <div className="flex gap-2">
                         <button onClick={() => {
                           const copy = { ...resume, id: String(Date.now()), name: `${resume.name} (Copy)`, updated: 'just now' }
-                          addResume(copy)
+                          addResume({ id: copy.id, data: copy })
                           setActiveResumeId(copy.id)
                           notify({ message: 'Resume cloned', type: 'success' })
                         }} className="flex cursor-pointer items-center gap-1 rounded-sm border border-border bg-card px-2.5 py-1 text-[11px] hover:bg-muted">

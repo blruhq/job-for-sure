@@ -3,7 +3,7 @@
 import { useMemo } from 'react'
 import { Check } from 'lucide-react'
 import { cn } from '~/lib/utils'
-import { useAppStore } from '~/lib/store'
+import { useUIStore } from '~/hooks/use-ui'
 import type { Resume, PendingTailor, TailorChange } from '~/types/resume'
 
 // ── Pure function: apply only accepted changes to produce the previewed resume ──
@@ -53,7 +53,8 @@ function applyAcceptedChanges(base: Resume, optimized: Resume, changes: TailorCh
 }
 
 export function TailorReviewPanel({ onApply, onCancel }: { onApply: (variant: Resume) => void; onCancel: () => void }) {
-  const { pendingTailor, toggleAcceptedChange } = useAppStore()
+  const pendingTailor = useUIStore((s) => s.pendingTailor)
+  const toggleAcceptedChange = useUIStore((s) => s.toggleAcceptedChange)
 
   // ── Hooks MUST be before any early return ──
   const pending = pendingTailor // local alias for readability

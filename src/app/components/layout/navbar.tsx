@@ -5,7 +5,7 @@ import { PanelLeft, Sun, Moon, Globe } from 'lucide-react'
 import { UserMenu } from '~/components/layout/user-menu'
 import { cn } from '~/lib/utils'
 import { useTheme } from '~/components/layout/theme-provider'
-import { useAppStore } from '~/lib/store'
+import { useUIStore } from '~/hooks/use-ui'
 import { Menu } from '@base-ui/react/menu'
 import { useLocale } from 'next-intl'
 import { useRouter, usePathname } from '~/i18n/routing'
@@ -51,7 +51,8 @@ export function LanguageSwitcher() {
 
 export function Topbar() {
   const { theme, toggle } = useTheme()
-  const { sidebarCollapsed, toggleSidebar } = useAppStore()
+  const sidebarCollapsed = useUIStore((s) => s.sidebarCollapsed)
+  const toggleSidebar = useUIStore((s) => s.toggleSidebar)
 
   return (
     <header className="flex h-[var(--topbar-height)] shrink-0 items-center border-b border-border bg-card z-50">

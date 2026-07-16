@@ -3,7 +3,8 @@
 import { useState, useRef } from 'react'
 import { useRouter } from '~/i18n/routing'
 import { X, Upload, FileText, Loader2 } from 'lucide-react'
-import { useAppStore } from '~/lib/store'
+import { useUIStore } from '~/hooks/use-ui'
+import { useCreateResume } from '~/hooks/use-resumes'
 import { createResume } from '~/lib/company-data'
 import { notify } from '~/lib/toast'
 import { BuildWizard, type WizardData } from '~/components/chat/build-wizard'
@@ -16,7 +17,8 @@ interface UploadModalProps {
 
 export function UploadModal({ open, onClose }: UploadModalProps) {
   const router = useRouter()
-  const { addResume, setActiveResumeId } = useAppStore()
+  const { mutate: addResume } = useCreateResume()
+  const setActiveResumeId = useUIStore((s) => s.setActiveResumeId)
   const fileRef = useRef<HTMLInputElement>(null)
   const [parsing, setParsing] = useState(false)
   const [dragOver, setDragOver] = useState(false)
@@ -95,7 +97,7 @@ export function UploadModal({ open, onClose }: UploadModalProps) {
         })),
       })
 
-      addResume(resume)
+      addResume({ id: resume.id, data: resume })
       setActiveResumeId(resume.id)
 
       notify({ message: 'Resume uploaded!', type: 'success' })

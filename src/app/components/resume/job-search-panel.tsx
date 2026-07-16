@@ -9,7 +9,9 @@ import {
 } from 'lucide-react'
 import { cn } from '~/lib/utils'
 import { compareJobs } from '~/lib/job-sources/scoring'
-import { useAppStore } from '~/lib/store'
+import { useApplications, useCreateApplication, useDeleteApplication } from '~/hooks/use-apps'
+import { useCreateResume } from '~/hooks/use-resumes'
+import { useUIStore } from '~/hooks/use-ui'
 import { notify } from '~/lib/toast'
 import { companyColor, companyLogo } from '~/lib/company-data'
 import type { Resume } from '~/types/resume'
@@ -78,7 +80,22 @@ const DEFAULT_FILTERS: Filters = {
 
 export function JobSearchPanel({ resume }: { resume: Resume }) {
   const router = useRouter()
-  const { isBookmarked, bookmarkJob, toggleBookmark, addResume, setActiveResumeId } = useAppStore()
+  const { data: applications } = useApplications()
+  const { mutateAsync: createBookmark } = useCreateApplication()
+  const { mutateAsync: deleteBookmark } = useDeleteApplication()
+  const { mutate: addResume } = useCreateResume()
+  const setActiveResumeId = useUIStore((s) => s.setActiveResumeId)
+
+  const isBookmarked = (key: string) => applications?.bookmark.some((j) => j.key === key) ?? false
+
+  const bookmarkJob = (job: { key: string; company: string; title: string; loc: string; score: number; level: string; url: string; logo: string; color: string; resume: string; addedAt: string }) => {
+    createBookmark({ sourceKey: job.key, company: job.company, jobTitle: job.title, jobUrl: job.url, location: job.loc, logoUrl: job.logo, color: job.color, level: job.level, matchScore: job.score, resumeId: job.resume, status: 'bookmarked' })
+  }
+
+  const toggleBookmark = (key: string) => {
+    const existing = applications?.bookmark.find((j) => j.key === key)
+    if (existing?.applicationId) deleteBookmark(existing.applicationId)
+  }
 
   // ── Search query defaults to the AI-detected role ──
   const fallbackQuery = resume.skills && resume.skills.length > 0 
@@ -434,7 +451,6 @@ export function JobSearchPanel({ resume }: { resume: Resume }) {
         loc: job.location,
         score: job.score,
         level: job.score >= 75 ? 'high' : 'mid',
-        time: 'just now',
         url: job.url,
         resume: resume.id,
         addedAt: new Date().toISOString(),

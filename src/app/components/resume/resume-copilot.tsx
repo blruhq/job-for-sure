@@ -3,12 +3,12 @@
 import { useRef, useEffect, useMemo } from 'react'
 import { useChat } from '@ai-sdk/react'
 import { DefaultChatTransport } from 'ai'
-import { useAppStore } from '~/lib/store'
+import { useApplications } from '~/hooks/use-apps'
 import type { Resume } from '~/types/resume'
 
 export function ResumeCopilot({ resume }: { resume: Resume }) {
   const scrollRef = useRef<HTMLDivElement>(null)
-  const { applications } = useAppStore()
+  const { data: applications } = useApplications()
 
   const transport = useMemo(() => new DefaultChatTransport({
     api: '/api/copilot',
@@ -22,14 +22,14 @@ export function ResumeCopilot({ resume }: { resume: Resume }) {
         summary: resume.summary,
         skills: resume.skills,
         experience: resume.experience,
-        companies: applications.bookmark.map((b) => ({
+        companies: (applications?.bookmark ?? []).map((b) => ({
           name: b.company,
           role: b.title,
           score: b.score,
         })),
       },
     },
-  }), [resume, applications.bookmark])
+  }), [resume, applications?.bookmark])
 
   const { messages, status, sendMessage, stop, error } = useChat({ transport })
 
@@ -47,7 +47,7 @@ export function ResumeCopilot({ resume }: { resume: Resume }) {
     sendMessage({ text })
   }
 
-  const topBookmark = applications.bookmark[0]
+  const topBookmark = (applications?.bookmark ?? [])[0]
 
   const suggestions = [
     { label: 'Rewrite summary', prompt: `Rewrite my professional summary to be more impactful. Current: "${resume.summary || 'None'}"` },

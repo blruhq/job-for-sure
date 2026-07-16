@@ -9,7 +9,7 @@ import type { Resume } from '~/types/resume'
 
 interface CoverLetterEditorProps {
   resume: Resume
-  updateResume: (id: string, updates: Partial<Resume>) => void
+  updateResume: (payload: { id: string; data: Partial<Resume> }) => void
 }
 
 export function CoverLetterEditor({ resume, updateResume }: CoverLetterEditorProps) {
@@ -61,10 +61,10 @@ export function CoverLetterEditor({ resume, updateResume }: CoverLetterEditorPro
       const data = await res.json()
       if (data.letter) {
         setLetterText(data.letter)
-        updateResume(resume.id, {
+        updateResume({ id: resume.id, data: {
           coverLetter: data.letter,
           coverLetterJD: mode === 'jd' ? jdText : `Company: ${company}, Role: ${role}${focus ? `, Focus: ${focus}` : ''}`,
-        })
+        } })
         notify({ message: t('generatedSuccess'), type: 'success' })
       } else {
         throw new Error('No letter content returned')
@@ -78,10 +78,10 @@ export function CoverLetterEditor({ resume, updateResume }: CoverLetterEditorPro
   }
 
   const handleSave = () => {
-    updateResume(resume.id, {
+    updateResume({ id: resume.id, data: {
       coverLetter: letterText,
       coverLetterJD: mode === 'jd' ? jdText : `Company: ${company}, Role: ${role}${focus ? `, Focus: ${focus}` : ''}`,
-    })
+    } })
     notify({ message: t('savedSuccess'), type: 'success' })
   }
 
@@ -270,7 +270,7 @@ export function CoverLetterEditor({ resume, updateResume }: CoverLetterEditorPro
         onClose={() => setShowDeleteDialog(false)}
         onConfirm={() => {
           setLetterText('')
-          updateResume(resume.id, { coverLetter: '', coverLetterJD: '' })
+          updateResume({ id: resume.id, data: { coverLetter: '', coverLetterJD: '' } })
           setShowDeleteDialog(false)
           notify({ message: 'Cover letter cleared', type: 'success' })
         }}

@@ -7,7 +7,11 @@ import { DefaultChatTransport } from 'ai'
 import { AgentChat } from '@/components/agent-elements/agent-chat'
 import { InputBar } from '@/components/agent-elements/input-bar'
 import type { InputBarProps } from '@/components/agent-elements/input-bar'
-import { useAppStore } from '~/lib/store'
+import { useActiveResume } from '~/hooks/use-active-resume'
+import { useUpdateResume, useCreateResume } from '~/hooks/use-resumes'
+import { useResumes } from '~/hooks/use-resumes'
+import { useApplications } from '~/hooks/use-apps'
+import { useUIStore } from '~/hooks/use-ui'
 import { createResume } from '~/lib/company-data'
 import { notify } from '~/lib/toast'
 import { cn } from '~/lib/utils'
@@ -21,7 +25,15 @@ import { Upload, FileText, ClipboardList, Loader2, Paperclip, RotateCcw, Sparkle
 
 export function ChatView() {
   const router = useRouter()
-  const { activeResume, addResume, updateResume, targetCompanyKey, setTargetCompanyKey, resumes, activeResumeId, setActiveResumeId, applications } = useAppStore()
+  const { activeResume } = useActiveResume()
+  const { data: resumes = [] } = useResumes()
+  const activeResumeId = useUIStore((s) => s.activeResumeId)
+  const setActiveResumeId = useUIStore((s) => s.setActiveResumeId)
+  const targetCompanyKey = useUIStore((s) => s.targetCompanyKey)
+  const setTargetCompanyKey = useUIStore((s) => s.setTargetCompanyKey)
+  const { mutate: addResume } = useCreateResume()
+  const { mutate: updateResume } = useUpdateResume()
+  const { data: applications } = useApplications()
   const fileRef = useRef<HTMLInputElement>(null)
   const [wizardOpen, setWizardOpen] = useState(false)
   const [pasteOpen, setPasteOpen] = useState(false)
@@ -195,7 +207,7 @@ export function ChatView() {
     let content = message.content
     // Only append target company context in coach mode (not build mode)
     if (targetCompanyKey !== 'none' && !buildDataRef.current) {
-      const job = applications.bookmark.find((j) => j.key === targetCompanyKey)
+      const job = applications?.bookmark?.find((j) => j.key === targetCompanyKey)
       if (job) {
         content += `\n\n*(Context: I am asking this in the context of my application for the ${job.title} role at ${job.company} (Match Score: ${job.score}%). Please tailor your response for this role.)*`
       }
@@ -277,7 +289,7 @@ export function ChatView() {
         })),
       })
 
-      addResume(resume)
+      addResume({ id: resume.id, data: resume })
       setActiveResumeId(resume.id)
 
       // Inject upload card as a chat message — it stays frozen at this position.
@@ -369,7 +381,7 @@ export function ChatView() {
         template: buildDataRef.current.template,
       })
 
-      addResume(resume)
+      addResume({ id: resume.id, data: resume })
       setActiveResumeId(resume.id)
 
       const ackText = `✅ Resume saved! I've created your **${buildDataRef.current.role}** resume with the **${buildDataRef.current.template}** template. You can open the editor to make any changes.`
@@ -445,8 +457,8 @@ export function ChatView() {
             template: data.template,
           })
 
-          addResume(resume)
-          setActiveResumeId(resume.id)
+      addResume({ id: resume.id, data: resume })
+      setActiveResumeId(resume.id)
 
           buildDataRef.current = null
           setBuildData(null)
@@ -470,7 +482,7 @@ export function ChatView() {
       template: data.template,
     })
 
-    addResume(resume)
+    addResume({ id: resume.id, data: resume })
     setActiveResumeId(resume.id)
 
     buildDataRef.current = null
@@ -656,11 +668,11 @@ export function ChatView() {
           <select
             value={targetCompanyKey}
             onChange={(e) => setTargetCompanyKey(e.target.value)}
-            disabled={applications.bookmark.length === 0}
+            disabled={(applications?.bookmark?.length ?? 0) === 0}
             className="rounded-xs border border-border bg-background px-1.5 py-0.5 text-[11px] text-foreground outline-none focus:border-primary"
           >
             <option value="none">General Career Coach</option>
-            {applications.bookmark.map((job) => (
+            {(applications?.bookmark ?? []).map((job) => (
               <option key={job.key} value={job.key}>{job.company} ({job.title})</option>
             ))}
           </select>
