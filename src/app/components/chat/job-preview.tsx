@@ -58,12 +58,19 @@ export function JobPreview({ resume, onDismiss, onLoadComplete }: { resume: Resu
   const [loading, setLoading] = useState(true)
   const [total, setTotal] = useState(0)
   const [error, setError] = useState(false)
+  const lastSearchKeyRef = useRef('')
 
   // ── Detail modal ──
   const [modalJob, setModalJob] = useState<ScoredJob | null>(null)
   const [modalOpen, setModalOpen] = useState(false)
 
   const fetchJobs = useCallback(async () => {
+    // Guard: skip if search params haven't changed (e.g. React Query
+    // returned a new resume object ref from onSettled invalidation).
+    const searchKey = `${resume.role}|${resume.location ?? ''}|${(resume.skills ?? []).sort().join(',')}`
+    if (searchKey === lastSearchKeyRef.current) return
+    lastSearchKeyRef.current = searchKey
+
     setLoading(true)
     setError(false)
     try {
