@@ -1,47 +1,43 @@
-# Global State & Data Fetching Refactor Plan
+# Fresh State & Data Fetching Refactor Plan (Zero-Legacy Edition)
 
-> **For the implementing agent:** Follow every step in order. Do NOT skip any file or compile check. Do NOT use Context. Keep UI state in Zustand + Immer and Server state in TanStack Query.
-
----
-
-## Table of Contents
-1. [Step 1: Install Package Dependencies](#step-1-install-package-dependencies)
-2. [Step 2: Database Schema & Relations Refactoring](#step-2-database-schema--relations-refactoring)
-3. [Step 3: Centralized API Client Implementation](#step-3-centralized-api-client-implementation)
-4. [Step 4: Query Provider Setup](#step-4-query-provider-setup)
-5. [Step 5: Zustand Store & TanStack Query Hooks Setup](#step-5-zustand-store--tanstack-query-hooks-setup)
-6. [Step 6: Core Component Refactoring Slices](#step-6-core-component-refactoring-slices)
-7. [Step 7: Clean Up Dead Code](#step-7-clean-up-dead-code)
-8. [Step 8: Verify Build & Compile](#step-8-verify-build--compile)
+> **For the implementing agent:** Follow every step in order. Do NOT keep any backward-compatibility hooks, aliased wrappers, or dummy providers. Build the cleanest, modular state architecture possible.
 
 ---
 
-## Step 1: Install Package Dependencies
+## Directory Map
 
-Run this command in the workspace root:
+```
+src/app/
+├── lib/
+│   ├── schema.ts         Drizzle DB schema (Clean slate, tailored_resumes removed)
+│   └── api-client.ts     NEW: Typed fetch client wrapping all internal routes
+├── hooks/
+│   ├── use-ui.ts         NEW: Zustand client store for layout & UI state
+│   ├── use-resumes.ts    NEW: TanStack Query hooks for Resumes querying
+│   └── use-apps.ts       NEW: TanStack Query hooks for Kanban/Applications
+└── components/
+    └── layout/
+        └── query-provider.tsx   NEW: TanStack Query Client wrapper
+```
+
+---
+
+## Step 1: Install Dependencies
+
+Run in root:
 ```bash
 pnpm add zustand @tanstack/react-query immer
 ```
-Verify that `zustand`, `@tanstack/react-query`, and `immer` are in `package.json`.
 
 ---
 
-## Step 2: Database Schema & Relations Refactoring
+## Step 2: Drizzle Schema Cleanup
 
 ### 2A: Update `src/app/lib/schema.ts`
-We are deleting the dead `tailoredResumes` table, removing the `tailoredResumeId` from applications, and adding the missing Drizzle relation for `coverLetter`.
-
-Replace sections in `src/app/lib/schema.ts` matching these steps:
-
-1. **Delete** the `tailoredResumes` table and its relation definition completely (lines 131 to 149):
-   - Remove `tailoredResumes` definition.
-   - Remove `tailoredResumesRelations` definition.
-
-2. **Update** `applications` table (line 154) to remove `tailoredResumeId`:
-   - Delete line 172: `tailoredResumeId: text("tailored_resume_id").references(() => tailoredResumes.id, { onDelete: "set null" }),`
-
-3. **Update** `applicationsRelations` (line 184) to remove `tailoredResume` and add the missing `coverLetter` relation:
-   Replace lines 184 to 189:
+1. **Delete** the `tailoredResumes` table definition completely (lines 131 to 149).
+2. **Delete** the `tailoredResumesRelations` definition.
+3. **Delete** the `tailoredResumeId` column inside `applications` (line 172).
+4. **Update** `applicationsRelations` (line 184) to reference only `user`, `resume`, and `coverLetter`:
    ```typescript
    export const applicationsRelations = relations(applications, ({ one }) => ({
      user: one(user, { fields: [applications.userId], references: [user.id] }),
@@ -50,20 +46,18 @@ Replace sections in `src/app/lib/schema.ts` matching these steps:
    }));
    ```
 
-### 2B: Generate and Apply DB Migration
-Run these commands in order:
+### 2B: Apply Database Changes
+Since we are in a fresh-start state, drop the database schema and push the new Drizzle schema cleanly:
 ```bash
 pnpm db:generate
 pnpm db:migrate
 ```
 
-Verify that the migrations directory has a new sql file dropping the table and changing the foreign keys.
-
 ---
 
-## Step 3: Centralized API Client Implementation
+## Step 3: Centralized API Client
 
-Create a new file: `src/app/lib/api-client.ts`
+Create `src/app/lib/api-client.ts`:
 
 ```typescript
 import type { Resume, PipelineJob, ApplicationBoard, PendingTailor } from '~/types/resume'
@@ -121,23 +115,15 @@ export class ApiClient {
   }
 
   static createResume(payload: { id: string; data: Resume; isBase?: boolean }): Promise<void> {
-    return this.request('/api/resumes', {
-      method: 'POST',
-      body: JSON.stringify(payload),
-    })
+    return this.request('/api/resumes', { method: 'POST', body: JSON.stringify(payload) })
   }
 
   static updateResume(id: string, payload: { data: Partial<Resume>; isBase?: boolean }): Promise<void> {
-    return this.request(`/api/resumes/${id}`, {
-      method: 'PATCH',
-      body: JSON.stringify(payload),
-    })
+    return this.request(`/api/resumes/${id}`, { method: 'PATCH', body: JSON.stringify(payload) })
   }
 
   static deleteResume(id: string): Promise<void> {
-    return this.request(`/api/resumes/${id}`, {
-      method: 'DELETE',
-    })
+    return this.request(`/api/resumes/${id}`, { method: 'DELETE' })
   }
 
   // Applications
@@ -146,29 +132,19 @@ export class ApiClient {
   }
 
   static createApplication(payload: CreateApplicationPayload): Promise<{ id: string }> {
-    return this.request('/api/applications', {
-      method: 'POST',
-      body: JSON.stringify(payload),
-    })
+    return this.request('/api/applications', { method: 'POST', body: JSON.stringify(payload) })
   }
 
   static deleteApplication(id: string): Promise<void> {
-    return this.request(`/api/applications/${id}`, {
-      method: 'DELETE',
-    })
+    return this.request(`/api/applications/${id}`, { method: 'DELETE' })
   }
 
   static clearApplications(): Promise<void> {
-    return this.request('/api/applications', {
-      method: 'DELETE',
-    })
+    return this.request('/api/applications', { method: 'DELETE' })
   }
 
   static reorderApplications(payload: ReorderApplicationsPayload): Promise<void> {
-    return this.request('/api/applications/reorder', {
-      method: 'POST',
-      body: JSON.stringify(payload),
-    })
+    return this.request('/api/applications/reorder', { method: 'POST', body: JSON.stringify(payload) })
   }
 
   // Cover Letters
@@ -177,16 +153,11 @@ export class ApiClient {
   }
 
   static deleteCoverLetter(id: string): Promise<void> {
-    return this.request(`/api/cover-letters/${id}`, {
-      method: 'DELETE',
-    })
+    return this.request(`/api/cover-letters/${id}`, { method: 'DELETE' })
   }
 
   static generateCoverLetter(payload: GenerateCoverLetterPayload): Promise<{ id: string; letter: string }> {
-    return this.request('/api/ai/cover-letter', {
-      method: 'POST',
-      body: JSON.stringify(payload),
-    })
+    return this.request('/api/ai/cover-letter', { method: 'POST', body: JSON.stringify(payload) })
   }
 
   // Parser
@@ -196,7 +167,6 @@ export class ApiClient {
     return this.request('/api/parse-resume', {
       method: 'POST',
       body: formData,
-      // Let browser set boundaries for multipart/form-data
     })
   }
 
@@ -209,82 +179,21 @@ export class ApiClient {
 
 ---
 
-## Step 4: Query Provider Setup
+## Step 4: UI state store (Zustand)
 
-Create a new file: `src/app/components/layout/query-provider.tsx`
-This wraps children in TanStack Query's QueryClientProvider.
+Create `src/app/hooks/use-ui.ts`:
 
-```tsx
-'use client'
-
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { useState, type ReactNode } from 'react'
-
-export function QueryProvider({ children }: { children: ReactNode }) {
-  const [queryClient] = useState(
-    () =>
-      new QueryClient({
-        defaultOptions: {
-          queries: {
-            staleTime: 60 * 1000, // 1 minute stale time
-            refetchOnWindowFocus: false,
-          },
-        },
-      })
-  )
-
-  return <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
-}
-```
-
-Then, wrap the app layout `src/app/[locale]/layout.tsx` in this provider.
-
-1. **Import** the `QueryProvider` at the top of `src/app/[locale]/layout.tsx`:
-   ```typescript
-   import { QueryProvider } from '~/components/layout/query-provider'
-   ```
-
-2. **Wrap** the `ThemeProvider` inside `QueryProvider` (around lines 56 to 62):
-   ```tsx
-     return (
-       <NextIntlClientProvider messages={messages}>
-         <QueryProvider>
-           <ThemeProvider>
-             {children}
-             <Toaster position="bottom-center" richColors />
-           </ThemeProvider>
-         </QueryProvider>
-       </NextIntlClientProvider>
-     )
-   ```
-
----
-
-## Step 5: Zustand Store & TanStack Query Hooks Setup
-
-We will replace the Context-based `src/app/lib/store.tsx` entirely with a Zustand UI store and TanStack Query hooks.
-
-Replace the contents of `src/app/lib/store.tsx`:
-
-```tsx
-'use client'
-
+```typescript
 import { create } from 'zustand'
 import { immer } from 'zustand/middleware/immer'
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import type { Resume, PipelineJob, ApplicationBoard, PendingTailor } from '~/types/resume'
-import { ApiClient } from '~/lib/api-client'
-import { notify } from '~/lib/toast'
-import { EMPTY_APPLICATIONS } from '~/lib/constants'
+import type { PendingTailor } from '~/types/resume'
 
-// ── Ephemeral UI Zustand Store ──
-
-interface AppUIState {
+interface UIState {
   sidebarCollapsed: boolean
   activeResumeId: string | null
   targetCompanyKey: string
   pendingTailor: PendingTailor | null
-  
+
   toggleSidebar: () => void
   setSidebarCollapsed: (collapsed: boolean) => void
   setActiveResumeId: (id: string | null) => void
@@ -293,7 +202,7 @@ interface AppUIState {
   toggleAcceptedChange: (changeId: string) => void
 }
 
-export const useUIStore = create<AppUIState>()(
+export const useUIStore = create<UIState>()(
   immer((set) => ({
     sidebarCollapsed: false,
     activeResumeId: null,
@@ -333,27 +242,52 @@ export const useUIStore = create<AppUIState>()(
       }),
   }))
 )
+```
 
-// Legacy AppStoreProvider dummy wrapper to prevent breaking layout files during migration
-export function AppStoreProvider({ children }: { children: React.ReactNode }) {
-  return <>{children}</>
+---
+
+## Step 5: Query Provider Setup
+
+Create `src/app/components/layout/query-provider.tsx`:
+
+```tsx
+'use client'
+
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { useState, type ReactNode } from 'react'
+
+export function QueryProvider({ children }: { children: ReactNode }) {
+  const [queryClient] = useState(
+    () =>
+      new QueryClient({
+        defaultOptions: {
+          queries: {
+            staleTime: 60 * 1000,
+            refetchOnWindowFocus: false,
+          },
+        },
+      })
+  )
+
+  return <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
 }
+```
 
-// Legacy alias wrapper hook to prevent breaking imports of useAppStore in UI layout components
-export function useAppStore() {
-  const uiState = useUIStore()
-  const { data: resumes } = useResumes()
-  const { data: applications } = useApplications()
-  return {
-    ...uiState,
-    resumes: resumes || [],
-    applications: applications || EMPTY_APPLICATIONS,
-    hydrated: true, // Legacy compatibility
-    loading: false,  // Legacy compatibility
-  }
-}
+Wrap `src/app/[locale]/layout.tsx`:
+```typescript
+import { QueryProvider } from '~/components/layout/query-provider'
+```
+Wrap the `ThemeProvider` inside `<QueryProvider>` in the `LocaleLayout` return block.
 
-// ── Server State TanStack Query Hooks ──
+---
+
+## Step 6: TanStack Query Hooks
+
+### 6A: Resumes Hooks (`src/app/hooks/use-resumes.ts`)
+```typescript
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { ApiClient } from '~/lib/api-client'
+import type { Resume } from '~/types/resume'
 
 export function useResumes() {
   return useQuery({
@@ -365,13 +299,45 @@ export function useResumes() {
   })
 }
 
-// Helper query to find a single resume
-export function useResume(id: string | null) {
-  const { data: resumes } = useResumes()
-  return resumes?.find((r) => r.id === id)
+export function useCreateResume() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: ApiClient.createResume,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['resumes'] })
+    },
+  })
 }
 
-// Helper to group application database rows into Kanban column buckets
+export function useUpdateResume() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: ({ id, data }: { id: string; data: Partial<Resume>; isBase?: boolean }) =>
+      ApiClient.updateResume(id, { data }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['resumes'] })
+    },
+  })
+}
+
+export function useDeleteResume() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: ApiClient.deleteResume,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['resumes'] })
+    },
+  })
+}
+```
+
+### 6B: Applications Hooks (`src/app/hooks/use-apps.ts`)
+```typescript
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { ApiClient } from '~/lib/api-client'
+import type { PipelineJob, ApplicationBoard } from '~/types/resume'
+import { notify } from '~/lib/toast'
+
 function groupByStatus(apps: any[]): ApplicationBoard {
   const board: ApplicationBoard = {
     bookmark: [],
@@ -433,39 +399,6 @@ export function useApplications() {
   })
 }
 
-// Resumes Mutations
-export function useCreateResume() {
-  const queryClient = useQueryClient()
-  return useMutation({
-    mutationFn: ApiClient.createResume,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['resumes'] })
-    },
-  })
-}
-
-export function useUpdateResume() {
-  const queryClient = useQueryClient()
-  return useMutation({
-    mutationFn: ({ id, data }: { id: string; data: Partial<Resume>; isBase?: boolean }) =>
-      ApiClient.updateResume(id, { data }),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['resumes'] })
-    },
-  })
-}
-
-export function useDeleteResume() {
-  const queryClient = useQueryClient()
-  return useMutation({
-    mutationFn: ApiClient.deleteResume,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['resumes'] })
-    },
-  })
-}
-
-// Applications Mutations
 export function useCreateApplication() {
   const queryClient = useQueryClient()
   return useMutation({
@@ -503,9 +436,6 @@ export function useReorderApplications() {
     onMutate: async ({ updates }) => {
       await queryClient.cancelQueries({ queryKey: ['applications'] })
       const previous = queryClient.getQueryData<ApplicationBoard>(['applications'])
-
-      // Perform optimistic update on the cache
-      // The implementation details will map Kanban movement states
       return { previous }
     },
     onError: (err, variables, context) => {
@@ -523,111 +453,74 @@ export function useReorderApplications() {
 
 ---
 
-## Step 6: Core Component Refactoring Slices
+## Step 7: Clean Up Global Layout (`src/app/[locale]/(app)/layout.tsx`)
 
-We must refactor all components that read database state from `useAppStore()` or context:
+Delete `<AppStoreProvider>` wrapping from the layout entirely.
+1. Remove line 5: `import { AppStoreProvider, useAppStore } from '~/lib/store'`
+2. Add imports:
+   ```typescript
+   import { useUIStore } from '~/hooks/use-ui'
+   ```
+3. Update `AppShell` to read from the Zustand store directly:
+   ```typescript
+   const sidebarCollapsed = useUIStore((s) => s.sidebarCollapsed)
+   const toggleSidebar = useUIStore((s) => s.toggleSidebar)
+   ```
+4. Replace the default export return block (lines 104 to 112) with a direct wrap:
+   ```tsx
+   export default function AppLayout({ children }: { children: React.ReactNode }) {
+     return (
+       <AuthGuard>
+         <AppShell>{children}</AppShell>
+       </AuthGuard>
+     )
+   }
+   ```
 
-### 6A: Refactoring `src/app/components/layout/sidebar.tsx`
-Instead of reading resumes from store Context, it reads from `useResumes()` query:
+---
 
-```tsx
-import { useResumes, useUIStore } from '~/lib/store'
+## Step 8: Delete `src/app/lib/store.tsx`
+Delete the file `/Users/pantorn/satori/projects/job-for-sure/src/app/lib/store.tsx` entirely once all imports are refactored.
 
-export function Sidebar() {
-  const { data: resumes, isLoading } = useResumes()
-  const activeResumeId = useUIStore((s) => s.activeResumeId)
-  const setActiveResumeId = useUIStore((s) => s.setActiveResumeId)
-  ...
-}
-```
+---
 
-### 6B: Refactoring `src/app/components/resume/resume-detail.tsx`
-Replace the local store bindings with query hooks:
+## Step 9: Component-Level Refactoring
 
-```tsx
-import { useUIStore, useResumes, useUpdateResume, useDeleteResume } from '~/lib/store'
+Refactor the components that read data from the store to use the new hooks:
 
-export function ResumeDetail({ resumeId }: { resumeId: string }) {
+### 9A: `src/app/components/layout/sidebar.tsx`
+- Replace `useAppStore()` imports with `useResumes()` and `useUIStore()`.
+- Access resumes via `const { data: resumes } = useResumes()`.
+- Access active resume ID via `const activeResumeId = useUIStore((s) => s.activeResumeId)`.
+
+### 9B: `src/app/components/resume/resume-detail.tsx`
+- Replace `useAppStore()` with `useResumes()`, `useUIStore()`, and mutations `useUpdateResume()`, `useDeleteResume()`.
+- Retrieve target resume from query:
+  ```typescript
   const { data: resumes } = useResumes()
   const resume = resumes?.find((r) => r.id === resumeId)
-  
-  const updateMutation = useUpdateResume()
-  const deleteMutation = useDeleteResume()
+  ```
 
-  // Replace updateResume(id, data) with updateMutation.mutate({ id, data })
-  // Replace deleteResume(id) with deleteMutation.mutateAsync(id)
-}
-```
+### 9C: Kanban applications (`src/app/components/pipeline/applications-view.tsx`)
+- Replace `useAppStore()` with `useApplications()`, `useReorderApplications()`, `useDeleteApplication()`, `useClearApplications()`.
+- Connect mutations for reordering and clearing.
 
-### 6C: Refactoring Kanban Application board (`src/app/components/pipeline/applications-view.tsx`)
-```tsx
-import { useApplications, useReorderApplications, useDeleteApplication, useClearApplications } from '~/lib/store'
-
-export function ApplicationsView() {
-  const { data: board, isLoading } = useApplications()
-  const reorderMutation = useReorderApplications()
-  const deleteMutation = useDeleteApplication()
-  const clearMutation = useClearApplications()
-
-  // Replace moveJob, removeJob, clearApplications with corresponding mutation calls
-}
-```
+### 9D: Cover letters (`src/app/[locale]/(app)/cover-letter/page.tsx`)
+- Point to custom query / API client methods instead of manual `fetch` calls.
 
 ---
 
-## Step 7: Clean Up Dead Code
+## Step 10: Verify Build & Compile
 
-Delete the `/api/resumes` checks for `tailored_resumes` inside the dashboard/admin counts if found:
-In `/src/app/[locale]/admin/page.tsx` (or dashboard file):
-Change:
-```typescript
-const [tailoredCount] = await db.select({ total: count() }).from(tailoredResumes)
-```
-to:
-```typescript
-const [tailoredCount] = await db.select({ total: count() }).from(resumes).where(eq(resumes.isBase, false))
-```
-
----
-
-## Step 8: Verify Build & Compile
-
-Run compilation check:
+Run validation checks:
 ```bash
 npx tsc --noEmit
-```
-Verify that Next.js static files build:
-```bash
 pnpm build
-```
-Run tests:
-```bash
 pnpm test
 ```
-Commit files using conventional commits prefix:
+Stage only intended modifications and commit:
 ```bash
 git add .
-git commit -m "refactor(store): migrate React Context to Zustand and TanStack Query"
+git commit -m "refactor(store): migrate global state and fetching to modular Zustand and TanStack Query"
 git push
 ```
-
----
-
-## Step 9: Optional Phase — PDF.js Canvas Rendering (For Ultra-Performance)
-
-> **Recommended future UX upgrade:** Standard `@react-pdf/renderer` `<PDFViewer>` uses an iframe, which renders the browser's native PDF interface (print/download bars, gray background, inconsistent styling across Chrome/Safari/mobile).
-> 
-> To match **Reactive Resume** and **FlowCV's** premium look, implement a canvas-based viewer:
-> 
-> 1. Install `pdfjs-dist`:
->    ```bash
->    pnpm add pdfjs-dist
->    ```
-> 
-> 2. Create a client-side PDF canvas renderer `src/app/components/resume/resume-canvas-preview.tsx` that:
->    - Uses `@react-pdf/renderer`'s `pdf(<ResumePDF resume={resume} />).toBlob()` helper to compile the document into a blob in memory.
->    - Loads the blob via `pdfjsLib.getDocument({ data: arrayBuffer })`.
->    - Instantiates an HTML5 `<canvas>` in React for each page of the document.
->    - Renders the pages directly to the canvases inside the React cycle.
-> 
-> This eliminates iframe scrollbars, allows dark-mode styling of the page borders, and speeds up typing responsiveness.
