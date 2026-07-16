@@ -67,7 +67,7 @@ export function useApplications() {
 export function useCreateApplication() {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: ApiClient.createApplication,
+    mutationFn: ApiClient.createApplication.bind(ApiClient),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['applications'] })
     },
@@ -77,7 +77,7 @@ export function useCreateApplication() {
 export function useDeleteApplication() {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: ApiClient.deleteApplication,
+    mutationFn: ApiClient.deleteApplication.bind(ApiClient),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['applications'] })
     },
@@ -87,7 +87,7 @@ export function useDeleteApplication() {
 export function useClearApplications() {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: ApiClient.clearApplications,
+    mutationFn: ApiClient.clearApplications.bind(ApiClient),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['applications'] })
     },
@@ -97,7 +97,7 @@ export function useClearApplications() {
 export function useReorderApplications() {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: ApiClient.reorderApplications,
+    mutationFn: ApiClient.reorderApplications.bind(ApiClient),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['applications'] })
     },

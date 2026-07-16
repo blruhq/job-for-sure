@@ -15,7 +15,7 @@ export function useResumes() {
 export function useCreateResume() {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: ApiClient.createResume,
+    mutationFn: ApiClient.createResume.bind(ApiClient),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['resumes'] })
     },
@@ -36,7 +36,7 @@ export function useUpdateResume() {
 export function useDeleteResume() {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: ApiClient.deleteResume,
+    mutationFn: ApiClient.deleteResume.bind(ApiClient),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['resumes'] })
     },
