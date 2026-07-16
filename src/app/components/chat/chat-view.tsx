@@ -295,10 +295,11 @@ export function ChatView() {
 
       // Inject upload card as a chat message — it stays frozen at this position.
       // Follow with an assistant ack so the last message isn't 'user' (avoids infinite "Processing..." spinner).
-      const uploadText = `📎 Resume uploaded: ${resume.persona || 'Unknown'}${resume.role ? ` — ${resume.role}` : ''}`
+      const uploadText = `📎 Resume uploaded: ${resume.persona || 'Unknown'}${resume.role ? ` — ${resume.role}` : ''}${resume.location ? ` (${resume.location})` : ''}`
+      const locClause = resume.location ? ` based in **${resume.location}**` : ''
       const ackText = resume.role
-        ? `Great! I've parsed your resume. I can see you're a **${resume.role}**. I found ${resume.skills.length} skills in your profile. Ask me anything — I have your full resume context.`
-        : `Great! I've parsed your resume. Ask me anything — I have your full resume context.`
+        ? `Great! I've parsed your resume. I can see you're a **${resume.role}**${locClause}. I found ${resume.skills.length} skills in your profile. Ask me anything — I have your full resume context.`
+        : `Great! I've parsed your resume${locClause}. Ask me anything — I have your full resume context.`
       setMessages(prev => [...prev, {
         id: `upload-${Date.now()}`,
         role: 'user',
