@@ -312,7 +312,7 @@ export function JobSearchPanel({ resume }: { resume: Resume }) {
         setLoading(false)
       }
     }
-  }, [query, location, resume.skills, resume.role, mergeResults])
+  }, [query, location, countryCode, resume.skills, resume.role, mergeResults])
 
   // Auto-search on mount — check sessionStorage first for instant back-nav
   useEffect(() => {
