@@ -247,7 +247,7 @@ Language rules: Evaluate the candidate's answer and return strengths, improvemen
     system: systemPrompt,
     prompt: 'Evaluate the candidate answer.',
     schema: InterviewEvaluateSchema,
-    temperature: 0.3,
+    temperature: 0,
     maxOutputTokens: 800,
   })
 

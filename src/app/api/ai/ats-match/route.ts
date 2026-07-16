@@ -96,7 +96,7 @@ Definitions:
     system: systemPrompt,
     prompt: userPrompt,
     schema: AtsSchema,
-    temperature: 0.3,
+    temperature: 0,
     maxOutputTokens: 1000,
   })
 
