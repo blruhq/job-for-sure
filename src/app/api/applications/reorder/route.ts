@@ -13,7 +13,6 @@ export const POST = withAuth(async (req, { user }) => {
   }
 
   const { updates } = body.data
-  console.log('[Reorder API] updates:', updates)
   const ids = updates.map((u) => u.id)
 
   // Verify ownership
@@ -32,10 +31,8 @@ export const POST = withAuth(async (req, { user }) => {
 
   const updatePromises = updates.map(async (update) => {
     if (!ownedIds.has(update.id)) {
-      console.log(`[Reorder API] Skipping update for ${update.id} - not owned or deleted`)
       return
     }
-    console.log(`[Reorder API] Updating application ${update.id} to status: ${update.status}, position: ${update.position}`)
     await db
       .update(applications)
       .set({

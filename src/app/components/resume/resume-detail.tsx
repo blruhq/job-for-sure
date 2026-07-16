@@ -365,7 +365,7 @@ export function ResumeDetail({ resumeId }: { resumeId: string }) {
   const setPendingTailor = useUIStore((s) => s.setPendingTailor)
 
   const getResume = (id: string) => resumesList.find((r) => r.id === id)
-  const [tab, setTab] = useState<'jobs' | 'view' | 'editor' | 'cover-letter'>('jobs')
+  const [tab, setTab] = useState<'jobs' | 'view' | 'editor' | 'cover-letter'>('editor')
   const searchParams = useSearchParams()
   const [galleryOpen, setGalleryOpen] = useState(false)
   const [showDeleteDialog, setShowDeleteDialog] = useState(false)

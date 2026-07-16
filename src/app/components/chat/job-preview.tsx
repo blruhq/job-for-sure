@@ -7,29 +7,13 @@ import {
 } from 'lucide-react'
 import { cn } from '~/lib/utils'
 import { useApplications, useCreateApplication, useDeleteApplication } from '~/hooks/use-apps'
+import { useBookmarkJob } from '~/hooks/use-bookmark'
 import { notify } from '~/lib/toast'
 import { companyColor, companyLogo } from '~/lib/company-data'
 import type { Resume } from '~/types/resume'
 import type { ScoredJob, SearchResult, JobSource } from '~/lib/job-sources/types'
 import { JobDetailModal } from '~/components/resume/job-detail-modal'
-
-const SOURCE_SHORT: Record<JobSource, string> = {
-  greenhouse: 'Greenhouse',
-  ashby: 'Ashby',
-  remoteok: 'RemoteOK',
-  himalayas: 'Himalayas',
-  remotive: 'Remotive',
-  themuse: 'The Muse',
-  arbeitnow: 'Arbeitnow',
-  adzuna: 'Adzuna',
-  jsearch: 'JSearch',
-  jobbkk: 'JobbKK',
-  'linkedin-guest': 'LinkedIn',
-  linkedin: 'LinkedIn',
-  indeed: 'Indeed',
-  jobsdb: 'JobsDB',
-  'jobsdb-rest': 'JobsDB',
-}
+import { SOURCE_SHORT } from '~/lib/source-names'
 
 // ═══════════════════════════════════════════════════════════════
 // JobPreview — shows up to 10 real job cards inline in the chat

@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { authClient } from '~/lib/auth-client'
 import { Loader2, User, Bell, AlertTriangle, Check, X, Eye, EyeOff } from 'lucide-react'
-import { Sun, Moon, Linkedin, Chrome, Crown } from 'lucide-react'
+import { Sun, Moon } from 'lucide-react'
 import { useTheme } from '~/components/layout/theme-provider'
 
 // ── TYPES ──
@@ -433,61 +433,6 @@ export default function SettingsPage() {
 
       {/* Toast */}
       {notif && <Toast notif={notif} onClose={() => {}} />}
-    </div>
-  )
-}
-
-function LegacySettings() {
-  const { theme, toggle } = useTheme()
-
-  return (
-    <div className="overflow-hidden rounded-sm border border-border bg-card">
-      <div className="flex items-center justify-between border-b border-border/50 px-4 py-3">
-        <div>
-          <div className="text-xs font-medium">Theme</div>
-          <div className="text-[11px] text-muted-foreground">Light or dark mode</div>
-        </div>
-        <button
-          onClick={toggle}
-          className="flex items-center gap-1.5 rounded-sm border border-border bg-background px-3 py-1.5 text-xs hover:bg-background"
-        >
-          {theme === 'dark' ? <Sun size={13} /> : <Moon size={13} />}
-          Toggle
-        </button>
-      </div>
-      <div className="flex items-center justify-between border-b border-border/50 px-4 py-3">
-        <div>
-          <div className="text-xs font-medium flex items-center gap-1.5">
-            <Linkedin size={13} className="text-[#0073b1]" /> LinkedIn Import
-          </div>
-          <div className="text-[11px] text-muted-foreground">Auto-populate profile</div>
-        </div>
-        <button className="rounded-sm border border-border bg-background px-3 py-1.5 text-xs hover:bg-background">
-          Connect
-        </button>
-      </div>
-      <div className="flex items-center justify-between border-b border-border/50 px-4 py-3">
-        <div>
-          <div className="text-xs font-medium flex items-center gap-1.5">
-            <Chrome size={13} /> Chrome Extension
-          </div>
-          <div className="text-[11px] text-muted-foreground">Import jobs from any career page</div>
-        </div>
-        <button className="rounded-sm border border-border bg-background px-3 py-1.5 text-xs hover:bg-background">
-          Install
-        </button>
-      </div>
-      <div className="flex items-center justify-between px-4 py-3">
-        <div>
-          <div className="text-xs font-medium flex items-center gap-1.5">
-            <Crown size={13} className="text-[var(--warn)]" /> Plan
-          </div>
-          <div className="text-[11px] text-muted-foreground">Free tier · upgrade for unlimited</div>
-        </div>
-        <span className="rounded-sm bg-accent-soft px-2.5 py-1 text-[11px] font-medium text-primary">
-          Free Tier (Active)
-        </span>
-      </div>
     </div>
   )
 }

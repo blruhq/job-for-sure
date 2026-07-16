@@ -146,7 +146,7 @@ export type ApplicationColumnId = keyof ApplicationBoard
 
 export interface ChatMessage {
   id: string
-  role: 'coach' | 'user'
+  role: 'user' | 'assistant' | 'system' | 'tool'
   name: string
   content: string
   kind?: 'text' | 'matches' | 'resume' | 'form' | 'entry'

@@ -28,23 +28,7 @@ import { RoleAutocomplete } from '../search/RoleAutocomplete'
 // Replaces the hallucinated match-companies.
 // ═══════════════════════════════════════════════════════════════
 
-const SOURCE_NAMES: Record<JobSource, string> = {
-  greenhouse: 'Greenhouse',
-  ashby: 'Ashby',
-  remoteok: 'RemoteOK',
-  himalayas: 'Himalayas',
-  remotive: 'Remotive',
-  themuse: 'The Muse',
-  arbeitnow: 'Arbeitnow',
-  adzuna: 'Adzuna',
-  jsearch: 'JSearch',
-  jobbkk: 'JobbKK',
-  'linkedin-guest': 'LinkedIn',
-  linkedin: 'LinkedIn (Apify)',
-  indeed: 'Indeed (Apify)',
-  jobsdb: 'JobsDB (Apify)',
-  'jobsdb-rest': 'JobsDB',
-}
+import { SOURCE_NAMES } from '~/lib/source-names'
 
 // Source tiers used by the search flow (see plan)
 const FAST_FREE_SOURCES: JobSource[] = [

@@ -34,8 +34,6 @@ export function ResizableHandle({ className, ...props }: SeparatorProps) {
         'hidden lg:flex',
         className,
       )}
-      onPointerDown={(e) => console.log('[Resize] pointerdown', e.clientX, e.clientY)}
-      onPointerMove={(e) => console.log('[Resize] pointermove', e.clientX, e.clientY, e.buttons)}
       {...props}
     >
       <div className="h-12 w-1 rounded-full bg-red-500 transition-colors" />
