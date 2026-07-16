@@ -28,18 +28,16 @@ export function ResizableHandle({ className, ...props }: SeparatorProps) {
   return (
     <Separator
       className={cn(
-        // Wide hit area (24px) with an inner pill for the visual bar.
-        // react-resizable-panels applies `data-separator` attribute:
-        //   "inactive" | "hover" | "active" (dragging) | "focus" | "disabled"
-        'group relative flex w-6 items-center justify-center bg-transparent transition-colors',
-        'hover:bg-primary/10',
-        'data-[separator=active]:bg-primary/20',
-        'hidden lg:flex',  // Hidden on mobile — mobile uses tab toggle
+        'group relative flex w-6 items-center justify-center transition-colors',
+        'bg-red-500/20 hover:bg-red-500/40',
+        'data-[separator=active]:bg-red-500/60',
+        'hidden lg:flex',
         className,
       )}
+      onPointerDown={(e) => console.log('[Resize] pointerdown', e.clientX, e.clientY, e.target)}
       {...props}
     >
-      <div className="h-8 w-1 rounded-full bg-muted-foreground/30 transition-colors group-hover:bg-primary group-data-[separator=active]:bg-primary" />
+      <div className="h-12 w-1 rounded-full bg-red-500 transition-colors" />
     </Separator>
   )
 }
