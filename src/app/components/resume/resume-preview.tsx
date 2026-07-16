@@ -1,54 +1,67 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, memo } from 'react'
 import type { Resume } from '~/types/resume'
 import { ResumePDF } from '~/components/resume/resume-pdf'
 
-export function ResumePreview({ resume }: { resume: Resume }) {
+export const ResumePreview = memo(function ResumePreview({ resume }: { resume: Resume }) {
   const [dataUrl, setDataUrl] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
   const resumeRef = useRef(resume)
   const genRef = useRef(0)
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const blobUrlRef = useRef<string | null>(null)
 
   useEffect(() => {
-    // Skip if the same reference (useDeferredValue may pass the same object)
     if (resume === resumeRef.current) return
     resumeRef.current = resume
 
     const thisGen = ++genRef.current
-    setLoading(true)
 
-    // Defer to next microtask so the loading state renders immediately
-    Promise.resolve().then(async () => {
+    // Debounce: wait 400ms before starting PDF generation
+    if (debounceRef.current) clearTimeout(debounceRef.current)
+    debounceRef.current = setTimeout(async () => {
+      if (thisGen !== genRef.current) return
+      setLoading(true)
+
       try {
-        // Dynamic import — @react-pdf/renderer has Node deps that break SSR
         const { pdf } = await import('@react-pdf/renderer')
-
-        // Cancel if a newer generation has already started
         if (thisGen !== genRef.current) return
 
-        // Generate PDF blob
         const instance = pdf(<ResumePDF resume={resume} />)
         const blob = await instance.toBlob()
         if (thisGen !== genRef.current) return
 
-        // Convert Blob → data URL (avoids Chrome Blob URL partitioning)
-        const url = await new Promise<string>((resolve, reject) => {
-          const reader = new FileReader()
-          reader.onload = () => resolve(reader.result as string)
-          reader.onerror = reject
-          reader.readAsDataURL(blob)
-        })
+        // Revoke previous blob URL
+        if (blobUrlRef.current) URL.revokeObjectURL(blobUrlRef.current)
 
-        if (thisGen !== genRef.current) return
+        const url = URL.createObjectURL(blob)
+        blobUrlRef.current = url
+
+        if (thisGen !== genRef.current) {
+          URL.revokeObjectURL(url)
+          return
+        }
+
         setDataUrl(url)
         setLoading(false)
       } catch (err) {
         console.error('PDF preview generation failed:', err)
         if (thisGen === genRef.current) setLoading(false)
       }
-    })
+    }, 400)
+
+    return () => {
+      if (debounceRef.current) clearTimeout(debounceRef.current)
+    }
   }, [resume])
+
+  // Cleanup blob URL on unmount
+  useEffect(() => {
+    return () => {
+      if (blobUrlRef.current) URL.revokeObjectURL(blobUrlRef.current)
+    }
+  }, [])
 
   if (loading && !dataUrl) {
     return (
@@ -76,4 +89,4 @@ export function ResumePreview({ resume }: { resume: Resume }) {
       title="Resume Preview"
     />
   )
-}
+})

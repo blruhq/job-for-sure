@@ -204,24 +204,17 @@ export function createResumeEditorStore(initial?: Partial<ResumeSavePayload> | P
           s.customSections = sectionsWithIds
 
           // Build sectionOrder from resume or default
-          const rawOrder = (r.sectionOrder as string[]) ?? [...ALL_EDITOR_SECTIONS, 'custom']
-          const expandedOrder: string[] = []
-          for (const id of rawOrder) {
-            if (id === 'custom') {
-              // Expand old 'custom' entry to individual cs-{id} entries
-              for (const cs of sectionsWithIds) {
-                expandedOrder.push(`cs-${cs.id}`)
-              }
-            } else {
-              expandedOrder.push(id)
+          const rawOrder = (r.sectionOrder as string[]) ?? Array.from(ALL_EDITOR_SECTIONS)
+          const existingCsIds = new Set(sectionsWithIds.map((cs) => `cs-${cs.id}`))
+          // Filter out legacy 'custom' and stale cs-{id} entries
+          const cleanOrder = rawOrder.filter((id) => id !== 'custom' && (!id.startsWith('cs-') || existingCsIds.has(id)))
+          // Append any custom sections not already in the order
+          for (const csId of existingCsIds) {
+            if (!cleanOrder.includes(csId)) {
+              cleanOrder.push(csId)
             }
           }
-
-          // Remove stale cs-{id} entries whose custom section no longer exists
-          const validIds = new Set(sectionsWithIds.map((cs) => `cs-${cs.id}`))
-          s.sectionOrder = expandedOrder.filter(
-            (id) => !id.startsWith('cs-') || validIds.has(id),
-          ) as SectionOrderId[]
+          s.sectionOrder = cleanOrder as SectionOrderId[]
 
           s.sectionVisibility = r.sectionVisibility ?? {}
         }),

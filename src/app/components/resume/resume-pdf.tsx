@@ -7,7 +7,7 @@ import { ClassicPDF } from './templates/classic-pdf'
 import { ExecutivePDF } from './templates/executive-pdf'
 import { PhotoPDF } from './templates/photo-pdf'
 
-export function ResumePDF({ resume }: { resume: Resume }) {
+export const ResumePDF = React.memo(function ResumePDF({ resume }: { resume: Resume }) {
   const template = resume.template || DEFAULT_TEMPLATE
 
   switch (template) {
@@ -23,4 +23,4 @@ export function ResumePDF({ resume }: { resume: Resume }) {
     default:
       return <MinimalistPDF resume={resume} />
   }
-}
+})

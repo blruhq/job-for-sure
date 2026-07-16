@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef, useCallback, useMemo, useDeferredValue } from 'react'
+import dynamic from 'next/dynamic'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { ArrowLeft, Wand2, Download, Trash2, Plus, X, PlusCircle, Lightbulb, GripVertical, ChevronDown, ChevronUp, Sparkles, Eye, EyeOff } from 'lucide-react'
 import {
@@ -32,7 +33,7 @@ import { JobSearchPanel } from '~/components/resume/job-search-panel'
 import type { Resume, ResumeEducation, ResumeProject, ResumeExperience, ResumeCertification, ResumeLanguage, ResumeCustomSection } from '~/types/resume'
 import { TemplateGallery } from '~/components/resume/templates/template-gallery'
 import { DEFAULT_TEMPLATE, getTemplateMeta } from '~/components/resume/templates/registry'
-import { ResumePreview } from '~/components/resume/resume-preview'
+const ResumePreview = dynamic(() => import('~/components/resume/resume-preview').then(m => ({ default: m.ResumePreview })), { ssr: false })
 import { TailorReviewPanel } from '~/components/resume/tailor-review-panel'
 import { ResizableGroup, ResizablePanel, ResizableHandle, useDefaultLayout } from '~/components/ui/resizable'
 import { useResumeEditor, ALL_EDITOR_SECTIONS, type EditorSectionId, type SectionOrderId, type SectionKey } from '~/lib/resume-editor-store'
@@ -434,14 +435,9 @@ export function ResumeDetail({ resumeId }: { resumeId: string }) {
       case 'certifications': return certifications.length > 0
       case 'languages': return languages.length > 0
       default: {
-        // Handle cs-{id} entries — check if the specific custom section exists
-        if (typeof id === 'string') {
-          if (id.startsWith('cs-')) {
-            const csId = id.slice(3)
-            return customSections.some((s) => s.id === csId)
-          }
-          // Legacy 'custom' entry — show if any custom sections exist
-          if ((id as string) === 'custom') return customSections.length > 0
+        if (typeof id === 'string' && id.startsWith('cs-')) {
+          const csId = id.slice(3)
+          return customSections.some((s) => s.id === csId)
         }
         return false
       }
@@ -709,48 +705,6 @@ export function ResumeDetail({ resumeId }: { resumeId: string }) {
             )}
           />
         )
-    }
-    // Legacy 'custom' entry — render all custom sections inline
-    // This is reached when sectionOrder still has a literal 'custom' entry
-    // (old resumes that haven't been re-hydrated yet)
-    if ((id as string) === 'custom') {
-      return (
-        <div className="space-y-3">
-          {customSections.length === 0 && (
-            <p className="py-2 text-center text-[10px] text-muted-foreground/50 italic">No custom sections yet.</p>
-          )}
-          {customSections.map((sec) => (
-            <div key={sec.id} className="rounded-xs border border-border/50 bg-background p-2">
-              <div className="flex items-center justify-between gap-2 mb-2">
-                <input
-                  value={sec.title}
-                  onChange={(e) => setCustomSections(customSections.map((s) => s.id === sec.id ? { ...s, title: e.target.value } : s))}
-                  placeholder="Section Title"
-                  className="flex-1 rounded-xs border border-border bg-background px-2 py-1 text-[11px] font-medium outline-none focus:border-primary"
-                />
-                <button
-                  type="button"
-                  onClick={() => setCustomSections(customSections.filter((s) => s.id !== sec.id))}
-                  className="cursor-pointer rounded-xs p-1 text-muted-foreground hover:text-red-500"
-                  title="Remove section"
-                >
-                  <X size={12} />
-                </button>
-              </div>
-              <div>
-                <label className="label-mono mb-0.5 block text-[9px]">Highlights (one per line)</label>
-                <textarea
-                  placeholder="Enter each bullet point on a new line"
-                  value={sec.bullets?.join('\n') || ''}
-                  onChange={(e) => setCustomSections(customSections.map((s) => s.id === sec.id ? { ...s, bullets: e.target.value.split('\n').filter(Boolean) } : s))}
-                  rows={3}
-                  className="w-full resize-y rounded-xs border border-border bg-background px-2 py-1 text-[11px] outline-none focus:border-primary"
-                />
-              </div>
-            </div>
-          ))}
-        </div>
-      )
     }
     // Handle cs-{id} entries — individual custom sections
     if (typeof id === 'string' && id.startsWith('cs-')) {

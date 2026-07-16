@@ -112,7 +112,6 @@ export const DEFAULT_SECTION_ORDER: string[] = [
   'projects',
   'certifications',
   'languages',
-  'custom',
 ]
 
 // Sections that appear in the editor's left panel but NOT in the PDF body

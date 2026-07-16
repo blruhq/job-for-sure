@@ -28,19 +28,19 @@ export function ResizableHandle({ className, ...props }: SeparatorProps) {
   return (
     <Separator
       className={cn(
-        // Visual bar is 6px, but the hit area is 22px via padding + background-clip
-        'relative flex w-1.5 items-center justify-center bg-border transition-colors',
-        'hover:bg-primary/40 active:bg-primary/60',
-        'after:absolute after:h-8 after:w-1 after:rounded-full after:bg-muted-foreground/30',
-        'hover:after:bg-primary after:transition-colors',
-        'data-[resize-handle-state=drag]:bg-primary data-[resize-handle-state=drag]:after:bg-primary',
+        // Wide hit area (24px) with an inner pill for the visual bar.
+        // react-resizable-panels applies `data-separator` attribute:
+        //   "inactive" | "hover" | "active" (dragging) | "focus" | "disabled"
+        'group relative flex w-6 items-center justify-center bg-transparent transition-colors',
+        'hover:bg-primary/10',
+        'data-[separator=active]:bg-primary/20',
         'hidden lg:flex',  // Hidden on mobile — mobile uses tab toggle
         className,
       )}
-      // Wide invisible hit area without visible width increase
-      style={{ padding: '0 8px', backgroundClip: 'content-box' }}
       {...props}
-    />
+    >
+      <div className="h-8 w-1 rounded-full bg-muted-foreground/30 transition-colors group-hover:bg-primary group-data-[separator=active]:bg-primary" />
+    </Separator>
   )
 }
 

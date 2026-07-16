@@ -32,8 +32,7 @@ export interface SectionStyleSet {
  * Returns the list of section IDs that should be rendered in the PDF,
  * in the correct order, respecting sectionOrder and sectionVisibility.
  * Excludes 'basic' (rendered in header) and sections with no data.
- * Supports both legacy 'custom' (one entry for all custom sections)
- * and new cs-{id} entries (individual custom sections in the order).
+ * Supports cs-{id} entries for individual custom sections.
  */
 export function getVisiblePdfSections(resume: Resume): string[] {
   const order = resume.sectionOrder ?? DEFAULT_SECTION_ORDER
@@ -65,7 +64,6 @@ export function getVisiblePdfSections(resume: Resume): string[] {
       case 'projects': return (resume.projects?.length ?? 0) > 0
       case 'certifications': return (resume.certifications?.length ?? 0) > 0
       case 'languages': return (resume.languages?.length ?? 0) > 0
-      case 'custom': return (resume.customSections?.length ?? 0) > 0
       default: return false
     }
   })
@@ -202,42 +200,6 @@ function LanguagesSection({ resume, s }: { resume: Resume; s: SectionStyleSet })
   )
 }
 
-function CustomSectionsRenderer({ resume, s }: { resume: Resume; s: SectionStyleSet }) {
-  return (
-    <>
-      {resume.customSections!.map((sec: ResumeCustomSection, i: number) => (
-        <View key={i} style={s.section}>
-          <Text style={s.sectionTitle}>{sec.title}</Text>
-          {sec.items && sec.items.length > 0 ? (
-            sec.items.map((item, j) => (
-              <View key={j} style={{ marginBottom: 4 }}>
-                {(item.title || item.subtitle) && (
-                  <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                    <Text style={{ fontSize: 9, fontWeight: 600, color: COLORS.ink }}>
-                      {item.title}{item.subtitle ? ` — ${item.subtitle}` : ''}
-                    </Text>
-                    {item.date ? <Text style={{ fontSize: 8, color: COLORS.muted }}>{item.date}</Text> : null}
-                  </View>
-                )}
-                {item.description ? (
-                  <Text style={{ fontSize: 9, color: COLORS.muted }}>• {item.description}</Text>
-                ) : null}
-                {item.link ? (
-                  <Text style={{ fontSize: 8, color: '#5B6ABF' }}>{item.link}</Text>
-                ) : null}
-              </View>
-            ))
-          ) : (
-            sec.bullets.map((b: string, j: number) => (
-              <Text key={j} style={s.bullet}>• {b}</Text>
-            ))
-          )}
-        </View>
-      ))}
-    </>
-  )
-}
-
 // ── Main: render sections in dynamic order ──
 
 export function renderPdfSections(resume: Resume, s: SectionStyleSet): React.ReactNode[] {
@@ -251,7 +213,6 @@ export function renderPdfSections(resume: Resume, s: SectionStyleSet): React.Rea
       case 'projects': return <ProjectsSection key={id} resume={resume} s={s} />
       case 'certifications': return <CertificationsSection key={id} resume={resume} s={s} />
       case 'languages': return <LanguagesSection key={id} resume={resume} s={s} />
-      case 'custom': return <CustomSectionsRenderer key={id} resume={resume} s={s} />
       default: {
         // Handle cs-{id} — render individual custom section
         if (id.startsWith('cs-')) {
@@ -383,7 +344,6 @@ export function renderMainSections(resume: Resume, s: SectionStyleSet): React.Re
       case 'education': return <EducationSection key={id} resume={resume} s={s} />
       case 'experience': return <ExperienceSection key={id} resume={resume} s={s} />
       case 'projects': return <ProjectsSection key={id} resume={resume} s={s} />
-      case 'custom': return <CustomSectionsRenderer key={id} resume={resume} s={s} />
       default: {
         if (id.startsWith('cs-')) {
           const csId = id.slice(3)
