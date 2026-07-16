@@ -26,7 +26,7 @@ const nextConfig: NextConfig = {
               "img-src 'self' data: https: blob:",
               "font-src 'self' data:",
               "connect-src 'self' data: blob: https://api.deepseek.com https://api.deepinfra.com https://us.i.posthog.com https://us-assets.i.posthog.com",
-              "frame-src 'self' blob:",
+              "frame-src 'self' blob: data:",
               "frame-ancestors 'none'",
             ].join('; '),
           },
