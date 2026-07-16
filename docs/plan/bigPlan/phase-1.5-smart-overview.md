@@ -9,11 +9,14 @@
 > either (a) implement Phase 2 first (2-3 hours), or (b) stub the `Links.*` functions
 > as no-ops that return `#` and add a TODO comment. The component uses:
 > - `Links.costOfLivingUrl(city)` — Numbeo link
-> - `Links.googleMapsUrl(origin, destination)` — Google Maps directions
+> - `Links.directionsUrl(origin, destination)` — Google Maps directions
 > - `Links.rome2RioUrl(origin, destination)` — Rome2Rio travel prices
-> - `Links.cultureUrl(company)` — jobsbyculture.com link
-> - `Links.redditUrl(company)` — Reddit search link
-> - `Links.registryUrl(company)` — OpenCorporates link
+> - `Links.cultureProfileUrl(company)` — jobsbyculture.com link
+> - `Links.redditSearchUrl(company)` — Reddit search link
+> - `Links.openCorporatesUrl(company)` — OpenCorporates link
+>
+> **Type file:** Create `src/app/types/smart-overview.ts` and export
+> `SmartOverviewResult` from there. Import it in both the component and the API route.
 
 ## What & Why
 
@@ -107,11 +110,11 @@ const SmartOverviewSchema = z.object({
   }),
   roleSummary: z.array(z.string()).max(4), // ["Build React app", "Lead team of 3", ...]
   salaryCheck: z.object({
-    listed: z.string().optional(), // "฿90,000-110,000/month"
-    estimate: z.string().optional(), // "~฿85,000 median for this role in this city"
+    listed: z.string().optional(),
+    estimate: z.string().optional(),
     assessment: z.enum(['above_market', 'fair', 'below_market', 'unknown']),
-    note: z.string().optional(), // "Room to negotiate. Ask for ฿110-115k"
-  }),
+    note: z.string().optional(),
+  }).optional(),  // optional — AI may skip if no salary data available
   commuteEstimate: z.object({
     summary: z.string(), // "~12 min by BTS (8 km)"
     monthlyCostEstimate: z.string().optional(), // "~฿1,936/month"
@@ -232,6 +235,8 @@ The Smart Overview UI component. Shown inside the Job Detail Panel.
 import { useState } from 'react'
 import { Sparkles, RefreshCw, Loader2, TrendingUp, TrendingDown, Minus, Bus, DollarSign, Building2, Lightbulb } from 'lucide-react'
 import { cn } from '~/lib/utils'
+import type { SmartOverviewResult } from '~/types/smart-overview'
+import * as Links from '~/lib/area-links'  // Phase 2 dependency — see warning at top
 
 interface SmartOverviewProps {
   // Job data for generating
@@ -246,7 +251,7 @@ interface SmartOverviewProps {
   }
   // User data
   resumeData: Record<string, unknown> | null
-  homeLocation: string
+  homeLocation?: string  // optional — from Phase 2 settings. If empty, commute estimate is skipped.
   // Match data (from existing ats-match or job scoring)
   matchScore: number
   matchedSkills: string[]
@@ -344,11 +349,29 @@ export function SmartOverview(props: SmartOverviewProps) {
 
   // ── STATE 3: Complete ──
   return (
-    <OverviewContent overview={overview!} onRegenerate={generate} />
+    <OverviewContent
+      overview={overview!}
+      onRegenerate={generate}
+      company={props.job.company}
+      jobLocation={props.job.loc}
+      homeLocation={props.homeLocation || ''}
+    />
   )
 }
 
-function OverviewContent({ overview, onRegenerate }: { overview: SmartOverviewResult; onRegenerate: () => void }) {
+function OverviewContent({
+  overview,
+  onRegenerate,
+  company,
+  jobLocation,
+  homeLocation,
+}: {
+  overview: SmartOverviewResult
+  onRegenerate: () => void
+  company: string       // from job.company — used for verification link URLs
+  jobLocation: string   // from job.loc — used for verification link URLs
+  homeLocation: string  // from settings — used for commute direction URLs
+}) {
   return (
     <div className="rounded-lg border border-primary/20 bg-accent-soft/30 p-4 space-y-4">
 
@@ -428,7 +451,7 @@ function OverviewContent({ overview, onRegenerate }: { overview: SmartOverviewRe
             <div className="text-xs text-muted-foreground italic">{overview.salaryCheck.note}</div>
           )}
           {/* Verification link — build URL from Phase 2 area-links.ts */}
-          <VerifyLink href={Links.costOfLivingUrl(overview.location || '')} label="Verify on Numbeo" />
+          <VerifyLink href={Links.costOfLivingUrl(jobLocation)} label="Verify on Numbeo" />
         </Section>
       )}
 
@@ -443,8 +466,8 @@ function OverviewContent({ overview, onRegenerate }: { overview: SmartOverviewRe
           )}
           {/* Verification links — build URLs from Phase 2 area-links.ts */}
           <div className="flex gap-1.5 pt-1">
-            <VerifyLink href={Links.googleMapsUrl(homeLocation || '', overview.location || '')} label="Directions" />
-            <VerifyLink href={Links.rome2RioUrl(homeLocation || '', overview.location || '')} label="Prices" />
+            <VerifyLink href={Links.directionsUrl(homeLocation, jobLocation)} label="Directions" />
+            <VerifyLink href={Links.rome2RioUrl(homeLocation, jobLocation)} label="Prices" />
           </div>
         </Section>
       )}
@@ -459,9 +482,9 @@ function OverviewContent({ overview, onRegenerate }: { overview: SmartOverviewRe
         )}
         {/* Verification links — build URLs from Phase 2 area-links.ts */}
         <div className="flex flex-wrap gap-1.5 pt-1">
-          <VerifyLink href={Links.cultureUrl(overview.company || '')} label="Culture" />
-          <VerifyLink href={Links.redditUrl(overview.company || '')} label="Reddit" />
-          <VerifyLink href={Links.registryUrl(overview.company || '')} label="Registry" />
+          <VerifyLink href={Links.cultureProfileUrl(company)} label="Culture" />
+          <VerifyLink href={Links.redditSearchUrl(company)} label="Reddit" />
+          <VerifyLink href={Links.openCorporatesUrl(company)} label="Registry" />
         </div>
       </Section>
 
@@ -525,7 +548,7 @@ export interface SmartOverviewResult {
     insight: string
   }
   roleSummary: string[]
-  salaryCheck: {
+  salaryCheck?: {
     listed?: string
     estimate?: string
     assessment: 'above_market' | 'fair' | 'below_market' | 'unknown'

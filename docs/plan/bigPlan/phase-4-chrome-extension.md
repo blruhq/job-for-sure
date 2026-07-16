@@ -4,6 +4,28 @@
 > **Depends on:** Phase 1 (panel pattern) + Phase 2 (intelligence links)
 > **Status:** Biggest competitive gap. Huntr, Teal, Simplify ALL have extensions.
 
+> **CRITICAL — AUTH DESIGN (read before implementing):**
+>
+> The existing `withAuth()` HOF in `src/app/lib/with-auth.ts` (lines 47-61) does
+> an **origin/host equality check** on ALL non-GET requests. Extension requests
+> originate from `linkedin.com` / `indeed.com` → origin ≠ host → **403 blocked**.
+>
+> Additionally, Better Auth session cookies default to `SameSite=Lax`, which
+> browsers **refuse to send** on cross-site POSTs.
+>
+> **Solution: Bearer token auth (recommended).** Do NOT try to make cookies work
+> cross-origin. Instead:
+> 1. Create `/api/extension/auth` — accepts email+password (or existing session
+>    cookie if the extension is opened from the app domain), returns a
+>    long-lived token (stored in `extension_token` table or as a random string
+>    in `user_preferences`).
+> 2. Extension stores token in `chrome.storage.sync`.
+> 3. Every extension API call sends `Authorization: Bearer <token>`.
+> 4. Add a `withExtensionAuth()` HOF (or extend `withAuth`) that accepts bearer
+>    tokens and skips the origin check.
+> 5. The ATS match route must also accept a full resume object (not just
+>    `resumeId`) — see note below.
+
 ## What & Why
 
 Every competitor has a Chrome extension. Simplify's autofill is the #1 feature users cite for switching. This is the biggest competitive gap.
@@ -175,24 +197,46 @@ export function scrapeGreenhouse() {
 ### api.ts — Call Your Existing API
 
 ```typescript
-const API_BASE = 'https://your-app-domain.com'
+const API_BASE = process.env.REACT_APP_API_BASE || 'https://your-app-domain.com'
 
-export async function getMatchScore(jdText: string, resumeId: string) {
+// Retrieve bearer token from extension storage
+async function getToken(): Promise<string | null> {
+  const { jfs_token } = await chrome.storage.sync.get('jfs_token')
+  return jfs_token || null
+}
+
+function authHeaders(token: string) {
+  return {
+    'Content-Type': 'application/json',
+    'Authorization': `Bearer ${token}`,
+  }
+}
+
+// NOTE: /api/ai/ats-match requires a FULL resume object (validated by
+// ResumeDataSchema), NOT a resumeId. The extension must fetch the active
+// resume first via GET /api/resumes (with bearer token), then pass it here.
+export async function getMatchScore(jdText: string, resume: Record<string, unknown>, token: string) {
   const res = await fetch(`${API_BASE}/api/ai/ats-match`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    credentials: 'include', // send auth cookie
-    body: JSON.stringify({ jdText, resumeId }),
+    headers: authHeaders(token),
+    body: JSON.stringify({ resume, jdText }),
   })
   return res.json()
 }
 
-export async function saveToTracker(jobData: Record<string, unknown>) {
+export async function saveToTracker(jobData: Record<string, unknown>, token: string) {
   const res = await fetch(`${API_BASE}/api/applications`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    credentials: 'include',
+    headers: authHeaders(token),
     body: JSON.stringify(jobData),
+  })
+  return res.json()
+}
+
+// Fetch user's active resume for match scoring
+export async function getResumes(token: string) {
+  const res = await fetch(`${API_BASE}/api/resumes`, {
+    headers: authHeaders(token),
   })
   return res.json()
 }

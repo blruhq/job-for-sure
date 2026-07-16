@@ -23,6 +23,9 @@ This phase covers adding more job sources and culture data to your existing 13-s
 
 Follow the EXACT same pattern as existing sources (see `remoteok.ts`, `himalayas.ts`, etc.).
 
+> **REQUIRED IMPORTS:** Add `import * as cheerio from 'cheerio'` at the top.
+> Match the import pattern from existing source files (e.g. `remoteok.ts`).
+
 ```typescript
 import type { JobResult } from './types'
 
@@ -91,15 +94,28 @@ export async function fetchJobsByCulture(query: string, _location: string): Prom
 > **CRITICAL:** The orchestrator uses string arrays + `if (sources.includes(...))` blocks
 > with `fetchers.push()`. NOT an object array. Follow the EXACT pattern of existing sources.
 
-**Step 1:** Add `'jobsbyculture'` to the `JobSource` union type in `src/app/lib/job-sources/types.ts`:
+**Step 1:** Update `JobSource` union, `SOURCE_NAMES`, AND `SOURCE_SHORT` in the SAME commit (all three are typed against each other — missing one causes immediate TS errors):
 
+**`src/app/lib/job-sources/types.ts`** — add to union:
 ```typescript
 export type JobSource =
   | 'greenhouse'
   | 'ashby'
   // ... existing ...
   | 'jobsdb-rest'
-  | 'jobsbyculture'    // ← ADD THIS
+  | 'jobsbyculture'    // ← ADD
+```
+
+**`src/app/lib/source-names.ts`** — add to BOTH maps:
+```typescript
+export const SOURCE_NAMES: Record<JobSource, string> = {
+  // ... existing ...
+  jobsbyculture: 'JobsByCulture',     // ← ADD
+}
+export const SOURCE_SHORT: Record<JobSource, string> = {
+  // ... existing ...
+  jobsbyculture: 'JBC',               // ← ADD
+}
 ```
 
 **Step 2:** Add to `FAST_FREE_SOURCES` in `src/app/lib/job-sources/index.ts` (line 48):
@@ -131,9 +147,23 @@ if (sources.includes('jobsbyculture')) {
 }
 ```
 
-**Step 5:** Add `'jobsbyculture': 'JobsByCulture'` to `SOURCE_NAMES` and `SOURCE_SHORT` in:
-- `src/app/lib/source-names.ts`
-- (These maps were extracted to a shared file during cleanup)
+**Step 5:** (Covered in Step 1 above — source-names.ts updated atomically with types.ts.)
+
+**Step 6:** Update the `leanJobs` mapping in `index.ts` (around line 225-245). This code strips descriptions for caching — it explicitly lists every field. You MUST add `culture` to this list or culture data will be lost on cache hits:
+
+```typescript
+// In the leanJobs mapping, add culture:
+const leanJobs: JobResult[] = filtered.map(j => ({
+  id: j.id, source: j.source, company: j.company, title: j.title,
+  location: j.location, country: j.country, region: j.region,
+  locationType: j.locationType, url: j.url, description: '',
+  descriptionHtml: '', salary: j.salary, postedAt: j.postedAt,
+  companyLogo: j.companyLogo, department: j.department, tags: j.tags,
+  visaSponsorship: j.visaSponsorship, experienceLevel: j.experienceLevel,
+  employmentType: j.employmentType,
+  culture: j.culture,  // ← ADD THIS
+}))
+```
 
 ### Update JobResult type
 
