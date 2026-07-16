@@ -67,7 +67,7 @@ export function JobPreview({ resume, onDismiss, onLoadComplete }: { resume: Resu
   const fetchJobs = useCallback(async () => {
     // Guard: skip if search params haven't changed (e.g. React Query
     // returned a new resume object ref from onSettled invalidation).
-    const searchKey = `${resume.role}|${resume.location ?? ''}|${(resume.skills ?? []).sort().join(',')}`
+    const searchKey = `${resume.role}|${resume.location ?? ''}|${[...(resume.skills ?? [])].sort().join(',')}`
     if (searchKey === lastSearchKeyRef.current) return
     lastSearchKeyRef.current = searchKey
 
