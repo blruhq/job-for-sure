@@ -686,6 +686,66 @@ Refactor the components that read data from the store to use the new hooks:
   ```
 - **Connect** mutations for bookmarking (`useCreateApplication()`), removing bookmark (`useDeleteApplication()`), and adding resumes (`useCreateResume()`).
 
+### 9L: Chat Upload Card (`src/app/components/chat/upload-card-message.tsx`)
+- **Replace** `useAppStore()` with `useResumes()` and `useUpdateResume()`.
+- **Retrieve** resumes list from query and update mutation:
+  ```typescript
+  const { data: resumesList } = useResumes()
+  const resumes = resumesList || []
+  const updateResumeMutation = useUpdateResume()
+  ```
+
+### 9M: Navigation Topbar (`src/app/components/layout/navbar.tsx`)
+- **Replace** `useAppStore()` with `useUIStore()`.
+- **Retrieve** sidebar collapsed state and toggle method:
+  ```typescript
+  const sidebarCollapsed = useUIStore((s) => s.sidebarCollapsed)
+  const toggleSidebar = useUIStore((s) => s.toggleSidebar)
+  ```
+
+### 9N: Main Dashboard (`src/app/components/dashboard/dashboard-view.tsx`)
+- **Replace** `useAppStore()` with `useResumes()` and `useApplications()`.
+- **Retrieve** resumes and applications from queries, replacing `loading` / `hydrated` with TanStack Query's loading states:
+  ```typescript
+  const { data: resumesList, isLoading: resumesLoading, isSuccess: resumesHydrated } = useResumes()
+  const resumes = resumesList || []
+  
+  const { data: applicationsBoard, isLoading: appsLoading, isSuccess: appsHydrated } = useApplications()
+  const applications = applicationsBoard || { bookmark: [], applied: [], interviewing: [], offers: [], rejected: [] }
+
+  const loading = resumesLoading || appsLoading
+  const hydrated = resumesHydrated && appsHydrated
+  ```
+
+### 9O: Inline Job Preview (`src/app/components/chat/job-preview.tsx`)
+- **Replace** `useAppStore()` with `useApplications()`, mutations `useCreateApplication()`, and `useDeleteApplication()`.
+- **Retrieve** applications and set up mutations:
+  ```typescript
+  const { data: applicationsBoard } = useApplications()
+  const applications = applicationsBoard || { bookmark: [], applied: [], interviewing: [], offers: [], rejected: [] }
+  const createApplicationMutation = useCreateApplication()
+  const deleteApplicationMutation = useDeleteApplication()
+
+  const isBookmarked = (key: string) => applications.bookmark.some((j) => j.key === key)
+  ```
+- **Replace** `bookmarkJob(job)` and `toggleBookmark(key)` with these mutation calls.
+
+### 9P: Tailoring Review Panel (`src/app/components/resume/tailor-review-panel.tsx`)
+- **Replace** `useAppStore()` with `useUIStore()`.
+- **Retrieve** pending tailoring workspace state:
+  ```typescript
+  const pendingTailor = useUIStore((s) => s.pendingTailor)
+  const toggleAcceptedChange = useUIStore((s) => s.toggleAcceptedChange)
+  ```
+
+### 9Q: Resume Co-Pilot (`src/app/components/resume/resume-copilot.tsx`)
+- **Replace** `useAppStore()` with `useApplications()`.
+- **Retrieve** applications board:
+  ```typescript
+  const { data: applicationsBoard } = useApplications()
+  const applications = applicationsBoard || { bookmark: [], applied: [], interviewing: [], offers: [], rejected: [] }
+  ```
+
 ---
 
 ## Step 10: Verify Build & Compile
