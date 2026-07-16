@@ -82,11 +82,14 @@ export const ResumePreview = memo(function ResumePreview({ resume }: { resume: R
     }
   }, [resume, generatePreview])
 
-  // Cleanup on unmount
+  // Cleanup blob URL on unmount — but DON'T abort in-flight requests.
+  // Aborting on unmount kills the fetch when the parent rapidly re-renders
+  // during store hydration (component mounts → fetch starts → unmounts →
+  // abort → remounts → new fetch → unmounts → abort → ... forever).
+  // The fetch should complete; React 18+ ignores setState on unmounted components.
   useEffect(() => {
     return () => {
       if (blobUrlRef.current) URL.revokeObjectURL(blobUrlRef.current)
-      if (abortRef.current) abortRef.current.abort()
     }
   }, [])
 
