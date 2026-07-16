@@ -14,14 +14,12 @@ export const ResumePreview = memo(function ResumePreview({ resume }: { resume: R
   const abortRef = useRef<AbortController | null>(null)
 
   const generatePreview = useCallback(async (resumeData: Resume, gen: number) => {
-    console.log('[ResumePreview] generatePreview called, gen:', gen)
     // Cancel any in-flight request
     if (abortRef.current) abortRef.current.abort()
     const controller = new AbortController()
     abortRef.current = controller
 
     try {
-      console.log('[ResumePreview] Fetching /api/preview-pdf...')
       const resp = await fetch('/api/preview-pdf', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -29,12 +27,10 @@ export const ResumePreview = memo(function ResumePreview({ resume }: { resume: R
         signal: controller.signal,
       })
 
-      console.log('[ResumePreview] Response status:', resp.status)
       if (gen !== genRef.current) return
       if (!resp.ok) throw new Error(`Preview failed: ${resp.status}`)
 
       const blob = await resp.blob()
-      console.log('[ResumePreview] Blob size:', blob.size)
       if (gen !== genRef.current) return
 
       // Revoke previous blob URL
@@ -62,18 +58,24 @@ export const ResumePreview = memo(function ResumePreview({ resume }: { resume: R
   }, [])
 
   useEffect(() => {
-    // First mount: resumeRef is null → always proceed
-    // Subsequent: skip if same object reference
+    // Skip if same object reference
     if (resumeRef.current !== null && resume === resumeRef.current) return
-    console.log('[ResumePreview] Effect fired, resume changed. resumeRef was:', resumeRef.current === null ? 'null (first mount)' : 'object')
+    const isFirst = resumeRef.current === null
     resumeRef.current = resume
 
     const thisGen = ++genRef.current
 
-    if (debounceRef.current) clearTimeout(debounceRef.current)
-    debounceRef.current = setTimeout(() => {
-      if (thisGen === genRef.current) generatePreview(resume, thisGen)
-    }, 150)  // 150ms debounce — matches Reactive Resume's pattern
+    if (isFirst) {
+      // First mount: fire IMMEDIATELY (no debounce — avoids getting
+      // cancelled by rapid parent re-renders during store hydration)
+      generatePreview(resume, thisGen)
+    } else {
+      // Subsequent edits: debounce to batch rapid typing
+      if (debounceRef.current) clearTimeout(debounceRef.current)
+      debounceRef.current = setTimeout(() => {
+        if (thisGen === genRef.current) generatePreview(resume, thisGen)
+      }, 200)
+    }
 
     return () => {
       if (debounceRef.current) clearTimeout(debounceRef.current)
