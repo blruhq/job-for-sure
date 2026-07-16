@@ -28,6 +28,7 @@ export function ResizableHandle({ className, ...props }: SeparatorProps) {
   return (
     <Separator
       className={cn(
+        // Visual bar is 6px, but the hit area is 22px via padding + background-clip
         'relative flex w-1.5 items-center justify-center bg-border transition-colors',
         'hover:bg-primary/40 active:bg-primary/60',
         'after:absolute after:h-8 after:w-1 after:rounded-full after:bg-muted-foreground/30',
@@ -36,6 +37,8 @@ export function ResizableHandle({ className, ...props }: SeparatorProps) {
         'hidden lg:flex',  // Hidden on mobile — mobile uses tab toggle
         className,
       )}
+      // Wide invisible hit area without visible width increase
+      style={{ padding: '0 8px', backgroundClip: 'content-box' }}
       {...props}
     />
   )

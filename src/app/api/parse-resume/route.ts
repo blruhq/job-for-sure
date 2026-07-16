@@ -56,6 +56,7 @@ const ParseResumeSchema = z.object({
     z.object({
       title: z.string().default(''),
       bullets: z.array(z.string()).default([]),
+      id: z.string().optional(),
     })
   ).default([]),
   role: z.string().default(''),

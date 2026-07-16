@@ -156,6 +156,7 @@ export default function StandaloneCoverLetterPage() {
         customSections: parsed.customSections?.map((cs: any) => ({
           title: cs.title || '',
           bullets: cs.bullets || [],
+          ...(cs.id ? { id: cs.id } : {}),
         })),
       })
 

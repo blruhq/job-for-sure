@@ -32,16 +32,28 @@ export interface SectionStyleSet {
  * Returns the list of section IDs that should be rendered in the PDF,
  * in the correct order, respecting sectionOrder and sectionVisibility.
  * Excludes 'basic' (rendered in header) and sections with no data.
+ * Supports both legacy 'custom' (one entry for all custom sections)
+ * and new cs-{id} entries (individual custom sections in the order).
  */
 export function getVisiblePdfSections(resume: Resume): string[] {
   const order = resume.sectionOrder ?? DEFAULT_SECTION_ORDER
 
   return order.filter((id) => {
-    if (id === 'basic') return false  // basic info is in the header, not a section
+    if (id === 'basic') return false
 
     // Check visibility flag (missing = visible)
     if (resume.sectionVisibility && resume.sectionVisibility[id] === false) {
       return false
+    }
+
+    // Handle cs-{id} entries — check if the specific custom section exists
+    if (id.startsWith('cs-')) {
+      const csId = id.slice(3)
+      const section = resume.customSections?.find((s) => s.id === csId)
+      if (!section) return false
+      const hasBullets = section.bullets?.length > 0
+      const hasItems = (section.items?.length ?? 0) > 0
+      return hasBullets || hasItems
     }
 
     // Check if section has data
@@ -240,7 +252,44 @@ export function renderPdfSections(resume: Resume, s: SectionStyleSet): React.Rea
       case 'certifications': return <CertificationsSection key={id} resume={resume} s={s} />
       case 'languages': return <LanguagesSection key={id} resume={resume} s={s} />
       case 'custom': return <CustomSectionsRenderer key={id} resume={resume} s={s} />
-      default: return null
+      default: {
+        // Handle cs-{id} — render individual custom section
+        if (id.startsWith('cs-')) {
+          const csId = id.slice(3)
+          const section = resume.customSections?.find((s) => s.id === csId)
+          if (!section) return null
+          return (
+            <View key={id} style={s.section}>
+              <Text style={s.sectionTitle}>{section.title}</Text>
+              {section.items && section.items.length > 0 ? (
+                section.items.map((item, j) => (
+                  <View key={j} style={{ marginBottom: 4 }}>
+                    {(item.title || item.subtitle) && (
+                      <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                        <Text style={{ fontSize: 9, fontWeight: 600, color: COLORS.ink }}>
+                          {item.title}{item.subtitle ? ` — ${item.subtitle}` : ''}
+                        </Text>
+                        {item.date ? <Text style={{ fontSize: 8, color: COLORS.muted }}>{item.date}</Text> : null}
+                      </View>
+                    )}
+                    {item.description ? (
+                      <Text style={{ fontSize: 9, color: COLORS.muted }}>• {item.description}</Text>
+                    ) : null}
+                    {item.link ? (
+                      <Text style={{ fontSize: 8, color: '#5B6ABF' }}>{item.link}</Text>
+                    ) : null}
+                  </View>
+                ))
+              ) : (
+                section.bullets.map((b: string, j: number) => (
+                  <Text key={j} style={s.bullet}>• {b}</Text>
+                ))
+              )}
+            </View>
+          )
+        }
+        return null
+      }
     }
   })
 }
@@ -335,7 +384,43 @@ export function renderMainSections(resume: Resume, s: SectionStyleSet): React.Re
       case 'experience': return <ExperienceSection key={id} resume={resume} s={s} />
       case 'projects': return <ProjectsSection key={id} resume={resume} s={s} />
       case 'custom': return <CustomSectionsRenderer key={id} resume={resume} s={s} />
-      default: return null
+      default: {
+        if (id.startsWith('cs-')) {
+          const csId = id.slice(3)
+          const section = resume.customSections?.find((s) => s.id === csId)
+          if (!section) return null
+          return (
+            <View key={id} style={s.section}>
+              <Text style={s.sectionTitle}>{section.title}</Text>
+              {section.items && section.items.length > 0 ? (
+                section.items.map((item, j) => (
+                  <View key={j} style={{ marginBottom: 4 }}>
+                    {(item.title || item.subtitle) && (
+                      <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                        <Text style={{ fontSize: 9, fontWeight: 600, color: COLORS.ink }}>
+                          {item.title}{item.subtitle ? ` — ${item.subtitle}` : ''}
+                        </Text>
+                        {item.date ? <Text style={{ fontSize: 8, color: COLORS.muted }}>{item.date}</Text> : null}
+                      </View>
+                    )}
+                    {item.description ? (
+                      <Text style={{ fontSize: 9, color: COLORS.muted }}>• {item.description}</Text>
+                    ) : null}
+                    {item.link ? (
+                      <Text style={{ fontSize: 8, color: '#5B6ABF' }}>{item.link}</Text>
+                    ) : null}
+                  </View>
+                ))
+              ) : (
+                section.bullets.map((b: string, j: number) => (
+                  <Text key={j} style={s.bullet}>• {b}</Text>
+                ))
+              )}
+            </View>
+          )
+        }
+        return null
+      }
     }
   })
 }

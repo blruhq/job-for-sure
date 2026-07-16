@@ -48,6 +48,7 @@ export const LanguageSchema = z.object({
 export const CustomSectionSchema = z.object({
   title: z.string().max(200),
   bullets: z.array(z.string().max(2000)).max(50),
+  id: z.string().max(50).optional(),
 }).passthrough()
 
 // ── Composite resume schema ───────────────────────────────────

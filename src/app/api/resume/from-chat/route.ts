@@ -65,6 +65,7 @@ const ChatExtractSchema = z.object({
         })
       ).default([]),
       bullets: z.array(z.string()).default([]),
+      id: z.string().optional(),
     })
   ).default([]),
 })

@@ -57,6 +57,7 @@ describe('ResumePDF', () => {
       ],
       customSections: [
         {
+          id: 'cs_test_001',
           title: 'Open Source Contributions',
           bullets: ['Contributed to Next.js.'],
         },

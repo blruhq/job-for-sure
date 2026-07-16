@@ -35,7 +35,7 @@ import { DEFAULT_TEMPLATE, getTemplateMeta } from '~/components/resume/templates
 import { ResumePreview } from '~/components/resume/resume-preview'
 import { TailorReviewPanel } from '~/components/resume/tailor-review-panel'
 import { ResizableGroup, ResizablePanel, ResizableHandle, useDefaultLayout } from '~/components/ui/resizable'
-import { useResumeEditor, ALL_EDITOR_SECTIONS, type EditorSectionId, type SectionKey } from '~/lib/resume-editor-store'
+import { useResumeEditor, ALL_EDITOR_SECTIONS, type EditorSectionId, type SectionOrderId, type SectionKey } from '~/lib/resume-editor-store'
 import { useStore } from 'zustand'
 
 // ── Helpers ──
@@ -419,8 +419,8 @@ export function ResumeDetail({ resumeId }: { resumeId: string }) {
   const handleSectionDragEnd = (event: DragEndEvent) => {
     const { active, over } = event
     if (!over || active.id === over.id) return
-    const oldIndex = sectionOrder.indexOf(active.id as EditorSectionId)
-    const newIndex = sectionOrder.indexOf(over.id as EditorSectionId)
+    const oldIndex = sectionOrder.indexOf(active.id as SectionOrderId)
+    const newIndex = sectionOrder.indexOf(over.id as SectionOrderId)
     if (oldIndex === -1 || newIndex === -1) return
     setSectionOrder(arrayMove(sectionOrder, oldIndex, newIndex))
   }
@@ -433,8 +433,18 @@ export function ResumeDetail({ resumeId }: { resumeId: string }) {
       case 'projects': return projects.length > 0
       case 'certifications': return certifications.length > 0
       case 'languages': return languages.length > 0
-      case 'custom': return customSections.length > 0
-      default: return false
+      default: {
+        // Handle cs-{id} entries — check if the specific custom section exists
+        if (typeof id === 'string') {
+          if (id.startsWith('cs-')) {
+            const csId = id.slice(3)
+            return customSections.some((s) => s.id === csId)
+          }
+          // Legacy 'custom' entry — show if any custom sections exist
+          if ((id as string) === 'custom') return customSections.length > 0
+        }
+        return false
+      }
     }
   })
 
@@ -474,7 +484,7 @@ export function ResumeDetail({ resumeId }: { resumeId: string }) {
   })()
 
   // ── Render each section by ID for the sortable editor ──
-  const renderEditorSection = useCallback((id: EditorSectionId): React.ReactNode => {
+  const renderEditorSection = useCallback((id: SectionOrderId): React.ReactNode => {
     switch (id) {
       case 'basic':
         return (
@@ -699,91 +709,97 @@ export function ResumeDetail({ resumeId }: { resumeId: string }) {
             )}
           />
         )
-      case 'custom':
-        return (
-          <EditableList<ResumeCustomSection>
-            items={customSections}
-            onChange={setCustomSections}
-            label="Custom Sections"
-            createNew={() => ({ title: 'New Section', type: 'bullets' as const, items: [], bullets: [] })}
-            renderItem={(sec, _i, update) => (
-              <div className="flex flex-col gap-2">
-                <div>
-                  <label className="label-mono mb-0.5 block text-[9px]">Section Title</label>
-                  <input
-                    value={sec.title}
-                    onChange={(e) => update({ ...sec, title: e.target.value })}
-                    placeholder="e.g. Speaking, Volunteer Work, Publications"
-                    className="w-full rounded-xs border border-border bg-background px-2 py-1 text-[11px] outline-none focus:border-primary"
-                  />
-                </div>
-                {/* Items editor (new format) */}
-                {sec.items && sec.items.length > 0 ? (
-                  <div className="space-y-2">
-                    {sec.items.map((item, idx) => (
-                      <div key={idx} className="rounded-xs border border-border/50 bg-background p-2">
-                        <div className="flex gap-1.5">
-                          <div className="flex-1">
-                            <label className="label-mono mb-0.5 block text-[8px]">Title</label>
-                            <input value={item.title} onChange={(e) => {
-                              const items = sec.items!.map((it, j) => j === idx ? { ...it, title: e.target.value } : it)
-                              update({ ...sec, items })
-                            }} className="w-full rounded-xs border border-border bg-background px-1.5 py-0.5 text-[10px] outline-none focus:border-primary" />
-                          </div>
-                          <div className="flex-1">
-                            <label className="label-mono mb-0.5 block text-[8px]">Subtitle</label>
-                            <input value={item.subtitle} onChange={(e) => {
-                              const items = sec.items!.map((it, j) => j === idx ? { ...it, subtitle: e.target.value } : it)
-                              update({ ...sec, items })
-                            }} className="w-full rounded-xs border border-border bg-background px-1.5 py-0.5 text-[10px] outline-none focus:border-primary" />
-                          </div>
-                          <div className="w-24">
-                            <label className="label-mono mb-0.5 block text-[8px]">Date</label>
-                            <input value={item.date} onChange={(e) => {
-                              const items = sec.items!.map((it, j) => j === idx ? { ...it, date: e.target.value } : it)
-                              update({ ...sec, items })
-                            }} className="w-full rounded-xs border border-border bg-background px-1.5 py-0.5 text-[10px] outline-none focus:border-primary" />
-                          </div>
-                        </div>
-                        <div className="mt-1">
-                          <label className="label-mono mb-0.5 block text-[8px]">Description</label>
-                          <textarea value={item.description} onChange={(e) => {
-                            const items = sec.items!.map((it, j) => j === idx ? { ...it, description: e.target.value } : it)
-                            update({ ...sec, items })
-                          }} rows={1} className="w-full resize-y rounded-xs border border-border bg-background px-1.5 py-0.5 text-[10px] outline-none focus:border-primary" />
-                        </div>
-                      </div>
-                    ))}
-                    <button
-                      type="button"
-                      onClick={() => update({ ...sec, items: [...(sec.items || []), { title: '', subtitle: '', date: '', description: '', link: '' }] })}
-                      className="cursor-pointer rounded-xs border border-dashed border-border px-2 py-1 text-[10px] text-muted-foreground hover:border-primary hover:text-primary"
-                    >
-                      + Add Item
-                    </button>
-                  </div>
-                ) : (
-                  /* Legacy format: simple bullets textarea */
-                  <div>
-                    <label className="label-mono mb-0.5 block text-[9px]">Highlights (one per line)</label>
-                    <textarea
-                      value={sec.bullets?.join('\n') || ''}
-                      onChange={(e) => update({ ...sec, bullets: e.target.value.split('\n').filter(Boolean) })}
-                      rows={3}
-                      className="w-full resize-y rounded-xs border border-border bg-background px-2 py-1 text-[11px] outline-none focus:border-primary"
-                    />
-                  </div>
-                )}
-              </div>
-            )}
-          />
-        )
     }
+    // Legacy 'custom' entry — render all custom sections inline
+    // This is reached when sectionOrder still has a literal 'custom' entry
+    // (old resumes that haven't been re-hydrated yet)
+    if ((id as string) === 'custom') {
+      return (
+        <div className="space-y-3">
+          {customSections.length === 0 && (
+            <p className="py-2 text-center text-[10px] text-muted-foreground/50 italic">No custom sections yet.</p>
+          )}
+          {customSections.map((sec) => (
+            <div key={sec.id} className="rounded-xs border border-border/50 bg-background p-2">
+              <div className="flex items-center justify-between gap-2 mb-2">
+                <input
+                  value={sec.title}
+                  onChange={(e) => setCustomSections(customSections.map((s) => s.id === sec.id ? { ...s, title: e.target.value } : s))}
+                  placeholder="Section Title"
+                  className="flex-1 rounded-xs border border-border bg-background px-2 py-1 text-[11px] font-medium outline-none focus:border-primary"
+                />
+                <button
+                  type="button"
+                  onClick={() => setCustomSections(customSections.filter((s) => s.id !== sec.id))}
+                  className="cursor-pointer rounded-xs p-1 text-muted-foreground hover:text-red-500"
+                  title="Remove section"
+                >
+                  <X size={12} />
+                </button>
+              </div>
+              <div>
+                <label className="label-mono mb-0.5 block text-[9px]">Highlights (one per line)</label>
+                <textarea
+                  placeholder="Enter each bullet point on a new line"
+                  value={sec.bullets?.join('\n') || ''}
+                  onChange={(e) => setCustomSections(customSections.map((s) => s.id === sec.id ? { ...s, bullets: e.target.value.split('\n').filter(Boolean) } : s))}
+                  rows={3}
+                  className="w-full resize-y rounded-xs border border-border bg-background px-2 py-1 text-[11px] outline-none focus:border-primary"
+                />
+              </div>
+            </div>
+          ))}
+        </div>
+      )
+    }
+    // Handle cs-{id} entries — individual custom sections
+    if (typeof id === 'string' && id.startsWith('cs-')) {
+      const csId = id.slice(3) // Remove 'cs-' prefix
+      const sec = customSections.find((s) => s.id === csId)
+      if (!sec) return null
+      return (
+        <div className="relative flex flex-col gap-2">
+          <div className="flex items-center justify-between gap-2">
+            <input
+              data-cs-id={csId}
+              value={sec.title}
+              onChange={(e) => setCustomSections(customSections.map((s) => s.id === csId ? { ...s, title: e.target.value } : s))}
+              placeholder="Section Title"
+              className="flex-1 rounded-xs border border-border bg-background px-2 py-1 text-[11px] font-medium outline-none focus:border-primary"
+            />
+          </div>
+          <div>
+            <label className="label-mono mb-0.5 block text-[9px]">Highlights (one per line)</label>
+            <textarea
+              placeholder="Enter each bullet point on a new line"
+              value={sec.bullets?.join('\n') || ''}
+              onChange={(e) => setCustomSections(customSections.map((s) => s.id === csId ? { ...s, bullets: e.target.value.split('\n').filter(Boolean) } : s))}
+              rows={3}
+              className="w-full resize-y rounded-xs border border-border bg-background px-2 py-1 text-[11px] outline-none focus:border-primary"
+            />
+          </div>
+          {/* Delete button */}
+          <button
+            type="button"
+            onClick={() => {
+              setCustomSections(customSections.filter((s) => s.id !== csId))
+              setSectionOrder(sectionOrder.filter((oid) => oid !== id))
+            }}
+            className="absolute right-0 top-0 cursor-pointer rounded-xs p-0.5 text-muted-foreground/50 hover:text-red-500 transition-colors"
+            title="Remove section"
+          >
+            <X size={12} />
+          </button>
+        </div>
+      )
+    }
+    return null
   }, [
     name, persona, email, phone, location, github,
     role, summary, skills,
     experience, education, projects, certifications,
-    languages, customSections,
+    languages, customSections, sectionOrder,
+    setCustomSections, setSectionOrder,
   ])
 
   // ── Live resume for real-time PDF preview ──
@@ -890,18 +906,53 @@ export function ResumeDetail({ resumeId }: { resumeId: string }) {
     notify({ message: 'Tailoring cancelled. Your resume is unchanged.', type: 'info' })
   }
 
+  const [newCustomTitle, setNewCustomTitle] = useState('')
+  const newCustomInputRef = useRef<HTMLInputElement>(null)
+
   const handleAddSection = useCallback((section: SectionKey) => {
     if (section === 'projects') {
       setProjects([...projects, { name: '', description: '', techStack: [], link: '' }])
+      setShowAddSectionPicker(false)
     } else if (section === 'certifications') {
       setCertifications([...certifications, { name: '', issuer: '', date: '' }])
+      setShowAddSectionPicker(false)
     } else if (section === 'languages') {
       setLanguages([...languages, { name: '', proficiency: '' }])
+      setShowAddSectionPicker(false)
     } else if (section === 'custom') {
-      setCustomSections([...customSections, { title: 'New Section', type: 'bullets' as const, items: [], bullets: [] }])
+      // Show inline title input instead of immediately creating
+      setShowAddSectionPicker(false)
+      setShowNewCustomInput(true)
     }
-    setShowAddSectionPicker(false)
-  }, [projects, certifications, languages, customSections, setProjects, setCertifications, setLanguages, setCustomSections, setShowAddSectionPicker])
+  }, [projects, certifications, languages, customSections, sectionOrder, setProjects, setCertifications, setLanguages, setCustomSections, setSectionOrder, setShowAddSectionPicker])
+
+  const [showNewCustomInput, setShowNewCustomInput] = useState(false)
+
+  const handleCreateCustomSection = useCallback(() => {
+    const title = newCustomTitle.trim() || 'Untitled Section'
+    const id = crypto.randomUUID?.()?.slice(0, 8) ?? Math.random().toString(36).slice(2, 10)
+    const newSection: ResumeCustomSection = { id, title, type: 'bullets', bullets: [] }
+    setCustomSections([...customSections, newSection])
+    // Find last non-custom section index to insert after it
+    let insertAfter = -1
+    for (let i = sectionOrder.length - 1; i >= 0; i--) {
+      if (!sectionOrder[i].startsWith('cs-')) {
+        insertAfter = i
+        break
+      }
+    }
+    const newOrder = [...sectionOrder]
+    newOrder.splice(insertAfter + 1, 0, `cs-${id}` as SectionOrderId)
+    setSectionOrder(newOrder)
+    setNewCustomTitle('')
+    setShowNewCustomInput(false)
+    // Focus the new section's title input after render
+    setTimeout(() => {
+      const input = document.querySelector<HTMLInputElement>(`[data-cs-id="${id}"]`)
+      input?.focus()
+      input?.select()
+    }, 50)
+  }, [newCustomTitle, customSections, sectionOrder, setCustomSections, setSectionOrder])
 
   // ── Review mode: compute previewed resume from accepted changes ──
   // MUST be before early return (hooks rule)
@@ -1246,7 +1297,7 @@ export function ResumeDetail({ resumeId }: { resumeId: string }) {
                         </DndContext>
 
                         {/* + Add Section button */}
-                        {availableSections.length > 0 && (
+                        {availableSections.length > 0 && !showNewCustomInput && (
                           <div className="relative border-t border-border/50 pt-3">
                             <button
                               type="button"
@@ -1261,7 +1312,7 @@ export function ResumeDetail({ resumeId }: { resumeId: string }) {
                                   <button
                                     key={s}
                                     type="button"
-                                    onClick={() => { handleAddSection(s); setShowAddSectionPicker(false) }}
+                                    onClick={() => { handleAddSection(s) }}
                                     className="flex w-full cursor-pointer items-center gap-2 px-3 py-2 text-[11px] text-left text-foreground hover:bg-muted"
                                   >
                                     <span>{SECTION_ICONS[s]}</span>
@@ -1270,6 +1321,43 @@ export function ResumeDetail({ resumeId }: { resumeId: string }) {
                                 ))}
                               </div>
                             )}
+                          </div>
+                        )}
+
+                        {/* Inline title input when adding a new custom section */}
+                        {showNewCustomInput && (
+                          <div className="border-t border-border/50 pt-3">
+                            <div className="flex flex-col gap-2 rounded-xs border border-border bg-background p-3">
+                              <label className="label-mono block text-[9px]">Section Title</label>
+                              <div className="flex gap-2">
+                                <input
+                                  ref={newCustomInputRef}
+                                  value={newCustomTitle}
+                                  onChange={(e) => setNewCustomTitle(e.target.value)}
+                                  onKeyDown={(e) => {
+                                    if (e.key === 'Enter') { e.preventDefault(); handleCreateCustomSection() }
+                                    if (e.key === 'Escape') { setShowNewCustomInput(false); setNewCustomTitle('') }
+                                  }}
+                                  placeholder="e.g. Open Source Contributions, Volunteering, Awards"
+                                  className="flex-1 rounded-xs border border-border bg-background px-2.5 py-1.5 text-[11px] outline-none focus:border-primary"
+                                  autoFocus
+                                />
+                                <button
+                                  type="button"
+                                  onClick={handleCreateCustomSection}
+                                  className="cursor-pointer rounded-xs bg-primary px-3 py-1.5 text-[11px] font-medium text-primary-foreground hover:bg-primary/90"
+                                >
+                                  Add
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => { setShowNewCustomInput(false); setNewCustomTitle('') }}
+                                  className="cursor-pointer rounded-xs border border-border bg-card px-2 py-1.5 text-[11px] text-muted-foreground hover:bg-background"
+                                >
+                                  Cancel
+                                </button>
+                              </div>
+                            </div>
                           </div>
                         )}
                       </div>
@@ -1319,7 +1407,7 @@ export function ResumeDetail({ resumeId }: { resumeId: string }) {
                           ))}
                         </SortableContext>
                       </DndContext>
-                      {availableSections.length > 0 && (
+                      {availableSections.length > 0 && !showNewCustomInput && (
                         <div className="relative border-t border-border/50 pt-3">
                           <button type="button" onClick={() => setShowAddSectionPicker(!showAddSectionPicker)} className="flex cursor-pointer items-center gap-1 rounded-xs border border-dashed border-border bg-transparent px-3 py-2 text-[11px] text-muted-foreground hover:border-primary hover:text-primary transition-all w-full justify-center">
                             <PlusCircle size={13} /> Add Section
@@ -1327,13 +1415,50 @@ export function ResumeDetail({ resumeId }: { resumeId: string }) {
                           {showAddSectionPicker && (
                             <div className="absolute left-0 right-0 top-full z-10 mt-1 rounded-xs border border-border bg-card shadow-lg">
                               {availableSections.map((s) => (
-                                <button key={s} type="button" onClick={() => { handleAddSection(s); setShowAddSectionPicker(false) }} className="flex w-full cursor-pointer items-center gap-2 px-3 py-2 text-[11px] text-left text-foreground hover:bg-muted">
+                                <button key={s} type="button" onClick={() => { handleAddSection(s) }} className="flex w-full cursor-pointer items-center gap-2 px-3 py-2 text-[11px] text-left text-foreground hover:bg-muted">
                                   <span>{SECTION_ICONS[s]}</span>
                                   <span>{SECTION_LABELS[s]}</span>
                                 </button>
                               ))}
                             </div>
                           )}
+                        </div>
+                      )}
+
+                      {/* Inline title input when adding a new custom section (mobile) */}
+                      {showNewCustomInput && (
+                        <div className="border-t border-border/50 pt-3">
+                          <div className="flex flex-col gap-2 rounded-xs border border-border bg-background p-3">
+                            <label className="label-mono block text-[9px]">Section Title</label>
+                            <div className="flex gap-2">
+                              <input
+                                ref={newCustomInputRef}
+                                value={newCustomTitle}
+                                onChange={(e) => setNewCustomTitle(e.target.value)}
+                                onKeyDown={(e) => {
+                                  if (e.key === 'Enter') { e.preventDefault(); handleCreateCustomSection() }
+                                  if (e.key === 'Escape') { setShowNewCustomInput(false); setNewCustomTitle('') }}
+                                }
+                                placeholder="e.g. Open Source Contributions, Volunteering, Awards"
+                                className="flex-1 rounded-xs border border-border bg-background px-2.5 py-1.5 text-[11px] outline-none focus:border-primary"
+                                autoFocus
+                              />
+                              <button
+                                type="button"
+                                onClick={handleCreateCustomSection}
+                                className="cursor-pointer rounded-xs bg-primary px-3 py-1.5 text-[11px] font-medium text-primary-foreground hover:bg-primary/90"
+                              >
+                                Add
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => { setShowNewCustomInput(false); setNewCustomTitle('') }}
+                                className="cursor-pointer rounded-xs border border-border bg-card px-2 py-1.5 text-[11px] text-muted-foreground hover:bg-background"
+                              >
+                                Cancel
+                              </button>
+                            </div>
+                          </div>
                         </div>
                       )}
                     </div>

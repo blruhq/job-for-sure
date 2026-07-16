@@ -94,6 +94,7 @@ export function UploadModal({ open, onClose }: UploadModalProps) {
         customSections: parsed.customSections?.map((cs: any) => ({
           title: cs.title || '',
           bullets: cs.bullets || [],
+          ...(cs.id ? { id: cs.id } : {}),
         })),
       })
 

@@ -63,6 +63,7 @@ export interface CustomSectionItem {
 export type CustomSectionType = 'bullets' | 'dated-items' | 'grid'
 
 export interface ResumeCustomSection {
+  id: string                     // Stable ID for DnD ordering in sectionOrder
   title: string
   type?: CustomSectionType       // Optional — old resumes don't have this
   items?: CustomSectionItem[]    // Optional — old resumes use bullets instead

@@ -13,6 +13,7 @@ import type {
   ResumeLanguage,
   ResumeCustomSection,
 } from '~/types/resume'
+import { DEFAULT_SECTION_ORDER } from '~/types/resume'
 
 // ═══════════════════════════════════════════════════════════════
 // Editor section identifiers — shared with component
@@ -27,11 +28,13 @@ export type EditorSectionId =
   | 'projects'
   | 'certifications'
   | 'languages'
-  | 'custom'
+
+/** SectionOrderId is EditorSectionId, custom section reference (cs-{id}), or legacy 'custom' */
+export type SectionOrderId = EditorSectionId | `cs-${string}` | 'custom'
 
 export const ALL_EDITOR_SECTIONS: EditorSectionId[] = [
   'basic', 'summary', 'skills', 'experience', 'education',
-  'projects', 'certifications', 'languages', 'custom',
+  'projects', 'certifications', 'languages',
 ]
 
 export type SectionKey = 'projects' | 'certifications' | 'languages' | 'custom'
@@ -56,7 +59,7 @@ export interface ResumeSavePayload {
   certifications: ResumeCertification[]
   languages: ResumeLanguage[]
   customSections: ResumeCustomSection[]
-  sectionOrder: EditorSectionId[]
+  sectionOrder: SectionOrderId[]
   sectionVisibility: Record<string, boolean>
 }
 
@@ -90,9 +93,9 @@ export interface ResumeEditorActions {
   setCertifications: (v: ResumeCertification[]) => void
   setLanguages: (v: ResumeLanguage[]) => void
   setCustomSections: (v: ResumeCustomSection[]) => void
-  setSectionOrder: (v: EditorSectionId[]) => void
+  setSectionOrder: (v: SectionOrderId[]) => void
   setSectionVisibility: (v: Record<string, boolean>) => void
-  toggleSectionVisibility: (id: EditorSectionId) => void
+  toggleSectionVisibility: (id: SectionOrderId) => void
 
   // UI actions
   setSaveStatus: (v: 'idle' | 'saving' | 'saved') => void
@@ -132,7 +135,7 @@ export function createResumeEditorStore(initial?: Partial<ResumeSavePayload> | P
         certifications: [],
         languages: [],
         customSections: [],
-        sectionOrder: [...ALL_EDITOR_SECTIONS],
+        sectionOrder: [...ALL_EDITOR_SECTIONS] as SectionOrderId[],
         sectionVisibility: {},
       }
 
@@ -191,8 +194,35 @@ export function createResumeEditorStore(initial?: Partial<ResumeSavePayload> | P
           s.projects = r.projects ?? []
           s.certifications = r.certifications ?? []
           s.languages = r.languages ?? []
-          s.customSections = r.customSections ?? []
-          s.sectionOrder = (r.sectionOrder as EditorSectionId[]) ?? [...ALL_EDITOR_SECTIONS]
+
+          // ── Custom sections: auto-assign IDs if missing, expand sectionOrder ──
+          const rawSections = r.customSections ?? []
+          const sectionsWithIds: ResumeCustomSection[] = rawSections.map((cs) => ({
+            ...cs,
+            id: cs.id || `cs_${crypto.randomUUID?.()?.slice(0, 8) ?? Math.random().toString(36).slice(2, 10)}`,
+          }))
+          s.customSections = sectionsWithIds
+
+          // Build sectionOrder from resume or default
+          const rawOrder = (r.sectionOrder as string[]) ?? [...ALL_EDITOR_SECTIONS, 'custom']
+          const expandedOrder: string[] = []
+          for (const id of rawOrder) {
+            if (id === 'custom') {
+              // Expand old 'custom' entry to individual cs-{id} entries
+              for (const cs of sectionsWithIds) {
+                expandedOrder.push(`cs-${cs.id}`)
+              }
+            } else {
+              expandedOrder.push(id)
+            }
+          }
+
+          // Remove stale cs-{id} entries whose custom section no longer exists
+          const validIds = new Set(sectionsWithIds.map((cs) => `cs-${cs.id}`))
+          s.sectionOrder = expandedOrder.filter(
+            (id) => !id.startsWith('cs-') || validIds.has(id),
+          ) as SectionOrderId[]
+
           s.sectionVisibility = r.sectionVisibility ?? {}
         }),
 
