@@ -237,7 +237,26 @@ export function QueryProvider({ children }: { children: ReactNode }) {
 }
 ```
 
-Then, wrap the app layout `src/app/[locale]/layout.tsx` in this provider. Add it after i18n NextIntlClientProvider.
+Then, wrap the app layout `src/app/[locale]/layout.tsx` in this provider.
+
+1. **Import** the `QueryProvider` at the top of `src/app/[locale]/layout.tsx`:
+   ```typescript
+   import { QueryProvider } from '~/components/layout/query-provider'
+   ```
+
+2. **Wrap** the `ThemeProvider` inside `QueryProvider` (around lines 56 to 62):
+   ```tsx
+     return (
+       <NextIntlClientProvider messages={messages}>
+         <QueryProvider>
+           <ThemeProvider>
+             {children}
+             <Toaster position="bottom-center" richColors />
+           </ThemeProvider>
+         </QueryProvider>
+       </NextIntlClientProvider>
+     )
+   ```
 
 ---
 
@@ -314,6 +333,11 @@ export const useUIStore = create<AppUIState>()(
       }),
   }))
 )
+
+// Legacy AppStoreProvider dummy wrapper to prevent breaking layout files during migration
+export function AppStoreProvider({ children }: { children: React.ReactNode }) {
+  return <>{children}</>
+}
 
 // Legacy alias wrapper hook to prevent breaking imports of useAppStore in UI layout components
 export function useAppStore() {
