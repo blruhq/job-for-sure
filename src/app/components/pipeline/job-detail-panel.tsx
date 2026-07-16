@@ -316,14 +316,12 @@ export function JobDetailPanel({
           )}
 
           {/* Area & Company Intelligence */}
-          {homeLocation && (
-            <AreaIntelligence
-              job={{ company: job.company, loc: job.loc, title: job.title }}
-              homeLocation={homeLocation}
-              city={extractCity(job.loc)}
-              countryCode={detectCountry(job.loc)}
-            />
-          )}
+          <AreaIntelligence
+            job={{ company: job.company, loc: job.loc, title: job.title }}
+            homeLocation={homeLocation}
+            city={extractCity(job.loc)}
+            countryCode={detectCountry(job.loc)}
+          />
           <CompanyIntelligence
             company={job.company}
             countryCode={detectCountry(job.loc)}

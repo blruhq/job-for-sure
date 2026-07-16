@@ -27,11 +27,13 @@ export function AreaIntelligence({ job, homeLocation, city, countryCode }: AreaI
         Area Intelligence
       </div>
 
-      {/* COMMUTE */}
-      <Section label="Commute">
-        <LinkButton href={Links.directionsUrl(homeLocation, job.loc)} icon={<Bus size={14} />} label="Directions" />
-        <LinkButton href={Links.rome2RioUrl(homeLocation, job.loc)} icon={<DollarSign size={14} />} label="Travel Prices" />
-      </Section>
+      {/* COMMUTE (needs home location) */}
+      {homeLocation && (
+        <Section label="Commute">
+          <LinkButton href={Links.directionsUrl(homeLocation, job.loc)} icon={<Bus size={14} />} label="Directions" />
+          <LinkButton href={Links.rome2RioUrl(homeLocation, job.loc)} icon={<DollarSign size={14} />} label="Travel Prices" />
+        </Section>
+      )}
 
       {/* MONEY */}
       <Section label="Money">
@@ -49,12 +51,10 @@ export function AreaIntelligence({ job, homeLocation, city, countryCode }: AreaI
       )}
 
       {/* EXPANDABLE MORE */}
-      {homeLocation && (
-        <button onClick={() => setExpanded(!expanded)} className="flex cursor-pointer items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors">
-          {expanded ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
-          {expanded ? 'Less' : 'More'} area info
-        </button>
-      )}
+      <button onClick={() => setExpanded(!expanded)} className="flex cursor-pointer items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors">
+        {expanded ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
+        {expanded ? 'Less' : 'More'} area info
+      </button>
 
       {expanded && (
         <div className="space-y-2 pt-1">
