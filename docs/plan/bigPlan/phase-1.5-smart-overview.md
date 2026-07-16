@@ -81,7 +81,7 @@ import { NextResponse } from 'next/server'
 import { generateObjectWithFailover } from '~/lib/ai-providers'
 import { withAuth } from '~/lib/with-auth'
 import { captureServerEvent } from '~/lib/posthog-server'
-import { redis } from '~/lib/redis'
+import { getRedis } from '~/lib/redis'
 import { z } from 'zod'
 
 // ── Response schema ──
@@ -124,8 +124,11 @@ export const POST = withAuth(async (req, { user }) => {
   const { jdText, resumeData, homeLocation, jobLocation, salary, company, jobTitle, matchScore, missingSkills, matchedSkills } = body
 
   // ── Check Redis cache first ──
+  // WARNING: redis.ts exports getRedis() factory, NOT a redis object.
+  // Also wrap in try/catch — throws if env vars missing (fail-open per guardrails).
   const cacheKey = `smart_overview::${user.id}::${body.applicationId || company + jobTitle}`
   try {
+    const redis = getRedis()
     const cached = await redis.get(cacheKey)
     if (cached) {
       return NextResponse.json(JSON.parse(cached))
@@ -194,6 +197,7 @@ Provide your analysis as a structured overview.`
 
   // ── Cache for 7 days ──
   try {
+    const redis = getRedis()
     await redis.set(cacheKey, JSON.stringify(result), { ex: 7 * 24 * 60 * 60 })
   } catch {
     // fail-open: return result even if cache fails

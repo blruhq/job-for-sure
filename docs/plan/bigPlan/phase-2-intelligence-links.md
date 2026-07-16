@@ -370,17 +370,35 @@ export function CompanyIntelligence({ company, countryCode }: CompanyIntelligenc
 
 ### 4. `src/app/[locale]/(app)/settings/page.tsx` (EDIT — add home location field)
 
-Add a "Home Location" text input to the settings page. Store it in `userPreferences` or a new `homeLocation` field on the user table.
+Add a "Home Location" text input to the settings page, under the Profile tab.
 
-**Option A (simplest):** Store in `userPreferences` table as a new column:
+> **WARNING: This needs a DB column, not just UI.** The `userPreferences` table
+> does NOT have a `homeLocation` column. You must add it:
+
+**Step 1: Schema change** — `src/app/lib/schema.ts`, in `userPreferences` table:
 ```typescript
-// schema.ts → userPreferences table:
-homeLocation: text("home_location"),
+export const userPreferences = pgTable("user_preferences", {
+  userId: text("user_id").primaryKey().references(() => user.id, { onDelete: "cascade" }),
+  emailNotifications: boolean("email_notifications").default(true).notNull(),
+  weeklyDigest: boolean("weekly_digest").default(false).notNull(),
+  marketingEmails: boolean("marketing_emails").default(false).notNull(),
+  homeLocation: text("home_location"),  // ← ADD THIS
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().$onUpdate(() => new Date()).notNull(),
+})
 ```
 
-**Option B:** Store in localStorage if you don't want to change the DB again.
+**Step 2: Generate migration:**
+```bash
+pnpm db:generate
+pnpm db:migrate
+```
 
-The settings UI:
+**Step 3: Update preferences API** — `src/app/api/user/preferences/route.ts`:
+- GET: return `homeLocation` in response
+- PUT: accept `homeLocation` in body
+
+**Step 4: Settings UI** — add to profile tab after Email section:
 ```tsx
 <div>
   <label className="label-mono">Home Location</label>
@@ -396,6 +414,10 @@ The settings UI:
   </p>
 </div>
 ```
+
+> **Alternatively:** If you don't want another DB migration in Phase 2,
+> store home location in `localStorage` only. It won't sync across
+> devices but avoids schema changes. Upgrade to DB later.
 
 ### 5. `src/app/components/pipeline/job-detail-panel.tsx` (EDIT — import and render intelligence sections)
 
