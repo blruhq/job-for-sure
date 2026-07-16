@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { authClient } from '~/lib/auth-client'
-import { Loader2, User, Bell, AlertTriangle, Check, X, Eye, EyeOff } from 'lucide-react'
+import { Loader2, User, Bell, AlertTriangle, Check, X, Eye, EyeOff, LocateFixed } from 'lucide-react'
 import { Sun, Moon } from 'lucide-react'
 import { useTheme } from '~/components/layout/theme-provider'
 
@@ -53,6 +53,7 @@ export default function SettingsPage() {
   const [prefs, setPrefs] = useState<Prefs | null>(null)
   const [homeLocation, setHomeLocation] = useState('')
   const [savingHomeLocation, setSavingHomeLocation] = useState(false)
+  const [detectingLocation, setDetectingLocation] = useState(false)
   const [loading, setLoading] = useState(true)
   const { notif, notify } = useNotify()
 
@@ -199,14 +200,34 @@ export default function SettingsPage() {
         body: JSON.stringify({ homeLocation: homeLocation.trim() || null }),
       })
       if (res.ok) {
-        notify('Home location saved', 'success')
+        notify('Area saved', 'success')
       } else {
-        notify('Failed to save home location', 'error')
+        notify('Failed to save area', 'error')
       }
     } catch {
-      notify('Failed to save home location', 'error')
+      notify('Failed to save area', 'error')
     }
     setSavingHomeLocation(false)
+  }
+
+  const handleDetectLocation = async () => {
+    setDetectingLocation(true)
+    try {
+      const { detectArea } = await import('~/lib/geo')
+      const area = await detectArea()
+      setHomeLocation(area)
+      const res = await fetch('/api/user/preferences', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ homeLocation: area }),
+      })
+      if (res.ok) {
+        notify('Location detected: ' + area, 'success')
+      }
+    } catch {
+      notify('Could not detect location. Type your area manually.', 'error')
+    }
+    setDetectingLocation(false)
   }
 
   const handleDeleteAccount = async () => {
@@ -315,27 +336,37 @@ export default function SettingsPage() {
               )}
             </div>
 
-            {/* Home Location */}
+            {/* My Area */}
             <div className="rounded-sm border border-border bg-card p-4">
-              <div className="mb-3 text-xs font-medium">Home Location</div>
+              <div className="mb-1 text-xs font-medium">My Area</div>
+              <p className="mb-3 text-[10px] text-muted-foreground">
+                District or neighborhood is enough — we use this for commute
+                directions and living cost estimates. Not your exact address.
+              </p>
               <div className="flex gap-2">
                 <input
                   value={homeLocation}
                   onChange={(e) => setHomeLocation(e.target.value)}
+                  onKeyDown={(e) => { if (e.key === 'Enter') handleSaveHomeLocation() }}
                   className="flex-1 rounded-sm border border-border bg-background px-3 py-1.5 text-xs outline-none focus:border-foreground/50"
-                  placeholder="e.g. Bangna, Bangkok"
+                  placeholder="e.g. Bang Na, Bangkok"
                 />
                 <button
                   onClick={handleSaveHomeLocation}
                   disabled={savingHomeLocation}
-                  className="rounded-sm bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground transition-opacity hover:opacity-90 disabled:opacity-50"
+                  className="shrink-0 rounded-sm bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground transition-opacity hover:opacity-90 disabled:opacity-50"
                 >
                   {savingHomeLocation ? <Loader2 size={13} className="animate-spin" /> : 'Save'}
                 </button>
               </div>
-              <p className="mt-2 text-[10px] text-muted-foreground">
-                Used for commute directions and travel price estimates
-              </p>
+              <button
+                onClick={handleDetectLocation}
+                disabled={detectingLocation}
+                className="mt-2 flex cursor-pointer items-center gap-1.5 text-[11px] text-primary hover:underline disabled:opacity-50"
+              >
+                {detectingLocation ? <Loader2 size={12} className="animate-spin" /> : <LocateFixed size={12} />}
+                {detectingLocation ? 'Detecting…' : 'Use my current location'}
+              </button>
             </div>
 
             {/* Change Password */}

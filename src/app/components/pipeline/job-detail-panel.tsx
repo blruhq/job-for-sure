@@ -321,6 +321,16 @@ export function JobDetailPanel({
             homeLocation={homeLocation}
             city={extractCity(job.loc)}
             countryCode={detectCountry(job.loc)}
+            onHomeLocationChange={async (location) => {
+              setHomeLocation(location)
+              try {
+                await fetch('/api/user/preferences', {
+                  method: 'PUT',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ homeLocation: location || null }),
+                })
+              } catch { /* fail silent */ }
+            }}
           />
           <CompanyIntelligence
             company={job.company}
