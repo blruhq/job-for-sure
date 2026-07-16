@@ -178,17 +178,21 @@ router.push(`/interview?${params}`)
 function handleApply() {
   window.open(job.url, '_blank')
   if (mode === 'tracker' && job.applicationId) {
-    // Use ApiClient, NOT apiPatch (apiPatch is deleted):
-    ApiClient.request(`/api/applications/${job.applicationId}`, {
-      method: 'PATCH',
-      body: JSON.stringify({ status: 'applied' }),
-    })
+    // Step 1: Add a public method to ApiClient (request is private):
+    //   static updateApplication(id: string, payload: { status?: string; notes?: string; position?: number }): Promise<any> {
+    //     return this.request(`/api/applications/${id}`, { method: 'PATCH', body: JSON.stringify(payload) })
+    //   }
+    // Step 2: Call it:
+    ApiClient.updateApplication(job.applicationId, { status: 'applied' })
   }
 }
 ```
 
-> **WARNING:** `apiPatch()` does NOT exist anymore. The old `store.tsx` is deleted.
-> Use `ApiClient.request()` or add a `useUpdateApplication` hook to `~/hooks/use-apps.ts`.
+> **CRITICAL:** `ApiClient.request()` is `private static` — you CANNOT call it from
+> outside the class. Before implementing this button, add a public
+> `updateApplication()` method to `ApiClient` in `src/app/lib/api-client.ts`.
+> Alternatively, add a `useUpdateApplication` mutation hook to `~/hooks/use-apps.ts`
+> following the same pattern as `useDeleteApplication`.
 
 ## Acceptance Criteria
 

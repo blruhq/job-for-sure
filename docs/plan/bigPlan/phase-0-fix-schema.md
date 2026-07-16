@@ -143,43 +143,24 @@ export interface CreateApplicationPayload {
 }
 ```
 
-### Task 7: Send `salary` + `jobData` at all bookmark call sites
+### Task 7: Send `salary` + `jobData` at all bookmark payload-construction sites
 
-There are **4 call sites** that call `useCreateApplication()`. Each needs `salary` and `jobData` added to the payload:
+There are **4 payload-construction sites** that build the createApplication payload (plus 1 shared hook wrapper):
 
-**Site 1:** `src/app/components/resume/job-search-panel.tsx` (~line 76)
+| # | File | Approx line | salary sent? | jobData sent? | logo/color sent? |
+|---|------|-------------|-------------|---------------|-----------------|
+| 1 | `src/app/components/resume/job-search-panel.tsx` | ~76 | NO | NO | YES |
+| 2 | `src/app/components/chat/job-preview.tsx` | ~33 | NO | NO | NO (dropped) |
+| 3 | `src/app/components/pipeline/applications-view.tsx` | ~252 (scrape URL) | n/a | n/a | NO |
+| 4 | `src/app/components/pipeline/applications-view.tsx` | ~294 (manual add) | n/a | n/a | NO |
 
-The local `bookmarkJob` helper currently sends: `sourceKey, company, jobTitle, jobUrl, location, logoUrl, color, level, matchScore, resumeId, status`.
-
-Add `salary` and `jobData`:
-
-```typescript
-const bookmarkJob = (job: { ... }) => {
-  createBookmark({
-    sourceKey: job.key,
-    company: job.company,
-    jobTitle: job.title,
-    jobUrl: job.url,
-    location: job.loc,
-    salary: job.salary,                    // ← ADD
-    logoUrl: job.logo,
-    color: job.color,
-    level: job.level,
-    matchScore: job.score,
-    resumeId: job.resume,
-    status: 'bookmarked',
-    jobData: job.jobData,                  // ← ADD
-  })
-}
-```
-
-**Site 2:** `src/app/components/chat/job-preview.tsx` (~line 48)
-
-Same additions. Currently sends: `sourceKey, company, jobTitle, jobUrl, location, level, matchScore, resumeId, status`.
-
-**Site 3-4:** `src/app/components/pipeline/applications-view.tsx` (~lines 252, 294)
-
-The scrape-URL path and manual-add path don't have salary/jobData (user types manually). That's fine — leave these as-is.
+> **Note:** Sites 3-4 are manual entry (user types job title/company). They don't
+> have salary/jobData. Leave those as-is.
+>
+> **Shared hook:** `src/app/hooks/use-bookmark.ts` wraps `useCreateApplication`.
+> It is currently imported but unused in `job-preview.tsx`. If revived, callers
+> must pass `salary`/`jobData` through `toggleBookmark(payload)`. The hook already
+> accepts `CreateApplicationPayload`, so it will pass through any fields added there.
 
 ### Task 8: Generate and apply migration
 

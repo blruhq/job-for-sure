@@ -4,6 +4,17 @@
 > **Depends on:** Phase 0 (schema fix for jobData) + Phase 1 (panel exists)
 > **Status:** Built INTO the Job Detail Panel from Phase 1
 
+> **PHASE 2 DEPENDENCY:** The verification link buttons in this component call URL
+> builders from Phase 2 (`~/lib/area-links.ts`). If Phase 2 is not yet implemented,
+> either (a) implement Phase 2 first (2-3 hours), or (b) stub the `Links.*` functions
+> as no-ops that return `#` and add a TODO comment. The component uses:
+> - `Links.costOfLivingUrl(city)` — Numbeo link
+> - `Links.googleMapsUrl(origin, destination)` — Google Maps directions
+> - `Links.rome2RioUrl(origin, destination)` — Rome2Rio travel prices
+> - `Links.cultureUrl(company)` — jobsbyculture.com link
+> - `Links.redditUrl(company)` — Reddit search link
+> - `Links.registryUrl(company)` — OpenCorporates link
+
 ## What & Why
 
 When a user clicks a job (from search results OR Kanban tracker), they see raw JD text + match score + a bunch of link buttons. That's DATA. But the user wants an OPINION: "Should I apply for this job?"
@@ -416,8 +427,8 @@ function OverviewContent({ overview, onRegenerate }: { overview: SmartOverviewRe
           {overview.salaryCheck.note && (
             <div className="text-xs text-muted-foreground italic">{overview.salaryCheck.note}</div>
           )}
-          {/* Verification link */}
-          <VerifyLink href={numbeoUrl} label="Verify on Numbeo" />
+          {/* Verification link — build URL from Phase 2 area-links.ts */}
+          <VerifyLink href={Links.costOfLivingUrl(overview.location || '')} label="Verify on Numbeo" />
         </Section>
       )}
 
@@ -430,10 +441,10 @@ function OverviewContent({ overview, onRegenerate }: { overview: SmartOverviewRe
               Est. cost: {overview.commuteEstimate.monthlyCostEstimate}
             </div>
           )}
-          {/* Verification links */}
+          {/* Verification links — build URLs from Phase 2 area-links.ts */}
           <div className="flex gap-1.5 pt-1">
-            <VerifyLink href={googleMapsUrl} label="Directions" />
-            <VerifyLink href={rome2rioUrl} label="Prices" />
+            <VerifyLink href={Links.googleMapsUrl(homeLocation || '', overview.location || '')} label="Directions" />
+            <VerifyLink href={Links.rome2RioUrl(homeLocation || '', overview.location || '')} label="Prices" />
           </div>
         </Section>
       )}
@@ -446,11 +457,11 @@ function OverviewContent({ overview, onRegenerate }: { overview: SmartOverviewRe
             Limited info — verify with links below
           </div>
         )}
-        {/* Verification links */}
+        {/* Verification links — build URLs from Phase 2 area-links.ts */}
         <div className="flex flex-wrap gap-1.5 pt-1">
-          <VerifyLink href={cultureUrl} label="Culture" />
-          <VerifyLink href={redditUrl} label="Reddit" />
-          <VerifyLink href={registryUrl} label="Registry" />
+          <VerifyLink href={Links.cultureUrl(overview.company || '')} label="Culture" />
+          <VerifyLink href={Links.redditUrl(overview.company || '')} label="Reddit" />
+          <VerifyLink href={Links.registryUrl(overview.company || '')} label="Registry" />
         </div>
       </Section>
 

@@ -206,6 +206,23 @@ Add i18n key: `"contacts": "Contacts"` / `"contacts": "ผู้ติดต่�
 
 ### `src/app/hooks/use-contacts.ts` (NEW)
 
+> **CRITICAL:** `ApiClient.request()` is `private static`. You MUST first add public
+> methods to `ApiClient` in `src/app/lib/api-client.ts`:
+> ```typescript
+> static getContacts(): Promise<any[]> {
+>   return this.request('/api/contacts')
+> }
+> static createContact(payload: Record<string, unknown>): Promise<any> {
+>   return this.request('/api/contacts', { method: 'POST', body: JSON.stringify(payload) })
+> }
+> static updateContact(id: string, payload: Record<string, unknown>): Promise<any> {
+>   return this.request(`/api/contacts/${id}`, { method: 'PATCH', body: JSON.stringify(payload) })
+> }
+> static deleteContact(id: string): Promise<void> {
+>   return this.request(`/api/contacts/${id}`, { method: 'DELETE' })
+> }
+> ```
+
 ```typescript
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { ApiClient } from '~/lib/api-client'
@@ -213,16 +230,14 @@ import { ApiClient } from '~/lib/api-client'
 export function useContacts() {
   return useQuery({
     queryKey: ['contacts'],
-    queryFn: () => ApiClient.request('/api/contacts'),
+    queryFn: () => ApiClient.getContacts(),
   })
 }
 
 export function useCreateContact() {
   const qc = useQueryClient()
   return useMutation({
-    mutationFn: (payload: any) => ApiClient.request('/api/contacts', {
-      method: 'POST', body: JSON.stringify(payload),
-    }),
+    mutationFn: (payload: Record<string, unknown>) => ApiClient.createContact(payload),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['contacts'] }),
   })
 }
@@ -230,9 +245,8 @@ export function useCreateContact() {
 export function useUpdateContact() {
   const qc = useQueryClient()
   return useMutation({
-    mutationFn: ({ id, ...updates }: any) => ApiClient.request(`/api/contacts/${id}`, {
-      method: 'PATCH', body: JSON.stringify(updates),
-    }),
+    mutationFn: ({ id, ...updates }: { id: string } & Record<string, unknown>) =>
+      ApiClient.updateContact(id, updates),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['contacts'] }),
   })
 }
@@ -240,13 +254,13 @@ export function useUpdateContact() {
 export function useDeleteContact() {
   const qc = useQueryClient()
   return useMutation({
-    mutationFn: (id: string) => ApiClient.request(`/api/contacts/${id}`, { method: 'DELETE' }),
+    mutationFn: (id: string) => ApiClient.deleteContact(id),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['contacts'] }),
   })
 }
 ```
 
-Also add contact methods to `ApiClient` in `src/app/lib/api-client.ts`.
+Also add contact methods to `ApiClient` in `src/app/lib/api-client.ts` (see code block above).
 
 ## Acceptance Criteria
 

@@ -70,7 +70,7 @@ Phase 0 → Phase 1 → Phase 1.5 → Phase 2 → Phase 3 → Phase 4 → Phase 
 6. **Country-specific property sites** — Lookup table by country code (TH: Hipflat/PropertyHub/Baania)
 7. **Numbeo for universal cost data** — Works worldwide, free to link
 8. **Rome2Rio for commute prices** — Replaces fare table + cost calculator
-9. **jobsbyculture.com for company culture** — Scraper-friendly, will be 14th source
+9. **jobsbyculture.com for company culture** — Scraper-friendly, additional source
 
 ## What We're NOT Doing
 

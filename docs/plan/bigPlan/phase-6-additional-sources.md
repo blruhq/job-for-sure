@@ -17,7 +17,7 @@ This phase covers adding more job sources and culture data to your existing 13-s
 
 ---
 
-## Part A: jobsbyculture.com as 14th Job Source
+## Part A: jobsbyculture.com as Additional Job Source
 
 ### File: `src/app/lib/job-sources/jobsbyculture.ts` (NEW)
 
@@ -121,9 +121,12 @@ import { fetchJobsByCulture } from './jobsbyculture'
 
 **Step 4:** Add a `fetchers.push()` block in the `searchJobs()` function (around line 115+):
 
+> **CRITICAL:** In `searchJobs()`, the destructured variable `query` is a **string** (the search
+> query text), NOT an object with a `.query` property. Use bare `query` and `location`:
+
 ```typescript
 if (sources.includes('jobsbyculture')) {
-  fetchers.push(() => fetchJobsByCulture(query.query, query.location || ''))
+  fetchers.push(() => fetchJobsByCulture(query, location || ''))
   fetcherSources.push('jobsbyculture')
 }
 ```
