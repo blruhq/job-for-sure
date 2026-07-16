@@ -51,6 +51,7 @@ export interface ScoredJob extends JobResult {
 export interface SearchParams {
   query: string
   location?: string
+  countryCode?: string
   skills?: string[]
   role?: string
   sources?: JobSource[]    // defaults to all available

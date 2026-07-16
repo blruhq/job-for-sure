@@ -91,12 +91,11 @@ interface JobsDBResponse {
 export async function fetchJobsDBRest(
   query: string,
   location?: string,
-  opts?: { signal?: AbortSignal },
+  opts?: { signal?: AbortSignal; countryCode?: string },
 ): Promise<{ jobs: JobResult[]; error?: string }> {
   try {
-    // 1. Parse user location to get country code
-    const parsed = parseLocation(location)
-    const countryCode = parsed.country
+    // 1. Parse user location to get country code (use passed countryCode first)
+    const countryCode = opts?.countryCode || parseLocation(location).country
 
     // 2. Look up country in SEEK mapping
     const config = countryCode ? COUNTRY_MAP[countryCode] : null
@@ -114,6 +113,11 @@ export async function fetchJobsDBRest(
     params.set('pageSize', '50')
     params.set('page', '1')
     params.set('sortmode', 'ListedDate')
+
+    // Pass city as where parameter (only if location is not a country code or "Thailand")
+    if (location && location !== countryCode && location.toLowerCase() !== 'thailand') {
+      params.set('where', location)
+    }
 
     const url = `https://${config.domain}/api/jobsearch/v5/search?${params.toString()}`
 

@@ -18,6 +18,8 @@ import { countryToFlag } from '~/lib/job-sources/geo'
 import { JobDetailModal } from './job-detail-modal'
 import { getCards, setCards } from '~/lib/client-cache'
 import { expandQueryTerms } from '~/lib/job-sources/role-synonyms'
+import { LocationAutocomplete } from '../search/LocationAutocomplete'
+import { RoleAutocomplete } from '../search/RoleAutocomplete'
 
 // ═══════════════════════════════════════════════════════════════
 // JobSearchPanel — real job search from 9+ free sources.
@@ -84,6 +86,7 @@ export function JobSearchPanel({ resume }: { resume: Resume }) {
     : ''
   const [query, setQuery] = useState(resume.role || fallbackQuery)
   const [location, setLocation] = useState(resume.location || '')
+  const [countryCode, setCountryCode] = useState('')
   const [results, setResults] = useState<ScoredJob[]>([])
   const [loading, setLoading] = useState(false)
   const [searched, setSearched] = useState(false)
@@ -144,7 +147,8 @@ export function JobSearchPanel({ resume }: { resume: Resume }) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           query: searchQuery,
-          location: loc.trim() || undefined,
+          location: loc?.trim().toLowerCase() === 'remote' ? undefined : loc?.trim() || undefined,
+          countryCode: countryCode || undefined,
           skills: resume.skills,
           role: resume.role,
           sources: FAST_FREE_SOURCES,
@@ -175,7 +179,8 @@ export function JobSearchPanel({ resume }: { resume: Resume }) {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             query: searchQuery,
-            location: loc.trim() || undefined,
+            location: loc?.trim().toLowerCase() === 'remote' ? undefined : loc?.trim() || undefined,
+            countryCode: countryCode || undefined,
             skills: resume.skills,
             role: resume.role,
             sources: FULL_FREE_SOURCES,
@@ -240,7 +245,8 @@ export function JobSearchPanel({ resume }: { resume: Resume }) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           query: searchQuery,
-          location: (loc ?? location).trim() || undefined,
+          location: (loc ?? location)?.trim().toLowerCase() === 'remote' ? undefined : (loc ?? location)?.trim() || undefined,
+          countryCode: countryCode || undefined,
           skills: resume.skills,
           role: resume.role,
           sources: FAST_FREE_SOURCES,
@@ -273,7 +279,8 @@ export function JobSearchPanel({ resume }: { resume: Resume }) {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             query: searchQuery,
-            location: (loc ?? location).trim() || undefined,
+            location: (loc ?? location)?.trim().toLowerCase() === 'remote' ? undefined : (loc ?? location)?.trim() || undefined,
+            countryCode: countryCode || undefined,
             skills: resume.skills,
             role: resume.role,
             sources: FULL_FREE_SOURCES,
@@ -487,28 +494,21 @@ export function JobSearchPanel({ resume }: { resume: Resume }) {
       {/* Search bar */}
       <div className="shrink-0 border-b border-border bg-card px-4 md:px-6 py-3">
         <div className="flex flex-wrap items-center gap-2">
-          <div className="relative flex-1 min-w-[200px]">
-            <Search size={13} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
-            <input
-              type="text"
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-              placeholder="Job title or keywords…"
-              className="w-full rounded-sm border border-border bg-background py-1.5 pl-8 pr-3 text-[12px] outline-none focus:border-primary"
-            />
-          </div>
-          <div className="relative w-[150px]">
-            <MapPin size={13} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
-            <input
-              type="text"
-              value={location}
-              onChange={(e) => setLocation(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-              placeholder="Location…"
-              className="w-full rounded-sm border border-border bg-background py-1.5 pl-8 pr-3 text-[12px] outline-none focus:border-primary"
-            />
-          </div>
+          <RoleAutocomplete
+            value={query}
+            onChange={setQuery}
+            onKeyDownEnter={() => handleSearch()}
+          />
+          <LocationAutocomplete
+            value={location}
+            onChange={setLocation}
+            countryCode={countryCode}
+            onSelectCountryCode={setCountryCode}
+            onSelectRemoteOnly={(remote) => {
+              setFilters(f => ({ ...f, remoteOnly: remote }))
+            }}
+            onKeyDownEnter={() => handleSearch()}
+          />
           <button
             onClick={() => handleSearch()}
             disabled={loading || query.trim().length < 2}

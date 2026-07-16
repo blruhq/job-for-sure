@@ -2,1251 +2,1501 @@
   "countries": [
     {
       "name": "Afghanistan",
+      "thaiName": "",
       "code": "AF",
       "region": "Asia"
     },
     {
       "name": "Åland Islands",
+      "thaiName": "",
       "code": "AX",
       "region": "Europe"
     },
     {
       "name": "Albania",
+      "thaiName": "",
       "code": "AL",
       "region": "Europe"
     },
     {
       "name": "Algeria",
+      "thaiName": "",
       "code": "DZ",
       "region": "Africa"
     },
     {
       "name": "American Samoa",
+      "thaiName": "",
       "code": "AS",
       "region": "Oceania"
     },
     {
       "name": "Andorra",
+      "thaiName": "",
       "code": "AD",
       "region": "Europe"
     },
     {
       "name": "Angola",
+      "thaiName": "",
       "code": "AO",
       "region": "Africa"
     },
     {
       "name": "Anguilla",
+      "thaiName": "",
       "code": "AI",
       "region": "Americas"
     },
     {
       "name": "Antarctica",
+      "thaiName": "",
       "code": "AQ",
       "region": "Antarctic"
     },
     {
       "name": "Antigua and Barbuda",
+      "thaiName": "",
       "code": "AG",
       "region": "Americas"
     },
     {
       "name": "Argentina",
+      "thaiName": "อาร์เจนตินา",
       "code": "AR",
       "region": "Americas"
     },
     {
       "name": "Armenia",
+      "thaiName": "",
       "code": "AM",
       "region": "Asia"
     },
     {
       "name": "Aruba",
+      "thaiName": "",
       "code": "AW",
       "region": "Americas"
     },
     {
       "name": "Australia",
+      "thaiName": "ออสเตรเลีย",
       "code": "AU",
       "region": "Oceania"
     },
     {
       "name": "Austria",
+      "thaiName": "ออสเตรีย",
       "code": "AT",
       "region": "Europe"
     },
     {
       "name": "Azerbaijan",
+      "thaiName": "",
       "code": "AZ",
       "region": "Asia"
     },
     {
       "name": "Bahamas",
+      "thaiName": "",
       "code": "BS",
       "region": "Americas"
     },
     {
       "name": "Bahrain",
+      "thaiName": "",
       "code": "BH",
       "region": "Asia"
     },
     {
       "name": "Bangladesh",
+      "thaiName": "",
       "code": "BD",
       "region": "Asia"
     },
     {
       "name": "Barbados",
+      "thaiName": "",
       "code": "BB",
       "region": "Americas"
     },
     {
       "name": "Belarus",
+      "thaiName": "",
       "code": "BY",
       "region": "Europe"
     },
     {
       "name": "Belgium",
+      "thaiName": "เบลเยียม",
       "code": "BE",
       "region": "Europe"
     },
     {
       "name": "Belize",
+      "thaiName": "",
       "code": "BZ",
       "region": "Americas"
     },
     {
       "name": "Benin",
+      "thaiName": "",
       "code": "BJ",
       "region": "Africa"
     },
     {
       "name": "Bermuda",
+      "thaiName": "",
       "code": "BM",
       "region": "Americas"
     },
     {
       "name": "Bhutan",
+      "thaiName": "",
       "code": "BT",
       "region": "Asia"
     },
     {
       "name": "Bolivia",
+      "thaiName": "",
       "code": "BO",
       "region": "Americas"
     },
     {
       "name": "Bosnia and Herzegovina",
+      "thaiName": "",
       "code": "BA",
       "region": "Europe"
     },
     {
       "name": "Botswana",
+      "thaiName": "",
       "code": "BW",
       "region": "Africa"
     },
     {
       "name": "Bouvet Island",
+      "thaiName": "",
       "code": "BV",
       "region": "Antarctic"
     },
     {
       "name": "Brazil",
+      "thaiName": "บราซิล",
       "code": "BR",
       "region": "Americas"
     },
     {
       "name": "British Indian Ocean Territory",
+      "thaiName": "",
       "code": "IO",
       "region": "Africa"
     },
     {
       "name": "British Virgin Islands",
+      "thaiName": "",
       "code": "VG",
       "region": "Americas"
     },
     {
       "name": "Brunei",
+      "thaiName": "",
       "code": "BN",
       "region": "Asia"
     },
     {
       "name": "Bulgaria",
+      "thaiName": "",
       "code": "BG",
       "region": "Europe"
     },
     {
       "name": "Burkina Faso",
+      "thaiName": "",
       "code": "BF",
       "region": "Africa"
     },
     {
       "name": "Burundi",
+      "thaiName": "",
       "code": "BI",
       "region": "Africa"
     },
     {
       "name": "Cambodia",
+      "thaiName": "",
       "code": "KH",
       "region": "Asia"
     },
     {
       "name": "Cameroon",
+      "thaiName": "",
       "code": "CM",
       "region": "Africa"
     },
     {
       "name": "Canada",
+      "thaiName": "แคนาดา",
       "code": "CA",
       "region": "Americas"
     },
     {
       "name": "Cape Verde",
+      "thaiName": "",
       "code": "CV",
       "region": "Africa"
     },
     {
       "name": "Caribbean Netherlands",
+      "thaiName": "",
       "code": "BQ",
       "region": "Americas"
     },
     {
       "name": "Cayman Islands",
+      "thaiName": "",
       "code": "KY",
       "region": "Americas"
     },
     {
       "name": "Central African Republic",
+      "thaiName": "",
       "code": "CF",
       "region": "Africa"
     },
     {
       "name": "Chad",
+      "thaiName": "",
       "code": "TD",
       "region": "Africa"
     },
     {
       "name": "Chile",
+      "thaiName": "ชิลี",
       "code": "CL",
       "region": "Americas"
     },
     {
       "name": "China",
+      "thaiName": "จีน",
       "code": "CN",
       "region": "Asia"
     },
     {
       "name": "Christmas Island",
+      "thaiName": "",
       "code": "CX",
       "region": "Oceania"
     },
     {
       "name": "Cocos (Keeling) Islands",
+      "thaiName": "",
       "code": "CC",
       "region": "Oceania"
     },
     {
       "name": "Colombia",
+      "thaiName": "โคลอมเบีย",
       "code": "CO",
       "region": "Americas"
     },
     {
       "name": "Comoros",
+      "thaiName": "",
       "code": "KM",
       "region": "Africa"
     },
     {
       "name": "Cook Islands",
+      "thaiName": "",
       "code": "CK",
       "region": "Oceania"
     },
     {
       "name": "Costa Rica",
+      "thaiName": "",
       "code": "CR",
       "region": "Americas"
     },
     {
       "name": "Croatia",
+      "thaiName": "",
       "code": "HR",
       "region": "Europe"
     },
     {
       "name": "Cuba",
+      "thaiName": "",
       "code": "CU",
       "region": "Americas"
     },
     {
       "name": "Curaçao",
+      "thaiName": "",
       "code": "CW",
       "region": "Americas"
     },
     {
       "name": "Cyprus",
+      "thaiName": "",
       "code": "CY",
       "region": "Europe"
     },
     {
       "name": "Czechia",
+      "thaiName": "สาธารณรัฐเช็ก",
       "code": "CZ",
       "region": "Europe"
     },
     {
       "name": "Denmark",
+      "thaiName": "เดนมาร์ก",
       "code": "DK",
       "region": "Europe"
     },
     {
       "name": "Djibouti",
+      "thaiName": "",
       "code": "DJ",
       "region": "Africa"
     },
     {
       "name": "Dominica",
+      "thaiName": "",
       "code": "DM",
       "region": "Americas"
     },
     {
       "name": "Dominican Republic",
+      "thaiName": "",
       "code": "DO",
       "region": "Americas"
     },
     {
       "name": "DR Congo",
+      "thaiName": "",
       "code": "CD",
       "region": "Africa"
     },
     {
       "name": "Ecuador",
+      "thaiName": "",
       "code": "EC",
       "region": "Americas"
     },
     {
       "name": "Egypt",
+      "thaiName": "อียิปต์",
       "code": "EG",
       "region": "Africa"
     },
     {
       "name": "El Salvador",
+      "thaiName": "",
       "code": "SV",
       "region": "Americas"
     },
     {
       "name": "Equatorial Guinea",
+      "thaiName": "",
       "code": "GQ",
       "region": "Africa"
     },
     {
       "name": "Eritrea",
+      "thaiName": "",
       "code": "ER",
       "region": "Africa"
     },
     {
       "name": "Estonia",
+      "thaiName": "",
       "code": "EE",
       "region": "Europe"
     },
     {
       "name": "Eswatini",
+      "thaiName": "",
       "code": "SZ",
       "region": "Africa"
     },
     {
       "name": "Ethiopia",
+      "thaiName": "",
       "code": "ET",
       "region": "Africa"
     },
     {
       "name": "Falkland Islands",
+      "thaiName": "",
       "code": "FK",
       "region": "Americas"
     },
     {
       "name": "Faroe Islands",
+      "thaiName": "",
       "code": "FO",
       "region": "Europe"
     },
     {
       "name": "Fiji",
+      "thaiName": "",
       "code": "FJ",
       "region": "Oceania"
     },
     {
       "name": "Finland",
+      "thaiName": "ฟินแลนด์",
       "code": "FI",
       "region": "Europe"
     },
     {
       "name": "France",
+      "thaiName": "ฝรั่งเศส",
       "code": "FR",
       "region": "Europe"
     },
     {
       "name": "French Guiana",
+      "thaiName": "",
       "code": "GF",
       "region": "Americas"
     },
     {
       "name": "French Polynesia",
+      "thaiName": "",
       "code": "PF",
       "region": "Oceania"
     },
     {
       "name": "French Southern and Antarctic Lands",
+      "thaiName": "",
       "code": "TF",
       "region": "Antarctic"
     },
     {
       "name": "Gabon",
+      "thaiName": "",
       "code": "GA",
       "region": "Africa"
     },
     {
       "name": "Gambia",
+      "thaiName": "",
       "code": "GM",
       "region": "Africa"
     },
     {
       "name": "Georgia",
+      "thaiName": "",
       "code": "GE",
       "region": "Asia"
     },
     {
       "name": "Germany",
+      "thaiName": "เยอรมนี",
       "code": "DE",
       "region": "Europe"
     },
     {
       "name": "Ghana",
+      "thaiName": "",
       "code": "GH",
       "region": "Africa"
     },
     {
       "name": "Gibraltar",
+      "thaiName": "",
       "code": "GI",
       "region": "Europe"
     },
     {
       "name": "Greece",
+      "thaiName": "",
       "code": "GR",
       "region": "Europe"
     },
     {
       "name": "Greenland",
+      "thaiName": "",
       "code": "GL",
       "region": "Americas"
     },
     {
       "name": "Grenada",
+      "thaiName": "",
       "code": "GD",
       "region": "Americas"
     },
     {
       "name": "Guadeloupe",
+      "thaiName": "",
       "code": "GP",
       "region": "Americas"
     },
     {
       "name": "Guam",
+      "thaiName": "",
       "code": "GU",
       "region": "Oceania"
     },
     {
       "name": "Guatemala",
+      "thaiName": "",
       "code": "GT",
       "region": "Americas"
     },
     {
       "name": "Guernsey",
+      "thaiName": "",
       "code": "GG",
       "region": "Europe"
     },
     {
       "name": "Guinea",
+      "thaiName": "",
       "code": "GN",
       "region": "Africa"
     },
     {
       "name": "Guinea-Bissau",
+      "thaiName": "",
       "code": "GW",
       "region": "Africa"
     },
     {
       "name": "Guyana",
+      "thaiName": "",
       "code": "GY",
       "region": "Americas"
     },
     {
       "name": "Haiti",
+      "thaiName": "",
       "code": "HT",
       "region": "Americas"
     },
     {
       "name": "Heard Island and McDonald Islands",
+      "thaiName": "",
       "code": "HM",
       "region": "Antarctic"
     },
     {
       "name": "Honduras",
+      "thaiName": "",
       "code": "HN",
       "region": "Americas"
     },
     {
       "name": "Hong Kong",
+      "thaiName": "",
       "code": "HK",
       "region": "Asia"
     },
     {
       "name": "Hungary",
+      "thaiName": "",
       "code": "HU",
       "region": "Europe"
     },
     {
       "name": "Iceland",
+      "thaiName": "",
       "code": "IS",
       "region": "Europe"
     },
     {
       "name": "India",
+      "thaiName": "อินเดีย",
       "code": "IN",
       "region": "Asia"
     },
     {
       "name": "Indonesia",
+      "thaiName": "อินโดนีเซีย",
       "code": "ID",
       "region": "Asia"
     },
     {
       "name": "Iran",
+      "thaiName": "",
       "code": "IR",
       "region": "Asia"
     },
     {
       "name": "Iraq",
+      "thaiName": "",
       "code": "IQ",
       "region": "Asia"
     },
     {
       "name": "Ireland",
+      "thaiName": "ไอร์แลนด์",
       "code": "IE",
       "region": "Europe"
     },
     {
       "name": "Isle of Man",
+      "thaiName": "",
       "code": "IM",
       "region": "Europe"
     },
     {
       "name": "Israel",
+      "thaiName": "อิสราเอล",
       "code": "IL",
       "region": "Asia"
     },
     {
       "name": "Italy",
+      "thaiName": "อิตาลี",
       "code": "IT",
       "region": "Europe"
     },
     {
       "name": "Ivory Coast",
+      "thaiName": "",
       "code": "CI",
       "region": "Africa"
     },
     {
       "name": "Jamaica",
+      "thaiName": "",
       "code": "JM",
       "region": "Americas"
     },
     {
       "name": "Japan",
+      "thaiName": "ญี่ปุ่น",
       "code": "JP",
       "region": "Asia"
     },
     {
       "name": "Jersey",
+      "thaiName": "",
       "code": "JE",
       "region": "Europe"
     },
     {
       "name": "Jordan",
+      "thaiName": "",
       "code": "JO",
       "region": "Asia"
     },
     {
       "name": "Kazakhstan",
+      "thaiName": "",
       "code": "KZ",
       "region": "Asia"
     },
     {
       "name": "Kenya",
+      "thaiName": "เคนยา",
       "code": "KE",
       "region": "Africa"
     },
     {
       "name": "Kiribati",
+      "thaiName": "",
       "code": "KI",
       "region": "Oceania"
     },
     {
       "name": "Kosovo",
+      "thaiName": "",
       "code": "XK",
       "region": "Europe"
     },
     {
       "name": "Kuwait",
+      "thaiName": "",
       "code": "KW",
       "region": "Asia"
     },
     {
       "name": "Kyrgyzstan",
+      "thaiName": "",
       "code": "KG",
       "region": "Asia"
     },
     {
       "name": "Laos",
+      "thaiName": "",
       "code": "LA",
       "region": "Asia"
     },
     {
       "name": "Latvia",
+      "thaiName": "",
       "code": "LV",
       "region": "Europe"
     },
     {
       "name": "Lebanon",
+      "thaiName": "",
       "code": "LB",
       "region": "Asia"
     },
     {
       "name": "Lesotho",
+      "thaiName": "",
       "code": "LS",
       "region": "Africa"
     },
     {
       "name": "Liberia",
+      "thaiName": "",
       "code": "LR",
       "region": "Africa"
     },
     {
       "name": "Libya",
+      "thaiName": "",
       "code": "LY",
       "region": "Africa"
     },
     {
       "name": "Liechtenstein",
+      "thaiName": "",
       "code": "LI",
       "region": "Europe"
     },
     {
       "name": "Lithuania",
+      "thaiName": "",
       "code": "LT",
       "region": "Europe"
     },
     {
       "name": "Luxembourg",
+      "thaiName": "ลักเซมเบิร์ก",
       "code": "LU",
       "region": "Europe"
     },
     {
       "name": "Macau",
+      "thaiName": "",
       "code": "MO",
       "region": "Asia"
     },
     {
       "name": "Madagascar",
+      "thaiName": "",
       "code": "MG",
       "region": "Africa"
     },
     {
       "name": "Malawi",
+      "thaiName": "",
       "code": "MW",
       "region": "Africa"
     },
     {
       "name": "Malaysia",
+      "thaiName": "มาเลเซีย",
       "code": "MY",
       "region": "Asia"
     },
     {
       "name": "Maldives",
+      "thaiName": "",
       "code": "MV",
       "region": "Asia"
     },
     {
       "name": "Mali",
+      "thaiName": "",
       "code": "ML",
       "region": "Africa"
     },
     {
       "name": "Malta",
+      "thaiName": "",
       "code": "MT",
       "region": "Europe"
     },
     {
       "name": "Marshall Islands",
+      "thaiName": "",
       "code": "MH",
       "region": "Oceania"
     },
     {
       "name": "Martinique",
+      "thaiName": "",
       "code": "MQ",
       "region": "Americas"
     },
     {
       "name": "Mauritania",
+      "thaiName": "",
       "code": "MR",
       "region": "Africa"
     },
     {
       "name": "Mauritius",
+      "thaiName": "",
       "code": "MU",
       "region": "Africa"
     },
     {
       "name": "Mayotte",
+      "thaiName": "",
       "code": "YT",
       "region": "Africa"
     },
     {
       "name": "Mexico",
+      "thaiName": "เม็กซิโก",
       "code": "MX",
       "region": "Americas"
     },
     {
       "name": "Micronesia",
+      "thaiName": "",
       "code": "FM",
       "region": "Oceania"
     },
     {
       "name": "Moldova",
+      "thaiName": "",
       "code": "MD",
       "region": "Europe"
     },
     {
       "name": "Monaco",
+      "thaiName": "",
       "code": "MC",
       "region": "Europe"
     },
     {
       "name": "Mongolia",
+      "thaiName": "",
       "code": "MN",
       "region": "Asia"
     },
     {
       "name": "Montenegro",
+      "thaiName": "",
       "code": "ME",
       "region": "Europe"
     },
     {
       "name": "Montserrat",
+      "thaiName": "",
       "code": "MS",
       "region": "Americas"
     },
     {
       "name": "Morocco",
+      "thaiName": "โมร็อกโก",
       "code": "MA",
       "region": "Africa"
     },
     {
       "name": "Mozambique",
+      "thaiName": "",
       "code": "MZ",
       "region": "Africa"
     },
     {
       "name": "Myanmar",
+      "thaiName": "",
       "code": "MM",
       "region": "Asia"
     },
     {
       "name": "Namibia",
+      "thaiName": "",
       "code": "NA",
       "region": "Africa"
     },
     {
       "name": "Nauru",
+      "thaiName": "",
       "code": "NR",
       "region": "Oceania"
     },
     {
       "name": "Nepal",
+      "thaiName": "",
       "code": "NP",
       "region": "Asia"
     },
     {
       "name": "Netherlands",
+      "thaiName": "เนเธอร์แลนด์",
       "code": "NL",
       "region": "Europe"
     },
     {
       "name": "New Caledonia",
+      "thaiName": "",
       "code": "NC",
       "region": "Oceania"
     },
     {
       "name": "New Zealand",
+      "thaiName": "นิวซีแลนด์",
       "code": "NZ",
       "region": "Oceania"
     },
     {
       "name": "Nicaragua",
+      "thaiName": "",
       "code": "NI",
       "region": "Americas"
     },
     {
       "name": "Niger",
+      "thaiName": "",
       "code": "NE",
       "region": "Africa"
     },
     {
       "name": "Nigeria",
+      "thaiName": "ไนจีเรีย",
       "code": "NG",
       "region": "Africa"
     },
     {
       "name": "Niue",
+      "thaiName": "",
       "code": "NU",
       "region": "Oceania"
     },
     {
       "name": "Norfolk Island",
+      "thaiName": "",
       "code": "NF",
       "region": "Oceania"
     },
     {
       "name": "North Korea",
+      "thaiName": "",
       "code": "KP",
       "region": "Asia"
     },
     {
       "name": "North Macedonia",
+      "thaiName": "",
       "code": "MK",
       "region": "Europe"
     },
     {
       "name": "Northern Mariana Islands",
+      "thaiName": "",
       "code": "MP",
       "region": "Oceania"
     },
     {
       "name": "Norway",
+      "thaiName": "นอร์เวย์",
       "code": "NO",
       "region": "Europe"
     },
     {
       "name": "Oman",
+      "thaiName": "",
       "code": "OM",
       "region": "Asia"
     },
     {
       "name": "Pakistan",
+      "thaiName": "",
       "code": "PK",
       "region": "Asia"
     },
     {
       "name": "Palau",
+      "thaiName": "",
       "code": "PW",
       "region": "Oceania"
     },
     {
       "name": "Palestine",
+      "thaiName": "",
       "code": "PS",
       "region": "Asia"
     },
     {
       "name": "Panama",
+      "thaiName": "",
       "code": "PA",
       "region": "Americas"
     },
     {
       "name": "Papua New Guinea",
+      "thaiName": "",
       "code": "PG",
       "region": "Oceania"
     },
     {
       "name": "Paraguay",
+      "thaiName": "",
       "code": "PY",
       "region": "Americas"
     },
     {
       "name": "Peru",
+      "thaiName": "",
       "code": "PE",
       "region": "Americas"
     },
     {
       "name": "Philippines",
+      "thaiName": "ฟิลิปปินส์",
       "code": "PH",
       "region": "Asia"
     },
     {
       "name": "Pitcairn Islands",
+      "thaiName": "",
       "code": "PN",
       "region": "Oceania"
     },
     {
       "name": "Poland",
+      "thaiName": "โปแลนด์",
       "code": "PL",
       "region": "Europe"
     },
     {
       "name": "Portugal",
+      "thaiName": "โปรตุเกส",
       "code": "PT",
       "region": "Europe"
     },
     {
       "name": "Puerto Rico",
+      "thaiName": "",
       "code": "PR",
       "region": "Americas"
     },
     {
       "name": "Qatar",
+      "thaiName": "กาตาร์",
       "code": "QA",
       "region": "Asia"
     },
     {
       "name": "Republic of the Congo",
+      "thaiName": "",
       "code": "CG",
       "region": "Africa"
     },
     {
       "name": "Réunion",
+      "thaiName": "",
       "code": "RE",
       "region": "Africa"
     },
     {
       "name": "Romania",
+      "thaiName": "",
       "code": "RO",
       "region": "Europe"
     },
     {
       "name": "Russia",
+      "thaiName": "รัสเซีย",
       "code": "RU",
       "region": "Europe"
     },
     {
       "name": "Rwanda",
+      "thaiName": "",
       "code": "RW",
       "region": "Africa"
     },
     {
       "name": "Saint Barthélemy",
+      "thaiName": "",
       "code": "BL",
       "region": "Americas"
     },
     {
       "name": "Saint Helena, Ascension and Tristan da Cunha",
+      "thaiName": "",
       "code": "SH",
       "region": "Africa"
     },
     {
       "name": "Saint Kitts and Nevis",
+      "thaiName": "",
       "code": "KN",
       "region": "Americas"
     },
     {
       "name": "Saint Lucia",
+      "thaiName": "",
       "code": "LC",
       "region": "Americas"
     },
     {
       "name": "Saint Martin",
+      "thaiName": "",
       "code": "MF",
       "region": "Americas"
     },
     {
       "name": "Saint Pierre and Miquelon",
+      "thaiName": "",
       "code": "PM",
       "region": "Americas"
     },
     {
       "name": "Saint Vincent and the Grenadines",
+      "thaiName": "",
       "code": "VC",
       "region": "Americas"
     },
     {
       "name": "Samoa",
+      "thaiName": "",
       "code": "WS",
       "region": "Oceania"
     },
     {
       "name": "San Marino",
+      "thaiName": "",
       "code": "SM",
       "region": "Europe"
     },
     {
       "name": "São Tomé and Príncipe",
+      "thaiName": "",
       "code": "ST",
       "region": "Africa"
     },
     {
       "name": "Saudi Arabia",
+      "thaiName": "ซาอุดีอาระเบีย",
       "code": "SA",
       "region": "Asia"
     },
     {
       "name": "Senegal",
+      "thaiName": "",
       "code": "SN",
       "region": "Africa"
     },
     {
       "name": "Serbia",
+      "thaiName": "",
       "code": "RS",
       "region": "Europe"
     },
     {
       "name": "Seychelles",
+      "thaiName": "",
       "code": "SC",
       "region": "Africa"
     },
     {
       "name": "Sierra Leone",
+      "thaiName": "",
       "code": "SL",
       "region": "Africa"
     },
     {
       "name": "Singapore",
+      "thaiName": "สิงคโปร์",
       "code": "SG",
       "region": "Asia"
     },
     {
       "name": "Sint Maarten",
+      "thaiName": "",
       "code": "SX",
       "region": "Americas"
     },
     {
       "name": "Slovakia",
+      "thaiName": "",
       "code": "SK",
       "region": "Europe"
     },
     {
       "name": "Slovenia",
+      "thaiName": "",
       "code": "SI",
       "region": "Europe"
     },
     {
       "name": "Solomon Islands",
+      "thaiName": "",
       "code": "SB",
       "region": "Oceania"
     },
     {
       "name": "Somalia",
+      "thaiName": "",
       "code": "SO",
       "region": "Africa"
     },
     {
       "name": "South Africa",
+      "thaiName": "แอฟริกาใต้",
       "code": "ZA",
       "region": "Africa"
     },
     {
       "name": "South Georgia",
+      "thaiName": "",
       "code": "GS",
       "region": "Antarctic"
     },
     {
       "name": "South Korea",
+      "thaiName": "เกาหลีใต้",
       "code": "KR",
       "region": "Asia"
     },
     {
       "name": "South Sudan",
+      "thaiName": "",
       "code": "SS",
       "region": "Africa"
     },
     {
       "name": "Spain",
+      "thaiName": "สเปน",
       "code": "ES",
       "region": "Europe"
     },
     {
       "name": "Sri Lanka",
+      "thaiName": "",
       "code": "LK",
       "region": "Asia"
     },
     {
       "name": "Sudan",
+      "thaiName": "",
       "code": "SD",
       "region": "Africa"
     },
     {
       "name": "Suriname",
+      "thaiName": "",
       "code": "SR",
       "region": "Americas"
     },
     {
       "name": "Svalbard and Jan Mayen",
+      "thaiName": "",
       "code": "SJ",
       "region": "Europe"
     },
     {
       "name": "Sweden",
+      "thaiName": "สวีเดน",
       "code": "SE",
       "region": "Europe"
     },
     {
       "name": "Switzerland",
+      "thaiName": "สวิตเซอร์แลนด์",
       "code": "CH",
       "region": "Europe"
     },
     {
       "name": "Syria",
+      "thaiName": "",
       "code": "SY",
       "region": "Asia"
     },
     {
       "name": "Taiwan",
+      "thaiName": "ไต้หวัน",
       "code": "TW",
       "region": "Asia"
     },
     {
       "name": "Tajikistan",
+      "thaiName": "",
       "code": "TJ",
       "region": "Asia"
     },
     {
       "name": "Tanzania",
+      "thaiName": "",
       "code": "TZ",
       "region": "Africa"
     },
     {
       "name": "Thailand",
+      "thaiName": "ประเทศไทย",
       "code": "TH",
       "region": "Asia"
     },
     {
       "name": "Timor-Leste",
+      "thaiName": "",
       "code": "TL",
       "region": "Asia"
     },
     {
       "name": "Togo",
+      "thaiName": "",
       "code": "TG",
       "region": "Africa"
     },
     {
       "name": "Tokelau",
+      "thaiName": "",
       "code": "TK",
       "region": "Oceania"
     },
     {
       "name": "Tonga",
+      "thaiName": "",
       "code": "TO",
       "region": "Oceania"
     },
     {
       "name": "Trinidad and Tobago",
+      "thaiName": "",
       "code": "TT",
       "region": "Americas"
     },
     {
       "name": "Tunisia",
+      "thaiName": "",
       "code": "TN",
       "region": "Africa"
     },
     {
       "name": "Türkiye",
+      "thaiName": "ตุรกี",
       "code": "TR",
       "region": "Asia"
     },
     {
       "name": "Turkmenistan",
+      "thaiName": "",
       "code": "TM",
       "region": "Asia"
     },
     {
       "name": "Turks and Caicos Islands",
+      "thaiName": "",
       "code": "TC",
       "region": "Americas"
     },
     {
       "name": "Tuvalu",
+      "thaiName": "",
       "code": "TV",
       "region": "Oceania"
     },
     {
       "name": "Uganda",
+      "thaiName": "",
       "code": "UG",
       "region": "Africa"
     },
     {
       "name": "Ukraine",
+      "thaiName": "",
       "code": "UA",
       "region": "Europe"
     },
     {
       "name": "United Arab Emirates",
+      "thaiName": "สหรัฐอาหรับเอมิเรตส์",
       "code": "AE",
       "region": "Asia"
     },
     {
       "name": "United Kingdom",
+      "thaiName": "อังกฤษ",
       "code": "GB",
       "region": "Europe"
     },
     {
       "name": "United States",
+      "thaiName": "สหรัฐอเมริกา",
       "code": "US",
       "region": "Americas"
     },
     {
       "name": "United States Minor Outlying Islands",
+      "thaiName": "",
       "code": "UM",
       "region": "Americas"
     },
     {
       "name": "United States Virgin Islands",
+      "thaiName": "",
       "code": "VI",
       "region": "Americas"
     },
     {
       "name": "Uruguay",
+      "thaiName": "",
       "code": "UY",
       "region": "Americas"
     },
     {
       "name": "Uzbekistan",
+      "thaiName": "",
       "code": "UZ",
       "region": "Asia"
     },
     {
       "name": "Vanuatu",
+      "thaiName": "",
       "code": "VU",
       "region": "Oceania"
     },
     {
       "name": "Vatican City",
+      "thaiName": "",
       "code": "VA",
       "region": "Europe"
     },
     {
       "name": "Venezuela",
+      "thaiName": "",
       "code": "VE",
       "region": "Americas"
     },
     {
       "name": "Vietnam",
+      "thaiName": "เวียดนาม",
       "code": "VN",
       "region": "Asia"
     },
     {
       "name": "Wallis and Futuna",
+      "thaiName": "",
       "code": "WF",
       "region": "Oceania"
     },
     {
       "name": "Western Sahara",
+      "thaiName": "",
       "code": "EH",
       "region": "Africa"
     },
     {
       "name": "Yemen",
+      "thaiName": "",
       "code": "YE",
       "region": "Asia"
     },
     {
       "name": "Zambia",
+      "thaiName": "",
       "code": "ZM",
       "region": "Africa"
     },
     {
       "name": "Zimbabwe",
+      "thaiName": "",
       "code": "ZW",
       "region": "Africa"
     }
@@ -1254,668 +1504,297 @@
   "cities": [
     {
       "city": "Bangkok",
+      "thaiCity": "กรุงเทพมหานคร",
       "country": "Thailand",
       "code": "TH"
     },
     {
       "city": "Chiang Mai",
+      "thaiCity": "เชียงใหม่",
       "country": "Thailand",
       "code": "TH"
     },
     {
       "city": "Phuket",
+      "thaiCity": "ภูเก็ต",
       "country": "Thailand",
       "code": "TH"
     },
     {
       "city": "Nonthaburi",
+      "thaiCity": "นนทบุรี",
       "country": "Thailand",
       "code": "TH"
     },
     {
       "city": "Khon Kaen",
+      "thaiCity": "ขอนแก่น",
       "country": "Thailand",
       "code": "TH"
     },
     {
       "city": "Pattaya",
+      "thaiCity": "พัทยา",
       "country": "Thailand",
       "code": "TH"
     },
     {
       "city": "Chonburi",
+      "thaiCity": "ชลบุรี",
       "country": "Thailand",
       "code": "TH"
     },
     {
       "city": "Nakhon Ratchasima",
+      "thaiCity": "นครราชสีมา",
       "country": "Thailand",
       "code": "TH"
     },
     {
       "city": "Hat Yai",
+      "thaiCity": "หาดใหญ่",
       "country": "Thailand",
       "code": "TH"
     },
     {
       "city": "Udon Thani",
+      "thaiCity": "อุดรธานี",
       "country": "Thailand",
       "code": "TH"
     },
     {
       "city": "Singapore",
+      "thaiCity": "สิงคโปร์",
       "country": "Singapore",
       "code": "SG"
     },
     {
       "city": "Kuala Lumpur",
+      "thaiCity": "กัวลาลัมเปอร์",
       "country": "Malaysia",
       "code": "MY"
     },
     {
       "city": "Penang",
+      "thaiCity": "ปีนัง",
       "country": "Malaysia",
       "code": "MY"
     },
     {
       "city": "Johor Bahru",
+      "thaiCity": "ยะโฮร์บาฮ์รู",
       "country": "Malaysia",
       "code": "MY"
     },
     {
       "city": "Jakarta",
+      "thaiCity": "จาการ์ตา",
       "country": "Indonesia",
       "code": "ID"
     },
     {
       "city": "Surabaya",
+      "thaiCity": "สุราบายา",
       "country": "Indonesia",
       "code": "ID"
     },
     {
       "city": "Bandung",
+      "thaiCity": "บันดุง",
       "country": "Indonesia",
       "code": "ID"
     },
     {
       "city": "Bali",
+      "thaiCity": "บาหลี",
       "country": "Indonesia",
       "code": "ID"
     },
     {
       "city": "Manila",
+      "thaiCity": "มะนิลา",
       "country": "Philippines",
       "code": "PH"
     },
     {
       "city": "Cebu",
+      "thaiCity": "เซบู",
       "country": "Philippines",
       "code": "PH"
     },
     {
       "city": "Davao",
+      "thaiCity": "ดาเวา",
       "country": "Philippines",
       "code": "PH"
     },
     {
       "city": "Hong Kong",
+      "thaiCity": "ฮ่องกง",
       "country": "Hong Kong",
       "code": "HK"
     },
     {
       "city": "Ho Chi Minh City",
+      "thaiCity": "โฮจิมินห์ซิตี้",
       "country": "Vietnam",
       "code": "VN"
     },
     {
       "city": "Hanoi",
+      "thaiCity": "ฮานอย",
       "country": "Vietnam",
       "code": "VN"
     },
     {
       "city": "Tokyo",
+      "thaiCity": "โตเกียว",
       "country": "Japan",
       "code": "JP"
     },
     {
       "city": "Osaka",
+      "thaiCity": "โอซาก้า",
       "country": "Japan",
       "code": "JP"
     },
     {
       "city": "Kyoto",
-      "country": "Japan",
-      "code": "JP"
-    },
-    {
-      "city": "Yokohama",
+      "thaiCity": "เกียวโต",
       "country": "Japan",
       "code": "JP"
     },
     {
       "city": "Seoul",
-      "country": "South Korea",
-      "code": "KR"
-    },
-    {
-      "city": "Busan",
+      "thaiCity": "โซล",
       "country": "South Korea",
       "code": "KR"
     },
     {
       "city": "Shanghai",
+      "thaiCity": "เซี่ยงไฮ้",
       "country": "China",
       "code": "CN"
     },
     {
       "city": "Beijing",
+      "thaiCity": "ปักกิ่ง",
       "country": "China",
       "code": "CN"
     },
     {
       "city": "Shenzhen",
-      "country": "China",
-      "code": "CN"
-    },
-    {
-      "city": "Guangzhou",
-      "country": "China",
-      "code": "CN"
-    },
-    {
-      "city": "Hangzhou",
-      "country": "China",
-      "code": "CN"
-    },
-    {
-      "city": "Chengdu",
+      "thaiCity": "เซินเจิ้น",
       "country": "China",
       "code": "CN"
     },
     {
       "city": "Taipei",
+      "thaiCity": "ไทเป",
       "country": "Taiwan",
       "code": "TW"
     },
     {
       "city": "Bangalore",
+      "thaiCity": "บังคาลอร์",
       "country": "India",
       "code": "IN"
     },
     {
       "city": "Mumbai",
+      "thaiCity": "มุมไบ",
       "country": "India",
       "code": "IN"
     },
     {
       "city": "Delhi",
-      "country": "India",
-      "code": "IN"
-    },
-    {
-      "city": "Hyderabad",
-      "country": "India",
-      "code": "IN"
-    },
-    {
-      "city": "Chennai",
-      "country": "India",
-      "code": "IN"
-    },
-    {
-      "city": "Pune",
-      "country": "India",
-      "code": "IN"
-    },
-    {
-      "city": "Gurgaon",
+      "thaiCity": "เดลี",
       "country": "India",
       "code": "IN"
     },
     {
       "city": "Sydney",
+      "thaiCity": "ซิดนีย์",
       "country": "Australia",
       "code": "AU"
     },
     {
       "city": "Melbourne",
-      "country": "Australia",
-      "code": "AU"
-    },
-    {
-      "city": "Brisbane",
-      "country": "Australia",
-      "code": "AU"
-    },
-    {
-      "city": "Perth",
+      "thaiCity": "เมลเบิร์น",
       "country": "Australia",
       "code": "AU"
     },
     {
       "city": "Auckland",
-      "country": "New Zealand",
-      "code": "NZ"
-    },
-    {
-      "city": "Wellington",
+      "thaiCity": "โอ๊คแลนด์",
       "country": "New Zealand",
       "code": "NZ"
     },
     {
       "city": "New York",
+      "thaiCity": "นิวยอร์ก",
       "country": "United States",
       "code": "US"
     },
     {
       "city": "San Francisco",
+      "thaiCity": "ซานฟรานซิสโก",
       "country": "United States",
       "code": "US"
     },
     {
       "city": "Los Angeles",
+      "thaiCity": "ลอสแอนเจลิส",
       "country": "United States",
       "code": "US"
     },
     {
       "city": "Seattle",
-      "country": "United States",
-      "code": "US"
-    },
-    {
-      "city": "Austin",
-      "country": "United States",
-      "code": "US"
-    },
-    {
-      "city": "Boston",
-      "country": "United States",
-      "code": "US"
-    },
-    {
-      "city": "Chicago",
-      "country": "United States",
-      "code": "US"
-    },
-    {
-      "city": "Denver",
-      "country": "United States",
-      "code": "US"
-    },
-    {
-      "city": "Atlanta",
-      "country": "United States",
-      "code": "US"
-    },
-    {
-      "city": "Miami",
-      "country": "United States",
-      "code": "US"
-    },
-    {
-      "city": "Portland",
-      "country": "United States",
-      "code": "US"
-    },
-    {
-      "city": "Washington",
-      "country": "United States",
-      "code": "US"
-    },
-    {
-      "city": "Remote",
+      "thaiCity": "ซีแอตเทิล",
       "country": "United States",
       "code": "US"
     },
     {
       "city": "Toronto",
+      "thaiCity": "โตรอนโต",
       "country": "Canada",
       "code": "CA"
     },
     {
       "city": "Vancouver",
-      "country": "Canada",
-      "code": "CA"
-    },
-    {
-      "city": "Montreal",
-      "country": "Canada",
-      "code": "CA"
-    },
-    {
-      "city": "Calgary",
-      "country": "Canada",
-      "code": "CA"
-    },
-    {
-      "city": "Ottawa",
+      "thaiCity": "แวนคูเวอร์",
       "country": "Canada",
       "code": "CA"
     },
     {
       "city": "London",
+      "thaiCity": "ลอนดอน",
       "country": "United Kingdom",
       "code": "GB"
     },
     {
       "city": "Manchester",
+      "thaiCity": "แมนเชสเตอร์",
       "country": "United Kingdom",
       "code": "GB"
     },
     {
-      "city": "Edinburgh",
-      "country": "United Kingdom",
-      "code": "GB"
-    },
-    {
-      "city": "Bristol",
-      "country": "United Kingdom",
-      "code": "GB"
-    },
-    {
-      "city": "Cambridge",
-      "country": "United Kingdom",
-      "code": "GB"
-    },
-    {
-      "city": "Dublin",
-      "country": "Ireland",
-      "code": "IE"
+      "city": "Paris",
+      "thaiCity": "ปารีส",
+      "country": "France",
+      "code": "FR"
     },
     {
       "city": "Berlin",
+      "thaiCity": "เบอร์ลิน",
       "country": "Germany",
       "code": "DE"
     },
     {
       "city": "Munich",
+      "thaiCity": "มิวนิก",
       "country": "Germany",
       "code": "DE"
-    },
-    {
-      "city": "Hamburg",
-      "country": "Germany",
-      "code": "DE"
-    },
-    {
-      "city": "Frankfurt",
-      "country": "Germany",
-      "code": "DE"
-    },
-    {
-      "city": "Cologne",
-      "country": "Germany",
-      "code": "DE"
-    },
-    {
-      "city": "Amsterdam",
-      "country": "Netherlands",
-      "code": "NL"
-    },
-    {
-      "city": "Rotterdam",
-      "country": "Netherlands",
-      "code": "NL"
-    },
-    {
-      "city": "Paris",
-      "country": "France",
-      "code": "FR"
-    },
-    {
-      "city": "Lyon",
-      "country": "France",
-      "code": "FR"
-    },
-    {
-      "city": "Nice",
-      "country": "France",
-      "code": "FR"
-    },
-    {
-      "city": "Madrid",
-      "country": "Spain",
-      "code": "ES"
-    },
-    {
-      "city": "Barcelona",
-      "country": "Spain",
-      "code": "ES"
-    },
-    {
-      "city": "Valencia",
-      "country": "Spain",
-      "code": "ES"
-    },
-    {
-      "city": "Seville",
-      "country": "Spain",
-      "code": "ES"
-    },
-    {
-      "city": "Lisbon",
-      "country": "Portugal",
-      "code": "PT"
-    },
-    {
-      "city": "Porto",
-      "country": "Portugal",
-      "code": "PT"
-    },
-    {
-      "city": "Rome",
-      "country": "Italy",
-      "code": "IT"
-    },
-    {
-      "city": "Milan",
-      "country": "Italy",
-      "code": "IT"
-    },
-    {
-      "city": "Turin",
-      "country": "Italy",
-      "code": "IT"
-    },
-    {
-      "city": "Zurich",
-      "country": "Switzerland",
-      "code": "CH"
-    },
-    {
-      "city": "Geneva",
-      "country": "Switzerland",
-      "code": "CH"
-    },
-    {
-      "city": "Basel",
-      "country": "Switzerland",
-      "code": "CH"
-    },
-    {
-      "city": "Stockholm",
-      "country": "Sweden",
-      "code": "SE"
-    },
-    {
-      "city": "Gothenburg",
-      "country": "Sweden",
-      "code": "SE"
-    },
-    {
-      "city": "Oslo",
-      "country": "Norway",
-      "code": "NO"
-    },
-    {
-      "city": "Copenhagen",
-      "country": "Denmark",
-      "code": "DK"
-    },
-    {
-      "city": "Helsinki",
-      "country": "Finland",
-      "code": "FI"
-    },
-    {
-      "city": "Warsaw",
-      "country": "Poland",
-      "code": "PL"
-    },
-    {
-      "city": "Krakow",
-      "country": "Poland",
-      "code": "PL"
-    },
-    {
-      "city": "Prague",
-      "country": "Czech Republic",
-      "code": "CZ"
-    },
-    {
-      "city": "Vienna",
-      "country": "Austria",
-      "code": "AT"
-    },
-    {
-      "city": "Brussels",
-      "country": "Belgium",
-      "code": "BE"
-    },
-    {
-      "city": "Luxembourg",
-      "country": "Luxembourg",
-      "code": "LU"
-    },
-    {
-      "city": "Istanbul",
-      "country": "Turkey",
-      "code": "TR"
-    },
-    {
-      "city": "Ankara",
-      "country": "Turkey",
-      "code": "TR"
-    },
-    {
-      "city": "Tel Aviv",
-      "country": "Israel",
-      "code": "IL"
-    },
-    {
-      "city": "Dubai",
-      "country": "United Arab Emirates",
-      "code": "AE"
-    },
-    {
-      "city": "Abu Dhabi",
-      "country": "United Arab Emirates",
-      "code": "AE"
-    },
-    {
-      "city": "Riyadh",
-      "country": "Saudi Arabia",
-      "code": "SA"
-    },
-    {
-      "city": "Jeddah",
-      "country": "Saudi Arabia",
-      "code": "SA"
-    },
-    {
-      "city": "Doha",
-      "country": "Qatar",
-      "code": "QA"
-    },
-    {
-      "city": "Cape Town",
-      "country": "South Africa",
-      "code": "ZA"
-    },
-    {
-      "city": "Johannesburg",
-      "country": "South Africa",
-      "code": "ZA"
-    },
-    {
-      "city": "Lagos",
-      "country": "Nigeria",
-      "code": "NG"
-    },
-    {
-      "city": "Nairobi",
-      "country": "Kenya",
-      "code": "KE"
-    },
-    {
-      "city": "Cairo",
-      "country": "Egypt",
-      "code": "EG"
-    },
-    {
-      "city": "Casablanca",
-      "country": "Morocco",
-      "code": "MA"
-    },
-    {
-      "city": "São Paulo",
-      "country": "Brazil",
-      "code": "BR"
-    },
-    {
-      "city": "Rio de Janeiro",
-      "country": "Brazil",
-      "code": "BR"
-    },
-    {
-      "city": "Brasília",
-      "country": "Brazil",
-      "code": "BR"
-    },
-    {
-      "city": "Buenos Aires",
-      "country": "Argentina",
-      "code": "AR"
-    },
-    {
-      "city": "Santiago",
-      "country": "Chile",
-      "code": "CL"
-    },
-    {
-      "city": "Bogotá",
-      "country": "Colombia",
-      "code": "CO"
-    },
-    {
-      "city": "Medellín",
-      "country": "Colombia",
-      "code": "CO"
-    },
-    {
-      "city": "Mexico City",
-      "country": "Mexico",
-      "code": "MX"
-    },
-    {
-      "city": "Guadalajara",
-      "country": "Mexico",
-      "code": "MX"
-    },
-    {
-      "city": "Monterrey",
-      "country": "Mexico",
-      "code": "MX"
-    },
-    {
-      "city": "Moscow",
-      "country": "Russia",
-      "code": "RU"
-    },
-    {
-      "city": "Saint Petersburg",
-      "country": "Russia",
-      "code": "RU"
     }
   ]
 }

@@ -10,6 +10,7 @@ export const maxDuration = 30
 const SearchBody = z.object({
   query: z.string().min(2).max(200),
   location: z.string().max(100).optional(),
+  countryCode: z.string().length(2).optional(),
   skills: z.array(z.string().max(80)).max(50).optional(),
   role: z.string().max(100).optional(),
   sources: z.array(z.string()).optional(),
@@ -26,11 +27,12 @@ export const POST = withAuth(async (req, { user }) => {
     )
   }
 
-  const { query, location, skills, role, sources, limit, fresh } = body.data
+  const { query, location, countryCode, skills, role, sources, limit, fresh } = body.data
 
   const result = await searchJobs({
     query: query.trim(),
     location: location?.trim() || undefined,
+    countryCode: countryCode || undefined,
     skills: skills || [],
     role: role || undefined,
     sources: sources as JobSource[] | undefined,

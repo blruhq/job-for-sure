@@ -78,6 +78,7 @@ export async function searchJobs(params: SearchParams): Promise<SearchResult> {
   const {
     query,
     location,
+    countryCode,
     skills = [],
     role,
     sources: rawSources,
@@ -146,7 +147,7 @@ export async function searchJobs(params: SearchParams): Promise<SearchResult> {
 
   // Key-gated sources (auto-activate when env vars present)
   if (sources.includes('adzuna')) {
-    fetchers.push(() => fetchAdzuna(query, location))
+    fetchers.push(() => fetchAdzuna(query, location, { countryCode }))
     fetcherSources.push('adzuna')
   }
   if (sources.includes('jsearch')) {
@@ -170,7 +171,7 @@ export async function searchJobs(params: SearchParams): Promise<SearchResult> {
     fetcherSources.push('jobsdb')
   }
   if (sources.includes('jobsdb-rest')) {
-    fetchers.push(() => fetchJobsDBRest(query, location))
+    fetchers.push(() => fetchJobsDBRest(query, location, { countryCode }))
     fetcherSources.push('jobsdb-rest')
   }
 

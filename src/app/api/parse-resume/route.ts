@@ -130,12 +130,12 @@ Guidelines:
      - "degree": Degree type (e.g. "B.Sc.")
      - "field": Field of study (e.g. "Information Technology")
      - "dates": Duration or graduation date (e.g. "Nov 2022 – Dec 2025")
- 6. Role / Headline:
-    - "role": Infer the candidate's target job title based on their skills, projects, and work experience using career progression logic:
-      - If their most recent job title is an internship/student role (e.g., "Software Engineer Intern", "Marketing Intern"), or if total experience is under 1 year, set target role to "Junior [Role]" (e.g., "Junior Software Engineer", "Junior Marketing Specialist").
-      - If their most recent job contains "Junior" or if total experience is 1-2 years, set target role to "Junior [Role]".
-      - Otherwise, set target role to the standard professional title matching their experience (e.g., "Software Engineer", "Product Manager", "Mechanical Engineer").
-      - DO NOT just copy "Intern" or "Internship" as the target role unless it is the only information available.
+  6. Role / Headline:
+     - "role": Infer the candidate's target job title using common standard industry terms (prefer "Software Engineer" over "SDE", "Frontend Developer" over "UI Developer"). Infer based on their skills, projects, and work experience using career progression logic:
+       - If their most recent job title is an internship/student role (e.g., "Software Engineer Intern", "Marketing Intern"), or if total experience is under 1 year, set target role to "Junior [Role]" (e.g., "Junior Software Engineer", "Junior Marketing Specialist").
+       - If their most recent job contains "Junior" or if total experience is 1-2 years, set target role to "Junior [Role]".
+       - Otherwise, set target role to the standard professional title matching their experience (e.g., "Software Engineer", "Product Manager", "Mechanical Engineer").
+       - DO NOT just copy "Intern" or "Internship" as the target role unless it is the only information available.
 7. Custom / Additional Sections:
    - If the resume contains other sections (e.g. "Open Source Contributions", "Extracurriculars", "Awards", "Publications", "Volunteering") that do not map to the fields above, extract them into "customSections".
    - "title": The name of the section (e.g. "Open Source Contributions").

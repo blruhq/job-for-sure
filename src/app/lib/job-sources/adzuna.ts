@@ -49,10 +49,12 @@ const COUNTRY_MAP: Record<string, string> = {
   'thailand': 'us', // Adzuna doesn't have TH — default to US for broad search
 }
 
+const ADZUNA_SUPPORTED = new Set(['at', 'au', 'be', 'br', 'ca', 'ch', 'de', 'es', 'fr', 'gb', 'in', 'it', 'mx', 'nl', 'nz', 'pl', 'sg', 'us', 'za'])
+
 export async function fetchAdzuna(
   query: string,
   location?: string,
-  opts?: { signal?: AbortSignal },
+  opts?: { signal?: AbortSignal; countryCode?: string },
 ): Promise<{ jobs: JobResult[]; error?: string }> {
   const appId = process.env.ADZUNA_APP_ID
   const appKey = process.env.ADZUNA_APP_KEY
@@ -62,8 +64,14 @@ export async function fetchAdzuna(
   }
 
   try {
-    // Determine country code from location
-    const country = resolveCountry(location)
+    // Determine country code from location (prioritize passed countryCode)
+    const country = (opts?.countryCode || resolveCountry(location)).toLowerCase()
+
+    // Skip if country is not supported by Adzuna
+    if (!ADZUNA_SUPPORTED.has(country)) {
+      return { jobs: [] }
+    }
+
     const baseUrl = `https://api.adzuna.com/v1/api/jobs/${country}/search/1`
 
     const params = new URLSearchParams({
