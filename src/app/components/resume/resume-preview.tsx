@@ -1,60 +1,62 @@
 'use client'
 
-import { useState, useEffect, useRef, memo } from 'react'
+import { useState, useEffect, useRef, useCallback, memo } from 'react'
 import type { Resume } from '~/types/resume'
 import { ResumePDF } from '~/components/resume/resume-pdf'
 
 export const ResumePreview = memo(function ResumePreview({ resume }: { resume: Resume }) {
   const [dataUrl, setDataUrl] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
-  const resumeRef = useRef(resume)
+  const resumeRef = useRef<Resume | null>(null)  // null = first mount, always proceed
   const genRef = useRef(0)
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const blobUrlRef = useRef<string | null>(null)
 
+  const generatePdf = useCallback(async (resumeData: Resume, gen: number) => {
+    setLoading(true)
+    try {
+      const { pdf } = await import('@react-pdf/renderer')
+      if (gen !== genRef.current) return
+
+      const instance = pdf(<ResumePDF resume={resumeData} />)
+      const blob = await instance.toBlob()
+      if (gen !== genRef.current) return
+
+      if (blobUrlRef.current) URL.revokeObjectURL(blobUrlRef.current)
+
+      const url = URL.createObjectURL(blob)
+      blobUrlRef.current = url
+
+      if (gen !== genRef.current) {
+        URL.revokeObjectURL(url)
+        return
+      }
+
+      setDataUrl(url)
+      setLoading(false)
+    } catch (err) {
+      console.error('PDF preview generation failed:', err)
+      if (gen === genRef.current) setLoading(false)
+    }
+  }, [])
+
   useEffect(() => {
-    if (resume === resumeRef.current) return
+    // First mount: resumeRef is null, so we always proceed
+    // Subsequent: skip if same object reference (prevents re-render storms)
+    if (resumeRef.current !== null && resume === resumeRef.current) return
     resumeRef.current = resume
 
     const thisGen = ++genRef.current
 
-    // Debounce: wait 400ms before starting PDF generation
     if (debounceRef.current) clearTimeout(debounceRef.current)
-    debounceRef.current = setTimeout(async () => {
-      if (thisGen !== genRef.current) return
-      setLoading(true)
-
-      try {
-        const { pdf } = await import('@react-pdf/renderer')
-        if (thisGen !== genRef.current) return
-
-        const instance = pdf(<ResumePDF resume={resume} />)
-        const blob = await instance.toBlob()
-        if (thisGen !== genRef.current) return
-
-        // Revoke previous blob URL
-        if (blobUrlRef.current) URL.revokeObjectURL(blobUrlRef.current)
-
-        const url = URL.createObjectURL(blob)
-        blobUrlRef.current = url
-
-        if (thisGen !== genRef.current) {
-          URL.revokeObjectURL(url)
-          return
-        }
-
-        setDataUrl(url)
-        setLoading(false)
-      } catch (err) {
-        console.error('PDF preview generation failed:', err)
-        if (thisGen === genRef.current) setLoading(false)
-      }
+    debounceRef.current = setTimeout(() => {
+      if (thisGen === genRef.current) generatePdf(resume, thisGen)
     }, 400)
 
     return () => {
       if (debounceRef.current) clearTimeout(debounceRef.current)
     }
-  }, [resume])
+  }, [resume, generatePdf])
 
   // Cleanup blob URL on unmount
   useEffect(() => {
