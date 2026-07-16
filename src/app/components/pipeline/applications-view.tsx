@@ -5,6 +5,7 @@ import { useRouter } from '~/i18n/routing'
 import { Trash2, Link2, RefreshCw, Plus } from 'lucide-react'
 import { cn } from '~/lib/utils'
 import { useApplications, useMoveApplication, useDeleteApplication, useCreateApplication } from '~/hooks/use-apps'
+import { JobDetailPanel } from '~/components/pipeline/job-detail-panel'
 import { useResumes } from '~/hooks/use-resumes'
 import { notify } from '~/lib/toast'
 import { useTranslations } from 'next-intl'
@@ -143,6 +144,7 @@ export function ApplicationsView() {
   const [filter, setFilter] = useState('all')
   const [dragOverCol, setDragOverCol] = useState<ApplicationColumnId | null>(null)
   const [activeJob, setActiveJob] = useState<PipelineJob | null>(null)
+  const [selectedJob, setSelectedJob] = useState<PipelineJob | null>(null)
   const [pasteUrl, setPasteUrl] = useState('')
   const [scraping, setScraping] = useState(false)
   const [addingToCol, setAddingToCol] = useState<ApplicationColumnId | null>(null)
@@ -469,7 +471,9 @@ export function ApplicationsView() {
                   <SortableContext items={jobs.map((j) => j.key)} strategy={verticalListSortingStrategy}>
                     {jobs.map((job) => (
                       <DraggableJobCard key={job.key} job={job}>
-                        <JobCardContent job={job} />
+                        <div onClick={() => setSelectedJob(job)} className="cursor-pointer">
+                          <JobCardContent job={job} />
+                        </div>
                         <div className="mt-1.5 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                           {job.url && (
                             <a
@@ -527,6 +531,14 @@ export function ApplicationsView() {
           ) : null}
         </DragOverlay>
       </DndContext>
+
+      {/* Job Detail Panel */}
+      <JobDetailPanel
+        job={selectedJob}
+        mode="tracker"
+        currentStatus={selectedJob ? findJobColumn(selectedJob.key) ?? undefined : undefined}
+        onClose={() => setSelectedJob(null)}
+      />
     </div>
   )
 }

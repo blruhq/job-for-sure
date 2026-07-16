@@ -87,6 +87,17 @@ export function useDeleteApplication() {
   })
 }
 
+export function useUpdateApplication() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: ({ id, ...payload }: { id: string; status?: string; notes?: string; position?: number }) =>
+      ApiClient.updateApplication(id, payload),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['applications'] })
+    },
+  })
+}
+
 export function useClearApplications() {
   const queryClient = useQueryClient()
   return useMutation({

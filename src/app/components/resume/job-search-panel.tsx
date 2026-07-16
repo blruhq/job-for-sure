@@ -14,10 +14,11 @@ import { useCreateResume } from '~/hooks/use-resumes'
 import { useUIStore } from '~/hooks/use-ui'
 import { notify } from '~/lib/toast'
 import { companyColor, companyLogo } from '~/lib/company-data'
-import type { Resume } from '~/types/resume'
+import type { Resume, PipelineJob } from '~/types/resume'
 import type { ScoredJob, SearchResult, JobSource, JobResult } from '~/lib/job-sources/types'
+import { scoredJobToPipelineJob } from '~/lib/job-utils'
 import { countryToFlag } from '~/lib/job-sources/geo'
-import { JobDetailModal } from './job-detail-modal'
+import { JobDetailPanel } from '~/components/pipeline/job-detail-panel'
 import { getCards, setCards } from '~/lib/client-cache'
 import { expandQueryTerms } from '~/lib/job-sources/role-synonyms'
 import { LocationAutocomplete } from '../search/LocationAutocomplete'
@@ -102,9 +103,8 @@ export function JobSearchPanel({ resume }: { resume: Resume }) {
   const searchRunRef = useRef(0) // track latest search to avoid stale merges
   const resultsRef = useRef<ScoredJob[]>([]) // mirror for closures
 
-  // ── Detail modal ──
-  const [modalJob, setModalJob] = useState<ScoredJob | null>(null)
-  const [modalOpen, setModalOpen] = useState(false)
+  // ── Detail panel ──
+  const [panelJob, setPanelJob] = useState<PipelineJob | null>(null)
 
   // ── SWR Background Refresh states ──
   const [newJobs, setNewJobs] = useState<ScoredJob[]>([])
@@ -484,20 +484,20 @@ export function JobSearchPanel({ resume }: { resume: Resume }) {
     notify({ message: 'Fetching fresh results (bypassing cache)…', type: 'info' })
   }
 
-  // ── Open detail modal for a job ──
+  // ── Open detail panel for a job ──
   const handleOpenDetail = (job: ScoredJob) => {
-    setModalJob(job)
-    setModalOpen(true)
+    setPanelJob(scoredJobToPipelineJob(job, resume.skills || []))
   }
 
   const handleCloseDetail = () => {
-    setModalOpen(false)
+    setPanelJob(null)
   }
 
-  // ── Bookmark from modal ──
-  const handleModalBookmark = () => {
-    if (!modalJob) return
-    handleBookmark(modalJob)
+  // ── Save to Tracker from panel ──
+  const handlePanelSave = () => {
+    if (!panelJob) return
+    createBookmark({ sourceKey: panelJob.key, company: panelJob.company, jobTitle: panelJob.title, jobUrl: panelJob.url, location: panelJob.loc, logoUrl: panelJob.logo, color: panelJob.color, level: panelJob.level, matchScore: panelJob.score, resumeId: panelJob.resume, status: 'bookmarked', salary: panelJob.salary, jobData: panelJob.jobData })
+    notify({ message: `Saved: ${panelJob.title} at ${panelJob.company}`, type: 'success' })
   }
 
   // ═══════════════════════════════════════════════════════════════
@@ -795,14 +795,13 @@ export function JobSearchPanel({ resume }: { resume: Resume }) {
         )}
       </div>
 
-      {/* Detail Modal */}
-      <JobDetailModal
-        job={modalJob}
-        resume={resume}
-        open={modalOpen}
+      {/* Detail Panel */}
+      <JobDetailPanel
+        job={panelJob}
+        mode="search"
+        isSaved={panelJob ? isBookmarked(panelJob.key) : false}
+        onSaveToTracker={handlePanelSave}
         onClose={handleCloseDetail}
-        bookmarked={modalJob ? isBookmarked(modalJob.id) : false}
-        onBookmark={handleModalBookmark}
       />
     </div>
   )

@@ -76,6 +76,10 @@ export class ApiClient {
     return this.request('/api/applications', { method: 'POST', body: JSON.stringify(payload) })
   }
 
+  static updateApplication(id: string, payload: { status?: string; notes?: string; position?: number }): Promise<any> {
+    return this.request(`/api/applications/${id}`, { method: 'PATCH', body: JSON.stringify(payload) })
+  }
+
   static deleteApplication(id: string): Promise<void> {
     return this.request(`/api/applications/${id}`, { method: 'DELETE' })
   }

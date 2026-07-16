@@ -10,9 +10,10 @@ import { useApplications, useCreateApplication, useDeleteApplication } from '~/h
 import { useBookmarkJob } from '~/hooks/use-bookmark'
 import { notify } from '~/lib/toast'
 import { companyColor, companyLogo } from '~/lib/company-data'
-import type { Resume } from '~/types/resume'
+import type { Resume, PipelineJob } from '~/types/resume'
 import type { ScoredJob, SearchResult, JobSource } from '~/lib/job-sources/types'
-import { JobDetailModal } from '~/components/resume/job-detail-modal'
+import { JobDetailPanel } from '~/components/pipeline/job-detail-panel'
+import { scoredJobToPipelineJob } from '~/lib/job-utils'
 import { SOURCE_SHORT } from '~/lib/source-names'
 
 // ═══════════════════════════════════════════════════════════════
@@ -44,9 +45,8 @@ export function JobPreview({ resume, onDismiss, onLoadComplete }: { resume: Resu
   const [error, setError] = useState(false)
   const lastSearchKeyRef = useRef('')
 
-  // ── Detail modal ──
-  const [modalJob, setModalJob] = useState<ScoredJob | null>(null)
-  const [modalOpen, setModalOpen] = useState(false)
+  // ── Detail panel ──
+  const [panelJob, setPanelJob] = useState<PipelineJob | null>(null)
 
   const fetchJobs = useCallback(async () => {
     // Guard: skip if search params haven't changed (e.g. React Query
@@ -157,7 +157,7 @@ export function JobPreview({ resume, onDismiss, onLoadComplete }: { resume: Resu
               <div
                 key={key}
                 className="cursor-pointer rounded-sm border border-border bg-background p-2.5 transition-colors hover:border-primary/40"
-                onClick={() => { setModalJob(job); setModalOpen(true) }}
+                onClick={() => setPanelJob(scoredJobToPipelineJob(job, resume.skills || []))}
               >
                 <div className="flex items-start justify-between gap-2">
                   <div className="min-w-0 flex-1">
@@ -274,7 +274,7 @@ export function JobPreview({ resume, onDismiss, onLoadComplete }: { resume: Resu
                     <Brain size={9} /> Interview
                   </button>
                   <button
-                    onClick={() => { setModalJob(job); setModalOpen(true) }}
+                    onClick={() => setPanelJob(scoredJobToPipelineJob(job, resume.skills || []))}
                     className="ml-auto flex cursor-pointer items-center gap-0.5 rounded-xs bg-primary px-1.5 py-0.5 text-[10px] font-medium text-primary-foreground transition-all hover:opacity-90"
                   >
                     Details <ChevronRight size={8} />
@@ -297,51 +297,36 @@ export function JobPreview({ resume, onDismiss, onLoadComplete }: { resume: Resu
 
       </div>
 
-      {/* Detail Modal */}
-      <JobDetailModal
-        job={modalJob}
-        resume={resume}
-        open={modalOpen}
-        onClose={() => setModalOpen(false)}
-        bookmarked={modalJob ? isBookmarked(modalJob.id) : false}
-        onBookmark={() => {
-          if (!modalJob) return
-          const j = modalJob
-          if (isBookmarked(j.id)) {
-            toggleBookmark(j.id)
+      {/* Detail Panel */}
+      <JobDetailPanel
+        job={panelJob}
+        mode="search"
+        isSaved={panelJob ? isBookmarked(panelJob.key) : false}
+        onSaveToTracker={() => {
+          if (!panelJob) return
+          const pj = panelJob
+          if (isBookmarked(pj.key)) {
+            toggleBookmark(pj.key)
           } else {
-            bookmarkJob({
-              key: j.id,
-              logo: companyLogo(j.company),
-              color: companyColor(j.company),
-              company: j.company,
-              title: j.title,
-              loc: j.location,
-              score: j.score,
-              level: j.score >= 75 ? 'high' : 'mid',
-              time: 'just now',
-              url: j.url,
-              resume: resume.id,
-              addedAt: new Date().toISOString(),
-              salary: j.salary,
-              jobData: {
-                description: j.description,
-                descriptionHtml: j.descriptionHtml,
-                tags: j.tags,
-                locationType: j.locationType,
-                visaSponsorship: j.visaSponsorship,
-                experienceLevel: j.experienceLevel,
-                employmentType: j.employmentType,
-                source: j.source,
-                companyLogo: j.companyLogo,
-                department: j.department,
-                country: j.country,
-                region: j.region,
-              },
+            createBookmark({
+              sourceKey: pj.key,
+              company: pj.company,
+              jobTitle: pj.title,
+              jobUrl: pj.url,
+              location: pj.loc,
+              logoUrl: pj.logo,
+              color: pj.color,
+              level: pj.level,
+              matchScore: pj.score,
+              resumeId: resume.id,
+              status: 'bookmarked',
+              salary: pj.salary,
+              jobData: pj.jobData,
             })
-            notify({ message: `Bookmarked: ${j.title}`, type: 'success' })
+            notify({ message: `Saved: ${pj.title}`, type: 'success' })
           }
         }}
+        onClose={() => setPanelJob(null)}
       />
     </div>
   )
