@@ -372,6 +372,9 @@ function OverviewContent({
   jobLocation: string   // from job.loc — used for verification link URLs
   homeLocation: string  // from settings — used for commute direction URLs
 }) {
+  // Extract city from raw location (e.g. "Bang Rak, Bangkok, Thailand" → "Bangkok")
+  // Phase 2's AreaIntelligence does the same — match the pattern
+  const city = jobLocation.split(',').pop()?.trim() || jobLocation
   return (
     <div className="rounded-lg border border-primary/20 bg-accent-soft/30 p-4 space-y-4">
 
@@ -451,7 +454,7 @@ function OverviewContent({
             <div className="text-xs text-muted-foreground italic">{overview.salaryCheck.note}</div>
           )}
           {/* Verification link — build URL from Phase 2 area-links.ts */}
-          <VerifyLink href={Links.costOfLivingUrl(jobLocation)} label="Verify on Numbeo" />
+          <VerifyLink href={Links.costOfLivingUrl(city)} label="Verify on Numbeo" />
         </Section>
       )}
 
