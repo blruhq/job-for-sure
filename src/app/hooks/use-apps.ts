@@ -1,3 +1,4 @@
+import { useRef } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { ApiClient } from '~/lib/api-client'
 import type { PipelineJob, ApplicationBoard } from '~/types/resume'
@@ -107,6 +108,11 @@ export function useReorderApplications() {
 export function useMoveApplication() {
   const queryClient = useQueryClient()
   const reorderMutation = useReorderApplications()
+  // Snapshot captured by onMutate before optimistic update — needed by
+  // mutationFn which runs AFTER onMutate already modified the cache.
+  // Without this, mutationFn tries to find jobKey in a cache where it's
+  // already been moved, returns early, and never calls the API.
+  const preMutationSnapshot = useRef<ApplicationBoard | null>(null)
 
   return useMutation({
     mutationFn: async ({
@@ -120,7 +126,9 @@ export function useMoveApplication() {
       toCol: keyof ApplicationBoard
       toIndex?: number
     }) => {
-      const previous = queryClient.getQueryData<ApplicationBoard>(['applications'])
+      // Read the PRE-MUTATION snapshot, not the optimistically-updated cache
+      const previous = preMutationSnapshot.current
+      preMutationSnapshot.current = null
       if (!previous) return
 
       const from = [...previous[fromCol]]
@@ -163,19 +171,22 @@ export function useMoveApplication() {
     onMutate: async ({ jobKey, fromCol, toCol, toIndex }) => {
       await queryClient.cancelQueries({ queryKey: ['applications'] })
       const previous = queryClient.getQueryData<ApplicationBoard>(['applications'])
+      if (!previous) return { previous: null }
 
-      if (previous) {
-        const next = JSON.parse(JSON.stringify(previous)) as ApplicationBoard
-        const from = next[fromCol]
-        const to = next[toCol]
+      // Save pre-mutation snapshot for mutationFn
+      preMutationSnapshot.current = previous
 
-        const idx = from.findIndex((j) => j.key === jobKey)
-        if (idx !== -1) {
-          const [job] = from.splice(idx, 1)
-          const target = typeof toIndex === 'number' ? toIndex : 0
-          to.splice(target, 0, job)
-          queryClient.setQueryData(['applications'], next)
-        }
+      // Optimistic update
+      const next = JSON.parse(JSON.stringify(previous)) as ApplicationBoard
+      const from = next[fromCol]
+      const to = next[toCol]
+
+      const idx = from.findIndex((j) => j.key === jobKey)
+      if (idx !== -1) {
+        const [job] = from.splice(idx, 1)
+        const target = typeof toIndex === 'number' ? toIndex : 0
+        to.splice(target, 0, job)
+        queryClient.setQueryData(['applications'], next)
       }
 
       return { previous }
