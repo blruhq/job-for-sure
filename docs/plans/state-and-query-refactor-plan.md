@@ -600,6 +600,58 @@ Refactor the components that read data from the store to use the new hooks:
   const [tailoredCount] = await db.select({ total: count() }).from(resumes).where(eq(resumes.isBase, false))
   ```
 
+### 9F: Upload modal (`src/app/components/layout/upload-modal.tsx`)
+- **Replace** `useAppStore()` imports with `useUIStore()` and the custom mutation `useCreateResume()`.
+- **Use** `mutateAsync` instead of synchronous `addResume(resume)`:
+  ```typescript
+  const setActiveResumeId = useUIStore((s) => s.setActiveResumeId)
+  const createResumeMutation = useCreateResume()
+
+  // During save:
+  await createResumeMutation.mutateAsync({
+    id: resume.id,
+    data: resume,
+    isBase: true,
+  })
+  setActiveResumeId(resume.id)
+  ```
+
+### 9G: Chat dashboard (`src/app/components/chat/chat-view.tsx`)
+- **Replace** `useAppStore()` with `useUIStore()`, `useResumes()`, `useApplications()`, and `useCreateResume()`.
+- **Retrieve** resumes and applications from queries:
+  ```typescript
+  const { data: resumesList } = useResumes()
+  const resumes = resumesList || []
+  const activeResumeId = useUIStore((s) => s.activeResumeId)
+  const setActiveResumeId = useUIStore((s) => s.setActiveResumeId)
+  const activeResume = resumes.find((r) => r.id === activeResumeId) ?? null
+
+  const { data: applicationsBoard } = useApplications()
+  const applications = applicationsBoard || { bookmark: [], applied: [], interviewing: [], offers: [], rejected: [] }
+  ```
+- **Replace** synchronous `addResume` calls with `createResumeMutation.mutateAsync()`.
+
+### 9H: ATS Keyword matcher (`src/app/components/ats/ats-view.tsx`)
+- **Replace** store bindings with `useUIStore()`, `useResumes()`, and `useUpdateResume()`.
+- **Resolve Re-Analysis Race Condition**: Since `mutateAsync` is asynchronous, calling `fetchAnalysis(jdText)` immediately after will read the *stale* local resume state before the cache updates, causing the score not to update until refresh.
+  To fix, modify `fetchAnalysis` signature to accept an optional `resumeOverride` parameter:
+  ```typescript
+  const fetchAnalysis = useCallback(async (jd: string, resumeOverride?: Resume) => {
+    const targetResume = resumeOverride || resume
+    if (!targetResume) return
+    // ... fetch logic ...
+  }, [resume])
+  ```
+  Then refactor keyword click/injection to pass the updated clone directly:
+  ```typescript
+  const updatedResume = { ...resume, skills: nextSkills }
+  await updateResumeMutation.mutateAsync({
+    id: resume.id,
+    data: { skills: nextSkills },
+  })
+  fetchAnalysis(jdText, updatedResume)
+  ```
+
 ---
 
 ## Step 10: Verify Build & Compile
