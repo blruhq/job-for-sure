@@ -4,18 +4,24 @@ import { useState, useEffect } from 'react'
 import { Wand2, Download, Copy, Save, Trash2 } from 'lucide-react'
 import { notify } from '~/lib/toast'
 import { ConfirmDialog } from '~/components/ui/confirm-dialog'
+import { useCoverLetters, useUpdateCoverLetter } from '~/hooks/use-cover-letters'
 import { useTranslations } from 'next-intl'
 import type { Resume } from '~/types/resume'
 
 interface CoverLetterEditorProps {
   resume: Resume
-  updateResume: (payload: { id: string; data: Partial<Resume> }) => void
 }
 
-export function CoverLetterEditor({ resume, updateResume }: CoverLetterEditorProps) {
+export function CoverLetterEditor({ resume }: CoverLetterEditorProps) {
   const t = useTranslations('coverLetter')
-  const [jdText, setJdText] = useState(resume.coverLetterJD || '')
-  const [letterText, setLetterText] = useState(resume.coverLetter || '')
+  const { data: coverLetters = [] } = useCoverLetters()
+  const { mutateAsync: updateCoverLetter } = useUpdateCoverLetter()
+
+  // Find the latest cover letter for this resume
+  const activeLetter = coverLetters.find((cl: any) => cl.resumeId === resume.id)
+
+  const [jdText, setJdText] = useState('')
+  const [letterText, setLetterText] = useState('')
   const [generating, setGenerating] = useState(false)
   const [showDeleteDialog, setShowDeleteDialog] = useState(false)
 
@@ -26,19 +32,17 @@ export function CoverLetterEditor({ resume, updateResume }: CoverLetterEditorPro
   const [focus, setFocus] = useState('')
   const [outputLanguage, setOutputLanguage] = useState<'en' | 'th'>('en')
 
-  // Sync letterText when resume changes
+  // Initialize from table record
   useEffect(() => {
-    if (resume.coverLetter !== undefined) {
-      setLetterText(resume.coverLetter)
+    if (activeLetter) {
+      setLetterText(activeLetter.content || '')
+      if (activeLetter.company) setCompany(activeLetter.company)
+      if (activeLetter.role) setRole(activeLetter.role)
+      if (activeLetter.jdText) setJdText(activeLetter.jdText)
+    } else {
+      setLetterText('')
     }
-  }, [resume.coverLetter])
-
-  // Sync jdText when resume changes
-  useEffect(() => {
-    if (resume.coverLetterJD !== undefined) {
-      setJdText(resume.coverLetterJD)
-    }
-  }, [resume.coverLetterJD])
+  }, [activeLetter?.id]) // re-init when switching to a different letter record
 
   const handleGenerate = async () => {
     setGenerating(true)
@@ -48,6 +52,7 @@ export function CoverLetterEditor({ resume, updateResume }: CoverLetterEditorPro
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           resume,
+          resumeId: resume.id,
           jdText: mode === 'jd' ? jdText : '',
           company: mode === 'quick' ? company : '',
           role: mode === 'quick' ? role : '',
@@ -61,10 +66,6 @@ export function CoverLetterEditor({ resume, updateResume }: CoverLetterEditorPro
       const data = await res.json()
       if (data.letter) {
         setLetterText(data.letter)
-        updateResume({ id: resume.id, data: {
-          coverLetter: data.letter,
-          coverLetterJD: mode === 'jd' ? jdText : `Company: ${company}, Role: ${role}${focus ? `, Focus: ${focus}` : ''}`,
-        } })
         notify({ message: t('generatedSuccess'), type: 'success' })
       } else {
         throw new Error('No letter content returned')
@@ -77,11 +78,34 @@ export function CoverLetterEditor({ resume, updateResume }: CoverLetterEditorPro
     }
   }
 
-  const handleSave = () => {
-    updateResume({ id: resume.id, data: {
-      coverLetter: letterText,
-      coverLetterJD: mode === 'jd' ? jdText : `Company: ${company}, Role: ${role}${focus ? `, Focus: ${focus}` : ''}`,
-    } })
+  const handleSave = async () => {
+    if (activeLetter?.id) {
+      await updateCoverLetter({
+        id: activeLetter.id,
+        content: letterText,
+        company: mode === 'quick' ? company : null,
+        role: mode === 'quick' ? role : null,
+      })
+    } else {
+      // No existing record — generate via API to create one, or just save locally
+      // The AI route creates a record. For manual save, we create via a direct POST.
+      try {
+        await fetch('/api/cover-letters', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            resumeId: resume.id,
+            content: letterText,
+            company: mode === 'quick' ? company : null,
+            role: mode === 'quick' ? role : null,
+            jdText: mode === 'jd' ? jdText : null,
+          }),
+        })
+      } catch {
+        notify({ message: 'Failed to save', type: 'error' })
+        return
+      }
+    }
     notify({ message: t('savedSuccess'), type: 'success' })
   }
 
@@ -92,6 +116,19 @@ export function CoverLetterEditor({ resume, updateResume }: CoverLetterEditorPro
     } catch {
       notify({ message: t('copy') + ' failed', type: 'error' })
     }
+  }
+
+  const handleDelete = async () => {
+    if (activeLetter?.id) {
+      try {
+        await fetch(`/api/cover-letters/${activeLetter.id}`, { method: 'DELETE' })
+      } catch {
+        // ignore
+      }
+    }
+    setLetterText('')
+    setShowDeleteDialog(false)
+    notify({ message: 'Cover letter cleared', type: 'success' })
   }
 
   return (
@@ -250,7 +287,7 @@ export function CoverLetterEditor({ resume, updateResume }: CoverLetterEditorPro
                 {[resume.email, resume.location].filter(Boolean).join(' · ')}
               </div>
             </div>
-            
+
             <div className="border-b border-border/50 mb-6"></div>
 
             {/* Letter Textarea */}
@@ -268,12 +305,7 @@ export function CoverLetterEditor({ resume, updateResume }: CoverLetterEditorPro
       <ConfirmDialog
         open={showDeleteDialog}
         onClose={() => setShowDeleteDialog(false)}
-        onConfirm={() => {
-          setLetterText('')
-          updateResume({ id: resume.id, data: { coverLetter: '', coverLetterJD: '' } })
-          setShowDeleteDialog(false)
-          notify({ message: 'Cover letter cleared', type: 'success' })
-        }}
+        onConfirm={handleDelete}
         title="Delete Cover Letter?"
         description="Remove the current cover letter from this resume? You can generate a new one anytime."
         confirmLabel="Clear Letter"

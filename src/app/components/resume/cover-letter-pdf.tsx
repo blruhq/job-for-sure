@@ -50,8 +50,8 @@ const styles = StyleSheet.create({
   },
 })
 
-export function CoverLetterPDF({ resume }: { resume: Resume }) {
-  const paragraphs = (resume.coverLetter || '')
+export function CoverLetterPDF({ resume, letterText }: { resume: Resume; letterText: string }) {
+  const paragraphs = (letterText || '')
     .split('\n')
     .map(p => p.trim())
     .filter(p => p.length > 0)

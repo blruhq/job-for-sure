@@ -79,8 +79,6 @@ export const ResumeDataSchema = z.object({
   companies: z.array(z.record(z.unknown())).max(50).optional(),
   stretch: z.array(z.record(z.unknown())).max(50).optional(),
   template: z.string().max(50).optional(),
-  coverLetter: z.string().max(20000).optional(),
-  coverLetterJD: z.string().max(20000).optional(),
   sectionOrder: z.array(z.string().max(50)).max(20).optional(),
   sectionVisibility: z.record(z.string(), z.boolean()).optional(),
 }).passthrough()

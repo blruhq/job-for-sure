@@ -27,3 +27,14 @@ export function useGenerateCoverLetter() {
     },
   })
 }
+
+export function useUpdateCoverLetter() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: ({ id, content, company, role }: { id: string; content?: string; company?: string | null; role?: string | null }) =>
+      ApiClient.updateCoverLetter(id, { content, company, role }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['cover-letters'] })
+    },
+  })
+}

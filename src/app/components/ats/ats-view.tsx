@@ -1,15 +1,18 @@
 'use client'
 
+import dynamic from 'next/dynamic'
 import { useState, useEffect, useCallback } from 'react'
 import { Wand2, Upload, FileText, ArrowRight, Sparkles, RefreshCw, CheckCircle2, AlertCircle } from 'lucide-react'
 import { useRouter } from '~/i18n/routing'
-import { cn } from '~/lib/utils'
 import { useActiveResume } from '~/hooks/use-active-resume'
 import { useUpdateResume, useCreateResume } from '~/hooks/use-resumes'
 import { useUIStore } from '~/hooks/use-ui'
 import { notify } from '~/lib/toast'
 import { useTranslations } from 'next-intl'
 import type { Resume } from '~/types/resume'
+
+// Server-side PDF preview — same renderer as the resume editor (ADR-002)
+const ResumePreview = dynamic(() => import('~/components/resume/resume-preview').then(m => ({ default: m.ResumePreview })), { ssr: false })
 
 interface AnalysisCategory {
   name: string
@@ -478,48 +481,8 @@ export function AtsView() {
           </button>
         </div>
         {resume ? (
-          <div className="resume-paper w-full max-w-[550px] min-h-[650px] rounded-xs p-6" style={{ boxShadow: 'var(--shadow-paper)' }}>
-            <div className="text-center text-base font-bold">{resume.persona || 'Your Name'}</div>
-            <div className="mb-3 text-center font-mono text-[9px] text-muted-foreground">
-              {resume.email || 'john@email.com'} · {resume.location || 'San Francisco, CA'}
-            </div>
-            {resume.summary && (
-              <div className="mb-3.5">
-                <div className="mb-1 border-b border-border pb-0.5 text-[10px] font-bold uppercase tracking-wider">Summary</div>
-                <div className="text-muted-foreground text-[10px] leading-relaxed">{resume.summary}</div>
-              </div>
-            )}
-            <div className="mb-3.5">
-              <div className="mb-1 border-b border-border pb-0.5 text-[10px] font-bold uppercase tracking-wider">Skills</div>
-              <div className="flex flex-wrap gap-1">
-                {resume.skills.map((s) => (
-                  <span key={s} className={cn(
-                    'rounded-xs border border-border bg-background px-1.5 py-0.5 text-[9px]',
-                    analysisResult?.missing?.some((m) => s.toLowerCase().includes(m.toLowerCase())) && 'ring-1 ring-destructive/30',
-                  )}>{s}</span>
-                ))}
-              </div>
-            </div>
-            {resume.experience && resume.experience.length > 0 && (
-              <div className="mb-3.5">
-                <div className="mb-1 border-b border-border pb-0.5 text-[10px] font-bold uppercase tracking-wider">Experience</div>
-                <div className="flex flex-col gap-3">
-                  {resume.experience.map((exp, idx) => (
-                    <div key={idx} className="flex flex-col gap-0.5">
-                      <div className="flex justify-between text-[10px] font-semibold">
-                        <span>{exp.role} at {exp.company}</span>
-                        <span className="text-[9px] font-mono text-muted-foreground">{exp.dates}</span>
-                      </div>
-                      <ul className="list-disc pl-3 text-muted-foreground text-[9px] leading-relaxed">
-                        {exp.bullets.map((b, bidx) => (
-                          <li key={bidx}>{b}</li>
-                        ))}
-                      </ul>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
+          <div className="w-full max-w-[550px] min-h-[650px]">
+            <ResumePreview resume={resume} />
           </div>
         ) : (
           <div className="flex flex-col items-center justify-center py-16 text-center">

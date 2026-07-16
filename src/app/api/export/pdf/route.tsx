@@ -3,9 +3,9 @@ import ReactPDF from '@react-pdf/renderer'
 import { ResumePDF } from '~/components/resume/resume-pdf'
 import { CoverLetterPDF } from '~/components/resume/cover-letter-pdf'
 import { db } from '~/lib/db'
-import { resumes } from '~/lib/schema'
+import { resumes, coverLetters } from '~/lib/schema'
 import { withAuth } from '~/lib/with-auth'
-import { eq, and, isNull } from 'drizzle-orm'
+import { eq, and, isNull, desc } from 'drizzle-orm'
 import type { Resume } from '~/types/resume'
 
 export const runtime = 'nodejs'
@@ -36,9 +36,21 @@ export const GET = withAuth(async (request, { user }) => {
 
   const resume = row.data as Resume
 
+  // For cover letter, fetch the latest letter from the table
+  let letterText = ''
+  if (type === 'cover-letter') {
+    const [latestLetter] = await db
+      .select({ content: coverLetters.content })
+      .from(coverLetters)
+      .where(and(eq(coverLetters.userId, user.id), eq(coverLetters.resumeId, id), isNull(coverLetters.deletedAt)))
+      .orderBy(desc(coverLetters.createdAt))
+      .limit(1)
+    letterText = latestLetter?.content || ''
+  }
+
   // Generate PDF stream based on type
   const doc = type === 'cover-letter'
-    ? <CoverLetterPDF resume={resume} />
+    ? <CoverLetterPDF resume={resume} letterText={letterText} />
     : <ResumePDF resume={resume} />
 
   const stream = await ReactPDF.renderToStream(doc)

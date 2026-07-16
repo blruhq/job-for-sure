@@ -6,6 +6,7 @@ import Link from 'next/link'
 import { FileText, Brain, KanbanSquare, CheckSquare, MessageSquare, Plus, ArrowRight, Mail } from 'lucide-react'
 import { useResumes } from '~/hooks/use-resumes'
 import { useApplications } from '~/hooks/use-apps'
+import { useCoverLetters } from '~/hooks/use-cover-letters'
 import { Skeleton } from '~/components/ui/skeleton'
 import { EMPTY_APPLICATIONS } from '~/lib/constants'
 import { cn } from '~/lib/utils'
@@ -17,6 +18,7 @@ export function DashboardView() {
   const t = useTranslations('dashboard')
   const { data: resumes = [], isLoading: resumesLoading } = useResumes()
   const { data: applicationsData } = useApplications()
+  const { data: coverLetters = [] } = useCoverLetters()
   const applications = applicationsData ?? EMPTY_APPLICATIONS
   const [userName, setUserName] = useState('')
   const [lastInterviewScore, setLastInterviewScore] = useState<number | null>(null)
@@ -64,9 +66,8 @@ export function DashboardView() {
   }
 
   const applicationTotal = applicationCounts.bookmark + applicationCounts.applied + applicationCounts.interviewing + applicationCounts.offers
-  const coverLetterCount = resumes.filter((r) => r.coverLetter).length
+  const coverLetterCount = coverLetters.length
   const topResumes = [...resumes].sort((a, b) => b.score - a.score).slice(0, 3)
-  const firstResumeWithCoverLetter = resumes.find((r) => r.coverLetter)
 
   // Loading State
   if (resumesLoading) {
@@ -198,7 +199,7 @@ export function DashboardView() {
 
           {/* Card 4: Cover Letters */}
           <Link
-            href={firstResumeWithCoverLetter ? `/resume/${firstResumeWithCoverLetter.id}` : '/chat'}
+            href={coverLetters.length > 0 ? `/cover-letter` : '/chat'}
             className="rounded-sm border border-border bg-card p-4 transition-colors hover:border-primary flex flex-col justify-between h-24"
           >
             <div className="flex justify-between items-start">

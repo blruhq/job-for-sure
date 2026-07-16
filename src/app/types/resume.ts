@@ -93,8 +93,6 @@ export interface Resume {
   companies: Company[]
   stretch: Company[]
   template?: ResumeTemplate
-  coverLetter?: string
-  coverLetterJD?: string
   baseResumeId?: string       // ID of parent resume if this is a tailored variant
   isVariant?: boolean         // True if this resume is a tailored variant (not a base)
   variantLabel?: string       // Display label, e.g. "Tailored for Google — SWE"

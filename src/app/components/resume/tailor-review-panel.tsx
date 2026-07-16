@@ -80,7 +80,7 @@ export function TailorReviewPanel({ onApply, onCancel }: { onApply: (variant: Re
     // Create a variant resume from the previewed state
     const variant: Resume = {
       ...previewedResume,
-      id: String(Date.now()),
+      id: crypto.randomUUID(),
       name: pending.jobContext
         ? `${base.name} → ${pending.jobContext.company || 'Tailored'}`
         : `${base.name} (Optimized)`,

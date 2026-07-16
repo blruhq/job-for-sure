@@ -109,6 +109,10 @@ export class ApiClient {
     })
   }
 
+  static updateCoverLetter(id: string, payload: { content?: string; company?: string | null; role?: string | null }): Promise<any> {
+    return this.request(`/api/cover-letters/${id}`, { method: 'PATCH', body: JSON.stringify(payload) })
+  }
+
   // Admin
   static getSourceHealth(): Promise<any> {
     return this.request('/api/jobs/source-health')

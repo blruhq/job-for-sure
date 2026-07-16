@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useActiveResume } from '~/hooks/use-active-resume'
 import { useUpdateResume, useCreateResume } from '~/hooks/use-resumes'
+import { useCoverLetters } from '~/hooks/use-cover-letters'
 import { useUIStore } from '~/hooks/use-ui'
 import { createResume } from '~/lib/company-data'
 import { notify } from '~/lib/toast'
@@ -67,34 +68,21 @@ export default function StandaloneCoverLetterPage() {
     loadLetters()
   }, [])
 
-  // Sync letter text from selected resume if it has one already saved
+  // Sync letter text from cover letters table
+  const { data: coverLettersData = [] } = useCoverLetters()
+
   useEffect(() => {
-    if (selectedResume?.coverLetter) {
-      setLetterText(selectedResume.coverLetter)
-    } else {
-      setLetterText('')
-    }
-    
-    // Attempt to extract company and role from existing coverLetterJD if it follows the template
-    if (selectedResume?.coverLetterJD) {
-      const jd = selectedResume.coverLetterJD
-      if (jd.startsWith('Company: ')) {
-        const matches = jd.match(/Company: (.*?), Role: (.*?)(?:, Focus: (.*))?$/)
-        if (matches) {
-          setCompany(matches[1] || '')
-          setRole(matches[2] || '')
-          setFocus(matches[3] || '')
-        }
+    if (selectedResume) {
+      const activeLetter = coverLettersData.find((l: any) => l.resumeId === selectedResume.id)
+      if (activeLetter) {
+        setLetterText(activeLetter.content)
+        if (activeLetter.company) setCompany(activeLetter.company)
+        if (activeLetter.role) setRole(activeLetter.role)
       } else {
-        setJdText(jd)
+        setLetterText('')
       }
-    } else {
-      setCompany('')
-      setRole('')
-      setFocus('')
-      setJdText('')
     }
-  }, [selectedResume])
+  }, [selectedResume?.id])
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
@@ -201,11 +189,6 @@ export default function StandaloneCoverLetterPage() {
       const data = await res.json()
       if (data.letter) {
         setLetterText(data.letter)
-        const jdVal = mode === 'jd' ? jdText : `Company: ${company}, Role: ${role}${focus ? `, Focus: ${focus}` : ''}`
-        updateResume({ id: selectedResume.id, data: {
-          coverLetter: data.letter,
-          coverLetterJD: jdVal,
-        } })
         // Add to saved letters list
         if (data.id) {
           setActiveLetterId(data.id)
@@ -232,13 +215,39 @@ export default function StandaloneCoverLetterPage() {
     }
   }
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!selectedResume) return
-    const jdVal = mode === 'jd' ? jdText : `Company: ${company}, Role: ${role}${focus ? `, Focus: ${focus}` : ''}`
-    updateResume({ id: selectedResume.id, data: {
-      coverLetter: letterText,
-      coverLetterJD: jdVal,
-    } })
+    // Save to cover letters table via PATCH (if existing) or POST (if new)
+    if (activeLetterId) {
+      try {
+        await fetch(`/api/cover-letters/${activeLetterId}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ content: letterText }),
+        })
+      } catch {
+        notify({ message: 'Failed to save', type: 'error' })
+        return
+      }
+    } else {
+      try {
+        const res = await fetch('/api/cover-letters', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            resumeId: selectedResume.id,
+            content: letterText,
+            company: mode === 'quick' ? company : null,
+            role: mode === 'quick' ? role : null,
+          }),
+        })
+        const data = await res.json()
+        if (data.id) setActiveLetterId(data.id)
+      } catch {
+        notify({ message: 'Failed to save', type: 'error' })
+        return
+      }
+    }
     notify({ message: 'Cover letter saved successfully!', type: 'success' })
   }
 

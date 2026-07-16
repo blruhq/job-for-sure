@@ -756,6 +756,101 @@ export function ResumeDetail({ resumeId }: { resumeId: string }) {
     setCustomSections, setSectionOrder,
   ])
 
+  // ── Shared form body (used by both desktop and mobile editors to avoid duplication) ──
+  const EditorFormBody = () => (
+    <div className="flex flex-col gap-3">
+      {/* Section suggestion banner */}
+      {!suggestionDismissed && (
+        <SectionSuggestionBanner
+          suggestions={suggestions}
+          onAdd={handleAddSection}
+          onDismiss={() => setSuggestionDismissed(true)}
+        />
+      )}
+
+      {/* Sortable sections */}
+      <DndContext sensors={sectionSensors} collisionDetection={pointerWithin} onDragEnd={handleSectionDragEnd}>
+        <SortableContext items={visibleEditorSections} strategy={verticalListSortingStrategy}>
+          {visibleEditorSections.map((id) => (
+            <SortableSection
+              key={id}
+              id={id}
+              isVisible={sectionVisibility[id] !== false}
+              onToggleVisible={() => toggleSectionVisibility(id)}
+            >
+              {renderEditorSection(id)}
+            </SortableSection>
+          ))}
+        </SortableContext>
+      </DndContext>
+
+      {/* + Add Section button */}
+      {availableSections.length > 0 && !showNewCustomInput && (
+        <div className="relative border-t border-border/50 pt-3">
+          <button
+            type="button"
+            onClick={() => setShowAddSectionPicker(!showAddSectionPicker)}
+            className="flex cursor-pointer items-center gap-1 rounded-xs border border-dashed border-border bg-transparent px-3 py-2 text-[11px] text-muted-foreground hover:border-primary hover:text-primary transition-all w-full justify-center"
+          >
+            <PlusCircle size={13} /> Add Section
+          </button>
+          {showAddSectionPicker && (
+            <div className="absolute left-0 right-0 top-full z-10 mt-1 rounded-xs border border-border bg-card shadow-lg">
+              {availableSections.map((s) => (
+                <button
+                  key={s}
+                  type="button"
+                  onClick={() => { handleAddSection(s) }}
+                  className="flex w-full cursor-pointer items-center gap-2 px-3 py-2 text-[11px] text-left text-foreground hover:bg-muted"
+                >
+                  <span>{SECTION_ICONS[s]}</span>
+                  <span>{SECTION_LABELS[s]}</span>
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Inline title input when adding a new custom section */}
+      {showNewCustomInput && (
+        <div className="border-t border-border/50 pt-3">
+          <div className="flex flex-col gap-2 rounded-xs border border-border bg-background p-3">
+            <label className="label-mono block text-[9px]">Section Title</label>
+            <div className="flex gap-2">
+              <input
+                ref={newCustomInputRef}
+                value={newCustomTitle}
+                onChange={(e) => setNewCustomTitle(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') { e.preventDefault(); handleCreateCustomSection() }
+                  if (e.key === 'Escape') { setShowNewCustomInput(false); setNewCustomTitle('') }
+                }}
+                placeholder="e.g. Open Source Contributions, Volunteering, Awards"
+                className="flex-1 rounded-xs border border-border bg-background px-2.5 py-1.5 text-[11px] outline-none focus:border-primary"
+                autoFocus
+              />
+              <button
+                type="button"
+                onClick={handleCreateCustomSection}
+                className="cursor-pointer rounded-xs bg-primary px-3 py-1.5 text-[11px] font-medium text-primary-foreground hover:bg-primary/90"
+              >
+                Add
+              </button>
+              <button
+                type="button"
+                onClick={() => { setShowNewCustomInput(false); setNewCustomTitle('') }}
+                className="cursor-pointer rounded-xs border border-border bg-card px-2 py-1.5 text-[11px] text-muted-foreground hover:bg-background"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  )
+
   // ── Live resume for real-time PDF preview ──
   const liveResume: Resume = useMemo(() => ({
     ...(resume as Resume),
@@ -1203,7 +1298,7 @@ export function ResumeDetail({ resumeId }: { resumeId: string }) {
                       </div>
                       <div className="flex gap-2">
                         <button onClick={() => {
-                          const copy = { ...resume, id: String(Date.now()), name: `${resume.name} (Copy)`, updated: 'just now' }
+                          const copy = { ...resume, id: crypto.randomUUID(), name: `${resume.name} (Copy)`, updated: 'just now' }
                           addResume({ id: copy.id, data: copy })
                           setActiveResumeId(copy.id)
                           notify({ message: 'Resume cloned', type: 'success' })
@@ -1224,97 +1319,7 @@ export function ResumeDetail({ resumeId }: { resumeId: string }) {
 
                     {/* Form body */}
                     <div className="resume-paper flex-1 rounded-xs p-6" style={{ fontFamily: 'var(--font-sans)', fontSize: '12px' }}>
-                      <div className="flex flex-col gap-3">
-                        {/* Section suggestion banner */}
-                        {!suggestionDismissed && (
-                          <SectionSuggestionBanner
-                            suggestions={suggestions}
-                            onAdd={handleAddSection}
-                            onDismiss={() => setSuggestionDismissed(true)}
-                          />
-                        )}
-
-                        {/* Sortable sections */}
-                        <DndContext sensors={sectionSensors} collisionDetection={pointerWithin} onDragEnd={handleSectionDragEnd}>
-                          <SortableContext items={visibleEditorSections} strategy={verticalListSortingStrategy}>
-                            {visibleEditorSections.map((id) => (
-                              <SortableSection
-                                key={id}
-                                id={id}
-                                isVisible={sectionVisibility[id] !== false}
-                                onToggleVisible={() => toggleSectionVisibility(id)}
-                              >
-                                {renderEditorSection(id)}
-                              </SortableSection>
-                            ))}
-                          </SortableContext>
-                        </DndContext>
-
-                        {/* + Add Section button */}
-                        {availableSections.length > 0 && !showNewCustomInput && (
-                          <div className="relative border-t border-border/50 pt-3">
-                            <button
-                              type="button"
-                              onClick={() => setShowAddSectionPicker(!showAddSectionPicker)}
-                              className="flex cursor-pointer items-center gap-1 rounded-xs border border-dashed border-border bg-transparent px-3 py-2 text-[11px] text-muted-foreground hover:border-primary hover:text-primary transition-all w-full justify-center"
-                            >
-                              <PlusCircle size={13} /> Add Section
-                            </button>
-                            {showAddSectionPicker && (
-                              <div className="absolute left-0 right-0 top-full z-10 mt-1 rounded-xs border border-border bg-card shadow-lg">
-                                {availableSections.map((s) => (
-                                  <button
-                                    key={s}
-                                    type="button"
-                                    onClick={() => { handleAddSection(s) }}
-                                    className="flex w-full cursor-pointer items-center gap-2 px-3 py-2 text-[11px] text-left text-foreground hover:bg-muted"
-                                  >
-                                    <span>{SECTION_ICONS[s]}</span>
-                                    <span>{SECTION_LABELS[s]}</span>
-                                  </button>
-                                ))}
-                              </div>
-                            )}
-                          </div>
-                        )}
-
-                        {/* Inline title input when adding a new custom section */}
-                        {showNewCustomInput && (
-                          <div className="border-t border-border/50 pt-3">
-                            <div className="flex flex-col gap-2 rounded-xs border border-border bg-background p-3">
-                              <label className="label-mono block text-[9px]">Section Title</label>
-                              <div className="flex gap-2">
-                                <input
-                                  ref={newCustomInputRef}
-                                  value={newCustomTitle}
-                                  onChange={(e) => setNewCustomTitle(e.target.value)}
-                                  onKeyDown={(e) => {
-                                    if (e.key === 'Enter') { e.preventDefault(); handleCreateCustomSection() }
-                                    if (e.key === 'Escape') { setShowNewCustomInput(false); setNewCustomTitle('') }
-                                  }}
-                                  placeholder="e.g. Open Source Contributions, Volunteering, Awards"
-                                  className="flex-1 rounded-xs border border-border bg-background px-2.5 py-1.5 text-[11px] outline-none focus:border-primary"
-                                  autoFocus
-                                />
-                                <button
-                                  type="button"
-                                  onClick={handleCreateCustomSection}
-                                  className="cursor-pointer rounded-xs bg-primary px-3 py-1.5 text-[11px] font-medium text-primary-foreground hover:bg-primary/90"
-                                >
-                                  Add
-                                </button>
-                                <button
-                                  type="button"
-                                  onClick={() => { setShowNewCustomInput(false); setNewCustomTitle('') }}
-                                  className="cursor-pointer rounded-xs border border-border bg-card px-2 py-1.5 text-[11px] text-muted-foreground hover:bg-background"
-                                >
-                                  Cancel
-                                </button>
-                              </div>
-                            </div>
-                          </div>
-                        )}
-                      </div>
+                      <EditorFormBody />
                     </div>
                   </div>
                 </ResizablePanel>
@@ -1348,74 +1353,7 @@ export function ResumeDetail({ resumeId }: { resumeId: string }) {
 
                   {/* Form body */}
                   <div className="resume-paper rounded-xs p-4" style={{ fontFamily: 'var(--font-sans)', fontSize: '12px' }}>
-                    <div className="flex flex-col gap-3">
-                      {!suggestionDismissed && (
-                        <SectionSuggestionBanner suggestions={suggestions} onAdd={handleAddSection} onDismiss={() => setSuggestionDismissed(true)} />
-                      )}
-                      <DndContext sensors={sectionSensors} collisionDetection={pointerWithin} onDragEnd={handleSectionDragEnd}>
-                        <SortableContext items={visibleEditorSections} strategy={verticalListSortingStrategy}>
-                          {visibleEditorSections.map((id) => (
-                            <SortableSection key={id} id={id} isVisible={sectionVisibility[id] !== false} onToggleVisible={() => toggleSectionVisibility(id)}>
-                              {renderEditorSection(id)}
-                            </SortableSection>
-                          ))}
-                        </SortableContext>
-                      </DndContext>
-                      {availableSections.length > 0 && !showNewCustomInput && (
-                        <div className="relative border-t border-border/50 pt-3">
-                          <button type="button" onClick={() => setShowAddSectionPicker(!showAddSectionPicker)} className="flex cursor-pointer items-center gap-1 rounded-xs border border-dashed border-border bg-transparent px-3 py-2 text-[11px] text-muted-foreground hover:border-primary hover:text-primary transition-all w-full justify-center">
-                            <PlusCircle size={13} /> Add Section
-                          </button>
-                          {showAddSectionPicker && (
-                            <div className="absolute left-0 right-0 top-full z-10 mt-1 rounded-xs border border-border bg-card shadow-lg">
-                              {availableSections.map((s) => (
-                                <button key={s} type="button" onClick={() => { handleAddSection(s) }} className="flex w-full cursor-pointer items-center gap-2 px-3 py-2 text-[11px] text-left text-foreground hover:bg-muted">
-                                  <span>{SECTION_ICONS[s]}</span>
-                                  <span>{SECTION_LABELS[s]}</span>
-                                </button>
-                              ))}
-                            </div>
-                          )}
-                        </div>
-                      )}
-
-                      {/* Inline title input when adding a new custom section (mobile) */}
-                      {showNewCustomInput && (
-                        <div className="border-t border-border/50 pt-3">
-                          <div className="flex flex-col gap-2 rounded-xs border border-border bg-background p-3">
-                            <label className="label-mono block text-[9px]">Section Title</label>
-                            <div className="flex gap-2">
-                              <input
-                                ref={newCustomInputRef}
-                                value={newCustomTitle}
-                                onChange={(e) => setNewCustomTitle(e.target.value)}
-                                onKeyDown={(e) => {
-                                  if (e.key === 'Enter') { e.preventDefault(); handleCreateCustomSection() }
-                                  if (e.key === 'Escape') { setShowNewCustomInput(false); setNewCustomTitle('') }}
-                                }
-                                placeholder="e.g. Open Source Contributions, Volunteering, Awards"
-                                className="flex-1 rounded-xs border border-border bg-background px-2.5 py-1.5 text-[11px] outline-none focus:border-primary"
-                                autoFocus
-                              />
-                              <button
-                                type="button"
-                                onClick={handleCreateCustomSection}
-                                className="cursor-pointer rounded-xs bg-primary px-3 py-1.5 text-[11px] font-medium text-primary-foreground hover:bg-primary/90"
-                              >
-                                Add
-                              </button>
-                              <button
-                                type="button"
-                                onClick={() => { setShowNewCustomInput(false); setNewCustomTitle('') }}
-                                className="cursor-pointer rounded-xs border border-border bg-card px-2 py-1.5 text-[11px] text-muted-foreground hover:bg-background"
-                              >
-                                Cancel
-                              </button>
-                            </div>
-                          </div>
-                        </div>
-                      )}
-                    </div>
+                    <EditorFormBody />
                   </div>
                 </div>
               )}
@@ -1461,7 +1399,7 @@ export function ResumeDetail({ resumeId }: { resumeId: string }) {
 
         {/* ── Tab 4: Cover Letter ── */}
         {tab === 'cover-letter' && (
-          <CoverLetterEditor resume={resume} updateResume={updateResume} />
+          <CoverLetterEditor resume={resume} />
         )}
       </div>
 
