@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback, useRef } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { Wand2, Upload, FileText, ArrowRight, Sparkles, RefreshCw, CheckCircle2, AlertCircle } from 'lucide-react'
 import { useRouter } from '~/i18n/routing'
 import { cn } from '~/lib/utils'
@@ -37,8 +37,8 @@ export function AtsView() {
   const [analysisResult, setAnalysisResult] = useState<AnalysisResult | null>(null)
   const [tailoringLoading, setTailoringLoading] = useState(false)
   const [hasAnalysedJd, setHasAnalysedJd] = useState(false)
-  const tailorCompanyRef = useRef('Target Company')
-  const tailorRoleRef = useRef('Target Role')
+  const [company, setCompany] = useState('')
+  const [role, setRole] = useState('')
 
   const resume = activeResume
 
@@ -77,9 +77,11 @@ export function AtsView() {
       sessionStorage.removeItem('jfs_pending_ats_company')
       sessionStorage.removeItem('jfs_pending_ats_role')
 
-      tailorCompanyRef.current = pendingCompany || 'Target Company'
-      tailorRoleRef.current = pendingRole || 'Target Role'
-      notify({ message: `Loaded details for ${tailorRoleRef.current} at ${tailorCompanyRef.current}. Click "Analyze Match" to start.`, type: 'info' })
+      const loadedCompany = pendingCompany || ''
+      const loadedRole = pendingRole || ''
+      setCompany(loadedCompany)
+      setRole(loadedRole)
+      notify({ message: `Loaded details for ${loadedRole || 'target role'} at ${loadedCompany || 'target company'}. Click "Analyze Match" to start.`, type: 'info' })
     }
   }, [])
 
@@ -94,8 +96,8 @@ export function AtsView() {
         body: JSON.stringify({
           resume,
           job: {
-            title: tailorRoleRef.current,
-            company: tailorCompanyRef.current,
+            title: role || 'Target Role',
+            company: company || 'Target Company',
             description: jdText,
           },
         }),
@@ -128,8 +130,8 @@ export function AtsView() {
         changes: changes,
         accepted: acceptedIds,
         jobContext: {
-          company: tailorCompanyRef.current,
-          title: tailorRoleRef.current,
+          company: company || undefined,
+          title: role || undefined,
         },
       })
 
@@ -283,6 +285,24 @@ export function AtsView() {
               Paste a job description above for a tailored match score, or click "Health Check" for a general audit.
             </p>
           )}
+        </div>
+
+        {/* Company / Role context (used for tailor) */}
+        <div className="flex gap-2">
+          <input
+            type="text"
+            value={company}
+            onChange={(e) => setCompany(e.target.value)}
+            placeholder="Company (optional)"
+            className="flex-1 rounded-sm border border-border bg-background px-2.5 py-1.5 text-xs outline-none focus:border-primary"
+          />
+          <input
+            type="text"
+            value={role}
+            onChange={(e) => setRole(e.target.value)}
+            placeholder="Role (optional)"
+            className="flex-1 rounded-sm border border-border bg-background px-2.5 py-1.5 text-xs outline-none focus:border-primary"
+          />
         </div>
 
         {/* Gauge / Score Output */}

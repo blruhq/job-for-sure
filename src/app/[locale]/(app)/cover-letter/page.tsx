@@ -185,6 +185,7 @@ export default function StandaloneCoverLetterPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           resume: selectedResume,
+          resumeId: selectedResume.id,
           jdText: mode === 'jd' ? jdText : '',
           company: mode === 'quick' ? company : '',
           role: mode === 'quick' ? role : '',

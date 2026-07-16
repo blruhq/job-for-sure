@@ -33,10 +33,11 @@ export interface GenerateCoverLetterPayload {
 
 export class ApiClient {
   private static async request<T>(url: string, init?: RequestInit): Promise<T> {
+    const isFormData = init?.body instanceof FormData
     const res = await fetch(url, {
       ...init,
       headers: {
-        'Content-Type': 'application/json',
+        ...(isFormData ? {} : { 'Content-Type': 'application/json' }),
         ...init?.headers,
       },
     })

@@ -46,6 +46,7 @@ function Toast({ notif, onClose }: { notif: NonNullable<ReturnType<typeof useNot
 // ── MAIN PAGE ──
 export default function SettingsPage() {
   const router = useRouter()
+  const { theme, toggle } = useTheme()
   const [tab, setTab] = useState<Tab>('profile')
   const [user, setUser] = useState<{ id: string; name: string; email: string } | null>(null)
   const [prefs, setPrefs] = useState<Prefs | null>(null)
@@ -349,6 +350,23 @@ export default function SettingsPage() {
                 <span className="font-mono text-[10px]">{user?.id}</span>
               </div>
             </div>
+
+            {/* Theme */}
+            <div className="rounded-sm border border-border bg-card px-4 py-3">
+              <div className="flex items-center justify-between">
+                <div>
+                  <div className="text-xs font-medium">Theme</div>
+                  <div className="text-[11px] text-muted-foreground">Light or dark mode</div>
+                </div>
+                <button
+                  onClick={toggle}
+                  className="flex items-center gap-1.5 rounded-sm border border-border bg-background px-3 py-1.5 text-xs hover:bg-background"
+                >
+                  {theme === 'dark' ? <Sun size={13} /> : <Moon size={13} />}
+                  Toggle
+                </button>
+              </div>
+            </div>
           </div>
         )}
 
@@ -411,10 +429,6 @@ export default function SettingsPage() {
           </div>
         )}
 
-        {/* Legacy settings section */}
-        <div className="mt-6 space-y-3">
-          <LegacySettings />
-        </div>
       </div>
 
       {/* Toast */}

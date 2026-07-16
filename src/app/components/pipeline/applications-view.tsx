@@ -2,9 +2,9 @@
 
 import { useState, useRef } from 'react'
 import { useRouter } from '~/i18n/routing'
-import { Trash2, Link2, RefreshCw, Plus, CalendarDays } from 'lucide-react'
+import { Trash2, Link2, RefreshCw, Plus } from 'lucide-react'
 import { cn } from '~/lib/utils'
-import { useApplications, useMoveApplication, useDeleteApplication, useClearApplications, useCreateApplication } from '~/hooks/use-apps'
+import { useApplications, useMoveApplication, useDeleteApplication, useCreateApplication } from '~/hooks/use-apps'
 import { useResumes } from '~/hooks/use-resumes'
 import { notify } from '~/lib/toast'
 import { useTranslations } from 'next-intl'
@@ -131,7 +131,6 @@ export function ApplicationsView() {
   const { data: applications } = useApplications()
   const { mutateAsync: moveJob } = useMoveApplication()
   const { mutateAsync: removeJobMutation } = useDeleteApplication()
-  const { mutateAsync: clearJobs } = useClearApplications()
   const { mutateAsync: bookmarkJob } = useCreateApplication()
   const { data: resumes = [] } = useResumes()
 
@@ -141,7 +140,6 @@ export function ApplicationsView() {
     if (job?.applicationId) removeJobMutation(job.applicationId)
   }
 
-  const clearApplications = () => clearJobs()
   const [filter, setFilter] = useState('all')
   const [dragOverCol, setDragOverCol] = useState<ApplicationColumnId | null>(null)
   const [activeJob, setActiveJob] = useState<PipelineJob | null>(null)
@@ -280,7 +278,6 @@ export function ApplicationsView() {
     const [title, setTitle] = useState('')
     const [company, setCompany] = useState('')
     const [loc, setLoc] = useState('')
-    const [date, setDate] = useState(new Date().toISOString().split('T')[0])
 
     const handleCancel = () => {
       setAddingToCol(null)
@@ -343,15 +340,6 @@ export function ApplicationsView() {
           placeholder="Location"
           className="w-full rounded-xs border border-border bg-background px-2 py-1.5 text-[11px] outline-none focus:border-primary placeholder:text-muted-foreground/50"
         />
-        <div className="flex items-center gap-2">
-          <CalendarDays size={11} className="text-muted-foreground shrink-0" />
-          <input
-            type="date"
-            value={date}
-            onChange={(e) => setDate(e.target.value)}
-            className="flex-1 rounded-xs border border-border bg-background px-2 py-1 text-[10px] outline-none focus:border-primary text-muted-foreground"
-          />
-        </div>
         <div className="flex items-center justify-end gap-1.5 mt-0.5">
           <button
             onClick={handleCancel}
@@ -466,13 +454,6 @@ export function ApplicationsView() {
                     <span className="text-xs font-semibold text-foreground">{t(col.labelKey)}</span>
                     <span className="text-[10px] font-mono text-muted-foreground">{jobs.length}</span>
                   </div>
-                    <button
-                      onClick={() => clearJobs()}
-                    className="text-[10px] text-muted-foreground hover:text-destructive transition-colors cursor-pointer"
-                    title="Clear"
-                  >
-                    ×
-                  </button>
                 </div>
 
                 {/* Job Cards */}
