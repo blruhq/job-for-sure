@@ -29,8 +29,8 @@ export function JobPreview({ resume, onDismiss, onLoadComplete }: { resume: Resu
 
   const isBookmarked = (key: string) => applications?.bookmark.some((j) => j.key === key) ?? false
 
-  const bookmarkJob = (job: { key: string; logo?: string; color?: string; company: string; title: string; loc: string; score: number; level: string; time?: string; url: string; resume: string; addedAt?: string }) => {
-    createBookmark({ sourceKey: job.key, company: job.company, jobTitle: job.title, jobUrl: job.url, location: job.loc, level: job.level, matchScore: job.score, resumeId: job.resume, status: 'bookmarked' })
+  const bookmarkJob = (job: { key: string; logo?: string; color?: string; company: string; title: string; loc: string; score: number; level: string; time?: string; url: string; resume: string; addedAt?: string; salary?: string; jobData?: Record<string, unknown> }) => {
+    createBookmark({ sourceKey: job.key, company: job.company, jobTitle: job.title, jobUrl: job.url, location: job.loc, level: job.level, matchScore: job.score, resumeId: job.resume, status: 'bookmarked', salary: job.salary, jobData: job.jobData })
   }
 
   const toggleBookmark = (key: string) => {
@@ -226,6 +226,21 @@ export function JobPreview({ resume, onDismiss, onLoadComplete }: { resume: Resu
                           url: job.url,
                           resume: resume.id,
                           addedAt: new Date().toISOString(),
+                          salary: job.salary,
+                          jobData: {
+                            description: job.description,
+                            descriptionHtml: job.descriptionHtml,
+                            tags: job.tags,
+                            locationType: job.locationType,
+                            visaSponsorship: job.visaSponsorship,
+                            experienceLevel: job.experienceLevel,
+                            employmentType: job.employmentType,
+                            source: job.source,
+                            companyLogo: job.companyLogo,
+                            department: job.department,
+                            country: job.country,
+                            region: job.region,
+                          },
                         })
                         notify({ message: `Bookmarked: ${job.title}`, type: 'success' })
                       }
@@ -308,6 +323,21 @@ export function JobPreview({ resume, onDismiss, onLoadComplete }: { resume: Resu
               url: j.url,
               resume: resume.id,
               addedAt: new Date().toISOString(),
+              salary: j.salary,
+              jobData: {
+                description: j.description,
+                descriptionHtml: j.descriptionHtml,
+                tags: j.tags,
+                locationType: j.locationType,
+                visaSponsorship: j.visaSponsorship,
+                experienceLevel: j.experienceLevel,
+                employmentType: j.employmentType,
+                source: j.source,
+                companyLogo: j.companyLogo,
+                department: j.department,
+                country: j.country,
+                region: j.region,
+              },
             })
             notify({ message: `Bookmarked: ${j.title}`, type: 'success' })
           }

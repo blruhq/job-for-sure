@@ -130,6 +130,8 @@ export interface PipelineJob {
   url: string
   resume: string
   addedAt: string
+  salary?: string
+  jobData?: Record<string, unknown>
 }
 
 export interface ApplicationBoard {

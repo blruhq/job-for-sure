@@ -151,6 +151,7 @@ export const CreateApplicationSchema = z.object({
   matchScore: z.number().optional(),
   resumeId: z.string().max(100).nullable().optional(),
   status: z.enum(['bookmarked', 'applied', 'interviewing', 'offered', 'rejected']).optional(),
+  jobData: z.record(z.unknown()).optional(),
 })
 
 export const ReorderApplicationSchema = z.object({

@@ -24,7 +24,7 @@ export const POST = withAuth(async (req, { user }) => {
     return NextResponse.json({ error: 'Invalid application data' }, { status: 400 })
   }
 
-  const { sourceKey, company, jobTitle, jobUrl, location, salary, logoUrl, color, level, matchScore, resumeId, status } = body.data
+  const { sourceKey, company, jobTitle, jobUrl, location, salary, logoUrl, color, level, matchScore, resumeId, status, jobData } = body.data
 
   const id = crypto.randomUUID()
   const now = new Date()
@@ -43,6 +43,7 @@ export const POST = withAuth(async (req, { user }) => {
     level: level || null,
     matchScore: matchScore ?? null,
     resumeId: resumeId || null,
+    jobData: jobData || null,
     status: (status as 'bookmarked' | 'applied' | 'interviewing' | 'offered' | 'rejected') || 'bookmarked',
     position: 0,
     appliedAt: status === 'applied' || status === 'interviewing' || status === 'offered' ? now : null,

@@ -72,8 +72,8 @@ export function JobSearchPanel({ resume }: { resume: Resume }) {
 
   const isBookmarked = (key: string) => applications?.bookmark.some((j) => j.key === key) ?? false
 
-  const bookmarkJob = (job: { key: string; company: string; title: string; loc: string; score: number; level: string; url: string; logo: string; color: string; resume: string; addedAt: string }) => {
-    createBookmark({ sourceKey: job.key, company: job.company, jobTitle: job.title, jobUrl: job.url, location: job.loc, logoUrl: job.logo, color: job.color, level: job.level, matchScore: job.score, resumeId: job.resume, status: 'bookmarked' })
+  const bookmarkJob = (job: { key: string; company: string; title: string; loc: string; score: number; level: string; url: string; logo: string; color: string; resume: string; addedAt: string; salary?: string; jobData?: Record<string, unknown> }) => {
+    createBookmark({ sourceKey: job.key, company: job.company, jobTitle: job.title, jobUrl: job.url, location: job.loc, logoUrl: job.logo, color: job.color, level: job.level, matchScore: job.score, resumeId: job.resume, status: 'bookmarked', salary: job.salary, jobData: job.jobData })
   }
 
   const toggleBookmark = (key: string) => {
@@ -438,6 +438,21 @@ export function JobSearchPanel({ resume }: { resume: Resume }) {
         url: job.url,
         resume: resume.id,
         addedAt: new Date().toISOString(),
+        salary: job.salary,
+        jobData: {
+          description: job.description,
+          descriptionHtml: job.descriptionHtml,
+          tags: job.tags,
+          locationType: job.locationType,
+          visaSponsorship: job.visaSponsorship,
+          experienceLevel: job.experienceLevel,
+          employmentType: job.employmentType,
+          source: job.source,
+          companyLogo: job.companyLogo,
+          department: job.department,
+          country: job.country,
+          region: job.region,
+        },
       })
       notify({ message: `Bookmarked: ${job.title} at ${job.company}`, type: 'success' })
     }

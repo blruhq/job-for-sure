@@ -148,6 +148,7 @@ export const applications = pgTable("applications", {
   resumeId: text("resume_id").references(() => resumes.id, { onDelete: "set null" }),
   coverLetterId: text("cover_letter_id").references(() => coverLetters.id, { onDelete: "set null" }),
   notes: text("notes"),
+  jobData: jsonb("job_data"),
   appliedAt: timestamp("applied_at"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().$onUpdate(() => new Date()).notNull(),

@@ -6,12 +6,14 @@ export interface CreateApplicationPayload {
   jobTitle: string
   jobUrl?: string
   location?: string
+  salary?: string
   logoUrl?: string
   color?: string
   level?: string
   matchScore?: number
   resumeId?: string
   status: string
+  jobData?: Record<string, unknown>
 }
 
 export interface ReorderApplicationsPayload {
