@@ -168,36 +168,85 @@ In the job detail panel, add a "Contacts" section:
 
 Simple page that renders the contacts view.
 
-### Sidebar nav: Add "Contacts" to ACCOUNT section
+### Sidebar nav: Add "Contacts" to Account section
 
-In `src/app/components/layout/sidebar.tsx`, add a contacts link:
-```typescript
-const NAV_ACCOUNT: readonly NavItem[] = [
-  { href: '/contacts', labelKey: 'contacts', icon: Users },
-  { href: '/settings', labelKey: 'settings', icon: Settings },
-]
+> **WARNING:** There is NO `NAV_ACCOUNT` array in sidebar.tsx. The Account section
+> is hardcoded inline JSX (lines 374-414). You must add the Contacts link there
+> alongside the existing Settings and Admin links, OR create a proper
+> `NAV_ACCOUNT` array. The simplest approach: add a new link in the inline JSX.
+
+**File:** `src/app/components/layout/sidebar.tsx`
+
+In the Account section (around line 382, after Settings link), add:
+
+```tsx
+<Tooltip label={t('contacts')} disabled={!c}>
+  <Link
+    href="/contacts"
+    className={cn(
+      'flex items-center gap-2 rounded-sm text-xs font-medium transition-[padding,background-color,color] duration-200 ease-[cubic-bezier(0.2,0,0,1)]',
+      pathname === '/contacts'
+        ? 'bg-sidebar-active text-foreground font-semibold'
+        : 'text-muted-foreground hover:bg-sidebar-hover hover:text-foreground',
+      c ? 'pl-[16px] pr-[17px] py-1.5' : 'px-2.5 py-1.5',
+    )}
+  >
+    <Users size={15} className="shrink-0 opacity-70" />
+    <span className={cn('transition-opacity duration-150', c && 'opacity-0')}>{t('contacts')}</span>
+  </Link>
+</Tooltip>
 ```
 
 Add i18n key: `"contacts": "Contacts"` / `"contacts": "ผู้ติดต่อ"`
 
-## Store Integration
+## React Query Hook Integration
 
-Add to `src/app/lib/store.tsx`:
+> **CRITICAL:** Do NOT import from `~/lib/store` — it's DELETED.
+> Create a new React Query hook following the pattern in `src/app/hooks/use-apps.ts`.
+
+### `src/app/hooks/use-contacts.ts` (NEW)
 
 ```typescript
-// Contacts state
-contacts: Contact[]
-addContact: (contact: Contact) => void
-updateContact: (id: string, updates: Partial<Contact>) => void
-deleteContact: (id: string) => Promise<void>
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { ApiClient } from '~/lib/api-client'
+
+export function useContacts() {
+  return useQuery({
+    queryKey: ['contacts'],
+    queryFn: () => ApiClient.request('/api/contacts'),
+  })
+}
+
+export function useCreateContact() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: (payload: any) => ApiClient.request('/api/contacts', {
+      method: 'POST', body: JSON.stringify(payload),
+    }),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['contacts'] }),
+  })
+}
+
+export function useUpdateContact() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: ({ id, ...updates }: any) => ApiClient.request(`/api/contacts/${id}`, {
+      method: 'PATCH', body: JSON.stringify(updates),
+    }),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['contacts'] }),
+  })
+}
+
+export function useDeleteContact() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: (id: string) => ApiClient.request(`/api/contacts/${id}`, { method: 'DELETE' }),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['contacts'] }),
+  })
+}
 ```
 
-Load contacts on hydration alongside applications:
-```typescript
-const [contacts, setContacts] = useState<Contact[]>([])
-// In hydrate():
-apiGet<Contact[]>('/api/contacts').catch(() => []),
-```
+Also add contact methods to `ApiClient` in `src/app/lib/api-client.ts`.
 
 ## Acceptance Criteria
 

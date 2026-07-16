@@ -39,7 +39,7 @@ Show salary on Kanban cards and in job detail panel. Add a "compare offers" view
 - If status is "offered", show "Compare Offers" section
 
 **PipelineJob type** (`src/app/types/resume.ts`):
-- Add `salary?: string` to PipelineJob if not already present
+- `salary?: string` is added in Phase 0. If not yet done, add it there first.
 
 ### Offer Comparison View
 When user has multiple "offered" applications, show a comparison table:
@@ -51,7 +51,8 @@ This is a simple table component that queries `applications WHERE status = 'offe
 No new API needed — salary is already in the application record returned by `GET /api/applications`.
 
 ### Store
-The `mapAppToJob` function in `store.tsx` already maps `app.salary` — verify it's included in PipelineJob.
+
+The `groupByStatus()` function in `src/app/hooks/use-apps.ts` (lines 29-44) does NOT currently map `salary`. After Phase 0 adds `salary` to `PipelineJob` and `groupByStatus`, the salary will flow through automatically.
 
 ---
 

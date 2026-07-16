@@ -26,7 +26,7 @@ Follow the EXACT same pattern as existing sources (see `remoteok.ts`, `himalayas
 ```typescript
 import type { JobResult } from './types'
 
-const SOURCE_NAME = 'JobsByCulture'
+const SOURCE_NAME = 'jobsbyculture' as const
 const BASE_URL = 'https://jobsbyculture.com'
 
 export async function fetchJobsByCulture(query: string, _location: string): Promise<JobResult[]> {
@@ -47,12 +47,11 @@ export async function fetchJobsByCulture(query: string, _location: string): Prom
 
   // Step 3: Extract job cards
   // NOTE: The exact selectors must be verified by inspecting the live site.
-  // The site structure should be consistent based on the sitemap analysis.
   $('[data-job-card], .job-card, article.job').each((_, el) => {
     const title = $(el).find('.job-title, h3, h2').first().text().trim()
     const company = $(el).find('.company-name, .company').first().text().trim()
     const location = $(el).find('.location').first().text().trim()
-    const url = $(el).find('a[href*="/jobs/"]').first().attr('href')
+    const link = $(el).find('a[href*="/jobs/"]').first().attr('href')
     const logoUrl = $(el).find('img').attr('src')
 
     // Culture-specific data (unique to this source):
@@ -63,15 +62,14 @@ export async function fetchJobsByCulture(query: string, _location: string): Prom
     if (title && company) {
       jobs.push({
         id: `${SOURCE_NAME}::${company}::${title}`.toLowerCase().replace(/\s+/g, '-'),
+        source: SOURCE_NAME,
         title,
         company,
         location: location || 'Remote',
-        url: url?.startsWith('http') ? url : `${BASE_URL}${url}`,
-        logoUrl: logoUrl || '',
-        source: SOURCE_NAME,
-        salary: '',
-        tags: [],
-        remote: location?.toLowerCase().includes('remote') || false,
+        url: link?.startsWith('http') ? link : `${BASE_URL}${link}`,
+        companyLogo: logoUrl || '',
+        description: '', // fetch from detail page if needed
+        locationType: location?.toLowerCase().includes('remote') ? 'remote' : 'unknown',
         // Culture data stored in a custom field for later use:
         ...(cultureScore || glassdoorRating ? {
           culture: {
@@ -90,29 +88,61 @@ export async function fetchJobsByCulture(query: string, _location: string): Prom
 
 ### Register in orchestrator
 
-**File:** `src/app/lib/job-sources/index.ts`
+> **CRITICAL:** The orchestrator uses string arrays + `if (sources.includes(...))` blocks
+> with `fetchers.push()`. NOT an object array. Follow the EXACT pattern of existing sources.
 
-Add to the FAST_FREE sources array:
+**Step 1:** Add `'jobsbyculture'` to the `JobSource` union type in `src/app/lib/job-sources/types.ts`:
+
+```typescript
+export type JobSource =
+  | 'greenhouse'
+  | 'ashby'
+  // ... existing ...
+  | 'jobsdb-rest'
+  | 'jobsbyculture'    // ← ADD THIS
+```
+
+**Step 2:** Add to `FAST_FREE_SOURCES` in `src/app/lib/job-sources/index.ts` (line 48):
+
+```typescript
+const FAST_FREE_SOURCES: JobSource[] = [
+  'remoteok', 'himalayas', 'remotive',
+  'themuse', 'arbeitnow', 'adzuna', 'jsearch', 'jobbkk',
+  'linkedin-guest',
+  'jobsbyculture',    // ← ADD THIS
+]
+```
+
+**Step 3:** Add the import at the top of `index.ts`:
 
 ```typescript
 import { fetchJobsByCulture } from './jobsbyculture'
-
-// In the fetchAllSources function:
-const FAST_FREE_SOURCES = [
-  // ... existing sources ...
-  { name: 'JobsByCulture', fetch: fetchJobsByCulture },
-]
 ```
+
+**Step 4:** Add a `fetchers.push()` block in the `searchJobs()` function (around line 115+):
+
+```typescript
+if (sources.includes('jobsbyculture')) {
+  fetchers.push(() => fetchJobsByCulture(query.query, query.location || ''))
+  fetcherSources.push('jobsbyculture')
+}
+```
+
+**Step 5:** Add `'jobsbyculture': 'JobsByCulture'` to `SOURCE_NAMES` and `SOURCE_SHORT` in:
+- `src/app/lib/source-names.ts`
+- (These maps were extracted to a shared file during cleanup)
 
 ### Update JobResult type
 
 **File:** `src/app/lib/job-sources/types.ts`
 
-Add optional culture data:
+Add `'jobsbyculture'` to the `JobSource` union (see Step 1 above — same change).
+
+Add optional culture data to `JobResult`:
 
 ```typescript
 export interface JobResult {
-  // ... existing fields ...
+  // ... existing 19 fields ...
   culture?: {
     score?: number
     glassdoorRating?: number
@@ -142,6 +172,8 @@ When a job from ANY source is displayed, enrich it with culture data from jobsby
 ### New API Route: `src/app/api/company-culture/route.ts`
 
 ```typescript
+import { getRedis } from '~/lib/redis'
+
 export const GET = withAuth(async (req, { user }) => {
   const { searchParams } = new URL(req.url)
   const company = searchParams.get('company')
@@ -150,10 +182,13 @@ export const GET = withAuth(async (req, { user }) => {
     return NextResponse.json({ error: 'Company name required' }, { status: 400 })
   }
 
-  // Check Redis cache first (24h TTL)
+  // Check Redis cache first (24h TTL) — getRedis() is a factory, wrap in try/catch
   const cacheKey = `culture::${company.toLowerCase()}`
-  const cached = await redis.get(cacheKey)
-  if (cached) return NextResponse.json(JSON.parse(cached))
+  try {
+    const redis = getRedis()
+    const cached = await redis.get(cacheKey)
+    if (cached) return NextResponse.json(JSON.parse(cached))
+  } catch { /* fail-open */ }
 
   // Scrape jobsbyculture.com/companies/{slug}
   const slug = company.toLowerCase().replace(/\s+/g, '-')
@@ -183,7 +218,10 @@ export const GET = withAuth(async (req, { user }) => {
   }
 
   // Cache for 24 hours
-  await redis.set(cacheKey, JSON.stringify(culture), { ex: 86400 })
+  try {
+    const redis = getRedis()
+    await redis.set(cacheKey, JSON.stringify(culture), { ex: 86400 })
+  } catch { /* fail-open */ }
 
   return NextResponse.json(culture)
 }, { route: '/api/company-culture' })
