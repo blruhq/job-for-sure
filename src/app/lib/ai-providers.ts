@@ -264,7 +264,7 @@ interface GenerateObjectParams {
 export async function generateObjectWithFailover<T>(
   params: GenerateObjectParams,
 ): Promise<T> {
-  const { system, prompt, schema, temperature = 0.4, maxOutputTokens = 2048 } = params
+  const { system, prompt, schema, temperature = 0, maxOutputTokens = 2048 } = params
 
   let lastError: Error | null = null
 
