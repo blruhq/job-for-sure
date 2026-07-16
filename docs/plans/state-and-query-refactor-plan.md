@@ -585,6 +585,21 @@ Refactor the components that read data from the store to use the new hooks:
 ### 9D: Cover letters (`src/app/[locale]/(app)/cover-letter/page.tsx`)
 - Point to custom query / API client methods instead of manual `fetch` calls.
 
+### 9E: Admin dashboard (`src/app/[locale]/(app)/admin/page.tsx`)
+- **Import** `eq` from `drizzle-orm` on line 7:
+  ```typescript
+  import { count, desc, sql, eq } from 'drizzle-orm'
+  ```
+- **Delete** the import of `tailoredResumes` from `~/lib/schema` on line 2.
+- **Change** `resumeCount` (line 21) to count only base resumes:
+  ```typescript
+  const [resumeCount] = await db.select({ total: count() }).from(resumes).where(eq(resumes.isBase, true))
+  ```
+- **Change** `tailoredCount` (line 22) to count tailored resumes from the resumes table:
+  ```typescript
+  const [tailoredCount] = await db.select({ total: count() }).from(resumes).where(eq(resumes.isBase, false))
+  ```
+
 ---
 
 ## Step 10: Verify Build & Compile
