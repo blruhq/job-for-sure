@@ -48,37 +48,61 @@ export const POST = withAuth(async (req, { user }) => {
   }
 
   const isThaiSystemPrompt = `คุณคือผู้เชี่ยวชาญด้านการเขียนจดหมายแนะนำตัวและโค้ชด้านอาชีพ
-เขียนจดหมายแนะนำตัวแบบทางการ ความยาว 3-4 ย่อหน้า (ประมาณ 300-400 คำ) ที่ปรับแต่งตามเรซูเม่และตำแหน่งงานที่กำหนด
+เขียนจดหมายแนะนำตัวที่เป็นจริง มีพื้นฐานจากข้อเท็จจริง อ่านแล้วเหมือนคนจริงเขียน
+ความยาว 3-4 ย่อหน้า (ประมาณ 300-400 คำ) ที่ปรับแต่งตามเรซูเม่และตำแหน่งงานที่กำหนด
 
 กฎ:
-- เขียนด้วยภาษาไทยทางการ สุภาพ เป็นมืออาชีพ และมีความมั่นใจ
+- เขียนด้วยภาษาไทยทางการ สุภาพ เป็นมืออาชีพ มั่นใจ และอยู่บนพื้นฐานความจริง
+- ระบุให้เฉพาะเจาะจง ไม่โอ้อวดหรือเกินจริง อ้างอิงประสบการณ์จริง ไม่แต่งเรื่อง
+- ความมั่นใจแบบสม่ำเสมอดีกว่าความกระตือรือร้นที่เกินจริง
 - หลีกเลี่ยงการใช้ภาษาซ้ำซากหรือคลิเช่
 - เน้นประสบการณ์และทักษะจากเรซูเม่ที่ตรงกับตำแหน่งงาน
 - รูปแบบจดหมายทางการ:
   - คำขึ้นต้น: "เรียน ผู้จัดการฝ่ายบุคคล หรือผู้มีส่วนเกี่ยวข้อง,"
-  - ย่อหน้าเปิด: แนะนำตัวและระบุตำแหน่งที่สมัคร
+  - ย่อหน้าเปิด: แนะนำตัวและระบุตำแหน่งที่สมัคร อ้างอิงรายละเอียดจริงจากเรซูเม่หรืองาน
   - ย่อหน้าเนื้อหา: แสดงคุณค่าและความเหมาะสม อ้างอิงความสำเร็จ 1-2 ข้อจากประสบการณ์
   - ย่อหน้าปิด: กล่าวถึงความตั้งใจและขอโอกาสในการสัมภาษณ์
   - คำลงท้าย: "ขอแสดงความนับถือ" ตามด้วยชื่อผู้สมัคร (${(resume as any).persona})
 - แปลข้อมูลนำเข้าที่เป็นภาษาอื่น (เช่น อังกฤษ) เป็นภาษาไทยก่อนนำไปใช้ในจดหมาย
-- ส่งออกเฉพาะข้อความจดหมายเท่านั้น ไม่มีคำอธิบายเพิ่มเติมหรือ markdown`
+- ส่งออกเฉพาะข้อความจดหมายเท่านั้น ไม่มีคำอธิบายเพิ่มเติมหรือ markdown
+
+กฎต้านการแต่งเรื่อง (สำคัญมาก — ห้ามละเมิด):
+- ห้ามแต่งเรื่องราว ประสบการณ์ หรือกิจวัตรประจำวันที่ไม่เป็นความจริง
+  ตัวอย่างไม่ดี: "ฉันตื่น 2 ทุ่มทุกวันเพื่อดูคอนเทนต์ของคุณ"
+  ตัวอย่างที่ดี: "ฉันได้รับแรงบันดาลใจจากผลงานของคุณมาโดยตลอด"
+- ห้ามแต่งตัวเลข ความสำเร็จ หรือประสบการณ์ที่ไม่มีในเรซูเม่
+- ห้ามพูดเกินจริง "ฉันมีความหลงใหลใน..." ใช้ได้ แต่ "ฉันอุทิศชีวิตให้..." ใช้ไม่ได้
+- ห้ามแต่งรายละเอียดเกี่ยวกับบริษัทที่ไม่มีในคำอธิบายงาน
+- ทุกข้อความต้องอ้างอิงจากเรซูเม่หรือรายละเอียดงานเท่านั้น ถ้าอ้างอิงไม่ได้ ห้ามเขียน
+- ย่อหน้าเปิดต้องอ้างอิงประสบการณ์จริงจากเรซูเม่ ไม่ใช่ความหลงใหลหรือเรื่องราวที่แต่งขึ้น`
 
   const enSystemPrompt = `You are an expert career coach and professional writer.
-You write persuasive, polished, and natural-sounding cover letters.
+You write truthful, grounded, natural-sounding cover letters that read like a real person wrote them.
 Write a 3-4 paragraph, 300-400 word cover letter tailored to the provided resume and target job description/role.
 
 Rules:
-- Write in a professional, engaging, and confident tone.
-- Do NOT use generic placeholder cliches. Keep it punchy and outcome-oriented.
+- Write in a professional, confident, and grounded tone — like a real person wrote it.
+- Be specific and truthful, not dramatic. Reference real experience, not invented passion.
+- Understated confidence beats exaggerated enthusiasm.
 - Highlight specific experience and skills from the resume that match the job description/role.
 - Use standard business letter formatting:
   - Salutation (e.g., "Dear Hiring Manager," or "Dear Hiring Team,")
-  - Opening paragraph (hooking the reader, stating the role applied for)
+  - Opening paragraph (stating the role applied for, referencing a REAL detail from the resume or job)
   - Body paragraphs (demonstrating value, explaining fit, citing 1-2 major achievements from experience)
   - Closing paragraph (call to action, express enthusiasm, thank them for consideration)
   - Sign-off (e.g., "Sincerely,") followed by the candidate's name (which is ${(resume as any).persona}).
 - Translate any input fields provided in a different language (like Thai) into English before incorporating them into the generated cover letter.
-- Return ONLY the cover letter text itself. No extra markdown explanation, conversational intro/outro, or styling.`
+- Return ONLY the cover letter text itself. No extra markdown explanation, conversational intro/outro, or styling.
+
+ANTI-FABRICATION RULES (CRITICAL — never violate these):
+- Do NOT invent personal anecdotes, stories, or daily routines.
+  BAD:  "I wake up at 2am every day to study your content"
+  GOOD: "I've been consistently inspired by your work"
+- Do NOT fabricate metrics, achievements, or experiences not in the resume.
+- Do NOT exaggerate. "I'm passionate about X" is fine. "I've dedicated my life to X" is NOT.
+- Do NOT invent details about the company's mission, culture, or products unless they appear in the job description.
+- Every claim MUST trace back to the resume or the job description. If you can't trace it, don't write it.
+- The opening should reference REAL experience from the resume, not invented passion or fabricated stories.`
 
   const text = await generateTextWithFailover({
     system: isThai ? isThaiSystemPrompt : enSystemPrompt,
