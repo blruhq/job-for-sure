@@ -1,7 +1,7 @@
 'use client'
 
-import { useState, useMemo, useEffect, useCallback } from 'react'
-import { Wand2, Upload, FileText, ArrowRight, Sparkles, RefreshCw, CheckCircle2, AlertTriangle, AlertCircle } from 'lucide-react'
+import { useState, useEffect, useCallback, useRef } from 'react'
+import { Wand2, Upload, FileText, ArrowRight, Sparkles, RefreshCw, CheckCircle2, AlertCircle } from 'lucide-react'
 import { useRouter } from '~/i18n/routing'
 import { cn } from '~/lib/utils'
 import { useActiveResume } from '~/hooks/use-active-resume'
@@ -37,6 +37,8 @@ export function AtsView() {
   const [analysisResult, setAnalysisResult] = useState<AnalysisResult | null>(null)
   const [tailoringLoading, setTailoringLoading] = useState(false)
   const [hasAnalysedJd, setHasAnalysedJd] = useState(false)
+  const tailorCompanyRef = useRef('Target Company')
+  const tailorRoleRef = useRef('Target Role')
 
   const resume = activeResume
 
@@ -75,9 +77,9 @@ export function AtsView() {
       sessionStorage.removeItem('jfs_pending_ats_company')
       sessionStorage.removeItem('jfs_pending_ats_role')
 
-      const comp = pendingCompany || 'Target Company'
-      const role = pendingRole || 'Target Role'
-      notify({ message: `Loaded details for ${role} at ${comp}. Click "Analyze Match" to start.`, type: 'info' })
+      tailorCompanyRef.current = pendingCompany || 'Target Company'
+      tailorRoleRef.current = pendingRole || 'Target Role'
+      notify({ message: `Loaded details for ${tailorRoleRef.current} at ${tailorCompanyRef.current}. Click "Analyze Match" to start.`, type: 'info' })
     }
   }, [])
 
@@ -92,8 +94,8 @@ export function AtsView() {
         body: JSON.stringify({
           resume,
           job: {
-            title: 'Target Position',
-            company: 'Target Company',
+            title: tailorRoleRef.current,
+            company: tailorCompanyRef.current,
             description: jdText,
           },
         }),
@@ -126,8 +128,8 @@ export function AtsView() {
         changes: changes,
         accepted: acceptedIds,
         jobContext: {
-          company: 'Target Company',
-          title: 'Target Position',
+          company: tailorCompanyRef.current,
+          title: tailorRoleRef.current,
         },
       })
 
@@ -205,7 +207,11 @@ export function AtsView() {
         <div>
           <h1 className="text-lg font-semibold">ATS Optimizer</h1>
           <div className="text-xs text-muted-foreground">
-            {hasAnalysedJd ? 'Real-time job matching and keyword analysis' : 'Baseline resume audit and formatting report'}
+            {analysisResult
+              ? hasAnalysedJd
+                ? 'Real-time job matching and keyword analysis'
+                : 'Baseline resume health report'
+              : 'Paste a job description and analyze to get started'}
           </div>
         </div>
 
@@ -239,7 +245,7 @@ export function AtsView() {
             <label className="label-mono block">{t('jobDescription')}</label>
             {jdText && (
               <button onClick={handleClearJd} className="text-[10px] text-destructive hover:underline cursor-pointer">
-                Clear & Show General Health
+                Clear & Reset
               </button>
             )}
           </div>
