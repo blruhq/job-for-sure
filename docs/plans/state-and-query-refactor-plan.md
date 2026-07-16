@@ -652,6 +652,40 @@ Refactor the components that read data from the store to use the new hooks:
   fetchAnalysis(jdText, updatedResume)
   ```
 
+### 9I: Mock Interview Dashboard (`src/app/components/interview/interview-view.tsx`)
+- **Replace** `useAppStore()` with `useResumes()` and `useUIStore()`.
+- **Retrieve** resumes and active resume ID:
+  ```typescript
+  const { data: resumesList } = useResumes()
+  const resumes = resumesList || []
+  const activeResumeId = useUIStore((s) => s.activeResumeId)
+  ```
+
+### 9J: Mock Interview Setup (`src/app/components/interview/interview-setup.tsx`)
+- **Replace** `useAppStore()` with `useResumes()`, `useUIStore()`, and `useApplications()`.
+- **Retrieve** resumes, active resume ID, and applications board:
+  ```typescript
+  const { data: resumesList } = useResumes()
+  const resumes = resumesList || []
+  const activeResumeId = useUIStore((s) => s.activeResumeId)
+  const setActiveResumeId = useUIStore((s) => s.setActiveResumeId)
+  const { data: applicationsBoard } = useApplications()
+  const applications = applicationsBoard || { bookmark: [], applied: [], interviewing: [], offers: [], rejected: [] }
+  ```
+
+### 9K: Job Search Panel (`src/app/components/resume/job-search-panel.tsx`)
+- **Replace** `useAppStore()` with `useUIStore()`, `useApplications()`, mutations `useCreateApplication()`, `useDeleteApplication()`, and `useCreateResume()`.
+- **Retrieve** applications board:
+  ```typescript
+  const { data: applicationsBoard } = useApplications()
+  const applications = applicationsBoard || { bookmark: [], applied: [], interviewing: [], offers: [], rejected: [] }
+  ```
+- **Replace** `isBookmarked(key)` helper inline:
+  ```typescript
+  const isBookmarked = (key: string) => applications.bookmark.some((j) => j.key === key)
+  ```
+- **Connect** mutations for bookmarking (`useCreateApplication()`), removing bookmark (`useDeleteApplication()`), and adding resumes (`useCreateResume()`).
+
 ---
 
 ## Step 10: Verify Build & Compile
