@@ -49,7 +49,7 @@ export const contacts = pgTable("contacts", {
   index("contacts_company_idx").on(table.company),
 ])
 
-export const contactsRelations = relations(contacts, ({ one, belongsTo }) => ({
+export const contactsRelations = relations(contacts, ({ one }) => ({
   user: one(user, { fields: [contacts.userId], references: [user.id] }),
   application: one(applications, { fields: [contacts.applicationId], references: [applications.id] }),
 }))

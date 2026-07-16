@@ -19,7 +19,11 @@ There is currently a `src/app/components/resume/job-detail-modal.tsx` that opens
 When building the unified `JobDetailPanel`, **DELETE `job-detail-modal.tsx`** and replace ALL usages with the new panel. The new panel is a strict superset — everything the modal does, the panel does better.
 
 Files that currently import `JobDetailModal`:
-- `src/app/components/chat/job-preview.tsx` (line 14: `import { JobDetailModal } from '~/components/resume/job-detail-modal'`)
+- `src/app/components/chat/job-preview.tsx` (line 14)
+- `src/app/components/resume/job-search-panel.tsx` (line 18)
+
+> **BOTH files must be updated** to replace JobDetailModal with JobDetailPanel.
+> Do NOT delete job-detail-modal.tsx until BOTH imports are replaced.
 
 ## Architecture
 
@@ -143,21 +147,14 @@ export function JobNotes({ applicationId, initialNotes }: { applicationId: strin
 
 ## Files to Edit
 
-### 4. `src/app/api/applications/[id]/route.ts` (EDIT — add PATCH handler)
+### 4. `src/app/api/applications/[id]/route.ts` (NO CHANGE NEEDED)
 
-Add a PATCH handler for updating individual application fields (notes, status):
-
-```typescript
-export const PATCH = withAuth(async (req, { user }) => {
-  const body = await req.json()
-  const { searchParams } = new URL(req.url)
-  const id = searchParams.get('id') // or extract from path
-
-  // Validate ownership
-  // Update fields: notes, status, appliedAt
-  // Return updated record
-})
-```
+> The PATCH handler **ALREADY EXISTS** and handles `{ status, position, notes }`.
+> It also auto-sets `appliedAt` when status becomes 'applied'.
+> The `PatchApplicationSchema` already validates the input.
+>
+> **Do NOT add a new PATCH handler.** Just use the existing one from the
+> Notes sub-component and status dropdown.
 
 ### 5. `src/app/components/pipeline/applications-view.tsx` (EDIT — add panel open on card click)
 
@@ -179,9 +176,52 @@ onClick={() => setSelectedJob(job)}
 )}
 ```
 
-### 6. `src/app/components/resume/job-search-panel.tsx` (EDIT — add panel open on card click)
+### 6. `src/app/components/resume/job-search-panel.tsx` (EDIT — replace JobDetailModal with JobDetailPanel)
 
-Same pattern — clicking a job in search results opens the panel with `mode="search"`.
+> This file ALSO imports JobDetailModal (line 18).
+> Same replacement pattern as step 7 below.
+
+```tsx
+// DELETE this import (line 18):
+import { JobDetailModal } from './job-detail-modal'
+
+// ADD this import:
+import { JobDetailPanel } from '~/components/pipeline/job-detail-panel'
+
+// OLD state (DELETE):
+const [modalJob, setModalJob] = useState<ScoredJob | null>(null)
+const [modalOpen, setModalOpen] = useState(false)
+
+// NEW state (ADD):
+const [panelJob, setPanelJob] = useState<PipelineJob | null>(null)
+
+// OLD click handler (line ~466, DELETE):
+function handleOpenDetail(job: ScoredJob) {
+  setModalJob(job)
+  setModalOpen(true)
+}
+
+// NEW click handler (ADD):
+function handleOpenDetail(job: ScoredJob) {
+  setPanelJob(scoredJobToPipelineJob(job, resume.skills || []))
+}
+
+// OLD render (line ~784, DELETE):
+{modalOpen && <JobDetailModal ... />}
+
+// NEW render (ADD):
+{panelJob && (
+  <JobDetailPanel
+    job={panelJob}
+    mode="search"
+    onClose={() => setPanelJob(null)}
+  />
+)}
+```
+
+Add the same `scoredJobToPipelineJob` converter function (from step 7 below)
+to this file, OR extract it to a shared utility file like
+`src/app/lib/job-utils.ts` and import from both places.
 
 ### 7. `src/app/components/chat/job-preview.tsx` (EDIT — replace JobDetailModal with JobDetailPanel)
 
@@ -229,13 +269,22 @@ onClick={() => { setPanelJob(scoredJobToPipelineJob(job)) }}
 ```
 
 **Step 4:** Add a converter function (ScoredJob → PipelineJob):
+
+> **WARNING:** ScoredJob does NOT have `remote` or `missingSkills` fields.
+> Use `locationType` (not `remote`) and compute missing skills from the
+> user's resume skills minus matchedSkills.
+
 ```tsx
 // ScoredJob (from job search) and PipelineJob (from tracker) have different shapes.
 // Convert before passing to the panel:
-function scoredJobToPipelineJob(job: ScoredJob): PipelineJob {
+function scoredJobToPipelineJob(job: ScoredJob, userSkills: string[]): PipelineJob {
+  // Compute missing skills (ScoredJob has matchedSkills but NOT missingSkills)
+  const matchedSet = new Set(job.matchedSkills.map(s => s.toLowerCase()))
+  const missing = userSkills.filter(s => !matchedSet.has(s.toLowerCase()))
+
   return {
     key: job.id,
-    logo: '',
+    logo: job.companyLogo || '',
     color: '',
     company: job.company,
     title: job.title,
@@ -250,14 +299,17 @@ function scoredJobToPipelineJob(job: ScoredJob): PipelineJob {
     jobData: {
       description: job.description || '',
       matchedSkills: job.matchedSkills || [],
-      missingSkills: job.missingSkills || [],
+      missingSkills: missing,
       source: job.source,
-      remote: job.remote,
+      locationType: job.locationType,    // NOT job.remote — field is locationType
       tags: job.tags,
+      country: job.country,
     },
   }
 }
 ```
+
+> Pass `resume.skills` as the second arg when calling: `scoredJobToPipelineJob(job, resume.skills || [])`
 
 ### 8. `src/app/components/resume/job-detail-modal.tsx` (DELETE)
 
@@ -290,16 +342,26 @@ async function handleTailor() {
 ```
 
 ### Cover Letter button:
+
+> **WARNING:** The cover letter page does NOT read URL query params.
+> Use `sessionStorage` instead — this is the SAME pattern the existing
+> `job-detail-modal.tsx` already uses (lines 141-153).
+
 ```tsx
 function handleCoverLetter() {
-  const params = new URLSearchParams({
-    company: job.company,
-    role: job.title,
-    jd: job.jobData?.description || '',
-  })
-  router.push(`/cover-letter?${params}`)
+  if (typeof window !== 'undefined') {
+    sessionStorage.setItem('jfs_pending_ats_jd', job.jobData?.description || '')
+    sessionStorage.setItem('jfs_pending_ats_company', job.company)
+    sessionStorage.setItem('jfs_pending_ats_role', job.title)
+  }
+  router.push(`/resume/${activeResumeId}?action=cover-letter`)
 }
 ```
+
+> The resume detail page already reads these sessionStorage keys.
+> If you want the cover letter standalone page to also read them,
+> add `useSearchParams` + `Suspense` to that page (mirror the interview
+> page pattern). But the resume page path works without changes.
 
 ### Interview button:
 ```tsx

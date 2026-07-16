@@ -174,11 +174,23 @@ ${jdText?.substring(0, 3000) || 'Not available'}
 Provide your analysis as a structured overview.`
 
   // ── Call AI ──
-  const result = await generateObjectWithFailover({
-    schema: SmartOverviewSchema,
-    systemPrompt,
-    userPrompt,
-  })
+  // WARNING: generateObjectWithFailover uses { system, prompt, schema }
+  // NOT { systemPrompt, userPrompt, schema }
+  let result
+  try {
+    result = await generateObjectWithFailover({
+      schema: SmartOverviewSchema,
+      system: systemPrompt,
+      prompt: userPrompt,
+    })
+  } catch (err) {
+    // AI failed (both primary + fallback down, or invalid output)
+    console.error('[smart-overview] AI generation failed:', err)
+    return NextResponse.json(
+      { error: 'Failed to generate overview. Please try again.' },
+      { status: 503 }
+    )
+  }
 
   // ── Cache for 7 days ──
   try {
@@ -228,7 +240,7 @@ interface SmartOverviewProps {
   applicationId?: string
 }
 
-type OverviewState = 'idle' | 'loading' | 'complete'
+type OverviewState = 'idle' | 'loading' | 'complete' | 'error'
 
 export function SmartOverview(props: SmartOverviewProps) {
   const [state, setState] = useState<OverviewState>('idle')
@@ -258,9 +270,26 @@ export function SmartOverview(props: SmartOverviewProps) {
       setOverview(data)
       setState('complete')
     } catch {
-      setState('idle')
-      // show error toast
+      setState('error')
     }
+  }
+
+  // ── STATE 0: Error (AI failed) ──
+  if (state === 'error') {
+    return (
+      <div className="rounded-lg border border-destructive/30 bg-danger-soft/20 p-4">
+        <p className="text-xs text-foreground mb-2">
+          ⚠️ Couldn't generate overview. The AI may be busy.
+        </p>
+        <button
+          onClick={generate}
+          className="flex items-center gap-1.5 text-xs font-medium text-primary hover:underline"
+        >
+          <RefreshCw size={12} />
+          Try again
+        </button>
+      </div>
+    )
   }
 
   // ── STATE 1: Not generated yet ──

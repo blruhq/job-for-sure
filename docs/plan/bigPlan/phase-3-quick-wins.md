@@ -92,7 +92,7 @@ export const POST = withAuth(async (req, { user }) => {
 
   const result = await generateObjectWithFailover({
     schema: ReviewSchema,
-    systemPrompt: `You are an expert resume reviewer. Analyze the resume and provide:
+    system: `You are an expert resume reviewer. Analyze the resume and provide:
     1. Overall quality score (0-100)
     2. Line-by-line issues with severity (critical/warning/suggestion)
     3. Strengths to keep
@@ -107,7 +107,7 @@ export const POST = withAuth(async (req, { user }) => {
     
     Be direct and specific. Reference the exact text that needs improvement.`,
 
-    userPrompt: `Review this resume:\n\n${JSON.stringify(resumeData, null, 2)}`,
+    prompt: `Review this resume:\n\n${JSON.stringify(resumeData, null, 2)}`,
   })
 
   return NextResponse.json(result)
