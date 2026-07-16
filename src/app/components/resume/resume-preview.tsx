@@ -14,12 +14,14 @@ export const ResumePreview = memo(function ResumePreview({ resume }: { resume: R
   const abortRef = useRef<AbortController | null>(null)
 
   const generatePreview = useCallback(async (resumeData: Resume, gen: number) => {
+    console.log('[ResumePreview] generatePreview called, gen:', gen)
     // Cancel any in-flight request
     if (abortRef.current) abortRef.current.abort()
     const controller = new AbortController()
     abortRef.current = controller
 
     try {
+      console.log('[ResumePreview] Fetching /api/preview-pdf...')
       const resp = await fetch('/api/preview-pdf', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -27,10 +29,12 @@ export const ResumePreview = memo(function ResumePreview({ resume }: { resume: R
         signal: controller.signal,
       })
 
+      console.log('[ResumePreview] Response status:', resp.status)
       if (gen !== genRef.current) return
       if (!resp.ok) throw new Error(`Preview failed: ${resp.status}`)
 
       const blob = await resp.blob()
+      console.log('[ResumePreview] Blob size:', blob.size)
       if (gen !== genRef.current) return
 
       // Revoke previous blob URL
@@ -61,6 +65,7 @@ export const ResumePreview = memo(function ResumePreview({ resume }: { resume: R
     // First mount: resumeRef is null → always proceed
     // Subsequent: skip if same object reference
     if (resumeRef.current !== null && resume === resumeRef.current) return
+    console.log('[ResumePreview] Effect fired, resume changed. resumeRef was:', resumeRef.current === null ? 'null (first mount)' : 'object')
     resumeRef.current = resume
 
     const thisGen = ++genRef.current

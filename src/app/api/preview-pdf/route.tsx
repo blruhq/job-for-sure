@@ -11,22 +11,28 @@ export const maxDuration = 10
 // POST /api/preview-pdf
 // Accepts resume data in the body, returns a PDF stream for inline display.
 // This keeps @react-pdf/renderer on the server (~2MB savings on client bundle).
-export const POST = withAuth(async (request, { user: _user }) => {
+export const POST = withAuth(async (request, { user }) => {
+  console.log('[preview-pdf] Request from user:', user.id)
+
   let body
   try {
     body = await request.json()
   } catch {
+    console.error('[preview-pdf] Invalid JSON body')
     return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 })
   }
 
   // Validate the resume data
   const result = ResumeDataSchema.safeParse(body?.resume)
   if (!result.success) {
+    console.error('[preview-pdf] Validation failed:', result.error.issues.slice(0, 3))
     return NextResponse.json(
       { error: 'Invalid resume data', details: result.error.issues.slice(0, 3) },
       { status: 400 },
     )
   }
+
+  console.log('[preview-pdf] Validated, generating PDF...')
 
   // Ensure fonts are registered (idempotent)
   registerFonts()
@@ -41,6 +47,8 @@ export const POST = withAuth(async (request, { user: _user }) => {
       chunks.push(chunk)
     }
     const buffer = Buffer.concat(chunks)
+
+    console.log('[preview-pdf] Generated, size:', buffer.length)
 
     return new NextResponse(buffer, {
       headers: {
