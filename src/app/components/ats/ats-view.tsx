@@ -36,7 +36,6 @@ export function AtsView() {
   const [analysisLoading, setAnalysisLoading] = useState(false)
   const [analysisResult, setAnalysisResult] = useState<AnalysisResult | null>(null)
   const [tailoringLoading, setTailoringLoading] = useState(false)
-  const [pendingTrigger, setPendingTrigger] = useState(false)
   const [hasAnalysedJd, setHasAnalysedJd] = useState(false)
 
   const resume = activeResume
@@ -63,14 +62,7 @@ export function AtsView() {
     }
   }, [resume])
 
-  // ── Auto-run General Health Audit on mount / resume change ──
-  useEffect(() => {
-    if (activeResumeId && !jdText && !pendingTrigger) {
-      fetchAnalysis('')
-    }
-  }, [activeResumeId, fetchAnalysis, pendingTrigger]) // eslint-disable-line react-hooks/exhaustive-deps
-
-  // ── Mount check for sessionStorage job context ──
+  // ── Mount check for sessionStorage job context (pre-fill only, no auto-run) ──
   useEffect(() => {
     if (typeof window === 'undefined') return
     const pendingJd = sessionStorage.getItem('jfs_pending_ats_jd')
@@ -79,24 +71,15 @@ export function AtsView() {
 
     if (pendingJd) {
       setJdText(pendingJd)
-      setPendingTrigger(true)
       sessionStorage.removeItem('jfs_pending_ats_jd')
       sessionStorage.removeItem('jfs_pending_ats_company')
       sessionStorage.removeItem('jfs_pending_ats_role')
-      
+
       const comp = pendingCompany || 'Target Company'
       const role = pendingRole || 'Target Role'
-      notify({ message: `Loaded details for ${role} at ${comp}`, type: 'info' })
+      notify({ message: `Loaded details for ${role} at ${comp}. Click "Analyze Match" to start.`, type: 'info' })
     }
   }, [])
-
-  // ── Trigger analysis when pending JD is loaded ──
-  useEffect(() => {
-    if (activeResumeId && pendingTrigger && jdText) {
-      setPendingTrigger(false)
-      fetchAnalysis(jdText)
-    }
-  }, [activeResumeId, pendingTrigger, jdText, fetchAnalysis])
 
   // ── Tailor Resume using API ──
   const handleTailor = async () => {
@@ -158,12 +141,11 @@ export function AtsView() {
     }
   }
 
-  // ── Clear JD and restore General Health Audit ──
+  // ── Clear JD and reset analysis ──
   const handleClearJd = () => {
     setJdText('')
     setHasAnalysedJd(false)
     setAnalysisResult(null)
-    fetchAnalysis('')
   }
 
   const score = analysisResult?.score || 0
@@ -178,13 +160,13 @@ export function AtsView() {
     ? hasAnalysedJd
       ? score >= 75 ? 'Strong Match' : score >= 50 ? 'Partial Match' : 'Weak Match'
       : score >= 75 ? 'Excellent Health' : score >= 50 ? 'Good Baseline' : 'Needs Optimization'
-    : 'No Data'
+    : 'Awaiting Analysis'
 
   const gaugeDesc = analysisResult
     ? hasAnalysedJd
       ? score >= 75 ? 'Your resume strongly aligns with this job description.' : score >= 50 ? 'Some requirements are missing. Review gaps below.' : 'Significant gap. Tailor your resume for better odds.'
       : score >= 75 ? 'Your resume format and impact language are highly competitive.' : score >= 50 ? 'Good baseline score, but we found a few critical improvements.' : 'High priority issues detected in format or language.'
-    : 'Select a profile to run a baseline general health report.'
+    : 'Paste a job description and click "Analyze Match" to see your score.'
 
   const injectKeywords = () => {
     if (!resume || !analysisResult) {
@@ -268,18 +250,33 @@ export function AtsView() {
             placeholder="Paste the job description you want to match against (optional)"
             className="w-full resize-y rounded-sm border border-border bg-background p-2.5 text-xs outline-none focus:border-primary"
           />
-          <button
-            onClick={() => fetchAnalysis(jdText)}
-            disabled={analysisLoading || !resume}
-            className="mt-2 flex w-full cursor-pointer items-center justify-center gap-1.5 rounded-sm bg-primary py-2 text-xs font-medium text-primary-foreground transition-opacity hover:opacity-90 disabled:opacity-50"
-          >
-            {analysisLoading ? (
-              <RefreshCw size={13} className="animate-spin" />
-            ) : (
-              <Wand2 size={13} />
-            )}
-            {jdText.trim() ? 'Analyze Match' : 'Run General Health Audit'}
-          </button>
+          <div className="mt-2 flex gap-2">
+            <button
+              onClick={() => fetchAnalysis(jdText)}
+              disabled={analysisLoading || !resume || !jdText.trim()}
+              className="flex flex-1 cursor-pointer items-center justify-center gap-1.5 rounded-sm bg-primary py-2 text-xs font-medium text-primary-foreground transition-opacity hover:opacity-90 disabled:opacity-40"
+            >
+              {analysisLoading ? (
+                <RefreshCw size={13} className="animate-spin" />
+              ) : (
+                <Wand2 size={13} />
+              )}
+              Analyze Match
+            </button>
+            <button
+              onClick={() => fetchAnalysis('')}
+              disabled={analysisLoading || !resume}
+              className="flex cursor-pointer items-center justify-center gap-1.5 rounded-sm border border-border bg-card px-3 py-2 text-xs text-muted-foreground transition-colors hover:bg-background disabled:opacity-40"
+              title="Run a general resume health check without a job description"
+            >
+              Health Check
+            </button>
+          </div>
+          {!jdText.trim() && (
+            <p className="mt-1.5 text-[10px] text-muted-foreground">
+              Paste a job description above for a tailored match score, or click "Health Check" for a general audit.
+            </p>
+          )}
         </div>
 
         {/* Gauge / Score Output */}
