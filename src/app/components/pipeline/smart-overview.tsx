@@ -168,6 +168,7 @@ function OverviewContent({
 }) {
   // Extract city from raw location (e.g. "Bang Rak, Bangkok, Thailand" → "Bangkok")
   const city = Links.extractCity(jobLocation)
+  const countryCode = Links.detectCountry(jobLocation)
 
   return (
     <div className="rounded-lg border border-primary/20 bg-accent-soft/30 p-4 space-y-4">
@@ -256,7 +257,7 @@ function OverviewContent({
           {overview.salaryCheck.note && (
             <div className="text-xs text-muted-foreground italic">{overview.salaryCheck.note}</div>
           )}
-          <VerifyLink href={Links.costOfLivingUrl(city)} label="Verify on Numbeo" />
+          <VerifyLink href={Links.costOfLivingUrl(city, countryCode)} label="Verify on Numbeo" />
         </Section>
       )}
 

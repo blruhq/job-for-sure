@@ -127,6 +127,7 @@ export function JobDetailPanel({
   // ── Structured location (prefer from source, fall back to extraction) ──
   const city = job.city || (job.jobData?.city as string) || extractCity(job.loc)
   const district = job.district || (job.jobData?.district as string) || extractDistrict(job.loc)
+  const countryCode = detectCountry(job.loc) || (job.jobData?.country as string) || ''
 
   // ── Status change handler (tracker mode) ──
   const handleStatusChange = async (newStatus: string) => {
@@ -325,7 +326,7 @@ export function JobDetailPanel({
             homeLocation={homeLocation}
             city={city}
             district={district}
-            countryCode={detectCountry(job.loc)}
+            countryCode={countryCode}
             onHomeLocationChange={async (location) => {
               setHomeLocation(location)
               try {
@@ -339,7 +340,7 @@ export function JobDetailPanel({
           />
           <CompanyIntelligence
             company={job.company}
-            countryCode={detectCountry(job.loc)}
+            countryCode={countryCode}
           />
 
           {/* Matched Skills */}

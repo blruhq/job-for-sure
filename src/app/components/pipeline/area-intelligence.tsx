@@ -167,8 +167,8 @@ export function AreaIntelligence({ job, homeLocation, city, district, countryCod
 
       {/* MONEY */}
       <Section label="Money">
-        <LinkButton href={Links.costOfLivingUrl(city)} icon={<DollarSign size={14} />} label="Cost of Living" />
-        <LinkButton href={Links.salaryCalculatorUrl(city)} icon={<DollarSign size={14} />} label="Salary Check" />
+        <LinkButton href={Links.costOfLivingUrl(city, countryCode)} icon={<DollarSign size={14} />} label="Cost of Living" />
+        <LinkButton href={Links.salaryCalculatorUrl(city, countryCode)} icon={<DollarSign size={14} />} label="Salary Check" />
       </Section>
 
       {/* HOUSING */}
@@ -191,9 +191,9 @@ export function AreaIntelligence({ job, homeLocation, city, district, countryCod
           <div className="flex flex-wrap gap-1.5">
             <LinkButton href={Links.agodaUrl(city)} icon={<Hotel size={14} />} label="Temporary Stay" />
             {visa && <LinkButton href={visa.url} icon={<Shield size={14} />} label={visa.name} />}
-            <LinkButton href={Links.crimeUrl(city)} icon={<Shield size={14} />} label="Safety / Crime" />
-            <LinkButton href={Links.qualityOfLifeUrl(city)} icon={<Star size={14} />} label="Quality of Life" />
-            <LinkButton href={Links.healthcareUrl(city)} icon={<HeartPulse size={14} />} label="Healthcare" />
+            <LinkButton href={Links.crimeUrl(city, countryCode)} icon={<Shield size={14} />} label="Safety / Crime" />
+            <LinkButton href={Links.qualityOfLifeUrl(city, countryCode)} icon={<Star size={14} />} label="Quality of Life" />
+            <LinkButton href={Links.healthcareUrl(city, countryCode)} icon={<HeartPulse size={14} />} label="Healthcare" />
             <LinkButton href={Links.restaurantsUrl(district ? `${district}, ${city}` : city)} icon={<UtensilsCrossed size={14} />} label="Restaurants Nearby" />
           </div>
         </div>
