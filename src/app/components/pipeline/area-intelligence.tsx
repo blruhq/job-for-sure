@@ -28,7 +28,7 @@ export function AreaIntelligence({ job, homeLocation, city, countryCode, onHomeL
   const visa = Links.visaUrl(countryCode)
 
   // ── Commute inline state ──
-  const [editing, setEditing] = useState(!homeLocation) // start in edit mode if no location
+  const [editing, setEditing] = useState(false)
   const [areaInput, setAreaInput] = useState(homeLocation)
   const [saving, setSaving] = useState(false)
   const [detecting, setDetecting] = useState(false)
@@ -64,18 +64,6 @@ export function AreaIntelligence({ job, homeLocation, city, countryCode, onHomeL
       setEditing(true)
     }
     setDetecting(false)
-    setSaving(false)
-  }
-
-  const handleClear = async () => {
-    setSaving(true)
-    try {
-      if (onHomeLocationChange) {
-        await onHomeLocationChange('')
-      }
-      setAreaInput('')
-      setEditing(true)
-    } catch { /* ignore */ }
     setSaving(false)
   }
 
