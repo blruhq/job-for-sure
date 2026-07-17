@@ -225,7 +225,9 @@ export function PhotoPDF({ resume }: { resume: Resume }) {
 
           {/* ── Main ── */}
           <View style={styles.main}>
-            <Text style={styles.name}>{resume.persona || 'Your Name'}</Text>
+            <Text style={resume.role ? styles.name : { ...styles.name, marginBottom: 10 }}>
+              {resume.persona || 'Your Name'}
+            </Text>
             {resume.role && <Text style={styles.role}>{resume.role}</Text>}
 
             {/* Main column dynamic sections */}

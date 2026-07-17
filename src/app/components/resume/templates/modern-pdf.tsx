@@ -155,7 +155,9 @@ export function ModernPDF({ resume }: { resume: Resume }) {
       <Page size="A4" style={styles.page}>
         {/* Header */}
         <View style={styles.headerBlock}>
-          <Text style={styles.name}>{resume.persona || 'Your Name'}</Text>
+          <Text style={resume.role ? styles.name : { ...styles.name, marginBottom: 10 }}>
+            {resume.persona || 'Your Name'}
+          </Text>
           {resume.role && <Text style={styles.role}>{resume.role}</Text>}
           <Text style={styles.contact}>
             {[resume.email, resume.phone, resume.location, resume.github].filter(Boolean).join('  ·  ')}

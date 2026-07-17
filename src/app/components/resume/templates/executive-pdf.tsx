@@ -144,7 +144,9 @@ export function ExecutivePDF({ resume }: { resume: Resume }) {
       <Page size="A4" style={styles.page}>
         {/* Dark header bar */}
         <View style={styles.headerBar}>
-          <Text style={styles.headerName}>{resume.persona || 'Your Name'}</Text>
+          <Text style={resume.role ? styles.headerName : { ...styles.headerName, marginBottom: 10 }}>
+            {resume.persona || 'Your Name'}
+          </Text>
           {resume.role && <Text style={styles.headerRole}>{resume.role}</Text>}
           <Text style={styles.headerContact}>
             {[resume.email, resume.phone, resume.location, resume.github].filter(Boolean).join('  ·  ')}
