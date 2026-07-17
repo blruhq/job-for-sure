@@ -28,7 +28,6 @@ import { useUIStore } from '~/hooks/use-ui'
 import { notify } from '~/lib/toast'
 import { ConfirmDialog } from '~/components/ui/confirm-dialog'
 import { ResumeCopilot } from '~/components/resume/resume-copilot'
-import { CoverLetterEditor } from '~/components/resume/cover-letter-editor'
 import { JobSearchPanel } from '~/components/resume/job-search-panel'
 import type { Resume, ResumeEducation, ResumeProject, ResumeExperience, ResumeCertification, ResumeLanguage, ResumeCustomSection } from '~/types/resume'
 import { TemplateGallery } from '~/components/resume/templates/template-gallery'
@@ -365,7 +364,7 @@ export function ResumeDetail({ resumeId }: { resumeId: string }) {
   const setPendingTailor = useUIStore((s) => s.setPendingTailor)
 
   const getResume = (id: string) => resumesList.find((r) => r.id === id)
-  const [tab, setTab] = useState<'jobs' | 'view' | 'editor' | 'cover-letter'>('editor')
+  const [tab, setTab] = useState<'jobs' | 'view' | 'editor'>('jobs')
   const searchParams = useSearchParams()
   const [galleryOpen, setGalleryOpen] = useState(false)
   const [showDeleteDialog, setShowDeleteDialog] = useState(false)
@@ -1137,7 +1136,7 @@ export function ResumeDetail({ resumeId }: { resumeId: string }) {
             <ArrowLeft size={12} /> Back
           </button>
           <div className="ml-3 flex gap-1 overflow-x-auto rounded-sm bg-border/30 p-0.5">
-            {(['jobs', 'view', 'editor', 'cover-letter'] as const).map((t) => (
+            {(['jobs', 'view', 'editor'] as const).map((t) => (
               <button
                 key={t}
                 onClick={() => {
@@ -1149,7 +1148,7 @@ export function ResumeDetail({ resumeId }: { resumeId: string }) {
                   tab === t ? 'bg-card text-foreground shadow-sm font-semibold' : 'text-muted-foreground hover:text-foreground',
                 )}
               >
-                {t === 'jobs' ? 'Find Jobs' : t === 'view' ? 'View Resume' : t === 'editor' ? 'Resume Editor' : 'Cover Letter'}
+                {t === 'jobs' ? 'Find Jobs' : t === 'view' ? 'View Resume' : 'Resume Editor'}
               </button>
             ))}
           </div>
@@ -1395,11 +1394,6 @@ export function ResumeDetail({ resumeId }: { resumeId: string }) {
               </div>
             </div>
           </>
-        )}
-
-        {/* ── Tab 4: Cover Letter ── */}
-        {tab === 'cover-letter' && (
-          <CoverLetterEditor resume={resume} />
         )}
       </div>
 
