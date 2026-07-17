@@ -124,8 +124,11 @@ export function JobDetailPanel({
   const country = (job.jobData?.country as string) || ''
   const postedAt = (job.jobData?.postedAt as string) || ''
 
-  // ── Structured location (prefer from source, fall back to extraction) ──
-  const city = job.city || (job.jobData?.city as string) || extractCity(job.loc)
+  // ── Structured location ──
+  // extractCity is smarter than jobData.city (which comes from parseLocation
+  // and grabs the first comma part — often a district like "Ratchathewi"
+  // instead of the actual city "Bangkok"). Use it first, structured as fallback.
+  const city = extractCity(job.loc) || (job.jobData?.city as string) || ''
   const district = job.district || (job.jobData?.district as string) || extractDistrict(job.loc)
   const countryCode = detectCountry(job.loc) || (job.jobData?.country as string) || ''
 
