@@ -67,6 +67,7 @@ export async function fetchGreenhouseCompany(
       company: companyName,
       title: job.title,
       location: locName,
+      city: parsed.city,
       country: parsed.country,
       region: parsed.region,
       locationType: detectLocationType(locName),

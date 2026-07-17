@@ -99,8 +99,19 @@ export async function fetchJSearch(
       if (job.job_highlights?.responsibilities) parts.push('Responsibilities: ' + job.job_highlights.responsibilities.join(', '))
       const description = parts.join('\n\n').slice(0, 8000)
 
-      // Location
-      const locParts = [job.job_city, job.job_state, job.job_country].filter(Boolean)
+      // Location — avoid redundant joins like "Bangkok, Bangkok City, Thailand"
+      const cityName = job.job_city?.trim() || undefined
+      const stateName = job.job_state?.trim() || undefined
+      const countryName = job.job_country?.trim() || undefined
+
+      // Build display string: skip state when it's redundant with city
+      // (e.g., city="Bangkok", state="Bangkok City" → don't include state)
+      const locParts: string[] = []
+      if (cityName) locParts.push(cityName)
+      if (stateName && normalizeForCompare(stateName) !== normalizeForCompare(cityName)) {
+        locParts.push(stateName)
+      }
+      if (countryName) locParts.push(countryName)
       const locationStr = locParts.join(', ') || job.job_location || (job.job_is_remote ? 'Remote' : 'Unspecified')
 
       // Extract structured country from job_country field
@@ -119,6 +130,7 @@ export async function fetchJSearch(
         company: job.employer_name || 'Unknown',
         title: job.job_title || 'Unknown',
         location: locationStr,
+        city: cityName,
         country: parsed.country,
         region: parsed.region,
         locationType: job.job_is_remote ? 'remote' : detectLocationType(locationStr),
@@ -153,4 +165,10 @@ function inferExperience(title: string, seniority?: string): JobResult['experien
   if (/\b(senior|lead|principal|staff|director)\b/.test(hay)) return 'senior'
   if (/\b(junior|entry|intern|graduate|associate)\b/.test(hay)) return 'entry'
   return 'mid'
+}
+
+/** Normalize a location string for comparison: lowercase, strip suffixes like "City" */
+function normalizeForCompare(s: string | undefined): string {
+  if (!s) return ''
+  return s.toLowerCase().trim().replace(/\s+(city|province|district|metropolis)$/i, '')
 }

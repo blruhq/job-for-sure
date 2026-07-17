@@ -61,6 +61,7 @@ export async function fetchAshbyCompany(
       company: companyName,
       title: job.title,
       location,
+      city: parsed.city,
       country: parsed.country,
       region: parsed.region,
       locationType: detectLocationType(location),

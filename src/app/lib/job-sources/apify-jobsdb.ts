@@ -10,6 +10,7 @@
 // ═══════════════════════════════════════════════════════════════
 
 import type { JobResult } from './types'
+import { parseLocation } from './geo'
 
 interface ApifyJobsDBJob {
   title?: string
@@ -62,6 +63,7 @@ export async function fetchApifyJobsDB(
       .map((job) => {
         const description = job.description || ''
         const jobLocation = job.location || 'Thailand'
+        const parsed = parseLocation(jobLocation)
 
         return {
           id: `jobsdb:${job.url ? extractJobId(job.url) : Math.random()}`,
@@ -69,6 +71,9 @@ export async function fetchApifyJobsDB(
           company: job.company!,
           title: job.title!,
           location: jobLocation,
+          city: parsed.city,
+          country: parsed.country,
+          region: parsed.region,
           locationType: detectLocationType(jobLocation),
           url: job.url || 'https://www.jobsdb.com/th',
           description: description.slice(0, 8000),

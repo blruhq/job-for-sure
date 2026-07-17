@@ -228,6 +228,8 @@ export async function searchJobs(params: SearchParams): Promise<SearchResult> {
       company: j.company,
       title: j.title,
       location: j.location,
+      city: j.city,
+      district: j.district,
       country: j.country,
       region: j.region,
       locationType: j.locationType,

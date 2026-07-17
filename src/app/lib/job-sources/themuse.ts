@@ -60,6 +60,7 @@ export async function fetchTheMuse(
         company: job.company?.name || 'Unknown',
         title: job.name,
         location: locations,
+        city: parsed.city,
         country: parsed.country,
         region: parsed.region,
         locationType: detectLocationType(locations),

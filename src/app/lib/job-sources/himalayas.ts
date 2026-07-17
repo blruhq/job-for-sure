@@ -65,6 +65,7 @@ export async function fetchHimalayas(
         company: job.companyName || 'Unknown',
         title: job.title || 'Unknown',
         location,
+        city: parsed.city,
         country: parsed.country,
         region: parsed.region,
         locationType: detectLocationType(location),

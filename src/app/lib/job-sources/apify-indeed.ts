@@ -10,6 +10,7 @@
 // ═══════════════════════════════════════════════════════════════
 
 import type { JobResult } from './types'
+import { parseLocation } from './geo'
 
 interface ApifyIndeedJob {
   title?: string
@@ -63,6 +64,7 @@ export async function fetchApifyIndeed(
       .map((job) => {
         const description = job.description || ''
         const jobLocation = job.location || 'Remote'
+        const parsed = parseLocation(jobLocation)
 
         return {
           id: `indeed:${job.jobId || Math.random()}`,
@@ -70,6 +72,9 @@ export async function fetchApifyIndeed(
           company: job.company!,
           title: job.title!,
           location: jobLocation,
+          city: parsed.city,
+          country: parsed.country,
+          region: parsed.region,
           locationType: job.isRemote ? 'remote' : detectLocationType(jobLocation),
           url: job.jobUrl || 'https://www.indeed.com',
           description: description.slice(0, 8000),

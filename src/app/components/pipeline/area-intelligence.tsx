@@ -16,16 +16,21 @@ interface AreaIntelligenceProps {
     title: string
   }
   homeLocation: string  // from user settings
-  city: string          // extracted city name for Numbeo
+  city: string          // structured city name for Numbeo, housing
+  district?: string     // structured district/neighborhood for Maps, commute
   countryCode: string   // detected country code for property/visa
   /** Called when user sets/changes their area. Parent saves to DB. */
   onHomeLocationChange?: (location: string) => Promise<void>
 }
 
-export function AreaIntelligence({ job, homeLocation, city, countryCode, onHomeLocationChange }: AreaIntelligenceProps) {
+export function AreaIntelligence({ job, homeLocation, city, district, countryCode, onHomeLocationChange }: AreaIntelligenceProps) {
   const [expanded, setExpanded] = useState(false)
   const propertySites = Links.getPropertySites(countryCode)
   const visa = Links.visaUrl(countryCode)
+
+  // For commute/directions: prefer district+city (more specific for routing)
+  // Fall back to full location string
+  const commuteDestination = district ? `${district}, ${city}` : job.loc
 
   // ── Commute inline state ──
   const [editing, setEditing] = useState(false)
@@ -144,8 +149,8 @@ export function AreaIntelligence({ job, homeLocation, city, countryCode, onHomeL
         // FILLED STATE — show commute links
         <>
           <Section label="Commute">
-            <LinkButton href={Links.directionsUrl(homeLocation, job.loc)} icon={<Bus size={14} />} label="Directions" />
-            <LinkButton href={Links.rome2RioUrl(homeLocation, job.loc)} icon={<DollarSign size={14} />} label="Travel Prices" />
+            <LinkButton href={Links.directionsUrl(homeLocation, commuteDestination)} icon={<Bus size={14} />} label="Directions" />
+            <LinkButton href={Links.rome2RioUrl(homeLocation, commuteDestination)} icon={<DollarSign size={14} />} label="Travel Prices" />
           </Section>
           <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground">
             <span>from: {homeLocation}</span>
@@ -189,7 +194,7 @@ export function AreaIntelligence({ job, homeLocation, city, countryCode, onHomeL
             <LinkButton href={Links.crimeUrl(city)} icon={<Shield size={14} />} label="Safety / Crime" />
             <LinkButton href={Links.qualityOfLifeUrl(city)} icon={<Star size={14} />} label="Quality of Life" />
             <LinkButton href={Links.healthcareUrl(city)} icon={<HeartPulse size={14} />} label="Healthcare" />
-            <LinkButton href={Links.restaurantsUrl(job.loc)} icon={<UtensilsCrossed size={14} />} label="Restaurants Nearby" />
+            <LinkButton href={Links.restaurantsUrl(district ? `${district}, ${city}` : city)} icon={<UtensilsCrossed size={14} />} label="Restaurants Nearby" />
           </div>
         </div>
       )}

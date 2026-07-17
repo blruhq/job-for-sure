@@ -176,12 +176,74 @@ export function glassdoorUrl(company: string): string {
 // GEO HELPERS
 // ═══════════════════════════════════════════════════════════════
 
-/** Extract city name from a location string like "Bang Rak, Bangkok, Thailand" */
+/**
+ * Normalize a single location part by stripping administrative suffixes.
+ * "Bangkok City" → "Bangkok", "Bang Rak District" → "Bang Rak"
+ */
+function normalizePart(part: string): string {
+  return part
+    .replace(/\s+(City|Province|District|Subdistrict|Metropolis|Prefecture|State)$/i, '')
+    .trim()
+}
+
+/**
+ * Extract city name from a location string.
+ *
+ * Handles common patterns:
+ *   "Bangkok, Bangkok City, Thailand"  → "Bangkok"  (dedup after suffix strip)
+ *   "Bang Rak, Bangkok, Thailand"      → "Bangkok"  (second-to-last)
+ *   "Sathon, Bangkok, Thailand"        → "Bangkok"
+ *   "Bangkok, Thailand"                 → "Bangkok"
+ *   "London, UK"                        → "London"
+ *   "New York, NY, USA"                → "New York"
+ */
 export function extractCity(location: string): string {
-  const parts = location.split(',').map(s => s.trim())
-  // Return the second-to-last part (usually the city, not the country)
-  if (parts.length >= 2) return parts[parts.length - 2]
-  return parts[0] || location
+  const parts = location.split(',').map(s => s.trim()).filter(Boolean)
+  if (parts.length === 0) return location
+
+  // Normalize each part (strip "City", "Province", etc.)
+  const normalized = parts.map(normalizePart)
+
+  // Deduplicate: remove parts that are identical (case-insensitive) to the previous part
+  // This handles "Bangkok, Bangkok, Thailand" → ["Bangkok", "Thailand"]
+  const deduped: string[] = []
+  for (const part of normalized) {
+    const prev = deduped[deduped.length - 1]
+    if (!prev || prev.toLowerCase() !== part.toLowerCase()) {
+      deduped.push(part)
+    }
+  }
+
+  if (deduped.length === 1) return deduped[0]
+
+  // Second-to-last is typically the city (last is country)
+  return deduped[deduped.length - 2] || deduped[0]
+}
+
+/**
+ * Extract district/neighborhood from a location string.
+ *
+ *   "Sathon, Bangkok, Thailand"  → "Sathon"
+ *   "Bang Rak, Bangkok, Thailand" → "Bang Rak"
+ *   "Bangkok, Thailand"           → "" (no district — just city)
+ *   "Bangkok, Bangkok City, Thailand" → "" (redundant, no district)
+ */
+export function extractDistrict(location: string): string {
+  const parts = location.split(',').map(s => s.trim()).filter(Boolean)
+  if (parts.length <= 2) return '' // need at least 3 parts for district + city + country
+
+  const normalized = parts.map(normalizePart)
+  const deduped: string[] = []
+  for (const part of normalized) {
+    const prev = deduped[deduped.length - 1]
+    if (!prev || prev.toLowerCase() !== part.toLowerCase()) {
+      deduped.push(part)
+    }
+  }
+
+  // After dedup, if we have 3+ parts, the first is the district
+  if (deduped.length >= 3) return deduped[0]
+  return ''
 }
 
 /** Detect country code from location string */

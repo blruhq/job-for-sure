@@ -35,6 +35,8 @@ function groupByStatus(apps: any[]): ApplicationBoard {
       company: app.company,
       title: app.jobTitle,
       loc: app.location || '',
+      city: app.jobData?.city || undefined,
+      district: app.jobData?.district || undefined,
       score: app.matchScore || 0,
       level: (app.level as 'high' | 'mid') || 'mid',
       time: timeLabels[app.status] || 'saved',

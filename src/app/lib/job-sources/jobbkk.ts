@@ -9,6 +9,7 @@
 
 import * as cheerio from 'cheerio'
 import type { JobResult } from './types'
+import { parseLocation } from './geo'
 import { getBroadSearchTerm } from './role-synonyms'
 
 const BASE_URL = 'https://www.jobbkk.com'
@@ -87,6 +88,7 @@ export async function fetchJobbKK(
 
       // ── Location ──
       const location = card.find('.position-location span').last().text().trim()
+      const parsed = parseLocation(location || 'Thailand')
 
       // ── Salary ──
       const salary = card.find('.position-salary span').last().text().trim()
@@ -117,6 +119,7 @@ export async function fetchJobbKK(
         company: company || 'Unknown Company',
         title,
         location: location || 'Thailand',
+        city: parsed.city,
         country: 'TH',           // JobbKK is a Thailand-only board
         region: 'Asia',
         locationType: 'onsite',  // JobbKK is primarily Thai onsite roles

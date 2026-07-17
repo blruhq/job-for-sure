@@ -452,6 +452,8 @@ export function JobSearchPanel({ resume }: { resume: Resume }) {
           department: job.department,
           country: job.country,
           region: job.region,
+          city: job.city,
+          district: job.district,
         },
       })
       notify({ message: `Bookmarked: ${job.title} at ${job.company}`, type: 'success' })

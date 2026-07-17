@@ -124,6 +124,8 @@ export interface PipelineJob {
   company: string
   title: string
   loc: string
+  city?: string         // structured city for Numbeo/housing links
+  district?: string     // structured district for Maps/commute
   score: number
   level: 'high' | 'mid'
   time: string

@@ -121,6 +121,7 @@ export async function fetchAdzuna(
         company: job.company?.display_name || 'Unknown',
         title: job.title,
         location: locationStr,
+        city: parsed.city,
         country: parsed.country,
         region: parsed.region,
         locationType: detectLocationType(locationStr),

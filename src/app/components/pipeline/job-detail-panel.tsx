@@ -17,7 +17,7 @@ import type { PipelineJob } from '~/types/resume'
 import { SmartOverview } from './smart-overview'
 import { AreaIntelligence } from './area-intelligence'
 import { CompanyIntelligence } from './company-intelligence'
-import { extractCity, detectCountry } from '~/lib/area-links'
+import { extractCity, extractDistrict, detectCountry } from '~/lib/area-links'
 
 // ═══════════════════════════════════════════════════════════════
 // JobDetailPanel — slide-over panel showing everything about a job.
@@ -123,6 +123,10 @@ export function JobDetailPanel({
   const visaSponsorship = job.jobData?.visaSponsorship as boolean | undefined
   const country = (job.jobData?.country as string) || ''
   const postedAt = (job.jobData?.postedAt as string) || ''
+
+  // ── Structured location (prefer from source, fall back to extraction) ──
+  const city = job.city || (job.jobData?.city as string) || extractCity(job.loc)
+  const district = job.district || (job.jobData?.district as string) || extractDistrict(job.loc)
 
   // ── Status change handler (tracker mode) ──
   const handleStatusChange = async (newStatus: string) => {
@@ -319,7 +323,8 @@ export function JobDetailPanel({
           <AreaIntelligence
             job={{ company: job.company, loc: job.loc, title: job.title }}
             homeLocation={homeLocation}
-            city={extractCity(job.loc)}
+            city={city}
+            district={district}
             countryCode={detectCountry(job.loc)}
             onHomeLocationChange={async (location) => {
               setHomeLocation(location)

@@ -67,6 +67,7 @@ export async function fetchRemoteOK(
         company: job.company!,
         title: job.position!,
         location,
+        city: parsed.city,
         country: parsed.country,
         region: parsed.region,
         locationType: 'remote' as const, // RemoteOK is remote-only by definition

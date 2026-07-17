@@ -145,6 +145,23 @@ export async function fetchJobsDBRest(
         const locData = job.locations?.[0]
         const locationLabel = locData?.label || location || ''
 
+        // Extract structured location from seoHierarchy
+        // seoHierarchy is ordered granular→broad: [district, city, country]
+        // e.g., [{ contextualName: "Sathon" }, { contextualName: "Bangkok" }, { contextualName: "Thailand" }]
+        const hierarchy = (locData?.seoHierarchy || []).map(h => h.contextualName).filter(Boolean)
+        let city: string | undefined
+        let district: string | undefined
+        if (hierarchy.length >= 2) {
+          // First entry is the most granular (district), second is city
+          if (hierarchy.length >= 3) {
+            district = hierarchy[0]
+            city = hierarchy[1]
+          } else {
+            // Only 2 levels — first is city, second is country
+            city = hierarchy[0]
+          }
+        }
+
         // Parse location for country/region
         const parsedLoc = parseLocation(locationLabel || 'Remote')
 
@@ -188,6 +205,8 @@ export async function fetchJobsDBRest(
           company,
           title: job.title,
           location: locationLabel || 'Unknown',
+          city,
+          district,
           country: parsedLoc.country || countryCode,
           region: parsedLoc.region,
           locationType,

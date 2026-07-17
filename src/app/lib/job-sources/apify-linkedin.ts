@@ -10,6 +10,7 @@
 // ═══════════════════════════════════════════════════════════════
 
 import type { JobResult } from './types'
+import { parseLocation } from './geo'
 
 interface ApifyLinkedInJob {
   title?: string
@@ -62,6 +63,7 @@ export async function fetchApifyLinkedIn(
       .map((job) => {
         const description = job.description || ''
         const jobLocation = job.location || 'Remote'
+        const parsed = parseLocation(jobLocation)
 
         return {
           id: `linkedin:${job.jobUrl ? extractJobId(job.jobUrl) : Math.random()}`,
@@ -69,6 +71,9 @@ export async function fetchApifyLinkedIn(
           company: job.company!,
           title: job.title!,
           location: jobLocation,
+          city: parsed.city,
+          country: parsed.country,
+          region: parsed.region,
           locationType: detectLocationType(jobLocation),
           url: job.applyUrl || job.jobUrl || 'https://www.linkedin.com',
           description: description.slice(0, 8000),

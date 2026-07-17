@@ -15,7 +15,7 @@ import {
 } from 'lucide-react'
 import { cn } from '~/lib/utils'
 import type { SmartOverviewResult } from '~/types/smart-overview'
-import * as Links from '~/lib/area-links' // Phase 2 dependency — stubbed
+import * as Links from '~/lib/area-links'
 
 // ═══════════════════════════════════════════════════════════════
 // SmartOverview — AI-powered job analysis shown inside the
@@ -167,7 +167,7 @@ function OverviewContent({
   homeLocation: string
 }) {
   // Extract city from raw location (e.g. "Bang Rak, Bangkok, Thailand" → "Bangkok")
-  const city = jobLocation.split(',').pop()?.trim() || jobLocation
+  const city = Links.extractCity(jobLocation)
 
   return (
     <div className="rounded-lg border border-primary/20 bg-accent-soft/30 p-4 space-y-4">

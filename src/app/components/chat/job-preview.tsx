@@ -240,6 +240,8 @@ export function JobPreview({ resume, onDismiss, onLoadComplete }: { resume: Resu
                             department: job.department,
                             country: job.country,
                             region: job.region,
+                            city: job.city,
+                            district: job.district,
                           },
                         })
                         notify({ message: `Bookmarked: ${job.title}`, type: 'success' })
