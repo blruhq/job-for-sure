@@ -895,11 +895,11 @@ export function ResumeDetail({ resumeId }: { resumeId: string }) {
       if (!state.hasUnsavedChanges()) return
       if (isReviewMode || state.optimizing) return
 
-      // Debounce 1.5s
+      // Debounce 1.5s — only show "saving" AFTER user stops typing
       if (timer) clearTimeout(timer)
-      state.setSaveStatus('saving')
 
       timer = setTimeout(() => {
+        store.getState().setSaveStatus('saving')
         const s = store.getState()
         updateResume({ id: resume.id, data: {
           name: s.name,
@@ -1318,7 +1318,7 @@ export function ResumeDetail({ resumeId }: { resumeId: string }) {
 
                     {/* Form body */}
                     <div className="resume-paper flex-1 rounded-xs p-6" style={{ fontFamily: 'var(--font-sans)', fontSize: '12px' }}>
-                      <EditorFormBody />
+                      {EditorFormBody()}
                     </div>
                   </div>
                 </ResizablePanel>
@@ -1352,7 +1352,7 @@ export function ResumeDetail({ resumeId }: { resumeId: string }) {
 
                   {/* Form body */}
                   <div className="resume-paper rounded-xs p-4" style={{ fontFamily: 'var(--font-sans)', fontSize: '12px' }}>
-                    <EditorFormBody />
+                    {EditorFormBody()}
                   </div>
                 </div>
               )}
