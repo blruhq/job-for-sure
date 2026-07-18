@@ -37,6 +37,12 @@ export default function MarketingLayout({ children }: { children: React.ReactNod
             >
               {t('interviewBadge')}
             </a>
+            <Link
+              href="/pricing"
+              className="cursor-pointer text-[13px] text-muted-foreground transition-colors hover:text-foreground"
+            >
+              Pricing
+            </Link>
           </nav>
 
           {/* Auth buttons */}
