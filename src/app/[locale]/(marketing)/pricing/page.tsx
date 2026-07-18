@@ -53,7 +53,7 @@ export default function PricingPage() {
     // Check auth first
     const { data: session } = await authClient.getSession()
     if (!session) {
-      router.push('/login?redirect=/pricing')
+      router.push('/login?redirect=/settings/billing')
       return
     }
 
