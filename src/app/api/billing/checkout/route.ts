@@ -25,11 +25,12 @@ export async function POST(req: Request) {
 
   const session = await stripe.checkout.sessions.create({
     mode: 'subscription',
+    integration_identifier: `jfs-checkout-${Math.random().toString(36).slice(2, 10)}`,
     line_items: [{ price: priceId, quantity: 1 }],
     client_reference_id: userData.id,
     customer_email: userData.email,
     metadata: { userId: userData.id },
-    success_url: `${process.env.BETTER_AUTH_URL}/settings/billing?checkout=success`,
+    success_url: `${process.env.BETTER_AUTH_URL}/settings/billing?checkout=success&session_id={CHECKOUT_SESSION_ID}`,
     cancel_url: `${process.env.BETTER_AUTH_URL}/pricing?checkout=canceled`,
     subscription_data: {
       metadata: { userId: userData.id },

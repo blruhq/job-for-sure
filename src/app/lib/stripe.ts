@@ -4,7 +4,7 @@ import Stripe from 'stripe'
  * Server-only Stripe client. Throws if a client bundle tries to import it.
  */
 export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2025-08-27.basil' as any,
+  apiVersion: '2026-06-24.dahlia' as any,
   typescript: true,
   appInfo: {
     name: 'Job For Sure',
