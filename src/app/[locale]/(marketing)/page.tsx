@@ -51,12 +51,6 @@ export default function LandingPage() {
                   {t('startChat')} <ArrowRight size={14} />
                 </Link>
                 <Link
-                  href="/pricing"
-                  className="inline-flex cursor-pointer items-center rounded-lg border border-border px-6 py-3 text-sm font-medium text-foreground transition-colors hover:bg-muted active:scale-[0.98]"
-                >
-                  Pricing
-                </Link>
-                <Link
                   href="/register"
                   className="inline-flex cursor-pointer items-center rounded-lg border border-border px-6 py-3 text-sm font-medium text-foreground transition-colors hover:bg-muted active:scale-[0.98]"
                 >
