@@ -112,7 +112,11 @@ export const POST = withAuth(async (req, { user }) => {
       if (err instanceof UnsupportedFileError) {
         return NextResponse.json({ error: err.message }, { status: 400 })
       }
-      throw err
+      console.error('[parse-resume] Extraction failed:', err)
+      return NextResponse.json(
+        { error: 'Could not read your file. Try converting to .txt and pasting the text.' },
+        { status: 400 },
+      )
     }
   } else {
     const body = z.object({ text: z.string().min(20).max(50000) }).safeParse(await req.json())

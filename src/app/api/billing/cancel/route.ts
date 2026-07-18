@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import { stripe } from '~/lib/stripe'
-import { getSessionUser } from '~/lib/auth-helpers'
+import { withAuth } from '~/lib/with-auth'
 import { db } from '~/lib/db'
 import { subscriptions } from '~/lib/schema'
 import { eq, desc } from 'drizzle-orm'
@@ -10,17 +10,12 @@ import { eq, desc } from 'drizzle-orm'
  * Cancels the subscription at the current period end.
  * The user keeps Pro access until currentPeriodEnd.
  */
-export async function POST() {
-  const userData = await getSessionUser()
-  if (!userData) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  }
-
+export const POST = withAuth(async (_req, { user }) => {
   // Find the active subscription
   const [sub] = await db
     .select()
     .from(subscriptions)
-    .where(eq(subscriptions.userId, userData.id))
+    .where(eq(subscriptions.userId, user.id))
     .orderBy(desc(subscriptions.createdAt))
     .limit(1)
 
@@ -40,4 +35,4 @@ export async function POST() {
     .where(eq(subscriptions.id, sub.id))
 
   return NextResponse.json({ canceled: true, accessUntil: sub.currentPeriodEnd })
-}
+}, { rateLimitType: 'general', route: '/api/billing/cancel' })

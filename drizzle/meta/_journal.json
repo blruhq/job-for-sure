@@ -50,6 +50,13 @@
       "when": 1784369078628,
       "tag": "0006_dusty_stellaris",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1784384966872,
+      "tag": "0007_fair_nextwave",
+      "breakpoints": true
     }
   ]
 }

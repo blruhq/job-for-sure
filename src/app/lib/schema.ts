@@ -1,5 +1,5 @@
 import { relations } from "drizzle-orm";
-import { pgTable, pgEnum, text, timestamp, boolean, jsonb, integer, numeric, index } from "drizzle-orm/pg-core";
+import { pgTable, pgEnum, text, timestamp, boolean, jsonb, integer, numeric, index, uniqueIndex } from "drizzle-orm/pg-core";
 
 // ═══════════════════════════════════════════════════════════════
 // BETTER AUTH TABLES
@@ -27,7 +27,7 @@ export const user = pgTable("user", {
   // this column on every request to avoid calling Stripe.
   plan: text("plan").default("free").notNull(),
   planUpdatedAt: timestamp("plan_updated_at").defaultNow().notNull(),
-  stripeCustomerId: text("stripe_customer_id"),
+  stripeCustomerId: text("stripe_customer_id").unique(),
 });
 
 export const session = pgTable(
@@ -74,7 +74,10 @@ export const account = pgTable(
       .$onUpdate(() => new Date())
       .notNull(),
   },
-  (table) => [index("account_userId_idx").on(table.userId)],
+  (table) => [
+    index("account_userId_idx").on(table.userId),
+    uniqueIndex("account_provider_account_idx").on(table.providerId, table.accountId),
+  ],
 );
 
 export const verification = pgTable(
@@ -131,6 +134,7 @@ export const subscriptions = pgTable(
     index("subscriptions_userId_idx").on(table.userId),
     index("subscriptions_status_idx").on(table.status),
     index("subscriptions_stripeCustomerId_idx").on(table.stripeCustomerId),
+    uniqueIndex("subscriptions_stripeCustomer_plan_idx").on(table.stripeCustomerId, table.plan),
   ],
 );
 
@@ -154,7 +158,7 @@ export const usageEvents = pgTable(
     createdAt: timestamp("created_at").defaultNow().notNull(),
   },
   (table) => [
-    index("usage_events_userId_feature_createdAt_idx").on(
+    uniqueIndex("usage_events_userId_feature_createdAt_idx").on(
       table.userId,
       table.feature,
       table.createdAt,
@@ -277,7 +281,7 @@ export const interviewSessions = pgTable("interview_sessions", {
   role: text("role").notNull(),
   type: text("type").notNull(),
   difficulty: text("difficulty").notNull(),
-  score: numeric("score", { precision: 3, scale: 1, mode: 'number' }).notNull(),
+  score: numeric("score", { precision: 4, scale: 1, mode: 'number' }).notNull(),
   exchanges: jsonb("exchanges").notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   deletedAt: timestamp("deleted_at"),

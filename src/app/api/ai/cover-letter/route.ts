@@ -122,6 +122,7 @@ ANTI-FABRICATION RULES (CRITICAL — never violate these):
   await captureServerEvent(user.id, 'cover_letter_created', { company, role, language })
 
   const letterId = crypto.randomUUID()
+  let savedId: string | null = letterId
   try {
     await db.insert(coverLetters).values({
       id: letterId,
@@ -136,7 +137,8 @@ ANTI-FABRICATION RULES (CRITICAL — never violate these):
     })
   } catch (err) {
     console.error('[cover-letter] Failed to save to DB:', err)
+    savedId = null // Don't return a fake ID if save failed
   }
 
-  return NextResponse.json({ letter: text.trim(), id: letterId })
+  return NextResponse.json({ letter: text.trim(), id: savedId })
 }, { rateLimitType: 'ai', route: '/api/ai/cover-letter' })

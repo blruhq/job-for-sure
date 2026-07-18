@@ -141,7 +141,7 @@ export async function streamWithFailover(
 
       // Decode the first chunk to check for errors
       const firstText = new TextDecoder().decode(firstChunk.value)
-      if (firstText.includes('"type":"error"') || response.status >= 400) {
+      if (firstText.includes('"type":"error"')) {
         throw new Error(`${provider.name}: stream error — ${firstText.slice(0, 200)}`)
       }
 
@@ -168,7 +168,7 @@ export async function streamWithFailover(
           }
         },
         cancel() {
-          reader.cancel()
+          return reader.cancel()
         },
       })
 
@@ -182,7 +182,8 @@ export async function streamWithFailover(
       })
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err)
-      console.warn(`⚠️  [AI] ${provider.name} failed: ${msg}`)
+      const sanitized = msg.replace(/(sk-|api[_-]?key|authorization)[^\s"']+/gi, '$1***')
+      console.warn(`⚠️  [AI] ${provider.name} failed: ${sanitized}`)
       lastError = err instanceof Error ? err : new Error(msg)
       continue
     }
@@ -235,7 +236,8 @@ export async function generateTextWithFailover(
       return result.text
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err)
-      console.warn(`⚠️  [AI] ${provider.name} failed: ${msg}`)
+      const sanitized = msg.replace(/(sk-|api[_-]?key|authorization)[^\s"']+/gi, '$1***')
+      console.warn(`⚠️  [AI] ${provider.name} failed: ${sanitized}`)
       lastError = err instanceof Error ? err : new Error(msg)
       continue
     } finally {
@@ -286,7 +288,8 @@ export async function generateObjectWithFailover<T>(
       return result.object as T
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err)
-      console.warn(`⚠️  [AI] ${provider.name} failed: ${msg}`)
+      const sanitized = msg.replace(/(sk-|api[_-]?key|authorization)[^\s"']+/gi, '$1***')
+      console.warn(`⚠️  [AI] ${provider.name} failed: ${sanitized}`)
       lastError = err instanceof Error ? err : new Error(msg)
       continue
     } finally {

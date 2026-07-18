@@ -42,7 +42,7 @@ export function CoverLetterEditor({ resume }: CoverLetterEditorProps) {
     } else {
       setLetterText('')
     }
-  }, [activeLetter?.id]) // re-init when switching to a different letter record
+  }, [activeLetter]) // re-init when the letter record changes (including server-side updates)
 
   const handleGenerate = async () => {
     setGenerating(true)

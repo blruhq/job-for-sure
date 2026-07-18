@@ -89,6 +89,8 @@ export function ChatView() {
   const savingResumeRef = useRef(false)
   savingResumeRef.current = savingResume
 
+  const navigateTimer = useRef<ReturnType<typeof setTimeout>>(undefined)
+
   // Build step ref — for stable CustomInputBar (useCallback[])
   const buildStepRef = useRef(buildStep)
   buildStepRef.current = buildStep
@@ -202,6 +204,13 @@ export function ChatView() {
       sendMessage({ text: pending })
     }
   }, [sendMessage])
+
+  // Cleanup timers on unmount
+  useEffect(() => {
+    return () => {
+      if (navigateTimer.current) clearTimeout(navigateTimer.current)
+    }
+  }, [])
 
   const handleSend = (message: { role: 'user'; content: string }) => {
     let content = message.content
@@ -401,7 +410,8 @@ export function ChatView() {
 
       notify({ message: 'Resume created!', type: 'success' })
 
-      setTimeout(() => router.push(`/resume/${resume.id}`), 600)
+      if (navigateTimer.current) clearTimeout(navigateTimer.current)
+      navigateTimer.current = setTimeout(() => router.push(`/resume/${resume.id}`), 600)
     } catch (err) {
       console.error(err)
       notify({ message: err instanceof Error ? err.message : 'Failed to build resume', type: 'error' })

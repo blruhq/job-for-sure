@@ -168,7 +168,12 @@ export async function POST(req: Request) {
     }
   } catch (err) {
     console.error(`[webhook] ${type} failed:`, err)
-    // Return 200 to acknowledge receipt even on handler error (Stripe retries otherwise)
+    // Return 500 to trigger Stripe retry for transient DB errors.
+    // Do NOT return 200 — that tells Stripe the event was delivered.
+    return NextResponse.json(
+      { received: true, error: 'Handler failed' },
+      { status: 500 },
+    )
   }
 
   return NextResponse.json({ received: true })

@@ -48,13 +48,18 @@ export const PATCH = withAuth(async (req, { user, params }) => {
   }
   if (body.data.data !== undefined) {
     // Merge incoming fields into existing data — never replace the entire blob
+    // Must filter by userId to prevent cross-user data access
     const [existing] = await db
       .select({ data: resumes.data })
       .from(resumes)
-      .where(eq(resumes.id, id))
+      .where(and(eq(resumes.id, id), eq(resumes.userId, user.id), isNull(resumes.deletedAt)))
       .limit(1)
 
-    const existingData = (existing?.data ?? {}) as Record<string, unknown>
+    if (!existing) {
+      return NextResponse.json({ error: 'Not found' }, { status: 404 })
+    }
+
+    const existingData = (existing.data ?? {}) as Record<string, unknown>
     updates.data = { ...existingData, ...body.data.data }
   }
   if (body.data.isBase !== undefined) updates.isBase = body.data.isBase

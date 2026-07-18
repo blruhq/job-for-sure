@@ -126,6 +126,106 @@ function JobCardContent({ job }: { job: PipelineJob }) {
   )
 }
 
+// ── Inline add form for a column ──
+// NOTE: This component MUST be defined at module scope, not inside
+// ApplicationsView. Defining it inside the parent makes React see a new
+// component type on every render and unmounts/remounts the input tree,
+// which causes focus loss after every keystroke.
+interface InlineAddFormProps {
+  colId: ApplicationColumnId
+  onCancel: () => void
+  onSave: (payload: {
+    sourceKey: string
+    company: string
+    jobTitle: string
+    location: string
+    status: 'bookmarked'
+  }) => void
+  titleRef: React.RefObject<HTMLInputElement | null>
+}
+
+function InlineAddForm({ colId: _colId, onCancel, onSave, titleRef }: InlineAddFormProps) {
+  const [title, setTitle] = useState('')
+  const [company, setCompany] = useState('')
+  const [loc, setLoc] = useState('')
+  const t = useTranslations('applications')
+
+  const handleSave = () => {
+    const trimmedTitle = title.trim()
+    const trimmedCompany = company.trim()
+    if (!trimmedTitle || !trimmedCompany) {
+      notify({ message: 'Job title and company are required.', type: 'error' })
+      return
+    }
+
+    onSave({
+      sourceKey: `manual-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+      company: trimmedCompany,
+      jobTitle: trimmedTitle,
+      location: loc.trim(),
+      status: 'bookmarked',
+    })
+
+    notify({ message: `Added "${trimmedTitle}" at ${trimmedCompany}`, type: 'success' })
+    onCancel()
+  }
+
+  return (
+    <div className="mt-1.5 flex flex-col gap-2 rounded-xs border border-border bg-card p-2.5">
+      <input
+        ref={titleRef}
+        type="text"
+        value={title}
+        onChange={(e) => setTitle(e.target.value)}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' && !e.shiftKey) handleSave()
+          if (e.key === 'Escape') onCancel()
+        }}
+        placeholder="Job title *"
+        autoFocus
+        className="w-full rounded-xs border border-border bg-background px-2 py-1.5 text-[11px] outline-none focus:border-primary placeholder:text-muted-foreground/50"
+      />
+      <input
+        type="text"
+        value={company}
+        onChange={(e) => setCompany(e.target.value)}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' && !e.shiftKey) handleSave()
+          if (e.key === 'Escape') onCancel()
+        }}
+        placeholder="Company *"
+        className="w-full rounded-xs border border-border bg-background px-2 py-1.5 text-[11px] outline-none focus:border-primary placeholder:text-muted-foreground/50"
+      />
+      <input
+        type="text"
+        value={loc}
+        onChange={(e) => setLoc(e.target.value)}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' && !e.shiftKey) handleSave()
+          if (e.key === 'Escape') onCancel()
+        }}
+        placeholder="Location"
+        className="w-full rounded-xs border border-border bg-background px-2 py-1.5 text-[11px] outline-none focus:border-primary placeholder:text-muted-foreground/50"
+      />
+      <div className="flex items-center justify-end gap-1.5 mt-0.5">
+        <button
+          onClick={onCancel}
+          className="rounded-xs px-2.5 py-1 text-[10px] text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+        >
+          {t('cancel')}
+        </button>
+        <button
+          onClick={handleSave}
+          disabled={!title.trim() || !company.trim()}
+          className="rounded-xs bg-primary px-2.5 py-1 text-[10px] font-medium text-primary-foreground transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer"
+        >
+          {t('add')}
+        </button>
+      </div>
+    </div>
+  )
+}
+
 export function ApplicationsView() {
   const router = useRouter()
   const t = useTranslations('applications')
@@ -308,92 +408,6 @@ export function ApplicationsView() {
     }
   }
 
-  // ── Inline add form for a column ──
-  function InlineAddForm({ colId }: { colId: ApplicationColumnId }) {
-    const [title, setTitle] = useState('')
-    const [company, setCompany] = useState('')
-    const [loc, setLoc] = useState('')
-
-    const handleCancel = () => {
-      setAddingToCol(null)
-    }
-
-    const handleSave = () => {
-      const trimmedTitle = title.trim()
-      const trimmedCompany = company.trim()
-      if (!trimmedTitle || !trimmedCompany) {
-        notify({ message: 'Job title and company are required.', type: 'error' })
-        return
-      }
-
-      bookmarkJob({
-        sourceKey: `manual-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
-        company: trimmedCompany,
-        jobTitle: trimmedTitle,
-        location: loc.trim(),
-        status: 'bookmarked',
-      })
-
-      notify({ message: `Added "${trimmedTitle}" at ${trimmedCompany}`, type: 'success' })
-      setAddingToCol(null)
-    }
-
-    return (
-      <div className="mt-1.5 flex flex-col gap-2 rounded-xs border border-border bg-card p-2.5">
-        <input
-          ref={addTitleRef}
-          type="text"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter' && !e.shiftKey) handleSave()
-            if (e.key === 'Escape') handleCancel()
-          }}
-          placeholder="Job title *"
-          autoFocus
-          className="w-full rounded-xs border border-border bg-background px-2 py-1.5 text-[11px] outline-none focus:border-primary placeholder:text-muted-foreground/50"
-        />
-        <input
-          type="text"
-          value={company}
-          onChange={(e) => setCompany(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter' && !e.shiftKey) handleSave()
-            if (e.key === 'Escape') handleCancel()
-          }}
-          placeholder="Company *"
-          className="w-full rounded-xs border border-border bg-background px-2 py-1.5 text-[11px] outline-none focus:border-primary placeholder:text-muted-foreground/50"
-        />
-        <input
-          type="text"
-          value={loc}
-          onChange={(e) => setLoc(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter' && !e.shiftKey) handleSave()
-            if (e.key === 'Escape') handleCancel()
-          }}
-          placeholder="Location"
-          className="w-full rounded-xs border border-border bg-background px-2 py-1.5 text-[11px] outline-none focus:border-primary placeholder:text-muted-foreground/50"
-        />
-        <div className="flex items-center justify-end gap-1.5 mt-0.5">
-          <button
-            onClick={handleCancel}
-            className="rounded-xs px-2.5 py-1 text-[10px] text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
-          >
-            Cancel
-          </button>
-          <button
-            onClick={handleSave}
-            disabled={!title.trim() || !company.trim()}
-            className="rounded-xs bg-primary px-2.5 py-1 text-[10px] font-medium text-primary-foreground transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer"
-          >
-            Add
-          </button>
-        </div>
-      </div>
-    )
-  }
-
   return (
     <div className="flex h-full w-full flex-col bg-background">
       {/* ── Header ── */}
@@ -536,7 +550,12 @@ export function ApplicationsView() {
 
                   {/* Inline Add Button / Form */}
                   {addingToCol === col.id ? (
-                    <InlineAddForm colId={col.id} />
+                    <InlineAddForm
+                      colId={col.id}
+                      titleRef={addTitleRef}
+                      onCancel={() => setAddingToCol(null)}
+                      onSave={(payload) => bookmarkJob(payload)}
+                    />
                   ) : (
                     <button
                       onClick={() => {

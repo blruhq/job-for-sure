@@ -169,9 +169,17 @@ function EditableList<T>({
     useSensor(TouchSensor, { activationConstraint: { delay: 150, tolerance: 5 } }),
   )
 
-  // Generate stable IDs for sortable items
-  // Items may not have an `id` field, so we use index-based keys
-  const itemIds = items.map((_, i) => `item-${label}-${i}`)
+  // Generate stable IDs for sortable items using a ref
+  const itemIdsRef = useRef<string[]>([])
+  if (itemIdsRef.current.length !== items.length) {
+    while (itemIdsRef.current.length < items.length) {
+      itemIdsRef.current.push(`${label}-${crypto.randomUUID()}`)
+    }
+    while (itemIdsRef.current.length > items.length) {
+      itemIdsRef.current.pop()
+    }
+  }
+  const itemIds = itemIdsRef.current
 
   const handleDragStart = (event: DragStartEvent) => {
     setActiveId(event.active.id as string)
@@ -959,20 +967,20 @@ export function ResumeDetail({ resumeId }: { resumeId: string }) {
 
   const handleAddSection = useCallback((section: SectionKey) => {
     if (section === 'projects') {
-      setProjects([...projects, { name: '', description: '', techStack: [], link: '' }])
+      setProjects(prev => [...prev, { name: '', description: '', techStack: [], link: '' }])
       setShowAddSectionPicker(false)
     } else if (section === 'certifications') {
-      setCertifications([...certifications, { name: '', issuer: '', date: '' }])
+      setCertifications(prev => [...prev, { name: '', issuer: '', date: '' }])
       setShowAddSectionPicker(false)
     } else if (section === 'languages') {
-      setLanguages([...languages, { name: '', proficiency: '' }])
+      setLanguages(prev => [...prev, { name: '', proficiency: '' }])
       setShowAddSectionPicker(false)
     } else if (section === 'custom') {
       // Show inline title input instead of immediately creating
       setShowAddSectionPicker(false)
       setShowNewCustomInput(true)
     }
-  }, [projects, certifications, languages, customSections, sectionOrder, setProjects, setCertifications, setLanguages, setCustomSections, setSectionOrder, setShowAddSectionPicker])
+  }, [setProjects, setCertifications, setLanguages, setShowAddSectionPicker])
 
   const [showNewCustomInput, setShowNewCustomInput] = useState(false)
 
@@ -980,18 +988,19 @@ export function ResumeDetail({ resumeId }: { resumeId: string }) {
     const title = newCustomTitle.trim() || 'Untitled Section'
     const id = crypto.randomUUID?.()?.slice(0, 8) ?? Math.random().toString(36).slice(2, 10)
     const newSection: ResumeCustomSection = { id, title, type: 'bullets', bullets: [] }
-    setCustomSections([...customSections, newSection])
-    // Find last non-custom section index to insert after it
-    let insertAfter = -1
-    for (let i = sectionOrder.length - 1; i >= 0; i--) {
-      if (!sectionOrder[i].startsWith('cs-')) {
-        insertAfter = i
-        break
+    setCustomSections(prev => [...prev, newSection])
+    setSectionOrder(prev => {
+      let insertAfter = -1
+      for (let i = prev.length - 1; i >= 0; i--) {
+        if (!prev[i].startsWith('cs-')) {
+          insertAfter = i
+          break
+        }
       }
-    }
-    const newOrder = [...sectionOrder]
-    newOrder.splice(insertAfter + 1, 0, `cs-${id}` as SectionOrderId)
-    setSectionOrder(newOrder)
+      const newOrder = [...prev]
+      newOrder.splice(insertAfter + 1, 0, `cs-${id}` as SectionOrderId)
+      return newOrder
+    })
     setNewCustomTitle('')
     setShowNewCustomInput(false)
     // Focus the new section's title input after render
@@ -1000,7 +1009,7 @@ export function ResumeDetail({ resumeId }: { resumeId: string }) {
       input?.focus()
       input?.select()
     }, 50)
-  }, [newCustomTitle, customSections, sectionOrder, setCustomSections, setSectionOrder])
+  }, [newCustomTitle, setCustomSections, setSectionOrder])
 
   // ── Review mode: compute previewed resume from accepted changes ──
   // MUST be before early return (hooks rule)

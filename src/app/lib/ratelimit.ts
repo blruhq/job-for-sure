@@ -15,6 +15,7 @@ import { getRedis } from '~/lib/redis'
 
 let _aiRatelimit: Ratelimit | null = null
 let _generalRatelimit: Ratelimit | null = null
+let _authIpRatelimit: Ratelimit | null = null
 
 function getAiRatelimit(): Ratelimit {
   if (!_aiRatelimit) {
@@ -40,6 +41,19 @@ function getGeneralRatelimit(): Ratelimit {
   return _generalRatelimit
 }
 
+function getAuthIpRatelimit(): Ratelimit {
+  if (!_authIpRatelimit) {
+    _authIpRatelimit = new Ratelimit({
+      redis: getRedis(),
+      // 10 req/min per IP — blocks brute-force and signup email-bombing
+      limiter: Ratelimit.slidingWindow(10, '1 m'),
+      prefix: 'jfs:auth-ip',
+      analytics: true,
+    })
+  }
+  return _authIpRatelimit
+}
+
 /**
  * Check AI rate limit for a user (20 req/min).
  * Returns null if allowed, or a Response (429) if rate limited.
@@ -58,6 +72,32 @@ export async function checkGeneralRateLimit(
   userId: string,
 ): Promise<Response | null> {
   return doLimit(getGeneralRatelimit(), userId)
+}
+
+/**
+ * Check auth rate limit by IP (10 req/min).
+ * Used for unauthenticated auth endpoints (login, signup, password reset)
+ * to prevent brute-force and email-bombing.
+ * Returns null if allowed, or a Response (429) if rate limited.
+ */
+export async function checkAuthIpRateLimit(
+  ip: string,
+): Promise<Response | null> {
+  return doLimit(getAuthIpRatelimit(), ip)
+}
+
+/**
+ * Extract client IP from request headers.
+ * Checks XFF (Vercel, Cloudflare) and X-Real-IP.
+ * Falls back to 'unknown' if all headers are missing.
+ */
+export function getClientIp(req: Request): string {
+  const xff = req.headers.get('x-forwarded-for')
+  if (xff) {
+    // First hop is the client
+    return xff.split(',')[0].trim()
+  }
+  return req.headers.get('x-real-ip')?.trim() || 'unknown'
 }
 
 async function doLimit(

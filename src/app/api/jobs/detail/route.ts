@@ -35,16 +35,23 @@ export const POST = withAuth(async (req) => {
 
   // ── LinkedIn guest: fetch full JD from guest detail endpoint ──
   if (source === 'linkedin-guest' && jobId) {
-    const result = await fetchLinkedInGuestDetail(jobId)
+    try {
+      const result = await fetchLinkedInGuestDetail(jobId)
 
-    if (result.job) {
-      return NextResponse.json({ success: true, job: result.job })
+      if (result.job) {
+        return NextResponse.json({ success: true, job: result.job })
+      }
+
+      return NextResponse.json(
+        { success: false, error: result.error || 'Could not fetch job details' },
+        { status: 502 },
+      )
+    } catch {
+      return NextResponse.json(
+        { success: false, error: 'Failed to fetch job details' },
+        { status: 502 },
+      )
     }
-
-    return NextResponse.json(
-      { success: false, error: result.error || 'Could not fetch job details' },
-      { status: 502 },
-    )
   }
 
   // ── Other sources: descriptions should already be in the search result ──

@@ -377,19 +377,23 @@ export function JobSearchPanel({ resume }: { resume: Resume }) {
     if (!sentinel) return
 
     let loadingMore = false
+    let loadingTimer: ReturnType<typeof setTimeout> | undefined
     const observer = new IntersectionObserver(
       (entries) => {
         if (entries[0].isIntersecting && !loadingMore) {
           loadingMore = true
           setDisplayLimit(prev => prev + 25)
-          setTimeout(() => { loadingMore = false }, 500)
+          loadingTimer = setTimeout(() => { loadingMore = false }, 500)
         }
       },
       { threshold: 0, rootMargin: '400px' },
     )
 
     observer.observe(sentinel)
-    return () => observer.disconnect()
+    return () => {
+      observer.disconnect()
+      if (loadingTimer) clearTimeout(loadingTimer)
+    }
   }, [filtered.length])
 
   const activeFilterCount =

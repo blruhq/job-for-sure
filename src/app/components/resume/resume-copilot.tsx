@@ -12,7 +12,7 @@ export function ResumeCopilot({ resume }: { resume: Resume }) {
 
   const transport = useMemo(() => new DefaultChatTransport({
     api: '/api/copilot',
-    body: {
+    body: () => ({
       resume: {
         name: resume.name,
         role: resume.role,
@@ -28,7 +28,7 @@ export function ResumeCopilot({ resume }: { resume: Resume }) {
           score: b.score,
         })),
       },
-    },
+    }),
   }), [resume, applications?.bookmark])
 
   const { messages, status, sendMessage, stop, error } = useChat({ transport })

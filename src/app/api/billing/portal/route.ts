@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import { stripe } from '~/lib/stripe'
-import { getSessionUser } from '~/lib/auth-helpers'
+import { withAuth } from '~/lib/with-auth'
 import { db } from '~/lib/db'
 import { user } from '~/lib/schema'
 import { eq } from 'drizzle-orm'
@@ -12,20 +12,14 @@ import { eq } from 'drizzle-orm'
  *
  * Returns: { url: string }
  */
-export async function POST() {
-  const userData = await getSessionUser()
-  if (!userData) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  }
-
+export const POST = withAuth(async (_req, { user: authUser }) => {
   const [found] = await db
     .select({ stripeCustomerId: user.stripeCustomerId })
     .from(user)
-    .where(eq(user.id, userData.id))
+    .where(eq(user.id, authUser.id))
     .limit(1)
 
   if (!found?.stripeCustomerId) {
-    // User has no Stripe customer yet (never subscribed)
     return NextResponse.json({ error: 'No subscription found' }, { status: 400 })
   }
 
@@ -35,4 +29,4 @@ export async function POST() {
   })
 
   return NextResponse.json({ url: session.url })
-}
+}, { rateLimitType: 'general', route: '/api/billing/portal' })

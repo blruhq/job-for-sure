@@ -58,6 +58,18 @@ export const POST = withAuth(async (req, { user }) => {
     )
   }
 
+  // If client provided an id, verify ownership before upsert
+  if (id) {
+    const [existing] = await db
+      .select({ userId: resumes.userId })
+      .from(resumes)
+      .where(eq(resumes.id, id))
+      .limit(1)
+    if (existing && existing.userId !== user.id) {
+      return NextResponse.json({ error: 'Not found' }, { status: 404 })
+    }
+  }
+
   const resume = {
     id: id || crypto.randomUUID(),
     userId: user.id,
@@ -69,7 +81,7 @@ export const POST = withAuth(async (req, { user }) => {
 
   await db.insert(resumes).values(resume).onConflictDoUpdate({
     target: resumes.id,
-    set: { data: resume.data, updatedAt: new Date() },
+    set: { data: resume.data, isBase: resume.isBase, updatedAt: new Date() },
   })
 
   // FIX: Return data as a parsed object (matching GET shape),

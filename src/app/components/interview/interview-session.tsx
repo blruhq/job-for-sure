@@ -115,7 +115,12 @@ export function InterviewSession({ config, resume, onEnd }: InterviewSessionProp
   useEffect(() => {
     return () => {
       if (recognitionRef.current) {
-        try { recognitionRef.current.stop() } catch { /* already stopped */ }
+        const rec = recognitionRef.current
+        rec.onresult = null
+        rec.onerror = null
+        rec.onend = null
+        try { rec.stop() } catch { /* already stopped */ }
+        recognitionRef.current = null
       }
     }
   }, [])

@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import { stripe, STRIPE_PRICES } from '~/lib/stripe'
-import { getSessionUser } from '~/lib/auth-helpers'
+import { withAuth } from '~/lib/with-auth'
 
 /**
  * POST /api/billing/checkout
@@ -9,12 +9,7 @@ import { getSessionUser } from '~/lib/auth-helpers'
  * Body: { interval: 'month' | 'year' }
  * Returns: { url: string } — redirect user here
  */
-export async function POST(req: Request) {
-  const userData = await getSessionUser()
-  if (!userData) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  }
-
+export const POST = withAuth(async (req, { user }) => {
   const body = await req.json()
   const interval = body.interval === 'year' ? 'yearly' : 'monthly'
   const priceId = STRIPE_PRICES[interval]
@@ -27,15 +22,15 @@ export async function POST(req: Request) {
     mode: 'subscription',
     integration_identifier: `jfs-checkout-${Math.random().toString(36).slice(2, 10)}`,
     line_items: [{ price: priceId, quantity: 1 }],
-    client_reference_id: userData.id,
-    customer_email: userData.email,
-    metadata: { userId: userData.id },
+    client_reference_id: user.id,
+    customer_email: user.email,
+    metadata: { userId: user.id },
     success_url: `${process.env.BETTER_AUTH_URL}/settings/billing?checkout=success&session_id={CHECKOUT_SESSION_ID}`,
     cancel_url: `${process.env.BETTER_AUTH_URL}/pricing?checkout=canceled`,
     subscription_data: {
-      metadata: { userId: userData.id },
+      metadata: { userId: user.id },
     },
   })
 
   return NextResponse.json({ url: session.url })
-}
+}, { rateLimitType: 'general', route: '/api/billing/checkout' })

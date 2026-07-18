@@ -29,21 +29,24 @@ export const POST = withAuth(async (req, { user }) => {
 
   const ownedIds = new Set(owned.map((o) => o.id))
 
-  const updatePromises = updates.map(async (update) => {
-    if (!ownedIds.has(update.id)) {
-      return
-    }
-    await db
-      .update(applications)
-      .set({
+  await db.transaction(async (tx) => {
+    for (const update of updates) {
+      if (!ownedIds.has(update.id)) continue
+      const setFields: Record<string, unknown> = {
         status: update.status as 'bookmarked' | 'applied' | 'interviewing' | 'offered' | 'rejected',
         position: update.position,
         updatedAt: new Date(),
-      })
-      .where(eq(applications.id, update.id))
+      }
+      // Set appliedAt when transitioning to 'applied'
+      if (update.status === 'applied') {
+        setFields.appliedAt = new Date()
+      }
+      await tx
+        .update(applications)
+        .set(setFields)
+        .where(eq(applications.id, update.id))
+    }
   })
-
-  await Promise.all(updatePromises)
 
   return NextResponse.json({ success: true })
 }, { rateLimitType: 'general', route: '/api/applications/reorder' })

@@ -24,7 +24,7 @@ export async function extractTextFromFile(file: File | Blob, filename?: string):
   const name = (filename || (file as File).name || '').toLowerCase()
 
   if (file.size > MAX_FILE_SIZE) {
-    throw new Error('File too large. Maximum size is 5MB.')
+    throw new UnsupportedFileError('File too large. Maximum size is 5MB.')
   }
 
   let text: string

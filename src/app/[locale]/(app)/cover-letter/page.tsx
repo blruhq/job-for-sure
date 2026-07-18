@@ -107,12 +107,12 @@ export default function StandaloneCoverLetterPage() {
 
       const resume = createResume({
         name: file.name.replace(/\.(pdf|docx|txt|md)$/i, ''),
-        role: parsed.role || 'Software Engineer',
+        role: parsed.role || '',
         persona: parsed.name || 'Your Name',
         email: parsed.email,
         location: parsed.location,
         summary: parsed.summary,
-        skills: parsed.skills?.length > 0 ? parsed.skills : ['JavaScript', 'Git'],
+        skills: parsed.skills || [],
         experience: parsed.experience?.map((exp: any) => ({
           company: exp.company || '',
           role: exp.role || '',

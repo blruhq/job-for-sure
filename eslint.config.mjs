@@ -21,4 +21,13 @@ export default tseslint.config(
       '.agents/**',
     ],
   },
+  {
+    files: ['scripts/**/*.mjs', 'scripts/**/*.js'],
+    languageOptions: {
+      globals: {
+        console: 'readonly',
+        process: 'readonly',
+      },
+    },
+  },
 )

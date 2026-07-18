@@ -42,15 +42,13 @@ function periodBoundary(period: FeaturePeriod): Date | null {
   const now = new Date()
   switch (period) {
     case 'day': {
-      const d = new Date(now.getFullYear(), now.getMonth(), now.getDate())
-      return d
+      return new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()))
     }
     case 'week': {
       // Monday 00:00 UTC
-      const day = now.getDay()
-      const diff = now.getDate() - day + (day === 0 ? -6 : 1)
-      const d = new Date(now.getFullYear(), now.getMonth(), diff)
-      return d
+      const day = now.getUTCDay()
+      const diff = now.getUTCDate() - day + (day === 0 ? -6 : 1)
+      return new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), diff))
     }
     case 'total':
       return null // no filter
@@ -108,7 +106,9 @@ export async function checkLimit(
     return { allowed: true, remaining: Infinity, limit: Infinity, plan: effectivePlan }
   }
 
-  const used = await getFeatureCount(userId, feature, config.period)
+  const used = feature === 'resume_create'
+    ? await getResumeCount(userId)
+    : await getFeatureCount(userId, feature, config.period)
   const remaining = Math.max(0, limit - used)
 
   return {
@@ -123,12 +123,17 @@ export async function checkLimit(
  * Record a feature usage event. Does NOT check limits — call checkLimit first.
  */
 export async function recordUsage(userId: string, feature: Feature): Promise<void> {
-  await db.insert(usageEvents).values({
-    id: crypto.randomUUID(),
-    userId,
-    feature,
-    createdAt: new Date(),
-  })
+  try {
+    await db.insert(usageEvents).values({
+      id: crypto.randomUUID(),
+      userId,
+      feature,
+      createdAt: new Date(),
+    })
+  } catch {
+    // Fail-open: usage tracking must never block core features
+    console.warn(`[plan] Failed to record usage for ${userId}/${feature}`)
+  }
 }
 
 /**

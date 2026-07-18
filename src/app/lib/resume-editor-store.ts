@@ -73,7 +73,7 @@ export interface ResumeEditorState extends ResumeSavePayload {
   suggestionDismissed: boolean
   showAddSectionPicker: boolean
   optimizing: boolean
-  savedSnapshot: string // JSON-stringified snapshot of last-saved state
+  isDirty: boolean // true when user has made changes since last save
 }
 
 export interface ResumeEditorActions {
@@ -89,11 +89,11 @@ export interface ResumeEditorActions {
   setSkills: (v: string[]) => void
   setExperience: (v: ResumeExperience[]) => void
   setEducation: (v: ResumeEducation[]) => void
-  setProjects: (v: ResumeProject[]) => void
-  setCertifications: (v: ResumeCertification[]) => void
-  setLanguages: (v: ResumeLanguage[]) => void
-  setCustomSections: (v: ResumeCustomSection[]) => void
-  setSectionOrder: (v: SectionOrderId[]) => void
+  setProjects: (v: ResumeProject[] | ((prev: ResumeProject[]) => ResumeProject[])) => void
+  setCertifications: (v: ResumeCertification[] | ((prev: ResumeCertification[]) => ResumeCertification[])) => void
+  setLanguages: (v: ResumeLanguage[] | ((prev: ResumeLanguage[]) => ResumeLanguage[])) => void
+  setCustomSections: (v: ResumeCustomSection[] | ((prev: ResumeCustomSection[]) => ResumeCustomSection[])) => void
+  setSectionOrder: (v: SectionOrderId[] | ((prev: SectionOrderId[]) => SectionOrderId[])) => void
   setSectionVisibility: (v: Record<string, boolean>) => void
   toggleSectionVisibility: (id: SectionOrderId) => void
 
@@ -106,7 +106,7 @@ export interface ResumeEditorActions {
 
   // Bulk actions
   hydrate: (r: Resume) => void
-  markSaved: () => void // Update savedSnapshot to match current state
+  markSaved: () => void // Clear isDirty after a successful save
   hasUnsavedChanges: () => boolean
 }
 
@@ -148,30 +148,31 @@ export function createResumeEditorStore(initial?: Partial<ResumeSavePayload> | P
         suggestionDismissed: false,
         showAddSectionPicker: false,
         optimizing: false,
-        savedSnapshot: JSON.stringify(merged),
+        isDirty: false,
 
         // ── Setters ──
 
-        setName: (v) => set((s) => { s.name = v }),
-        setPersona: (v) => set((s) => { s.persona = v }),
-        setRole: (v) => set((s) => { s.role = v }),
-        setEmail: (v) => set((s) => { s.email = v }),
-        setPhone: (v) => set((s) => { s.phone = v }),
-        setLocation: (v) => set((s) => { s.location = v }),
-        setGithub: (v) => set((s) => { s.github = v }),
-        setSummary: (v) => set((s) => { s.summary = v }),
-        setSkills: (v) => set((s) => { s.skills = v }),
-        setExperience: (v) => set((s) => { s.experience = v }),
-        setEducation: (v) => set((s) => { s.education = v }),
-        setProjects: (v) => set((s) => { s.projects = v }),
-        setCertifications: (v) => set((s) => { s.certifications = v }),
-        setLanguages: (v) => set((s) => { s.languages = v }),
-        setCustomSections: (v) => set((s) => { s.customSections = v }),
-        setSectionOrder: (v) => set((s) => { s.sectionOrder = v }),
-        setSectionVisibility: (v) => set((s) => { s.sectionVisibility = v }),
+        setName: (v) => set((s) => { s.name = v; s.isDirty = true }),
+        setPersona: (v) => set((s) => { s.persona = v; s.isDirty = true }),
+        setRole: (v) => set((s) => { s.role = v; s.isDirty = true }),
+        setEmail: (v) => set((s) => { s.email = v; s.isDirty = true }),
+        setPhone: (v) => set((s) => { s.phone = v; s.isDirty = true }),
+        setLocation: (v) => set((s) => { s.location = v; s.isDirty = true }),
+        setGithub: (v) => set((s) => { s.github = v; s.isDirty = true }),
+        setSummary: (v) => set((s) => { s.summary = v; s.isDirty = true }),
+        setSkills: (v) => set((s) => { s.skills = v; s.isDirty = true }),
+        setExperience: (v) => set((s) => { s.experience = v; s.isDirty = true }),
+        setEducation: (v) => set((s) => { s.education = v; s.isDirty = true }),
+        setProjects: (v) => set((s) => { s.projects = typeof v === 'function' ? v(s.projects) : v; s.isDirty = true }),
+        setCertifications: (v) => set((s) => { s.certifications = typeof v === 'function' ? v(s.certifications) : v; s.isDirty = true }),
+        setLanguages: (v) => set((s) => { s.languages = typeof v === 'function' ? v(s.languages) : v; s.isDirty = true }),
+        setCustomSections: (v) => set((s) => { s.customSections = typeof v === 'function' ? v(s.customSections) : v; s.isDirty = true }),
+        setSectionOrder: (v) => set((s) => { s.sectionOrder = typeof v === 'function' ? v(s.sectionOrder) : v; s.isDirty = true }),
+        setSectionVisibility: (v) => set((s) => { s.sectionVisibility = v; s.isDirty = true }),
         toggleSectionVisibility: (id) => set((s) => {
           if (id === 'basic') return // basic is always visible
           s.sectionVisibility[id] = s.sectionVisibility[id] === false ? true : false
+          s.isDirty = true
         }),
         setSaveStatus: (v) => set((s) => { s.saveStatus = v }),
         setSuggestions: (v) => set((s) => { s.suggestions = v }),
@@ -217,52 +218,15 @@ export function createResumeEditorStore(initial?: Partial<ResumeSavePayload> | P
           s.sectionOrder = cleanOrder as SectionOrderId[]
 
           s.sectionVisibility = r.sectionVisibility ?? {}
+          s.isDirty = false
         }),
 
         markSaved: () => set((s) => {
-          s.savedSnapshot = JSON.stringify({
-            name: s.name,
-            persona: s.persona,
-            role: s.role,
-            email: s.email,
-            phone: s.phone,
-            location: s.location,
-            github: s.github,
-            summary: s.summary,
-            skills: s.skills,
-            experience: s.experience,
-            education: s.education,
-            projects: s.projects,
-            certifications: s.certifications,
-            languages: s.languages,
-            customSections: s.customSections,
-            sectionOrder: s.sectionOrder,
-            sectionVisibility: s.sectionVisibility,
-          })
+          s.isDirty = false
         }),
 
         hasUnsavedChanges: () => {
-          const s = get()
-          const current = JSON.stringify({
-            name: s.name,
-            persona: s.persona,
-            role: s.role,
-            email: s.email,
-            phone: s.phone,
-            location: s.location,
-            github: s.github,
-            summary: s.summary,
-            skills: s.skills,
-            experience: s.experience,
-            education: s.education,
-            projects: s.projects,
-            certifications: s.certifications,
-            languages: s.languages,
-            customSections: s.customSections,
-            sectionOrder: s.sectionOrder,
-            sectionVisibility: s.sectionVisibility,
-          })
-          return current !== s.savedSnapshot
+          return get().isDirty
         },
       }
     }),

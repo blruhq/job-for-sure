@@ -53,20 +53,26 @@ export const GET = withAuth(async (request, { user }) => {
     ? <CoverLetterPDF resume={resume} letterText={letterText} />
     : <ResumePDF resume={resume} />
 
-  const stream = await ReactPDF.renderToStream(doc)
+  let pdfBuffer: Uint8Array
+  try {
+    const stream = await ReactPDF.renderToStream(doc)
 
-  // Convert stream to buffer
-  const chunks: Uint8Array[] = []
-  for await (const chunk of stream as unknown as AsyncIterable<Uint8Array>) {
-    chunks.push(chunk)
+    // Convert stream to buffer
+    const chunks: Uint8Array[] = []
+    for await (const chunk of stream as unknown as AsyncIterable<Uint8Array>) {
+      chunks.push(chunk)
+    }
+    pdfBuffer = Buffer.concat(chunks)
+  } catch (err) {
+    console.error('[export-pdf] Generation failed:', err)
+    return NextResponse.json({ error: 'Failed to generate PDF' }, { status: 500 })
   }
-  const buffer = Buffer.concat(chunks)
 
   const filename = type === 'cover-letter'
     ? `${resume.name || 'resume'}-cover-letter.pdf`
     : `${resume.name || 'resume'}.pdf`
 
-  return new NextResponse(buffer, {
+  return new NextResponse(new Blob([pdfBuffer as BlobPart], { type: 'application/pdf' }), {
     headers: {
       'Content-Type': 'application/pdf',
       'Content-Disposition': `attachment; filename="${filename}"`,
