@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, Suspense } from 'react'
+import { useState, Suspense, useEffect } from 'react'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { FileText } from 'lucide-react'
@@ -11,6 +11,15 @@ function LoginForm() {
   const searchParams = useSearchParams()
   const resetSuccess = searchParams.get('reset') === 'success'
   const redirectTo = searchParams.get('redirect') || '/chat'
+
+  // Auto-redirect if already signed in (e.g. after Google OAuth callback)
+  useEffect(() => {
+    authClient.getSession().then(({ data }) => {
+      if (data?.user) {
+        router.push(redirectTo)
+      }
+    })
+  }, [router, redirectTo])
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
@@ -45,7 +54,10 @@ function LoginForm() {
 
   const handleGoogle = async () => {
     try {
-      await authClient.signIn.social({ provider: 'google' })
+      await authClient.signIn.social({
+        provider: 'google',
+        callbackURL: redirectTo,
+      })
     } catch {
       setError('Google OAuth not configured.')
     }
