@@ -36,6 +36,13 @@
       "when": 1784351283010,
       "tag": "0004_big_crystal",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1784358156275,
+      "tag": "0005_grey_kitty_pryde",
+      "breakpoints": true
     }
   ]
 }

@@ -5,6 +5,7 @@ import { db } from '~/lib/db'
 import { coverLetters } from '~/lib/schema'
 import { captureServerEvent } from '~/lib/posthog-server'
 import { ResumeDataSchema } from '~/lib/schemas'
+import { gateFeature, recordUsage } from '~/lib/plan'
 import { z } from 'zod'
 
 export const maxDuration = 60
@@ -24,6 +25,11 @@ export const POST = withAuth(async (req, { user }) => {
   if (!body.success) {
     return NextResponse.json({ error: 'Invalid request' }, { status: 400 })
   }
+
+  // ── Feature gate: cover letter limit (free: 3/week) ──
+  const gate = await gateFeature(user.id, 'cover_letter', user.role, user.plan)
+  if (gate) return gate
+
   const { resume, jdText, company, role, focus, language, resumeId } = body.data
   const isThai = language === 'th'
 
@@ -112,6 +118,7 @@ ANTI-FABRICATION RULES (CRITICAL — never violate these):
     maxOutputTokens: 1024,
   })
 
+  await recordUsage(user.id, 'cover_letter')
   await captureServerEvent(user.id, 'cover_letter_created', { company, role, language })
 
   const letterId = crypto.randomUUID()

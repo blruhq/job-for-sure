@@ -7,12 +7,18 @@ const {
   mockGenerateObjectWithFailover,
   mockSelect,
   mockInsert,
+  mockGetUserPlan,
+  mockGateFeature,
+  mockRecordUsage,
 } = vi.hoisted(() => ({
   mockGetSessionUser: vi.fn(),
   mockCheckRateLimit: vi.fn(),
   mockGenerateObjectWithFailover: vi.fn(),
   mockSelect: vi.fn(),
   mockInsert: vi.fn(),
+  mockGetUserPlan: vi.fn(),
+  mockGateFeature: vi.fn().mockResolvedValue(null),
+  mockRecordUsage: vi.fn(),
 }))
 
 vi.mock('~/lib/auth-helpers', () => ({
@@ -21,6 +27,12 @@ vi.mock('~/lib/auth-helpers', () => ({
 
 vi.mock('~/lib/ratelimit', () => ({
   checkRateLimit: mockCheckRateLimit,
+}))
+
+vi.mock('~/lib/plan', () => ({
+  getUserPlan: mockGetUserPlan,
+  gateFeature: mockGateFeature,
+  recordUsage: mockRecordUsage,
 }))
 
 vi.mock('~/lib/ai-providers', () => ({
@@ -58,6 +70,8 @@ describe('Interview API Route', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     mockCheckRateLimit.mockResolvedValue(null) // Not rate limited by default
+    mockGetUserPlan.mockResolvedValue('free')
+    mockGateFeature.mockResolvedValue(null)
   })
 
   describe('GET', () => {
@@ -72,7 +86,7 @@ describe('Interview API Route', () => {
     })
 
     it('returns interview history on success', async () => {
-      mockGetSessionUser.mockResolvedValue({ id: 'u1', email: 'test@mail.com', name: 'Test' })
+      mockGetSessionUser.mockResolvedValue({ id: 'u1', email: 'test@mail.com', name: 'Test', role: 'user', banned: false })
       const mockHistory = [
         {
           id: 'int_1',
@@ -109,7 +123,7 @@ describe('Interview API Route', () => {
     })
 
     it('returns 400 when body does not match validation schema for action: question', async () => {
-      mockGetSessionUser.mockResolvedValue({ id: 'u1', email: 'test@mail.com', name: 'Test' })
+      mockGetSessionUser.mockResolvedValue({ id: 'u1', email: 'test@mail.com', name: 'Test', role: 'user', banned: false })
 
       const req = new NextRequest('http://localhost/api/ai/interview', {
         method: 'POST',
@@ -122,7 +136,7 @@ describe('Interview API Route', () => {
     })
 
     it('generates question when action: question is requested', async () => {
-      mockGetSessionUser.mockResolvedValue({ id: 'u1', email: 'test@mail.com', name: 'Test' })
+      mockGetSessionUser.mockResolvedValue({ id: 'u1', email: 'test@mail.com', name: 'Test', role: 'user', banned: false })
       mockGenerateObjectWithFailover.mockResolvedValue({
         question: 'Explain reconciliation in React.',
         category: 'technical',
@@ -150,7 +164,7 @@ describe('Interview API Route', () => {
     })
 
     it('evaluates answer when action: evaluate is requested', async () => {
-      mockGetSessionUser.mockResolvedValue({ id: 'u1', email: 'test@mail.com', name: 'Test' })
+      mockGetSessionUser.mockResolvedValue({ id: 'u1', email: 'test@mail.com', name: 'Test', role: 'user', banned: false })
       mockGenerateObjectWithFailover.mockResolvedValue({
         score: 8,
         strengths: ['Clear terminology'],
@@ -180,7 +194,7 @@ describe('Interview API Route', () => {
     })
 
     it('saves session when action: save is requested', async () => {
-      mockGetSessionUser.mockResolvedValue({ id: 'u1', email: 'test@mail.com', name: 'Test' })
+      mockGetSessionUser.mockResolvedValue({ id: 'u1', email: 'test@mail.com', name: 'Test', role: 'user', banned: false })
       mockValues.mockResolvedValue({ success: true })
 
       const req = new NextRequest('http://localhost/api/ai/interview', {

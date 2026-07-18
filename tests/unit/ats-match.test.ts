@@ -1,10 +1,13 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { NextRequest } from 'next/server'
 
-const { mockGetSessionUser, mockCheckRateLimit, mockGenerateObjectWithFailover } = vi.hoisted(() => ({
+const { mockGetSessionUser, mockCheckRateLimit, mockGenerateObjectWithFailover, mockGetUserPlan, mockGateFeature, mockRecordUsage } = vi.hoisted(() => ({
   mockGetSessionUser: vi.fn(),
   mockCheckRateLimit: vi.fn(),
   mockGenerateObjectWithFailover: vi.fn(),
+  mockGetUserPlan: vi.fn(),
+  mockGateFeature: vi.fn().mockResolvedValue(null),
+  mockRecordUsage: vi.fn(),
 }))
 
 vi.mock('~/lib/auth-helpers', () => ({
@@ -17,6 +20,12 @@ vi.mock('~/lib/ratelimit', () => ({
 
 vi.mock('~/lib/ai-providers', () => ({
   generateObjectWithFailover: mockGenerateObjectWithFailover,
+}))
+
+vi.mock('~/lib/plan', () => ({
+  getUserPlan: mockGetUserPlan,
+  gateFeature: mockGateFeature,
+  recordUsage: mockRecordUsage,
 }))
 
 import { POST } from '~/api/ai/ats-match/route'
@@ -42,7 +51,8 @@ describe('ATS Match API Route', () => {
   })
 
   it('returns 400 when body does not match validation schema', async () => {
-    mockGetSessionUser.mockResolvedValue({ id: 'u1', email: 'test@mail.com', name: 'Test' })
+    mockGetSessionUser.mockResolvedValue({ id: 'u1', email: 'test@mail.com', name: 'Test', role: 'user', banned: false })
+    mockGetUserPlan.mockResolvedValue('free')
 
     const req = new NextRequest('http://localhost/api/ai/ats-match', {
       method: 'POST',
@@ -56,7 +66,8 @@ describe('ATS Match API Route', () => {
   })
 
   it('runs baseline health check when jdText is missing or empty', async () => {
-    mockGetSessionUser.mockResolvedValue({ id: 'u1', email: 'test@mail.com', name: 'Test' })
+    mockGetSessionUser.mockResolvedValue({ id: 'u1', email: 'test@mail.com', name: 'Test', role: 'user', banned: false })
+    mockGetUserPlan.mockResolvedValue('free')
     mockGenerateObjectWithFailover.mockResolvedValue({
       score: 85,
       categories: [
@@ -89,7 +100,8 @@ describe('ATS Match API Route', () => {
   })
 
   it('runs job description match when jdText is provided', async () => {
-    mockGetSessionUser.mockResolvedValue({ id: 'u1', email: 'test@mail.com', name: 'Test' })
+    mockGetSessionUser.mockResolvedValue({ id: 'u1', email: 'test@mail.com', name: 'Test', role: 'user', banned: false })
+    mockGetUserPlan.mockResolvedValue('free')
     mockGenerateObjectWithFailover.mockResolvedValue({
       score: 72,
       categories: [

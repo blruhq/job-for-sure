@@ -38,7 +38,7 @@
 │   │   ├── (auth)/              Login, register, password reset pages
 │   │   ├── (app)/               Authenticated pages (dashboard, chat, resume, interview, etc.)
 │   │   └── (marketing)/         Public landing page
-│   ├── api/                     Route handlers (parse-resume, ai/*, scrape, jobs/*, export)
+│   ├── api/                     Route handlers (parse-resume, ai/*, scrape, jobs/*, export, billing/*, stripe/webhook)
 │   ├── lib/                     Shared libraries
 │   │   ├── auth.ts              Better Auth server instance
 │   │   ├── auth-client.ts       Better Auth browser client
@@ -48,7 +48,9 @@
 │   │   ├── scraper.ts           Job URL scraper with SSRF protection
 │   │   ├── store.tsx            Zustand-like React context store
 │   │   ├── email.ts             Resend email sender
-│   │   └── posthog-server.ts    Server-side PostHog analytics
+│   │   ├── posthog-server.ts    Server-side PostHog analytics
+│   │   ├── stripe.ts            Stripe client + price constants
+│   │   └── plan.ts              Plan/limit/usage helpers
 │   └── components/
 │       ├── resume/              Resume detail, PDF, co-pilot, cover letter
 │       ├── agent-elements/      AI chat UI components
@@ -77,6 +79,7 @@
 | Single test file | `pnpm vitest run tests/unit/<file>` |
 | DB migration generate | `pnpm db:generate` |
 | DB migration apply | `pnpm db:migrate` |
+| Setup Stripe products | `pnpm db:setup-stripe` |
 | Lint | `pnpm lint` |
 | TypeScript check | `npx tsc --noEmit` |
 
@@ -97,3 +100,17 @@
 7. **Module path aliases:** `~/` maps to `./app/`, `@/` maps to `./` root.
 
 8. **Resume PDF uses `@react-pdf/renderer`** — runs server-side, no headless browser. Do NOT use `html2canvas` or Puppeteer for PDF generation.
+
+9. **Stripe billing (Free/Pro).** Plans: Free (generous limits) or Pro ($4/mo or $29/yr). `user.plan` in DB is `'free' | 'pro'`. Admins also get `plan='pro'` via seed.
+
+10. **Feature gating.** Route handlers check limits via `gateFeature(userId, feature, role, plan)` + `recordUsage(userId, feature)` from `app/lib/plan.ts`. Usage is recorded to `usage_events` table (daily counters). Limits enforced via `checkLimit(userId, feature, plan)`. Resume creation counts actual DB rows (`resumes` table), not usage events.
+
+11. **Pricing page** at `/pricing` (public). **Billing settings** at `/settings/billing` (plan, usage bars, Stripe customer portal). Free users see an upgrade prompt; Pro users see plan details and cancel option.
+
+12. **Plan tiers & daily limits (Free/Pro):**
+    - Chat: 15 / unlimited
+    - Cover letters: 3/week / unlimited
+    - ATS matches: 5/day / unlimited
+    - Interview sessions: 3/week / unlimited
+    - Resumes: 3 total / unlimited
+    Usage resets nightly via `usage_events` daily counters.

@@ -1,10 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getSessionUser } from '~/lib/auth-helpers'
+import { getUserPlan } from '~/lib/plan'
 import { checkRateLimit, checkGeneralRateLimit } from '~/lib/ratelimit'
 import { captureServerError } from '~/lib/posthog-server'
 
 export interface AuthContext<P = Record<string, string>> {
-  user: { id: string; email: string; name: string }
+  user: { id: string; email: string; name: string; role: string; plan: string }
   params: P
 }
 
@@ -37,11 +38,16 @@ export function withAuth<P = Record<string, string>>(
 
     try {
       // 1. Auth check
-      const user = await getSessionUser()
-      if (!user) {
+      const sessionUser = await getSessionUser()
+      if (!sessionUser) {
         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
       }
-      userId = user.id
+      userId = sessionUser.id
+
+      // 1b. Fetch user plan for feature gating
+      const plan = await getUserPlan(sessionUser.id)
+
+      const user = { ...sessionUser, plan }
 
       // 1b. Origin check — defense against CSRF on custom API routes
       const method = nextReq.method.toUpperCase()

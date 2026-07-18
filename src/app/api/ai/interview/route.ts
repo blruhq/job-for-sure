@@ -6,6 +6,7 @@ import { db } from '~/lib/db'
 import { interviewSessions } from '~/lib/schema'
 import { eq, desc, and, isNull } from 'drizzle-orm'
 import { ResumeDataSchema } from '~/lib/schemas'
+import { gateFeature, recordUsage } from '~/lib/plan'
 import { z } from 'zod'
 
 export const maxDuration = 60
@@ -281,8 +282,13 @@ export const POST = withAuth(async (req, { user }) => {
   const { action } = body
 
   switch (action) {
-    case 'question':
+    case 'question': {
+      // ── Feature gate: interview prep limit (free: 3/week) ──
+      const gate = await gateFeature(user.id, 'interview', user.role, user.plan)
+      if (gate) return gate
+      await recordUsage(user.id, 'interview')
       return handleQuestion(body, user.id)
+    }
     case 'evaluate':
       return handleEvaluate(body)
     case 'save':

@@ -21,6 +21,13 @@ export const user = pgTable("user", {
   banned: boolean("banned").default(false).notNull(),
   banReason: text("ban_reason"),
   banExpires: timestamp("ban_expires"),
+  // ── Billing ──
+  // `plan` is the effective plan denormalized from Stripe state for fast reads.
+  // Updated by webhook. Source of truth is the Stripe subscription, but we read
+  // this column on every request to avoid calling Stripe.
+  plan: text("plan").default("free").notNull(),
+  planUpdatedAt: timestamp("plan_updated_at").defaultNow().notNull(),
+  stripeCustomerId: text("stripe_customer_id"),
 });
 
 export const session = pgTable(
@@ -97,6 +104,66 @@ export const sessionRelations = relations(session, ({ one }) => ({
 
 export const accountRelations = relations(account, ({ one }) => ({
   user: one(user, { fields: [account.userId], references: [user.id] }),
+}));
+
+// ═══════════════════════════════════════════════════════════════
+// BILLING — Stripe subscriptions (mirror of Stripe state)
+// ═══════════════════════════════════════════════════════════════
+
+export const subscriptions = pgTable(
+  "subscriptions",
+  {
+    // Stripe subscription ID (e.g. sub_xxx) — primary key, idempotent on webhook
+    id: text("id").primaryKey(),
+    userId: text("user_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+    stripeCustomerId: text("stripe_customer_id").notNull(),
+    status: text("status").notNull(), // active | past_due | canceled | trialing | incomplete
+    plan: text("plan").notNull(),     // pro | free (mirrors user.plan via webhook)
+    interval: text("interval"),       // month | year
+    currentPeriodEnd: timestamp("current_period_end").notNull(),
+    cancelAtPeriodEnd: boolean("cancel_at_period_end").default(false).notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().$onUpdate(() => new Date()).notNull(),
+  },
+  (table) => [
+    index("subscriptions_userId_idx").on(table.userId),
+    index("subscriptions_status_idx").on(table.status),
+    index("subscriptions_stripeCustomerId_idx").on(table.stripeCustomerId),
+  ],
+);
+
+export const subscriptionsRelations = relations(subscriptions, ({ one }) => ({
+  user: one(user, { fields: [subscriptions.userId], references: [user.id] }),
+}));
+
+// ═══════════════════════════════════════════════════════════════
+// USAGE TRACKING — daily/weekly limits for free plan
+// ═══════════════════════════════════════════════════════════════
+
+export const usageEvents = pgTable(
+  "usage_events",
+  {
+    id: text("id").primaryKey(),
+    userId: text("user_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+    // chat | cover_letter | ats_match | interview | resume_create
+    feature: text("feature").notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => [
+    index("usage_events_userId_feature_createdAt_idx").on(
+      table.userId,
+      table.feature,
+      table.createdAt,
+    ),
+  ],
+);
+
+export const usageEventsRelations = relations(usageEvents, ({ one }) => ({
+  user: one(user, { fields: [usageEvents.userId], references: [user.id] }),
 }));
 
 // ═══════════════════════════════════════════════════════════════

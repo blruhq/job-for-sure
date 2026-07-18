@@ -2,10 +2,11 @@ import { NextResponse } from 'next/server'
 import { db } from '~/lib/db'
 import { resumes } from '~/lib/schema'
 import { withAuth } from '~/lib/with-auth'
-import { eq, and, isNull } from 'drizzle-orm'
+import { eq, and, isNull, count } from 'drizzle-orm'
 import { z } from 'zod'
 import { ResumeDataSchema } from '~/lib/schemas'
 import { MAX_RESUME_JSON_BYTES } from '~/lib/constants'
+import { getEffectivePlan } from '~/lib/plan'
 
 // GET /api/resumes — list all resumes for the current user
 export const GET = withAuth(async (req, { user }) => {
@@ -32,6 +33,21 @@ export const POST = withAuth(async (req, { user }) => {
   }
 
   const { id, data, isBase } = body.data
+
+  // ── Feature gate: resume limit (free: 3 total) ──
+  const effectivePlan = getEffectivePlan(user.role, user.plan)
+  if (effectivePlan === 'free' && (isBase ?? true)) {
+    const [row] = await db
+      .select({ total: count() })
+      .from(resumes)
+      .where(and(eq(resumes.userId, user.id), eq(resumes.isBase, true), isNull(resumes.deletedAt)))
+    if ((row?.total ?? 0) >= 3) {
+      return NextResponse.json(
+        { error: 'Resume limit reached (max 3 on Free plan)', upgradeUrl: '/pricing' },
+        { status: 402 },
+      )
+    }
+  }
 
   // Enforce max payload size
   const payloadSize = JSON.stringify(data).length

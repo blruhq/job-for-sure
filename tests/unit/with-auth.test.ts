@@ -5,6 +5,10 @@ const { mockGetSessionUser } = vi.hoisted(() => ({
   mockGetSessionUser: vi.fn(),
 }))
 
+const { mockGetUserPlan } = vi.hoisted(() => ({
+  mockGetUserPlan: vi.fn(),
+}))
+
 const { mockCheckRateLimit, mockCheckGeneralRateLimit } = vi.hoisted(() => ({
   mockCheckRateLimit: vi.fn(),
   mockCheckGeneralRateLimit: vi.fn(),
@@ -16,6 +20,10 @@ const { mockCaptureServerError } = vi.hoisted(() => ({
 
 vi.mock('~/lib/auth-helpers', () => ({
   getSessionUser: mockGetSessionUser,
+}))
+
+vi.mock('~/lib/plan', () => ({
+  getUserPlan: mockGetUserPlan,
 }))
 
 vi.mock('~/lib/ratelimit', () => ({
@@ -32,7 +40,8 @@ import { withAuth } from '~/lib/with-auth'
 describe('withAuth wrapper', () => {
   beforeEach(() => {
     vi.clearAllMocks()
-    mockGetSessionUser.mockResolvedValue({ id: 'u1', email: 'test@test.com', name: 'Test' })
+    mockGetSessionUser.mockResolvedValue({ id: 'u1', email: 'test@test.com', name: 'Test', role: 'user', banned: false })
+    mockGetUserPlan.mockResolvedValue('free')
     mockCheckRateLimit.mockResolvedValue(null)
     mockCheckGeneralRateLimit.mockResolvedValue(null)
   })

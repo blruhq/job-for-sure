@@ -3,6 +3,7 @@ import { withAuth } from '~/lib/with-auth'
 import { NextResponse } from 'next/server'
 import { captureServerEvent } from '~/lib/posthog-server'
 import { ChatMessagesSchema, ChatContextSchema } from '~/lib/schemas'
+import { gateFeature, recordUsage } from '~/lib/plan'
 
 export const maxDuration = 30
 
@@ -12,6 +13,10 @@ export const POST = withAuth(async (req, { user }) => {
   if (!messagesResult.success) {
     return NextResponse.json({ error: 'Invalid messages payload' }, { status: 400 })
   }
+
+  // ── Feature gate: chat limit (free: 15/day) ──
+  const gate = await gateFeature(user.id, 'chat', user.role, user.plan)
+  if (gate) return gate
 
   const contextResult = ChatContextSchema.safeParse(raw.context)
   const context = contextResult.success ? contextResult.data : undefined
@@ -137,6 +142,7 @@ Rules:
 - Keep responses under 200 words unless the user asks for detail.
 - Respond in the same language the user uses to chat with you (e.g., if they write in Thai, reply in Thai. If they write in English, reply in English). Never switch languages mid-conversation unless the user explicitly asks you to translate something.`
 
+  await recordUsage(user.id, 'chat')
   await captureServerEvent(user.id, mode === 'build' ? 'resume_build_chat' : 'chat_message_sent')
 
   return streamWithFailover({

@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { generateObjectWithFailover } from '~/lib/ai-providers'
 import { withAuth } from '~/lib/with-auth'
 import { ResumeDataSchema } from '~/lib/schemas'
+import { gateFeature, recordUsage } from '~/lib/plan'
 import { z } from 'zod'
 
 export const maxDuration = 60
@@ -25,11 +26,16 @@ const AtsSchema = z.object({
   suggestions: z.array(z.string()),
 })
 
-export const POST = withAuth(async (req, { user: _user }) => {
+export const POST = withAuth(async (req, { user }) => {
   const body = AtsInputBody.safeParse(await req.json())
   if (!body.success) {
     return NextResponse.json({ error: 'Invalid request' }, { status: 400 })
   }
+
+  // ── Feature gate: ATS match limit (free: 5/day) ──
+  const gate = await gateFeature(user.id, 'ats_match', user.role, user.plan)
+  if (gate) return gate
+
   const { resume, jdText } = body.data
   const hasJd = !!jdText && jdText.trim().length > 0
 
@@ -99,6 +105,8 @@ Definitions:
     temperature: 0,
     maxOutputTokens: 1000,
   })
+
+  await recordUsage(user.id, 'ats_match')
 
   return NextResponse.json(result)
 }, { rateLimitType: 'ai', route: '/api/ai/ats-match' })
