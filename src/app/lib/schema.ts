@@ -192,7 +192,10 @@ export const resumes = pgTable("resumes", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().$onUpdate(() => new Date()).notNull(),
   deletedAt: timestamp("deleted_at"),
-}, (table) => [index("resumes_userId_idx").on(table.userId)]);
+}, (table) => [
+  index("resumes_userId_idx").on(table.userId),
+  index("resumes_userId_isBase_idx").on(table.userId, table.isBase),
+]);
 
 export const resumeRelations = relations(resumes, ({ one }) => ({
   user: one(user, { fields: [resumes.userId], references: [user.id] }),
@@ -230,6 +233,8 @@ export const applications = pgTable("applications", {
 }, (table) => [
   index("applications_userId_idx").on(table.userId),
   index("applications_userId_status_idx").on(table.userId, table.status),
+  index("applications_resumeId_idx").on(table.resumeId),
+  index("applications_coverLetterId_idx").on(table.coverLetterId),
 ]);
 
 export const applicationsRelations = relations(applications, ({ one }) => ({
@@ -276,7 +281,10 @@ export const interviewSessions = pgTable("interview_sessions", {
   exchanges: jsonb("exchanges").notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   deletedAt: timestamp("deleted_at"),
-}, (table) => [index("interview_sessions_userId_idx").on(table.userId)]);
+}, (table) => [
+  index("interview_sessions_userId_idx").on(table.userId),
+  index("interview_sessions_resumeId_idx").on(table.resumeId),
+]);
 
 export const interviewSessionsRelations = relations(interviewSessions, ({ one }) => ({
   user: one(user, { fields: [interviewSessions.userId], references: [user.id] }),
@@ -300,7 +308,10 @@ export const coverLetters = pgTable("cover_letters", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().$onUpdate(() => new Date()).notNull(),
   deletedAt: timestamp("deleted_at"),
-}, (table) => [index("cover_letters_userId_idx").on(table.userId)]);
+}, (table) => [
+  index("cover_letters_userId_idx").on(table.userId),
+  index("cover_letters_resumeId_idx").on(table.resumeId),
+]);
 
 export const coverLettersRelations = relations(coverLetters, ({ one }) => ({
   user: one(user, { fields: [coverLetters.userId], references: [user.id] }),

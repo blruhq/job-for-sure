@@ -2,7 +2,7 @@
 
 import { useState, useRef } from 'react'
 import { useRouter } from '~/i18n/routing'
-import { Trash2, Link2, RefreshCw, Plus } from 'lucide-react'
+import { Trash2, Link2, RefreshCw, Plus, Loader2, AlertCircle } from 'lucide-react'
 import { cn } from '~/lib/utils'
 import { useApplications, useMoveApplication, useDeleteApplication, useCreateApplication } from '~/hooks/use-apps'
 import { JobDetailPanel } from '~/components/pipeline/job-detail-panel'
@@ -129,7 +129,7 @@ function JobCardContent({ job }: { job: PipelineJob }) {
 export function ApplicationsView() {
   const router = useRouter()
   const t = useTranslations('applications')
-  const { data: applications } = useApplications()
+  const { data: applications, isLoading, isError, error } = useApplications()
   const { mutateAsync: moveJob } = useMoveApplication()
   const { mutateAsync: removeJobMutation } = useDeleteApplication()
   const { mutateAsync: bookmarkJob } = useCreateApplication()
@@ -160,6 +160,39 @@ export function ApplicationsView() {
   const resumeIds = ['all', ...new Set(allJobs.map((j) => j.resume).filter(Boolean))]
 
   const filterJobs = (jobs: PipelineJob[]) => filter === 'all' ? jobs : jobs.filter((j) => j.resume === filter)
+
+  // ── Loading state ──
+  if (isLoading) {
+    return (
+      <div className="flex h-full w-full items-center justify-center bg-background">
+        <div className="flex flex-col items-center gap-3">
+          <Loader2 size={20} className="animate-spin text-muted-foreground" />
+          <p className="text-xs text-muted-foreground">Loading applications…</p>
+        </div>
+      </div>
+    )
+  }
+
+  // ── Error state ──
+  if (isError) {
+    return (
+      <div className="flex h-full w-full flex-col items-center justify-center bg-background gap-3 px-6 text-center">
+        <AlertCircle size={24} className="text-destructive/60" />
+        <div className="max-w-xs">
+          <p className="text-sm font-medium text-foreground">Failed to load applications</p>
+          <p className="mt-1 text-xs text-muted-foreground">
+            {error instanceof Error ? error.message : 'An unexpected error occurred. Please try again.'}
+          </p>
+        </div>
+        <button
+          onClick={() => window.location.reload()}
+          className="cursor-pointer rounded-sm bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground hover:opacity-90"
+        >
+          Reload page
+        </button>
+      </div>
+    )
+  }
 
   // ── Empty board if applications not loaded ──
   if (!applications) return null

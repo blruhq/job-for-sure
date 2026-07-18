@@ -3,9 +3,9 @@
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import {
-  Search, Bookmark, ExternalLink, MapPin, Loader2, AlertCircle,
-  RefreshCw, Filter, X, Globe, Clock, Star, Plane, MessageSquare,
-  ChevronDown, Brain, FileText,
+  Search, Bookmark, Loader2, AlertCircle,
+  RefreshCw, Filter, X, Globe, Clock, Star, Plane,
+  ChevronDown,
 } from 'lucide-react'
 import { cn } from '~/lib/utils'
 import { compareJobs } from '~/lib/job-sources/scoring'
@@ -15,7 +15,7 @@ import { useUIStore } from '~/hooks/use-ui'
 import { notify } from '~/lib/toast'
 import { companyColor, companyLogo } from '~/lib/company-data'
 import type { Resume, PipelineJob } from '~/types/resume'
-import type { ScoredJob, SearchResult, JobSource, JobResult } from '~/lib/job-sources/types'
+import type { ScoredJob, SearchResult, JobSource } from '~/lib/job-sources/types'
 import { scoredJobToPipelineJob } from '~/lib/job-utils'
 import { countryToFlag } from '~/lib/job-sources/geo'
 import { JobDetailPanel } from '~/components/pipeline/job-detail-panel'

@@ -26,8 +26,10 @@ const PLANS = [
   {
     name: 'Pro',
     price: '$4',
+    originalPrice: '$8',
     period: '/ month',
-    description: 'Unlock everything',
+    discount: '50% off',
+    description: 'Launch special — lock in this price forever',
     features: [
       'Unlimited resumes & variants',
       'Unlimited AI chats',
@@ -37,7 +39,7 @@ const PLANS = [
       'Priority AI speed',
       'Early access to new features',
     ],
-    yearlyNote: 'or $29 / year (save 40%)',
+    yearlyNote: 'or $29 / year (save 70% vs $8/mo)',
     cta: 'Subscribe',
     highlight: true,
   },
@@ -102,9 +104,15 @@ export default function PricingPage() {
               <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
                 {plan.name}
               </h2>
-              <p className="mt-1 text-3xl font-bold text-foreground">
-                {plan.price}
+              <p className="mt-1 flex items-baseline gap-2">
+                {plan.originalPrice && (
+                  <span className="text-lg text-muted-foreground line-through">{plan.originalPrice}/mo</span>
+                )}
+                <span className="text-3xl font-bold text-foreground">{plan.price}</span>
                 <span className="text-sm font-normal text-muted-foreground">{plan.period}</span>
+                {plan.discount && (
+                  <span className="rounded-full bg-green-600 px-2 py-0.5 text-[10px] font-semibold text-white">{plan.discount}</span>
+                )}
               </p>
               <p className="mt-1 text-xs text-muted-foreground">{plan.description}</p>
 
@@ -144,7 +152,7 @@ export default function PricingPage() {
                     disabled={loading === 'yearly'}
                     className="w-full rounded-lg border border-primary/30 px-4 py-2 text-xs font-medium text-primary hover:bg-primary/5 transition-colors disabled:opacity-50 cursor-pointer"
                   >
-                    {loading === 'yearly' ? 'Redirecting…' : '$29 / year (save 40%)'}
+                    {loading === 'yearly' ? 'Redirecting…' : '$29 / year (save 70% vs $8/mo)'}
                   </button>
                 </div>
               )}

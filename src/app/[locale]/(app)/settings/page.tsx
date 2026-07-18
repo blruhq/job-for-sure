@@ -23,7 +23,8 @@ function useNotify() {
     setNotif({ message: m, type: t })
     setTimeout(() => setNotif(null), 4000)
   }, [])
-  return { notif, notify }
+  const dismiss = useCallback(() => setNotif(null), [])
+  return { notif, notify, dismiss }
 }
 
 function Toast({ notif, onClose }: { notif: NonNullable<ReturnType<typeof useNotify>['notif']>; onClose: () => void }) {
@@ -39,7 +40,14 @@ function Toast({ notif, onClose }: { notif: NonNullable<ReturnType<typeof useNot
     >
       {notif.type === 'success' && <Check size={13} />}
       {notif.type === 'error' && <X size={13} />}
-      {notif.message}
+      <span className="flex-1">{notif.message}</span>
+      <button
+        onClick={onClose}
+        className="ml-2 cursor-pointer text-current opacity-60 hover:opacity-100 transition-opacity"
+        aria-label="Dismiss"
+      >
+        <X size={13} />
+      </button>
     </div>
   )
 }
@@ -55,7 +63,7 @@ export default function SettingsPage() {
   const [savingHomeLocation, setSavingHomeLocation] = useState(false)
   const [detectingLocation, setDetectingLocation] = useState(false)
   const [loading, setLoading] = useState(true)
-  const { notif, notify } = useNotify()
+  const { notif, notify, dismiss } = useNotify()
 
   // Profile form state
   const [name, setName] = useState('')
@@ -517,7 +525,7 @@ export default function SettingsPage() {
       </div>
 
       {/* Toast */}
-      {notif && <Toast notif={notif} onClose={() => {}} />}
+      {notif && <Toast notif={notif} onClose={dismiss} />}
     </div>
   )
 }
