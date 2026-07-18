@@ -10,8 +10,7 @@ import { fetchJobbKK } from '~/lib/job-sources/jobbkk'
 import { fetchGreenhouseCompany } from '~/lib/job-sources/greenhouse'
 import { fetchAshbyCompany } from '~/lib/job-sources/ashby'
 import { GREENHOUSE_COMPANIES, ASHBY_COMPANIES } from '~/lib/job-sources/companies'
-import { auth } from '~/lib/auth'
-import { headers } from 'next/headers'
+import { requireAdminApi } from '~/lib/auth-helpers'
 
 export const dynamic = 'force-dynamic'
 export const maxDuration = 30
@@ -72,12 +71,8 @@ async function testSource(
 }
 
 export async function GET() {
-  const h = await headers()
-  const session = await auth.api.getSession({ headers: h })
-  if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  if (session.user.email !== process.env.ADMIN_EMAIL) {
-    return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
-  }
+  const user = await requireAdminApi()
+  if (user instanceof NextResponse) return user
 
   const tests = await Promise.allSettled([
     testSource('remoteok', async () => {

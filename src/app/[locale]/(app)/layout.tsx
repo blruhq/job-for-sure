@@ -1,15 +1,20 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, usePathname } from 'next/navigation'
 import { useUIStore } from '~/hooks/use-ui'
 import { Sidebar } from '~/components/layout/sidebar'
 import { Topbar } from '~/components/layout/navbar'
 import { Skeleton } from '~/components/ui/skeleton'
 import { authClient } from '~/lib/auth-client'
 
+// Routes an admin is allowed to land on inside (app). Everything else
+// bounces them to /admin. (Admins are monitor-only.)
+const ADMIN_ALLOWED = new Set(['/admin'])
+
 function AuthGuard({ children }: { children: React.ReactNode }) {
   const router = useRouter()
+  const pathname = usePathname()
   const [checked, setChecked] = useState(false)
 
   useEffect(() => {
@@ -18,28 +23,41 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
     async function check() {
       try {
         const { data: session } = await authClient.getSession()
-        if (!cancelled) {
-          if (session) {
-            // Identify user in PostHog
-            try {
-              const posthog = (await import('posthog-js')).default
-              posthog.identify(session.user.id, {
-                email: session.user.email,
-                name: session.user.name,
-              })
-            } catch {
-              // PostHog not loaded yet — skip
-            }
-            setChecked(true)
-            return
-          }
+        if (cancelled) return
+
+        if (!session) {
           router.replace('/login')
+          return
         }
+
+        // Identify user in PostHog
+        try {
+          const posthog = (await import('posthog-js')).default
+          posthog.identify(session.user.id, {
+            email: session.user.email,
+            name: session.user.name,
+          })
+        } catch {
+          // PostHog not loaded yet — skip
+        }
+
+        // ── Role-based routing ──
+        // Strip locale prefix (/en/admin → /admin) for the allowlist check.
+        const stripped = pathname.replace(/^\/(en|th)/, '') || '/'
+        const isAdmin = (session.user as { role?: string }).role === 'admin'
+
+        if (isAdmin && !ADMIN_ALLOWED.has(stripped)) {
+          router.replace('/admin')
+          return
+        }
+        if (!isAdmin && stripped === '/admin') {
+          router.replace('/chat')
+          return
+        }
+
+        setChecked(true)
       } catch {
-        // Auth not configured or API unavailable
-        if (!cancelled) {
-          router.replace('/login')
-        }
+        if (!cancelled) router.replace('/login')
       }
     }
 
@@ -48,7 +66,7 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
     return () => {
       cancelled = true
     }
-  }, [router])
+  }, [router, pathname])
 
   if (!checked) {
     return (

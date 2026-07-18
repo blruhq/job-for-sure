@@ -5,7 +5,7 @@ import { routing } from './app/i18n/routing'
 
 const intlMiddleware = createMiddleware(routing)
 
-const protectedRoutes = ['/chat', '/ats', '/applications', '/resume', '/settings', '/interview', '/dashboard', '/cover-letter']
+const protectedRoutes = ['/chat', '/ats', '/applications', '/resume', '/settings', '/interview', '/dashboard', '/cover-letter', '/admin']
 const publicRoutes = ['/', '/login', '/register']
 
 function stripLocale(pathname: string) {

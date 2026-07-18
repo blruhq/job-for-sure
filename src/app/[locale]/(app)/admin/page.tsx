@@ -1,19 +1,14 @@
 import { db } from '~/lib/db'
 import { user, resumes, applications, interviewSessions, coverLetters } from '~/lib/schema'
-import { auth } from '~/lib/auth'
-import { headers } from 'next/headers'
-import { redirect } from 'next/navigation'
+import { requireAdmin } from '~/lib/auth-helpers'
 import { count, desc, sql } from 'drizzle-orm'
 import { SourceHealth } from '~/components/admin/source-health'
 
 export const dynamic = 'force-dynamic'
 
 export default async function AdminPage() {
-  // ── Auth check ──
-  const h = await headers()
-  const session = await auth.api.getSession({ headers: h })
-  if (!session) redirect('/login')
-  if (session.user.email !== process.env.ADMIN_EMAIL) redirect('/chat')
+  // ── Auth check (admin-only) ──
+  await requireAdmin()
 
   // ── Stats queries ──
   const [userCount] = await db.select({ total: count() }).from(user)

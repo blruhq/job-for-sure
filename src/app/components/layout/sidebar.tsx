@@ -14,6 +14,7 @@ import { PreviewCard } from '@base-ui/react/preview-card'
 import { Tooltip } from '~/components/ui/tooltip'
 import { useTranslations } from 'next-intl'
 import { UploadModal } from '~/components/layout/upload-modal'
+import { authClient } from '~/lib/auth-client'
 
 type NavItem = {
   href: string
@@ -118,18 +119,19 @@ export function Sidebar() {
   const [uploadModalOpen, setUploadModalOpen] = useState(false)
 
   useEffect(() => {
-    async function checkAdmin() {
+    let cancelled = false
+    async function loadRole() {
       try {
-        const res = await fetch('/api/auth/is-admin')
-        if (res.ok) {
-          const { isAdmin } = await res.json()
-          setIsAdmin(isAdmin)
+        const { data: session } = await authClient.getSession()
+        if (!cancelled && session) {
+          setIsAdmin((session.user as { role?: string }).role === 'admin')
         }
       } catch {
-        // not admin
+        // not authenticated — AuthGuard will redirect
       }
     }
-    checkAdmin()
+    loadRole()
+    return () => { cancelled = true }
   }, [])
 
   const totalPipeline = (applications?.bookmark.length ?? 0) + (applications?.applied.length ?? 0) + (applications?.interviewing.length ?? 0) + (applications?.offers.length ?? 0)
@@ -159,217 +161,243 @@ export function Sidebar() {
           c ? 'w-[var(--sidebar-collapsed-width)]' : 'w-[var(--sidebar-width)]',
         )}
       >
-        {/* ── HOME ── */}
-        <NavSection
-          items={NAV_HOME}
-          collapsed={c}
-          label={t('home')}
-          pathname={pathname}
-          t={t}
-          totalPipeline={totalPipeline}
-          showSeparator={false}
-        />
-
-        {/* ── MY RESUMES ── */}
-        {c ? (
-          /* COLLAPSED: single icon + hover flyout */
-          <div className="flex flex-col items-center p-1 pt-3">
-            <PreviewCard.Root>
-              <PreviewCard.Trigger className="flex h-7 w-7 items-center justify-center rounded-sm text-muted-foreground hover:bg-sidebar-hover hover:text-foreground cursor-pointer">
-                <FileText size={15} />
-              </PreviewCard.Trigger>
-              <PreviewCard.Portal>
-                <PreviewCard.Positioner side="right" align="start" sideOffset={8} className="z-[100]">
-                  <PreviewCard.Popup className="min-w-[200px] rounded-md border border-border bg-popover p-1 shadow-lg">
-                    <div className="label-mono px-2 py-1">{t('resumes')}</div>
-                    {resumes.length === 0 && (
-                      <div className="px-2 py-3 text-xs text-muted-foreground text-center">{t('noResumes')}</div>
-                    )}
-                    <div className="max-h-[240px] overflow-y-auto">
-                      {baseResumes.map((r) => {
-                        const variants = variantsByBase[r.id] || []
-                        return (
-                          <div key={r.id}>
-                            <button
-                              onClick={() => {
-                                setActiveResumeId(r.id)
-                                router.push(`/resume/${r.id}`)
-                              }}
-                              className={cn(
-                                'flex w-full items-center gap-2 rounded-sm px-2 py-1.5 text-xs transition-colors',
-                                r.id === activeResumeId ? 'bg-sidebar-active font-semibold text-foreground' : 'text-muted-foreground hover:bg-sidebar-hover hover:text-foreground',
-                              )}
-                            >
-                              <span className={cn('h-2 w-2 rounded-full border-2 shrink-0', r.id === activeResumeId ? 'border-primary bg-primary' : 'border-muted-foreground')} />
-                              <span className="flex-1 truncate text-left">{r.name}</span>
-                              <span className="font-mono text-[10px] font-semibold text-success shrink-0">{r.score}%</span>
-                            </button>
-                            {variants.map((v) => (
-                              <button
-                                key={v.id}
-                                onClick={() => {
-                                  setActiveResumeId(v.id)
-                                  router.push(`/resume/${v.id}`)
-                                }}
-                                className={cn(
-                                  'flex w-full items-center gap-2 rounded-sm px-2 py-1 text-[11px] transition-colors pl-5',
-                                  v.id === activeResumeId ? 'bg-sidebar-active font-semibold text-foreground' : 'text-muted-foreground hover:bg-sidebar-hover hover:text-foreground',
-                                )}
-                              >
-                                <span className="text-[9px] shrink-0">└</span>
-                                <span className="flex-1 truncate text-left">{v.variantLabel || v.name}</span>
-                              </button>
-                            ))}
-                          </div>
-                        )
-                      })}
-                    </div>
-                    <button
-                      onClick={handleNewResume}
-                      className="flex w-full items-center gap-1.5 rounded-sm px-2 py-1.5 text-xs text-primary hover:bg-accent-soft cursor-pointer"
-                    >
-                      <Plus size={13} strokeWidth={2.5} />
-                      {t('newResume')}
-                    </button>
-                  </PreviewCard.Popup>
-                </PreviewCard.Positioner>
-              </PreviewCard.Portal>
-            </PreviewCard.Root>
-          </div>
-        ) : (
-          /* EXPANDED: resume list with scroll container */
+        {isAdmin ? (
+          /* ── ADMIN: monitor-only nav — just the Admin link ── */
           <div className="flex flex-col gap-0.5 p-1">
             <div className="label-mono px-2.5 pt-3 pb-1">
-              {t('resumes')}
+              {c ? '' : 'Admin'}
             </div>
-            {/* SCROLLABLE RESUME LIST — max-height prevents pushing tools down */}
-            <div className="max-h-[200px] overflow-y-auto scrollbar-thin">
-              {baseResumes.map((r) => {
-                const variants = variantsByBase[r.id] || []
-                return (
-                  <div key={r.id}>
-                    {/* Base resume */}
-                    <div
-                      className={cn(
-                        'group flex items-center gap-1 rounded-sm transition-colors border-l-2',
-                        r.id === activeResumeId && pathname === `/resume/${r.id}`
-                          ? 'bg-sidebar-active border-l-primary'
-                          : 'hover:bg-sidebar-hover border-l-transparent',
-                        'px-2 py-1',
-                      )}
-                    >
-                      <button
-                        onClick={() => {
-                          setActiveResumeId(r.id)
-                          router.push(`/resume/${r.id}`)
-                        }}
-                        className="flex cursor-pointer items-center gap-2 text-xs flex-1 min-w-0"
-                      >
-                        <span
-                          className={cn(
-                            'h-2 w-2 shrink-0 rounded-full border-2 transition-all',
-                            r.id === activeResumeId ? 'border-primary bg-primary' : 'border-muted-foreground',
-                          )}
-                        />
-                        <span className="flex-1 truncate text-left font-medium">{r.name}</span>
-                        <span className="font-mono text-[10px] font-semibold text-success">{r.score}%</span>
-                      </button>
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation()
-                          setDeleteTarget({ id: r.id, name: r.name })
-                        }}
-                        className="shrink-0 opacity-0 group-hover:opacity-100 cursor-pointer rounded-xs p-1 text-muted-foreground hover:text-red-500 hover:bg-red-500/10 transition-all"
-                        title="Delete resume"
-                      >
-                        <Trash2 size={12} />
-                      </button>
-                    </div>
-                    {/* Variants under this base */}
-                    {variants.map((v) => (
-                      <div
-                        key={v.id}
-                        className={cn(
-                          'group flex items-center gap-1 rounded-sm transition-colors border-l-2 ml-3',
-                          v.id === activeResumeId && pathname === `/resume/${v.id}`
-                            ? 'bg-sidebar-active border-l-primary/50'
-                            : 'hover:bg-sidebar-hover border-l-transparent',
-                          'px-2 py-0.5',
-                        )}
-                      >
-                        <button
-                          onClick={() => {
-                            setActiveResumeId(v.id)
-                            router.push(`/resume/${v.id}`)
-                          }}
-                          className="flex cursor-pointer items-center gap-2 text-xs flex-1 min-w-0"
-                        >
-                          <span className="shrink-0 text-[9px] text-muted-foreground">└</span>
-                          <span className="flex-1 truncate text-left text-[11px] text-muted-foreground">
-                            {v.variantLabel || v.name}
-                          </span>
-                          {v.score > 0 && (
-                            <span className="font-mono text-[9px] font-semibold text-success/70">{v.score}%</span>
-                          )}
-                        </button>
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation()
-                            setDeleteTarget({ id: v.id, name: v.variantLabel || v.name })
-                          }}
-                          className="shrink-0 opacity-0 group-hover:opacity-100 cursor-pointer rounded-xs p-0.5 text-muted-foreground hover:text-red-500 hover:bg-red-500/10 transition-all"
-                          title="Delete variant"
-                        >
-                          <Trash2 size={10} />
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-                )
-              })}
-            </div>
-            {/* Add resume — opens modal */}
-            <button
-              onClick={handleNewResume}
-              className={cn(
-                'flex items-center gap-1.5 rounded-sm px-2 py-1.5 text-xs text-primary transition-colors hover:bg-accent-soft',
-              )}
-            >
-              <Plus size={13} className="shrink-0" strokeWidth={2.5} />
-              <span>{t('newResume')}</span>
-            </button>
+            <Tooltip label="Admin" disabled={!c}>
+              <Link
+                href="/admin"
+                className={cn(
+                  'flex items-center gap-2 rounded-sm text-xs font-medium transition-[padding,background-color,color] duration-200 ease-[cubic-bezier(0.2,0,0,1)]',
+                  pathname === '/admin'
+                    ? 'bg-sidebar-active text-foreground font-semibold'
+                    : 'text-muted-foreground hover:bg-sidebar-hover hover:text-foreground',
+                  c ? 'pl-[16px] pr-[17px] py-1.5' : 'px-2.5 py-1.5',
+                )}
+              >
+                <Shield size={15} className={cn('shrink-0', pathname === '/admin' ? 'text-primary' : 'opacity-70')} />
+                <span className={cn('transition-opacity duration-150', c && 'opacity-0')}>Admin Dashboard</span>
+              </Link>
+            </Tooltip>
           </div>
+        ) : (
+          <>
+            {/* ── HOME ── */}
+            <NavSection
+              items={NAV_HOME}
+              collapsed={c}
+              label={t('home')}
+              pathname={pathname}
+              t={t}
+              totalPipeline={totalPipeline}
+              showSeparator={false}
+            />
+
+            {/* ── MY RESUMES ── */}
+            {c ? (
+              /* COLLAPSED: single icon + hover flyout */
+              <div className="flex flex-col items-center p-1 pt-3">
+                <PreviewCard.Root>
+                  <PreviewCard.Trigger className="flex h-7 w-7 items-center justify-center rounded-sm text-muted-foreground hover:bg-sidebar-hover hover:text-foreground cursor-pointer">
+                    <FileText size={15} />
+                  </PreviewCard.Trigger>
+                  <PreviewCard.Portal>
+                    <PreviewCard.Positioner side="right" align="start" sideOffset={8} className="z-[100]">
+                      <PreviewCard.Popup className="min-w-[200px] rounded-md border border-border bg-popover p-1 shadow-lg">
+                        <div className="label-mono px-2 py-1">{t('resumes')}</div>
+                        {resumes.length === 0 && (
+                          <div className="px-2 py-3 text-xs text-muted-foreground text-center">{t('noResumes')}</div>
+                        )}
+                        <div className="max-h-[240px] overflow-y-auto">
+                          {baseResumes.map((r) => {
+                            const variants = variantsByBase[r.id] || []
+                            return (
+                              <div key={r.id}>
+                                <button
+                                  onClick={() => {
+                                    setActiveResumeId(r.id)
+                                    router.push(`/resume/${r.id}`)
+                                  }}
+                                  className={cn(
+                                    'flex w-full items-center gap-2 rounded-sm px-2 py-1.5 text-xs transition-colors',
+                                    r.id === activeResumeId ? 'bg-sidebar-active font-semibold text-foreground' : 'text-muted-foreground hover:bg-sidebar-hover hover:text-foreground',
+                                  )}
+                                >
+                                  <span className={cn('h-2 w-2 rounded-full border-2 shrink-0', r.id === activeResumeId ? 'border-primary bg-primary' : 'border-muted-foreground')} />
+                                  <span className="flex-1 truncate text-left">{r.name}</span>
+                                  <span className="font-mono text-[10px] font-semibold text-success shrink-0">{r.score}%</span>
+                                </button>
+                                {variants.map((v) => (
+                                  <button
+                                    key={v.id}
+                                    onClick={() => {
+                                      setActiveResumeId(v.id)
+                                      router.push(`/resume/${v.id}`)
+                                    }}
+                                    className={cn(
+                                      'flex w-full items-center gap-2 rounded-sm px-2 py-1 text-[11px] transition-colors pl-5',
+                                      v.id === activeResumeId ? 'bg-sidebar-active font-semibold text-foreground' : 'text-muted-foreground hover:bg-sidebar-hover hover:text-foreground',
+                                    )}
+                                  >
+                                    <span className="text-[9px] shrink-0">└</span>
+                                    <span className="flex-1 truncate text-left">{v.variantLabel || v.name}</span>
+                                  </button>
+                                ))}
+                              </div>
+                            )
+                          })}
+                        </div>
+                        <button
+                          onClick={handleNewResume}
+                          className="flex w-full items-center gap-1.5 rounded-sm px-2 py-1.5 text-xs text-primary hover:bg-accent-soft cursor-pointer"
+                        >
+                          <Plus size={13} strokeWidth={2.5} />
+                          {t('newResume')}
+                        </button>
+                      </PreviewCard.Popup>
+                    </PreviewCard.Positioner>
+                  </PreviewCard.Portal>
+                </PreviewCard.Root>
+              </div>
+            ) : (
+              /* EXPANDED: resume list with scroll container */
+              <div className="flex flex-col gap-0.5 p-1">
+                <div className="label-mono px-2.5 pt-3 pb-1">
+                  {t('resumes')}
+                </div>
+                {/* SCROLLABLE RESUME LIST — max-height prevents pushing tools down */}
+                <div className="max-h-[200px] overflow-y-auto scrollbar-thin">
+                  {baseResumes.map((r) => {
+                    const variants = variantsByBase[r.id] || []
+                    return (
+                      <div key={r.id}>
+                        {/* Base resume */}
+                        <div
+                          className={cn(
+                            'group flex items-center gap-1 rounded-sm transition-colors border-l-2',
+                            r.id === activeResumeId && pathname === `/resume/${r.id}`
+                              ? 'bg-sidebar-active border-l-primary'
+                              : 'hover:bg-sidebar-hover border-l-transparent',
+                            'px-2 py-1',
+                          )}
+                        >
+                          <button
+                            onClick={() => {
+                              setActiveResumeId(r.id)
+                              router.push(`/resume/${r.id}`)
+                            }}
+                            className="flex cursor-pointer items-center gap-2 text-xs flex-1 min-w-0"
+                          >
+                            <span
+                              className={cn(
+                                'h-2 w-2 shrink-0 rounded-full border-2 transition-all',
+                                r.id === activeResumeId ? 'border-primary bg-primary' : 'border-muted-foreground',
+                              )}
+                            />
+                            <span className="flex-1 truncate text-left font-medium">{r.name}</span>
+                            <span className="font-mono text-[10px] font-semibold text-success">{r.score}%</span>
+                          </button>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              setDeleteTarget({ id: r.id, name: r.name })
+                            }}
+                            className="shrink-0 opacity-0 group-hover:opacity-100 cursor-pointer rounded-xs p-1 text-muted-foreground hover:text-red-500 hover:bg-red-500/10 transition-all"
+                            title="Delete resume"
+                          >
+                            <Trash2 size={12} />
+                          </button>
+                        </div>
+                        {/* Variants under this base */}
+                        {variants.map((v) => (
+                          <div
+                            key={v.id}
+                            className={cn(
+                              'group flex items-center gap-1 rounded-sm transition-colors border-l-2 ml-3',
+                              v.id === activeResumeId && pathname === `/resume/${v.id}`
+                                ? 'bg-sidebar-active border-l-primary/50'
+                                : 'hover:bg-sidebar-hover border-l-transparent',
+                              'px-2 py-0.5',
+                            )}
+                          >
+                            <button
+                              onClick={() => {
+                                setActiveResumeId(v.id)
+                                router.push(`/resume/${v.id}`)
+                              }}
+                              className="flex cursor-pointer items-center gap-2 text-xs flex-1 min-w-0"
+                            >
+                              <span className="shrink-0 text-[9px] text-muted-foreground">└</span>
+                              <span className="flex-1 truncate text-left text-[11px] text-muted-foreground">
+                                {v.variantLabel || v.name}
+                              </span>
+                              {v.score > 0 && (
+                                <span className="font-mono text-[9px] font-semibold text-success/70">{v.score}%</span>
+                              )}
+                            </button>
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation()
+                                setDeleteTarget({ id: v.id, name: v.variantLabel || v.name })
+                              }}
+                              className="shrink-0 opacity-0 group-hover:opacity-100 cursor-pointer rounded-xs p-0.5 text-muted-foreground hover:text-red-500 hover:bg-red-500/10 transition-all"
+                              title="Delete variant"
+                            >
+                              <Trash2 size={10} />
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    )
+                  })}
+                </div>
+                {/* Add resume — opens modal */}
+                <button
+                  onClick={handleNewResume}
+                  className={cn(
+                    'flex items-center gap-1.5 rounded-sm px-2 py-1.5 text-xs text-primary transition-colors hover:bg-accent-soft',
+                  )}
+                >
+                  <Plus size={13} className="shrink-0" strokeWidth={2.5} />
+                  <span>{t('newResume')}</span>
+                </button>
+              </div>
+            )}
+
+            {/* ── JOBS ── */}
+            <NavSection
+              items={NAV_JOBS}
+              collapsed={c}
+              label={t('jobs')}
+              pathname={pathname}
+              t={t}
+              totalPipeline={totalPipeline}
+            />
+
+            {/* ── PRACTICE ── */}
+            <NavSection
+              items={NAV_PRACTICE}
+              collapsed={c}
+              label={t('practice')}
+              pathname={pathname}
+              t={t}
+              totalPipeline={totalPipeline}
+            />
+
+            {/* ── TOOLS ── */}
+            <NavSection
+              items={NAV_TOOLS}
+              collapsed={c}
+              label={t('tools')}
+              pathname={pathname}
+              t={t}
+              totalPipeline={totalPipeline}
+            />
+          </>
         )}
-
-        {/* ── JOBS ── */}
-        <NavSection
-          items={NAV_JOBS}
-          collapsed={c}
-          label={t('jobs')}
-          pathname={pathname}
-          t={t}
-          totalPipeline={totalPipeline}
-        />
-
-        {/* ── PRACTICE ── */}
-        <NavSection
-          items={NAV_PRACTICE}
-          collapsed={c}
-          label={t('practice')}
-          pathname={pathname}
-          t={t}
-          totalPipeline={totalPipeline}
-        />
-
-        {/* ── TOOLS ── */}
-        <NavSection
-          items={NAV_TOOLS}
-          collapsed={c}
-          label={t('tools')}
-          pathname={pathname}
-          t={t}
-          totalPipeline={totalPipeline}
-        />
 
         {/* ── ACCOUNT ── */}
         <div className="flex flex-col gap-0.5 p-1 mt-auto">
@@ -394,23 +422,6 @@ export function Sidebar() {
               <span className={cn('transition-opacity duration-150', c && 'opacity-0')}>{t('settings')}</span>
             </Link>
           </Tooltip>
-          {isAdmin && (
-            <Tooltip label="Admin" disabled={!c}>
-              <Link
-                href="/admin"
-                className={cn(
-                  'flex items-center gap-2 rounded-sm text-xs font-medium transition-[padding,background-color,color] duration-200 ease-[cubic-bezier(0.2,0,0,1)]',
-                  pathname === '/admin'
-                    ? 'bg-sidebar-active text-foreground font-semibold'
-                    : 'text-muted-foreground hover:bg-sidebar-hover hover:text-foreground',
-                  c ? 'pl-[16px] pr-[17px] py-1.5' : 'px-2.5 py-1.5',
-                )}
-              >
-                <Shield size={15} className="shrink-0 opacity-70" />
-                <span className={cn('transition-opacity duration-150', c && 'opacity-0')}>Admin</span>
-              </Link>
-            </Tooltip>
-          )}
         </div>
 
         {/* Delete confirmation */}
