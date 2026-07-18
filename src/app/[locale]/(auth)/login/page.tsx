@@ -10,6 +10,7 @@ function LoginForm() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const resetSuccess = searchParams.get('reset') === 'success'
+  const redirectTo = searchParams.get('redirect') || '/chat'
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
@@ -32,7 +33,7 @@ function LoginForm() {
         } catch {
           // PostHog not loaded — skip
         }
-        router.push('/chat')
+        router.push(redirectTo)
       }
     } catch (err) {
       console.error(err)
