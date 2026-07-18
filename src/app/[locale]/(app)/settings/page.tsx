@@ -3,12 +3,12 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { authClient } from '~/lib/auth-client'
-import { Loader2, User, Bell, AlertTriangle, Check, X, Eye, EyeOff, LocateFixed } from 'lucide-react'
+import { Loader2, User, Bell, AlertTriangle, Check, X, Eye, EyeOff, LocateFixed, CreditCard } from 'lucide-react'
 import { Sun, Moon } from 'lucide-react'
 import { useTheme } from '~/components/layout/theme-provider'
 
 // ── TYPES ──
-type Tab = 'profile' | 'notifications' | 'danger'
+type Tab = 'profile' | 'notifications' | 'danger' | 'billing'
 
 interface Prefs {
   emailNotifications: boolean
@@ -267,10 +267,16 @@ export default function SettingsPage() {
 
         {/* Tabs */}
         <div className="mb-5 flex gap-0 border-b border-border">
-          {(['profile', 'notifications', 'danger'] as Tab[]).map((t) => (
+          {(['profile', 'notifications', 'danger', 'billing'] as Tab[]).map((t) => (
             <button
               key={t}
-              onClick={() => setTab(t)}
+              onClick={() => {
+                if (t === 'billing') {
+                  router.push('/settings/billing')
+                  return
+                }
+                setTab(t)
+              }}
               className={`flex items-center gap-1.5 border-b-2 px-4 pb-2.5 text-xs font-medium transition-colors ${
                 tab === t
                   ? 'border-foreground text-foreground'
@@ -280,9 +286,11 @@ export default function SettingsPage() {
               {t === 'profile' && <User size={13} />}
               {t === 'notifications' && <Bell size={13} />}
               {t === 'danger' && <AlertTriangle size={13} />}
+              {t === 'billing' && <CreditCard size={13} />}
               {t === 'profile' && 'Profile'}
               {t === 'notifications' && 'Notifications'}
               {t === 'danger' && 'Danger Zone'}
+              {t === 'billing' && 'Billing'}
             </button>
           ))}
         </div>
