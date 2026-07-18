@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { useRouter, usePathname } from 'next/navigation'
+import { useRouter, usePathname } from '~/i18n/routing'
 import { useUIStore } from '~/hooks/use-ui'
 import { Sidebar } from '~/components/layout/sidebar'
 import { Topbar } from '~/components/layout/navbar'
@@ -42,8 +42,9 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
         }
 
         // ── Role-based routing ──
-        // Strip locale prefix (/en/admin → /admin) for the allowlist check.
-        const stripped = pathname.replace(/^\/(en|th)/, '') || '/'
+        // usePathname from i18n/routing already returns the locale-stripped path,
+        // so we can compare directly against the allowlist.
+        const stripped = pathname || '/'
         const isAdmin = (session.user as { role?: string }).role === 'admin'
 
         if (isAdmin && !ADMIN_ALLOWED.has(stripped)) {
@@ -91,6 +92,22 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
 function AppShell({ children }: { children: React.ReactNode }) {
   const sidebarCollapsed = useUIStore((s) => s.sidebarCollapsed)
   const toggleSidebar = useUIStore((s) => s.toggleSidebar)
+  const sidebarOpen = !sidebarCollapsed
+
+  // Lock body scroll while the mobile sidebar overlay is open so the
+  // background page can't scroll behind it.
+  useEffect(() => {
+    if (typeof document === 'undefined') return
+    // Only lock on mobile widths — desktop renders the sidebar in-flow.
+    const isMobile = window.matchMedia('(max-width: 767px)').matches
+    if (sidebarOpen && isMobile) {
+      const prev = document.body.style.overflow
+      document.body.style.overflow = 'hidden'
+      return () => {
+        document.body.style.overflow = prev
+      }
+    }
+  }, [sidebarOpen])
 
   return (
     <div className="flex h-screen flex-col">
@@ -105,10 +122,15 @@ function AppShell({ children }: { children: React.ReactNode }) {
         {!sidebarCollapsed && (
           <>
             <div
-              className="fixed inset-0 top-[var(--topbar-height)] z-40 bg-black/20 backdrop-blur-[1px] md:hidden animate-fade-up"
+              className="fixed inset-0 top-[var(--topbar-height)] z-40 bg-black/40 backdrop-blur-[1px] md:hidden animate-fade-up"
               onClick={toggleSidebar}
+              aria-hidden="true"
             />
-            <div className="fixed left-0 top-[var(--topbar-height)] bottom-0 z-50 md:hidden animate-slide-in">
+            <div
+              className="fixed left-0 top-[var(--topbar-height)] bottom-0 z-50 md:hidden animate-slide-in"
+              role="dialog"
+              aria-modal="true"
+            >
               <Sidebar />
             </div>
           </>

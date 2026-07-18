@@ -90,7 +90,7 @@ export function CoverLetterEditor({ resume }: CoverLetterEditorProps) {
       // No existing record — generate via API to create one, or just save locally
       // The AI route creates a record. For manual save, we create via a direct POST.
       try {
-        await fetch('/api/cover-letters', {
+        const res = await fetch('/api/cover-letters', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -101,8 +101,12 @@ export function CoverLetterEditor({ resume }: CoverLetterEditorProps) {
             jdText: mode === 'jd' ? jdText : null,
           }),
         })
-      } catch {
-        notify({ message: 'Failed to save', type: 'error' })
+        if (!res.ok) {
+          const err = await res.json().catch(() => ({}))
+          throw new Error(err.error || 'Failed to save')
+        }
+      } catch (err) {
+        notify({ message: err instanceof Error ? err.message : 'Failed to save', type: 'error' })
         return
       }
     }
@@ -121,9 +125,15 @@ export function CoverLetterEditor({ resume }: CoverLetterEditorProps) {
   const handleDelete = async () => {
     if (activeLetter?.id) {
       try {
-        await fetch(`/api/cover-letters/${activeLetter.id}`, { method: 'DELETE' })
+        const res = await fetch(`/api/cover-letters/${activeLetter.id}`, { method: 'DELETE' })
+        if (!res.ok) {
+          const err = await res.json().catch(() => ({}))
+          notify({ message: err.error || 'Failed to delete cover letter', type: 'error' })
+          return
+        }
       } catch {
-        // ignore
+        notify({ message: 'Failed to delete cover letter', type: 'error' })
+        return
       }
     }
     setLetterText('')

@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter } from '~/i18n/routing'
 import { useActiveResume } from '~/hooks/use-active-resume'
 import { useUpdateResume, useCreateResume } from '~/hooks/use-resumes'
 import { useCoverLetters } from '~/hooks/use-cover-letters'
@@ -219,13 +219,17 @@ export default function StandaloneCoverLetterPage() {
     // Save to cover letters table via PATCH (if existing) or POST (if new)
     if (activeLetterId) {
       try {
-        await fetch(`/api/cover-letters/${activeLetterId}`, {
+        const res = await fetch(`/api/cover-letters/${activeLetterId}`, {
           method: 'PATCH',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ content: letterText }),
         })
-      } catch {
-        notify({ message: 'Failed to save', type: 'error' })
+        if (!res.ok) {
+          const err = await res.json().catch(() => ({}))
+          throw new Error(err.error || 'Failed to save')
+        }
+      } catch (err) {
+        notify({ message: err instanceof Error ? err.message : 'Failed to save', type: 'error' })
         return
       }
     } else {
@@ -240,10 +244,14 @@ export default function StandaloneCoverLetterPage() {
             role: mode === 'quick' ? role : null,
           }),
         })
+        if (!res.ok) {
+          const err = await res.json().catch(() => ({}))
+          throw new Error(err.error || 'Failed to save')
+        }
         const data = await res.json()
         if (data.id) setActiveLetterId(data.id)
-      } catch {
-        notify({ message: 'Failed to save', type: 'error' })
+      } catch (err) {
+        notify({ message: err instanceof Error ? err.message : 'Failed to save', type: 'error' })
         return
       }
     }
@@ -553,7 +561,11 @@ export default function StandaloneCoverLetterPage() {
           if (!deleteTarget) return
           setDeleting(true)
           try {
-            await fetch(`/api/cover-letters/${deleteTarget}`, { method: 'DELETE' })
+            const res = await fetch(`/api/cover-letters/${deleteTarget}`, { method: 'DELETE' })
+            if (!res.ok) {
+              const err = await res.json().catch(() => ({}))
+              throw new Error(err.error || 'Failed to delete')
+            }
             setSavedLetters(prev => prev.filter(l => l.id !== deleteTarget))
             if (activeLetterId === deleteTarget) {
               setActiveLetterId(null)
@@ -561,8 +573,8 @@ export default function StandaloneCoverLetterPage() {
             }
             setDeleteTarget(null)
             notify({ message: 'Cover letter deleted', type: 'success' })
-          } catch {
-            notify({ message: 'Failed to delete', type: 'error' })
+          } catch (err) {
+            notify({ message: err instanceof Error ? err.message : 'Failed to delete', type: 'error' })
           } finally {
             setDeleting(false)
           }

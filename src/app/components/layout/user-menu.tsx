@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter } from '~/i18n/routing'
 import { Menu } from '@base-ui/react/menu'
 import { Settings, LogOut } from 'lucide-react'
 import { authClient } from '~/lib/auth-client'

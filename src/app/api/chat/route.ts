@@ -142,13 +142,19 @@ Rules:
 - Keep responses under 200 words unless the user asks for detail.
 - Respond in the same language the user uses to chat with you (e.g., if they write in Thai, reply in Thai. If they write in English, reply in English). Never switch languages mid-conversation unless the user explicitly asks you to translate something.`
 
-  await recordUsage(user.id, 'chat')
-  await captureServerEvent(user.id, mode === 'build' ? 'resume_build_chat' : 'chat_message_sent')
-
-  return streamWithFailover({
+  // Initiate stream first — only bill the user if streaming actually starts
+  const streamResponse = await streamWithFailover({
     system: systemPrompt,
     messages: messagesResult.data,
     temperature: 0.7,
     maxOutputTokens: 1024,
   })
+
+  // streamWithFailover returns 503 when all providers fail — don't bill for that.
+  if (streamResponse.status === 200) {
+    await recordUsage(user.id, 'chat')
+    await captureServerEvent(user.id, mode === 'build' ? 'resume_build_chat' : 'chat_message_sent')
+  }
+
+  return streamResponse
 }, { rateLimitType: 'ai', route: '/api/chat' })

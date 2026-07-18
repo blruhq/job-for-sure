@@ -1,8 +1,8 @@
 'use client'
 
 import { useState, Suspense } from 'react'
-import Link from 'next/link'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { Link, useRouter } from '~/i18n/routing'
+import { useSearchParams } from 'next/navigation'
 import { authClient } from '~/lib/auth-client'
 
 function ResetPasswordForm() {

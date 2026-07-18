@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter } from '~/i18n/routing'
 import { authClient } from '~/lib/auth-client'
 import { Loader2, User, Bell, AlertTriangle, Check, X, Eye, EyeOff, LocateFixed, CreditCard } from 'lucide-react'
 import { Sun, Moon } from 'lucide-react'

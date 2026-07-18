@@ -2,7 +2,8 @@
 
 import { useState, useEffect, useRef, useCallback, useMemo, useDeferredValue } from 'react'
 import dynamic from 'next/dynamic'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useRouter } from '~/i18n/routing'
+import { useSearchParams } from 'next/navigation'
 import { ArrowLeft, Wand2, Download, Trash2, Plus, X, PlusCircle, Lightbulb, GripVertical, ChevronDown, ChevronUp, Sparkles, Eye, EyeOff } from 'lucide-react'
 import {
   DndContext,

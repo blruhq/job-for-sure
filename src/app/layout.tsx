@@ -30,6 +30,11 @@ const kanit = Kanit({
   display: 'swap',
 })
 
+// Inline script that runs BEFORE hydration to apply the saved theme.
+// Prevents the white-flash dark-mode users see when ThemeProvider mounts.
+// Must be a string — Next.js will render it verbatim inside <head>.
+const themeNoFlashScript = `(function(){try{var t=localStorage.getItem('theme');if(t==='dark'||(t==null&&window.matchMedia('(prefers-color-scheme: dark)').matches)){document.documentElement.classList.add('dark');}}catch(e){}})();`
+
 export default async function RootLayout({ children }: { children: ReactNode }) {
   const locale = await getLocale()
 
@@ -39,6 +44,9 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
       className={`${inter.variable} ${jetbrainsMono.variable} ${instrumentSerif.variable}${locale === 'th' ? ` ${kanit.variable}` : ''}`}
       suppressHydrationWarning
     >
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: themeNoFlashScript }} />
+      </head>
       <body className="min-h-screen bg-background text-foreground antialiased">
         {children}
       </body>

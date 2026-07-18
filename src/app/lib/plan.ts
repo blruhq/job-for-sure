@@ -3,6 +3,23 @@ import { usageEvents, user, resumes } from '~/lib/schema'
 import { eq, and, gte, count } from 'drizzle-orm'
 import { NextResponse } from 'next/server'
 
+// ── Ownership check ──
+
+/**
+ * Returns true if `resumeId` exists and belongs to `userId`.
+ * Use this on any route that accepts a resumeId in the body to prevent
+ * cross-user attachment (defensive — blocks future JOIN-based leaks).
+ */
+export async function userOwnsResume(userId: string, resumeId: string | null | undefined): Promise<boolean> {
+  if (!resumeId) return true // null resumeId is allowed (no attachment)
+  const [row] = await db
+    .select({ id: resumes.id })
+    .from(resumes)
+    .where(and(eq(resumes.id, resumeId), eq(resumes.userId, userId)))
+    .limit(1)
+  return !!row
+}
+
 // ── Feature & Limit Types ──
 
 export type PlanTier = 'free' | 'pro'

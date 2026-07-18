@@ -1,8 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useRouter } from '~/i18n/routing'
-import Link from 'next/link'
+import { Link, useRouter } from '~/i18n/routing'
 import { FileText, Brain, KanbanSquare, CheckSquare, MessageSquare, Plus, ArrowRight, Mail } from 'lucide-react'
 import { useResumes } from '~/hooks/use-resumes'
 import { useApplications } from '~/hooks/use-apps'

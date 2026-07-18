@@ -6,7 +6,15 @@ import { db } from '~/lib/db'
 import { interviewSessions } from '~/lib/schema'
 import { eq, desc, and, isNull } from 'drizzle-orm'
 import { ResumeDataSchema } from '~/lib/schemas'
-import { gateFeature, recordUsage } from '~/lib/plan'
+import { gateFeature, recordUsage, userOwnsResume } from '~/lib/plan'
+
+/**
+ * Record interview feature usage.
+ * Thin wrapper kept for clarity — interview is billed only after AI success.
+ */
+async function recordUsageForInterview(userId: string) {
+  await recordUsage(userId, 'interview')
+}
 import { z } from 'zod'
 
 export const maxDuration = 60
@@ -210,6 +218,9 @@ Instructions:
     maxOutputTokens: 800,
   })
 
+  // AI succeeded — bill the user NOW (moved here from POST dispatcher so
+  // failed AI calls never consume a credit).
+  await recordUsageForInterview(userId)
   await captureServerEvent(userId, 'interview_started', { company, role, type, difficulty })
   return NextResponse.json(result)
 }
@@ -261,6 +272,10 @@ async function handleSave(body: unknown, userId: string) {
     return NextResponse.json({ error: 'Missing required session parameters' }, { status: 400 })
   }
   const { resumeId, company, role, type, difficulty, score, exchanges } = parsed.data
+  // Ownership check — prevents cross-user resume attachment
+  if (!(await userOwnsResume(userId, resumeId))) {
+    return NextResponse.json({ error: 'Resume not found' }, { status: 404 })
+  }
   const id = 'int_' + crypto.randomUUID()
   await db.insert(interviewSessions).values({
     id,
@@ -286,7 +301,7 @@ export const POST = withAuth(async (req, { user }) => {
       // ── Feature gate: interview prep limit (free: 3/week) ──
       const gate = await gateFeature(user.id, 'interview', user.role, user.plan)
       if (gate) return gate
-      await recordUsage(user.id, 'interview')
+      // recordUsage is now called INSIDE handleQuestion after the AI call succeeds.
       return handleQuestion(body, user.id)
     }
     case 'evaluate':

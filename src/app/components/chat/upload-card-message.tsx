@@ -1,7 +1,7 @@
 'use client'
 
 import { memo, useState, useRef } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter } from '~/i18n/routing'
 import type { UIMessage } from 'ai'
 import { Briefcase, MapPin, Check, Pencil } from 'lucide-react'
 import { UserMessage } from '@/components/agent-elements/user-message'

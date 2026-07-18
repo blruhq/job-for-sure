@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { db } from '~/lib/db'
 import { coverLetters } from '~/lib/schema'
 import { withAuth } from '~/lib/with-auth'
+import { userOwnsResume } from '~/lib/plan'
 import { eq, and, desc, isNull } from 'drizzle-orm'
 import { z } from 'zod'
 
@@ -39,6 +40,11 @@ export const POST = withAuth(async (req, { user }) => {
   }
 
   const { id, resumeId, company, role, content, jdText } = body.data
+
+  // Ownership check — prevents cross-user resume attachment
+  if (!(await userOwnsResume(user.id, resumeId))) {
+    return NextResponse.json({ error: 'Resume not found' }, { status: 404 })
+  }
 
   const letter = {
     id: id || crypto.randomUUID(),

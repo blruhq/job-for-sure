@@ -10,6 +10,7 @@ const {
   mockGetUserPlan,
   mockGateFeature,
   mockRecordUsage,
+  mockUserOwnsResume,
 } = vi.hoisted(() => ({
   mockGetSessionUser: vi.fn(),
   mockCheckRateLimit: vi.fn(),
@@ -19,6 +20,7 @@ const {
   mockGetUserPlan: vi.fn(),
   mockGateFeature: vi.fn().mockResolvedValue(null),
   mockRecordUsage: vi.fn(),
+  mockUserOwnsResume: vi.fn().mockResolvedValue(true),
 }))
 
 vi.mock('~/lib/auth-helpers', () => ({
@@ -33,6 +35,7 @@ vi.mock('~/lib/plan', () => ({
   getUserPlan: mockGetUserPlan,
   gateFeature: mockGateFeature,
   recordUsage: mockRecordUsage,
+  userOwnsResume: mockUserOwnsResume,
 }))
 
 vi.mock('~/lib/ai-providers', () => ({

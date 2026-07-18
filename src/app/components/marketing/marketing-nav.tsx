@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import Link from 'next/link'
+import { Link } from '~/i18n/routing'
 import { useTranslations } from 'next-intl'
 import { LanguageSwitcher } from '~/components/layout/navbar'
 import { ThemeToggle } from '~/components/layout/theme-toggle'

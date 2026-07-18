@@ -368,14 +368,18 @@ export function InterviewSetup({ onStart, history, loadingHistory, onViewSession
           if (!deleteTarget) return
           setDeleting(true)
           try {
-            await fetch(`/api/ai/interview/${deleteTarget}`, { method: 'DELETE' })
+            const res = await fetch(`/api/ai/interview/${deleteTarget}`, { method: 'DELETE' })
+            if (!res.ok) {
+              const err = await res.json().catch(() => ({}))
+              throw new Error(err.error || 'Failed to delete session')
+            }
             // Remove from local history state — we need to call back to parent
             // The parent InterviewView has fetchHistory(), so we just close dialog
             onDeleteSession?.()
             setDeleteTarget(null)
             notify({ message: 'Interview session deleted', type: 'success' })
-          } catch {
-            notify({ message: 'Failed to delete session', type: 'error' })
+          } catch (err) {
+            notify({ message: err instanceof Error ? err.message : 'Failed to delete session', type: 'error' })
           } finally {
             setDeleting(false)
           }

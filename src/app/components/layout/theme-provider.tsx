@@ -12,16 +12,25 @@ interface ThemeContext {
 const ThemeCtx = createContext<ThemeContext>({ theme: 'light', toggle: () => {} })
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
-  const [theme, setTheme] = useState<Theme>('light')
+  // Initial state: read the class the inline no-flash script already set on <html>.
+  // This keeps React in sync with what the browser painted and avoids a re-render flash.
+  const [theme, setTheme] = useState<Theme>(() => {
+    if (typeof document !== 'undefined' && document.documentElement.classList.contains('dark')) {
+      return 'dark'
+    }
+    return 'light'
+  })
   const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
     setMounted(true)
+    // Prefer explicit user choice in localStorage over the system-pref fallback
+    // the no-flash script may have used.
     const stored = localStorage.getItem('theme') as Theme | null
-    if (stored) {
+    if (stored && stored !== theme) {
       setTheme(stored)
     }
-  }, [])
+  }, [theme])
 
   useEffect(() => {
     if (!mounted) return

@@ -3,6 +3,7 @@ import { db } from '~/lib/db'
 import { applications } from '~/lib/schema'
 import { withAuth } from '~/lib/with-auth'
 import { captureServerEvent } from '~/lib/posthog-server'
+import { userOwnsResume } from '~/lib/plan'
 import { CreateApplicationSchema } from '~/lib/schemas'
 import { eq, and, isNull, asc } from 'drizzle-orm'
 
@@ -25,6 +26,11 @@ export const POST = withAuth(async (req, { user }) => {
   }
 
   const { sourceKey, company, jobTitle, jobUrl, location, salary, logoUrl, color, level, matchScore, resumeId, status, jobData } = body.data
+
+  // Ownership check — prevents cross-user resume attachment
+  if (!(await userOwnsResume(user.id, resumeId))) {
+    return NextResponse.json({ error: 'Resume not found' }, { status: 404 })
+  }
 
   const id = crypto.randomUUID()
   const now = new Date()

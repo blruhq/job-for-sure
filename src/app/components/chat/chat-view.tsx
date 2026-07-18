@@ -1,7 +1,7 @@
 'use client'
 
 import { useRef, useState, useEffect, useCallback, useMemo } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter } from '~/i18n/routing'
 import { useChat } from '@ai-sdk/react'
 import { DefaultChatTransport } from 'ai'
 import { AgentChat } from '@/components/agent-elements/agent-chat'

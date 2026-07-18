@@ -108,20 +108,45 @@ export function AtsView() {
       if (!res.ok) throw new Error('Tailoring failed')
       const { optimized, changes } = await res.json()
 
-      // Build the optimized resume object (preserving fields AI doesn't touch)
+      // Build the optimized resume object (preserving fields AI doesn't touch).
+      // Merge strategy: AI's `optimized.experience` takes priority field-by-field,
+      // but we NEVER drop original experiences the AI omitted, and dates always
+      // come from the original (factual data — AI is told to preserve them).
+      const aiExperiences = optimized.experience || []
+      const originalExperiences = resume.experience || []
+      const maxLen = Math.max(aiExperiences.length, originalExperiences.length)
+      const mergedExperience = Array.from({ length: maxLen }, (_, idx) => {
+        const ai = aiExperiences[idx] as
+          | { company?: string; role?: string; dates?: string; bullets?: string[] }
+          | undefined
+        const orig = originalExperiences[idx]
+        if (!ai) {
+          // AI dropped this entry — keep the original verbatim
+          return orig
+        }
+        if (!orig) {
+          // AI added an entry with no original counterpart
+          return {
+            company: ai.company || '',
+            role: ai.role || '',
+            dates: ai.dates || '',
+            bullets: ai.bullets || [],
+          }
+        }
+        return {
+          company: ai.company || orig.company,
+          role: ai.role || orig.role,
+          // Dates are factual — always prefer the original
+          dates: orig.dates || ai.dates || '',
+          bullets: ai.bullets?.length ? ai.bullets : orig.bullets || [],
+        }
+      })
+
       const optimizedResume: Resume = {
         ...resume,
         summary: optimized.summary,
         skills: optimized.skills,
-        experience: optimized.experience?.map((e: any, idx: number) => {
-          const original = resume.experience?.[idx]
-          return {
-            company: e.company || original?.company || '',
-            role: e.role || original?.role || '',
-            dates: e.dates || original?.dates || '',
-            bullets: e.bullets || original?.bullets || [],
-          }
-        }) || resume.experience || [],
+        experience: mergedExperience,
       }
 
       // Store the pending tailor result and navigate to editor in review mode

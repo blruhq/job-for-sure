@@ -1,6 +1,5 @@
 'use client'
 
-import Link from 'next/link'
 import { PanelLeft, Sun, Moon, Globe } from 'lucide-react'
 import { UserMenu } from '~/components/layout/user-menu'
 import { cn } from '~/lib/utils'
@@ -8,7 +7,7 @@ import { useTheme } from '~/components/layout/theme-provider'
 import { useUIStore } from '~/hooks/use-ui'
 import { Menu } from '@base-ui/react/menu'
 import { useLocale } from 'next-intl'
-import { useRouter, usePathname } from '~/i18n/routing'
+import { Link, useRouter, usePathname } from '~/i18n/routing'
 
 export function LanguageSwitcher() {
   const locale = useLocale()

@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback, useRef } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter } from '~/i18n/routing'
 import {
   Bookmark, ExternalLink, Loader2, ChevronRight, MessageSquare, Plane, X, Brain,
 } from 'lucide-react'

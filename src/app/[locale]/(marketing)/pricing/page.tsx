@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter } from '~/i18n/routing'
 import { authClient } from '~/lib/auth-client'
 import { cn } from '~/lib/utils'
 

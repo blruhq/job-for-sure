@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter } from '~/i18n/routing'
 import {
   Search, Bookmark, Loader2, AlertCircle,
   RefreshCw, Filter, X, Globe, Clock, Star, Plane,
