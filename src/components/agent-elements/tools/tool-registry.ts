@@ -1,3 +1,5 @@
+// Agent-elements library: tool schemas are intentionally permissive (arbitrary tool payloads).
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import type React from "react";
 import {
   IconSearch as Search,

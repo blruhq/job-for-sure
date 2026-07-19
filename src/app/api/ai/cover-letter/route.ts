@@ -52,11 +52,11 @@ export const POST = withAuth(async (req, { user }) => {
   } else if (jdText) {
     prompt += `<job_description>\n${jdText}\n</job_description>`
   } else {
-    const topCompany = (resume as any).companies?.[0]
+    const topCompany = (resume as { companies?: Array<{ name?: string; role?: string }> }).companies?.[0]
     if (topCompany) {
       prompt += `Target Role: ${topCompany.role} at ${topCompany.name}. Write a tailored cover letter for this company and position.`
     } else {
-      prompt += `Target Role/Persona: ${(resume as any).persona}. Write a professional, general cover letter for roles matching this profile.`
+      prompt += `Target Role/Persona: ${(resume as { persona?: string }).persona}. Write a professional, general cover letter for roles matching this profile.`
     }
   }
 
@@ -75,7 +75,7 @@ export const POST = withAuth(async (req, { user }) => {
   - ย่อหน้าเปิด: แนะนำตัวและระบุตำแหน่งที่สมัคร อ้างอิงรายละเอียดจริงจากเรซูเม่หรืองาน
   - ย่อหน้าเนื้อหา: แสดงคุณค่าและความเหมาะสม อ้างอิงความสำเร็จ 1-2 ข้อจากประสบการณ์
   - ย่อหน้าปิด: กล่าวถึงความตั้งใจและขอโอกาสในการสัมภาษณ์
-  - คำลงท้าย: "ขอแสดงความนับถือ" ตามด้วยชื่อผู้สมัคร (${(resume as any).persona})
+  - คำลงท้าย: "ขอแสดงความนับถือ" ตามด้วยชื่อผู้สมัคร (${(resume as { persona?: string }).persona})
 - แปลข้อมูลนำเข้าที่เป็นภาษาอื่น (เช่น อังกฤษ) เป็นภาษาไทยก่อนนำไปใช้ในจดหมาย
 - ส่งออกเฉพาะข้อความจดหมายเท่านั้น ไม่มีคำอธิบายเพิ่มเติมหรือ markdown
 
@@ -103,7 +103,7 @@ Rules:
   - Opening paragraph (stating the role applied for, referencing a REAL detail from the resume or job)
   - Body paragraphs (demonstrating value, explaining fit, citing 1-2 major achievements from experience)
   - Closing paragraph (call to action, express enthusiasm, thank them for consideration)
-  - Sign-off (e.g., "Sincerely,") followed by the candidate's name (which is ${(resume as any).persona}).
+  - Sign-off (e.g., "Sincerely,") followed by the candidate's name (which is ${(resume as { persona?: string }).persona}).
 - Translate any input fields provided in a different language (like Thai) into English before incorporating them into the generated cover letter.
 - Return ONLY the cover letter text itself. No extra markdown explanation, conversational intro/outro, or styling.
 

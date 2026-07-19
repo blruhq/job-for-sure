@@ -1,4 +1,22 @@
-import type { Resume, PipelineJob, ApplicationBoard, PendingTailor } from '~/types/resume'
+import type { Resume } from '~/types/resume'
+
+// Lightweight return shapes for the API client. Kept loose (Record<string, unknown>)
+// intentionally — callers narrow via runtime use, and the upstream route handlers
+// already validate input. Strongly-typed wrappers exist at the hook layer.
+
+export type ApplicationRow = Record<string, unknown> & { id: string }
+export type CoverLetterRow = {
+  id: string
+  resumeId?: string | null
+  company?: string | null
+  role?: string | null
+  content?: string
+  jdText?: string | null
+  createdAt?: string
+  updatedAt?: string
+}
+export type SourceHealthRow = Record<string, unknown>
+export type ParsedResume = Record<string, unknown>
 
 export interface CreateApplicationPayload {
   sourceKey: string
@@ -68,7 +86,7 @@ export class ApiClient {
   }
 
   // Applications
-  static getApplications(): Promise<any[]> {
+  static getApplications(): Promise<ApplicationRow[]> {
     return this.request('/api/applications')
   }
 
@@ -76,7 +94,7 @@ export class ApiClient {
     return this.request('/api/applications', { method: 'POST', body: JSON.stringify(payload) })
   }
 
-  static updateApplication(id: string, payload: { status?: string; notes?: string; position?: number }): Promise<any> {
+  static updateApplication(id: string, payload: { status?: string; notes?: string; position?: number }): Promise<ApplicationRow> {
     return this.request(`/api/applications/${id}`, { method: 'PATCH', body: JSON.stringify(payload) })
   }
 
@@ -93,7 +111,7 @@ export class ApiClient {
   }
 
   // Cover Letters
-  static getCoverLetters(): Promise<any[]> {
+  static getCoverLetters(): Promise<CoverLetterRow[]> {
     return this.request('/api/cover-letters')
   }
 
@@ -106,7 +124,7 @@ export class ApiClient {
   }
 
   // Parser
-  static parseResume(file: File): Promise<any> {
+  static parseResume(file: File): Promise<ParsedResume> {
     const formData = new FormData()
     formData.append('file', file)
     return this.request('/api/parse-resume', {
@@ -115,12 +133,12 @@ export class ApiClient {
     })
   }
 
-  static updateCoverLetter(id: string, payload: { content?: string; company?: string | null; role?: string | null }): Promise<any> {
+  static updateCoverLetter(id: string, payload: { content?: string; company?: string | null; role?: string | null }): Promise<CoverLetterRow> {
     return this.request(`/api/cover-letters/${id}`, { method: 'PATCH', body: JSON.stringify(payload) })
   }
 
   // Admin
-  static getSourceHealth(): Promise<any> {
+  static getSourceHealth(): Promise<SourceHealthRow> {
     return this.request('/api/jobs/source-health')
   }
 }

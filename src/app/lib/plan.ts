@@ -163,7 +163,7 @@ export async function getUsageBreakdown(
   plan: string,
 ): Promise<Record<Feature, LimitResult>> {
   const entries = Object.entries(FEATURES) as [Feature, FeatureConfig][]
-  const results: Record<Feature, LimitResult> = {} as any
+  const results: Record<Feature, LimitResult> = {} as Record<Feature, LimitResult>
 
   for (const [feature] of entries) {
     results[feature] = await checkLimit(userId, feature, role, plan)

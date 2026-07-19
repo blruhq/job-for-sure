@@ -1,7 +1,6 @@
 'use client'
 
 import { useState, useRef } from 'react'
-import { useRouter } from '~/i18n/routing'
 import { Trash2, Link2, RefreshCw, Plus, Loader2, AlertCircle } from 'lucide-react'
 import { cn } from '~/lib/utils'
 import { useApplications, useMoveApplication, useDeleteApplication, useCreateApplication } from '~/hooks/use-apps'
@@ -9,7 +8,7 @@ import { JobDetailPanel } from '~/components/pipeline/job-detail-panel'
 import { useResumes } from '~/hooks/use-resumes'
 import { notify } from '~/lib/toast'
 import { useTranslations } from 'next-intl'
-import type { ApplicationBoard, ApplicationColumnId, PipelineJob } from '~/types/resume'
+import type { ApplicationColumnId, PipelineJob } from '~/types/resume'
 import {
   DndContext,
   PointerSensor,
@@ -227,7 +226,6 @@ function InlineAddForm({ colId: _colId, onCancel, onSave, titleRef }: InlineAddF
 }
 
 export function ApplicationsView() {
-  const router = useRouter()
   const t = useTranslations('applications')
   const { data: applications, isLoading, isError, error } = useApplications()
   const { mutateAsync: moveJob } = useMoveApplication()
@@ -299,7 +297,6 @@ export function ApplicationsView() {
 
   // ── Stats ──
   const total = allJobs.length
-  const avgScore = total > 0 ? Math.round(allJobs.reduce((s, j) => s + j.score, 0) / total) : 0
 
   // ── Find which column a job belongs to ──
   const findJobColumn = (jobKey: string): ApplicationColumnId | null => {
@@ -354,10 +351,6 @@ export function ApplicationsView() {
     const jobKey = event.active.id as string
     const job = allJobs.find((j) => j.key === jobKey)
     setActiveJob(job ?? null)
-  }
-
-  const handleDragOver = (event: React.DragEvent | null, colId: ApplicationColumnId) => {
-    setDragOverCol(colId)
   }
 
   const handlePasteUrl = async () => {
@@ -428,7 +421,7 @@ export function ApplicationsView() {
               >
                 {resumeIds.map((id) => (
                   <option key={id} value={id}>
-                    {id === 'all' ? t('all') : resumes.find((r: any) => r.id === id)?.name || id}
+                    {id === 'all' ? t('all') : resumes.find((r) => r.id === id)?.name || id}
                   </option>
                 ))}
               </select>

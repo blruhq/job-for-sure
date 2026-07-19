@@ -3,20 +3,20 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from '~/i18n/routing'
 import { useSearchParams } from 'next/navigation'
-import { Brain, FileText, ArrowRight, Loader2, Sparkles, Clock, Trash2 } from 'lucide-react'
+import { Brain, ArrowRight, Loader2, Clock, Trash2 } from 'lucide-react'
 import { useActiveResume } from '~/hooks/use-active-resume'
 import { useApplications } from '~/hooks/use-apps'
 import { useUIStore } from '~/hooks/use-ui'
 import { ConfirmDialog } from '~/components/ui/confirm-dialog'
 import { notify } from '~/lib/toast'
 import { useTranslations } from 'next-intl'
-import type { InterviewConfig } from '~/types/interview'
+import type { InterviewConfig, InterviewSessionRow } from '~/types/interview'
 
 interface InterviewSetupProps {
   onStart: (config: InterviewConfig) => void
-  history: any[]
+  history: InterviewSessionRow[]
   loadingHistory: boolean
-  onViewSession: (session: any) => void
+  onViewSession: (session: InterviewSessionRow) => void
   onDeleteSession?: () => void
 }
 

@@ -1,3 +1,5 @@
+// Agent-elements library: tool schemas are intentionally permissive (arbitrary tool payloads).
+/* eslint-disable @typescript-eslint/no-explicit-any */
 type AnyRecord = Record<string, any>;
 
 function isRecord(value: unknown): value is AnyRecord {

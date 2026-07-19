@@ -2,7 +2,7 @@ import React from 'react'
 import { Document, Page, View, Text, StyleSheet } from '@react-pdf/renderer'
 import type { Resume } from '~/types/resume'
 import { registerFonts, COLORS } from './shared-pdf'
-import { renderPdfSections, type SectionStyleSet } from './render-sections'
+import { renderPdfSections } from './render-sections'
 
 registerFonts()
 

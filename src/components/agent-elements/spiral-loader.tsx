@@ -1,3 +1,5 @@
+// Agent-elements library: tool schemas are intentionally permissive (arbitrary tool payloads).
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import dynamic from "next/dynamic";

@@ -1,9 +1,10 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
+import type { Mock } from 'vitest'
 import { NextRequest } from 'next/server'
 
 // ── Mock next-intl middleware ──
 const { mockIntlMiddleware } = vi.hoisted(() => ({
-  mockIntlMiddleware: vi.fn() as any,
+  mockIntlMiddleware: vi.fn() as Mock,
 }))
 
 vi.mock('next-intl/middleware', () => ({

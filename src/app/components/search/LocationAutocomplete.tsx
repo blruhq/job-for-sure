@@ -37,7 +37,7 @@ interface CityData {
 export function LocationAutocomplete({
   value,
   onChange,
-  countryCode,
+  countryCode: _countryCode,
   onSelectCountryCode,
   onSelectRemoteOnly,
   onKeyDownEnter,

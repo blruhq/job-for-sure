@@ -4,7 +4,7 @@ import { useState, useEffect, Suspense } from 'react'
 import { InterviewSetup } from './interview-setup'
 import { InterviewSession } from './interview-session'
 import { InterviewSummary } from './interview-summary'
-import type { InterviewConfig, InterviewExchange } from '~/types/interview'
+import type { InterviewConfig, InterviewExchange, InterviewSessionRow } from '~/types/interview'
 import { useActiveResume } from '~/hooks/use-active-resume'
 import { notify } from '~/lib/toast'
 
@@ -15,9 +15,9 @@ export function InterviewView() {
   const [exchanges, setExchanges] = useState<InterviewExchange[]>([])
 
   // History states
-  const [history, setHistory] = useState<any[]>([])
+  const [history, setHistory] = useState<InterviewSessionRow[]>([])
   const [loadingHistory, setLoadingHistory] = useState(false)
-  const [selectedPastSession, setSelectedPastSession] = useState<any | null>(null)
+  const [selectedPastSession, setSelectedPastSession] = useState<InterviewSessionRow | null>(null)
 
   const currentResume = resumes.find((r) => r.id === (config?.resumeId || activeResumeId)) || resumes[0] || null
 
@@ -139,7 +139,7 @@ export function InterviewView() {
 
             {/* Modal Content */}
             <div className="flex-1 overflow-y-auto p-5 space-y-6">
-              {(selectedPastSession.exchanges || []).map((exchange: any, idx: number) => (
+              {(selectedPastSession.exchanges || []).map((exchange, idx: number) => (
                 <div key={idx} className="space-y-3 border-b border-border/40 pb-5 last:border-0 last:pb-0">
                   <div className="text-[9px] font-mono uppercase text-muted-foreground tracking-wider">
                     Question {idx + 1}

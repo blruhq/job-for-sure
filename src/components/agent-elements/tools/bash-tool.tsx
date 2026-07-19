@@ -1,3 +1,5 @@
+// Agent-elements library: tool schemas are intentionally permissive (arbitrary tool payloads).
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { memo } from "react";
 import { TextShimmer } from "../text-shimmer";
 import type { TimelineStep, StepState } from "../types/timeline";

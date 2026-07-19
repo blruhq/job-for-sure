@@ -3,7 +3,6 @@
 import { useState, Suspense, useEffect } from 'react'
 import { Link, useRouter } from '~/i18n/routing'
 import { useSearchParams } from 'next/navigation'
-import { FileText } from 'lucide-react'
 import { authClient } from '~/lib/auth-client'
 
 function LoginForm() {

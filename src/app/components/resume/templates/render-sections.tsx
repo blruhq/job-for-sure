@@ -1,29 +1,34 @@
 import React from 'react'
 import { View, Text } from '@react-pdf/renderer'
-import type { Resume, ResumeExperience, ResumeEducation, ResumeProject, ResumeCertification, ResumeLanguage, ResumeCustomSection } from '~/types/resume'
+import type { Resume, ResumeExperience, ResumeEducation, ResumeProject, ResumeCertification, ResumeLanguage } from '~/types/resume'
 import { DEFAULT_SECTION_ORDER } from '~/types/resume'
 import { COLORS } from './shared-pdf'
 
 // ── Types ──
 
+// react-pdf's Style type isn't directly exported from the renderer package.
+// Derive it from the View component's `style` prop instead — this keeps the
+// style objects fully type-checked against the same shape the library expects.
+type PdfStyle = NonNullable<React.ComponentProps<typeof View>['style']>
+
 export interface SectionStyleSet {
-  section: any
-  sectionTitle: any
-  summary: any
-  experienceBlock: any
-  expHeader: any
-  expRole: any
-  expDates: any
-  expCompany: any
-  bullet: any
-  skillsRow: any
-  skill: any
-  languagesRow: any
-  langText: any
-  projectTech: any
-  skillBadge?: any
-  skillsCol?: any
-  certItem?: any
+  section: PdfStyle
+  sectionTitle: PdfStyle
+  summary: PdfStyle
+  experienceBlock: PdfStyle
+  expHeader: PdfStyle
+  expRole: PdfStyle
+  expDates: PdfStyle
+  expCompany: PdfStyle
+  bullet: PdfStyle
+  skillsRow: PdfStyle
+  skill: PdfStyle
+  languagesRow: PdfStyle
+  langText: PdfStyle
+  projectTech: PdfStyle
+  skillBadge?: PdfStyle
+  skillsCol?: PdfStyle
+  certItem?: PdfStyle
 }
 
 // ── Section visibility helper ──
@@ -260,12 +265,12 @@ export function renderPdfSections(resume: Resume, s: SectionStyleSet): React.Rea
 export function renderSidebarSections(
   resume: Resume,
   sidebarStyles: {
-    sidebarSection: any
-    sidebarSectionTitle: any
-    skillBadge?: any
-    skillsCol?: any
-    langText: any
-    certItem?: any
+    sidebarSection: PdfStyle
+    sidebarSectionTitle: PdfStyle
+    skillBadge?: PdfStyle
+    skillsCol?: PdfStyle
+    langText: PdfStyle
+    certItem?: PdfStyle
   },
   sidebarSectionIds?: string[]
 ): React.ReactNode[] {

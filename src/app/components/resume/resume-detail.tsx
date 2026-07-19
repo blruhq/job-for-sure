@@ -4,7 +4,7 @@ import { useState, useEffect, useRef, useCallback, useMemo, useDeferredValue } f
 import dynamic from 'next/dynamic'
 import { useRouter } from '~/i18n/routing'
 import { useSearchParams } from 'next/navigation'
-import { ArrowLeft, Wand2, Download, Trash2, Plus, X, PlusCircle, Lightbulb, GripVertical, ChevronDown, ChevronUp, Sparkles, Eye, EyeOff } from 'lucide-react'
+import { ArrowLeft, Wand2, Trash2, Plus, X, PlusCircle, Lightbulb, GripVertical, ChevronDown, ChevronUp, Sparkles, Eye, EyeOff } from 'lucide-react'
 import {
   DndContext,
   PointerSensor,
@@ -36,7 +36,7 @@ import { DEFAULT_TEMPLATE, getTemplateMeta } from '~/components/resume/templates
 const ResumePreview = dynamic(() => import('~/components/resume/resume-preview').then(m => ({ default: m.ResumePreview })), { ssr: false })
 import { TailorReviewPanel } from '~/components/resume/tailor-review-panel'
 import { ResizableGroup, ResizablePanel, ResizableHandle, useDefaultLayout } from '~/components/ui/resizable'
-import { useResumeEditor, ALL_EDITOR_SECTIONS, type EditorSectionId, type SectionOrderId, type SectionKey } from '~/lib/resume-editor-store'
+import { useResumeEditor, type SectionOrderId, type SectionKey } from '~/lib/resume-editor-store'
 import { useStore } from 'zustand'
 
 // ── Helpers ──
@@ -408,7 +408,7 @@ export function ResumeDetail({ resumeId }: { resumeId: string }) {
     customSections, setCustomSections,
     sectionOrder, setSectionOrder,
     sectionVisibility,
-    saveStatus, setSaveStatus,
+    saveStatus,
     suggestions, setSuggestions,
     suggestionDismissed, setSuggestionDismissed,
     showAddSectionPicker, setShowAddSectionPicker,
@@ -756,6 +756,9 @@ export function ResumeDetail({ resumeId }: { resumeId: string }) {
       )
     }
     return null
+  // Setter identities are stable (zustand never re-creates them) — including
+  // them in the dep array is pure noise.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     name, persona, email, phone, location, github,
     role, summary, skills,
@@ -946,6 +949,9 @@ export function ResumeDetail({ resumeId }: { resumeId: string }) {
       unsub()
       if (timer) clearTimeout(timer)
     }
+    // `resume` is read for an initial sync into the zustand store; including
+    // it would re-run the effect (and reset local edits) on every prop change.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [hydrated, resume?.id, store, isReviewMode, updateResume])
 
   // ── Co-Pilot drawer state ──
@@ -1016,7 +1022,7 @@ export function ResumeDetail({ resumeId }: { resumeId: string }) {
   // MUST be before early return (hooks rule)
   const reviewPreviewResume = useMemo(() => {
     if (!storePendingTailor) return resume as Resume
-    const { baseResume, optimized, changes, accepted } = storePendingTailor
+    const { baseResume, changes, accepted } = storePendingTailor
     let result: Resume = { ...baseResume }
     for (const change of changes) {
       if (!accepted.has(change.id)) continue
@@ -1055,6 +1061,9 @@ export function ResumeDetail({ resumeId }: { resumeId: string }) {
       }
     }
     return result
+    // Reads `resume` for fallback merging but should only recompute when the
+    // pending tailor payload changes (not on every resume prop update).
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [storePendingTailor])
 
   if (!hydrated) {
@@ -1074,30 +1083,6 @@ export function ResumeDetail({ resumeId }: { resumeId: string }) {
         Resume not found. <button onClick={() => router.push('/chat')} className="ml-2 text-primary">Back to Chat</button>
       </div>
     )
-  }
-
-  const saveChanges = () => {
-    const s = store!.getState()
-    updateResume({ id: resume.id, data: {
-      name: s.name,
-      persona: s.persona,
-      role: s.role,
-      email: s.email,
-      location: s.location,
-      phone: s.phone,
-      github: s.github,
-      summary: s.summary,
-      skills: s.skills,
-      experience: s.experience,
-      education: s.education,
-      projects: s.projects,
-      certifications: s.certifications,
-      languages: s.languages,
-      customSections: s.customSections,
-      sectionOrder: s.sectionOrder,
-      sectionVisibility: s.sectionVisibility,
-    } })
-    notify({ message: 'Resume saved', type: 'success' })
   }
 
   const handleOptimize = async () => {

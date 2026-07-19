@@ -8,9 +8,9 @@ const mockConvertToModelMessages = vi.fn()
 
 vi.mock('ai', () => ({
   streamText: vi.fn(),
-  generateText: (...args: any[]) => mockGenerateText(...args),
-  generateObject: (...args: any[]) => mockGenerateObject(...args),
-  convertToModelMessages: (...args: any[]) => mockConvertToModelMessages(...args),
+  generateText: (...args: unknown[]) => mockGenerateText(...args),
+  generateObject: (...args: unknown[]) => mockGenerateObject(...args),
+  convertToModelMessages: (...args: unknown[]) => mockConvertToModelMessages(...args),
 }))
 
 // Mock @ai-sdk/openai

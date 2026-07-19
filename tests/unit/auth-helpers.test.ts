@@ -53,7 +53,7 @@ function userWith(role: string) {
 describe('auth-helpers', () => {
   beforeEach(() => {
     vi.clearAllMocks()
-    vi.mocked(headers).mockResolvedValue(new Headers() as any)
+      vi.mocked(headers).mockResolvedValue(new Headers() as unknown as Awaited<ReturnType<typeof headers>>)
   })
 
   describe('getSessionUser', () => {

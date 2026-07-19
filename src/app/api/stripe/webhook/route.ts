@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import type Stripe from 'stripe'
 import { stripe, STRIPE_WEBHOOK_SECRET } from '~/lib/stripe'
 import { db } from '~/lib/db'
 import { user, subscriptions } from '~/lib/schema'
@@ -40,14 +41,14 @@ export async function POST(req: Request) {
     switch (type) {
       // ── Checkout completed → link customer to user ──
       case 'checkout.session.completed': {
-        const session = data.object as any
+        const session = data.object as Stripe.Checkout.Session
         const userId = session.client_reference_id
         const customerId = session.customer
 
         if (userId && customerId) {
           await db
             .update(user)
-            .set({ stripeCustomerId: customerId })
+            .set({ stripeCustomerId: typeof customerId === 'string' ? customerId : customerId.id })
             .where(eq(user.id, userId))
         }
         break
@@ -56,8 +57,9 @@ export async function POST(req: Request) {
       // ── Subscription created/updated → mirror to DB ──
       case 'customer.subscription.created':
       case 'customer.subscription.updated': {
-        const sub = data.object as any
-        const customerId = sub.customer
+        const sub = data.object as Stripe.Subscription
+        // customer can be a string ID or an expanded Customer object; coerce to string.
+        const customerId = typeof sub.customer === 'string' ? sub.customer : sub.customer.id
 
         // Find the user by stripeCustomerId
         const [found] = await db
@@ -87,6 +89,13 @@ export async function POST(req: Request) {
         // Determine plan from the subscription items
         const plan = sub.items?.data?.[0]?.price?.metadata?.plan || 'pro'
         const interval = sub.items?.data?.[0]?.price?.recurring?.interval || null
+        // Stripe SDK 2026 exposes current_period_end as camelCase in TS but the
+        // runtime payload uses snake_case; tolerate both.
+        const periodEndSeconds =
+          (sub as unknown as { current_period_end?: number }).current_period_end ??
+          (sub as unknown as { currentPeriodEnd?: number }).currentPeriodEnd ??
+          0
+        const periodEnd = periodEndSeconds > 0 ? new Date(periodEndSeconds * 1000) : new Date(0)
 
         // UPSERT subscription
         await db
@@ -98,7 +107,7 @@ export async function POST(req: Request) {
             status: sub.status,
             plan,
             interval,
-            currentPeriodEnd: new Date(sub.current_period_end * 1000),
+            currentPeriodEnd: periodEnd,
             cancelAtPeriodEnd: sub.cancel_at_period_end,
           })
           .onConflictDoUpdate({
@@ -107,7 +116,7 @@ export async function POST(req: Request) {
               status: sub.status,
               plan,
               interval,
-              currentPeriodEnd: new Date(sub.current_period_end * 1000),
+              currentPeriodEnd: periodEnd,
               cancelAtPeriodEnd: sub.cancel_at_period_end,
               updatedAt: new Date(),
             },
@@ -128,7 +137,8 @@ export async function POST(req: Request) {
 
       // ── Subscription deleted → downgrade user ──
       case 'customer.subscription.deleted': {
-        const canceledSub = data.object as any
+        const canceledSub = data.object as Stripe.Subscription
+        const canceledCustomerId = typeof canceledSub.customer === 'string' ? canceledSub.customer : canceledSub.customer.id
         await db
           .update(subscriptions)
           .set({ status: 'canceled', updatedAt: new Date() })
@@ -138,7 +148,7 @@ export async function POST(req: Request) {
         const [subUser] = await db
           .select({ id: user.id })
           .from(user)
-          .where(eq(user.stripeCustomerId, canceledSub.customer))
+          .where(eq(user.stripeCustomerId, canceledCustomerId))
           .limit(1)
         if (subUser) {
           await db
@@ -151,8 +161,12 @@ export async function POST(req: Request) {
 
       // ── Invoice payment failed → mark as past_due ──
       case 'invoice.payment_failed': {
-        const invoice = data.object as any
-        const subId = invoice.subscription
+        type InvoiceWithSub = Stripe.Invoice & { subscription?: string | Stripe.Subscription | null }
+        const invoice = data.object as InvoiceWithSub
+        // subscription is `string | Subscription | null` on the runtime payload.
+        const subId = typeof invoice.subscription === 'string'
+          ? invoice.subscription
+          : invoice.subscription?.id
         if (subId) {
           await db
             .update(subscriptions)

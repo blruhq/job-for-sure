@@ -7,6 +7,25 @@ import type { InterviewConfig, InterviewQuestion, AnswerFeedback, InterviewExcha
 import type { Resume } from '~/types/resume'
 import { Skeleton } from '~/components/ui/skeleton'
 
+// ── SpeechRecognition types (not in TS lib.dom yet) ──
+// Minimal permissive shapes — these APIs vary by browser.
+type SpeechRecognitionInstance = {
+  continuous: boolean
+  interimResults: boolean
+  lang: string
+  onresult: ((event: { resultIndex: number; results: ArrayLike<ArrayLike<{ transcript: string }> & { isFinal: boolean }> }) => void) | null
+  onerror: ((event: { error: string }) => void) | null
+  onend: (() => void) | null
+  start: () => void
+  stop: () => void
+  abort: () => void
+}
+type SpeechRecognitionCtor = new () => SpeechRecognitionInstance
+type WindowWithSpeech = Window & {
+  SpeechRecognition?: SpeechRecognitionCtor
+  webkitSpeechRecognition?: SpeechRecognitionCtor
+}
+
 interface InterviewSessionProps {
   config: InterviewConfig
   resume: Resume | null
@@ -25,7 +44,7 @@ export function InterviewSession({ config, resume, onEnd }: InterviewSessionProp
   const [isListening, setIsListening] = useState(false)
   const [speechSupported, setSpeechSupported] = useState(false)
   const [speechError, setSpeechError] = useState<string | null>(null)
-  const recognitionRef = useRef<any>(null)
+  const recognitionRef = useRef<SpeechRecognitionInstance | null>(null)
   const answerRef = useRef('')
   const locale = useLocale()
 
@@ -45,8 +64,8 @@ export function InterviewSession({ config, resume, onEnd }: InterviewSessionProp
 
   const createRecognition = useCallback(() => {
     if (typeof window === 'undefined') return null
-    const SpeechRecognition =
-      (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition
+    const w = window as WindowWithSpeech
+    const SpeechRecognition = w.SpeechRecognition || w.webkitSpeechRecognition
     if (!SpeechRecognition) return null
 
     const recognition = new SpeechRecognition()
@@ -54,7 +73,7 @@ export function InterviewSession({ config, resume, onEnd }: InterviewSessionProp
     recognition.interimResults = true
     recognition.lang = speechLang
 
-    recognition.onresult = (event: any) => {
+    recognition.onresult = (event) => {
       let finalTranscript = ''
 
       for (let i = event.resultIndex; i < event.results.length; i++) {
@@ -71,7 +90,7 @@ export function InterviewSession({ config, resume, onEnd }: InterviewSessionProp
       }
     }
 
-    recognition.onerror = (event: any) => {
+    recognition.onerror = (event) => {
       console.warn('Speech recognition error:', event.error)
       setIsListening(false)
       recognitionRef.current = null // mark instance as dead
@@ -105,8 +124,8 @@ export function InterviewSession({ config, resume, onEnd }: InterviewSessionProp
   // Detect browser support once
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      const SpeechRecognition =
-        (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition
+      const w = window as WindowWithSpeech
+      const SpeechRecognition = w.SpeechRecognition || w.webkitSpeechRecognition
       setSpeechSupported(!!SpeechRecognition)
     }
   }, [])

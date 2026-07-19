@@ -1,6 +1,5 @@
 import { auth } from '~/lib/auth'
 import { toNextJsHandler } from 'better-auth/next-js'
-import { NextResponse } from 'next/server'
 import { checkAuthIpRateLimit, getClientIp } from '~/lib/ratelimit'
 
 // Better Auth exposes GET (session reads, OAuth callbacks) and POST

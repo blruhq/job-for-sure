@@ -4,7 +4,29 @@ import { ApiClient } from '~/lib/api-client'
 import type { PipelineJob, ApplicationBoard } from '~/types/resume'
 import { notify } from '~/lib/toast'
 
-function groupByStatus(apps: any[]): ApplicationBoard {
+type RawApplication = {
+  id: string
+  status?: string | null
+  jobTitle?: string
+  company?: string
+  jobUrl?: string | null
+  location?: string | null
+  salary?: string | null
+  logoUrl?: string | null
+  color?: string | null
+  level?: string | null
+  matchScore?: number | null
+  sourceKey?: string | null
+  jobData?: Record<string, unknown> | null
+  applicationId?: string | null
+  notes?: string | null
+  appliedAt?: string | null
+  position?: number
+  createdAt?: string
+  resumeId?: string | null
+}
+
+function groupByStatus(apps: RawApplication[]): ApplicationBoard {
   const board: ApplicationBoard = {
     bookmark: [],
     applied: [],
@@ -14,8 +36,8 @@ function groupByStatus(apps: any[]): ApplicationBoard {
   }
 
   const sorted = [...apps].sort((a, b) => {
-    if (a.position !== b.position) return a.position - b.position
-    return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    if ((a.position ?? 0) !== (b.position ?? 0)) return (a.position ?? 0) - (b.position ?? 0)
+    return new Date(b.createdAt ?? 0).getTime() - new Date(a.createdAt ?? 0).getTime()
   })
 
   const timeLabels: Record<string, string> = {
@@ -28,31 +50,31 @@ function groupByStatus(apps: any[]): ApplicationBoard {
 
   for (const app of sorted) {
     const job: PipelineJob = {
-      key: app.sourceKey,
+      key: app.sourceKey ?? '',
       applicationId: app.id,
       logo: app.logoUrl || '',
       color: app.color || '',
-      company: app.company,
-      title: app.jobTitle,
+      company: app.company ?? '',
+      title: app.jobTitle ?? '',
       loc: app.location || '',
-      city: app.jobData?.city || undefined,
-      district: app.jobData?.district || undefined,
+      city: (app.jobData?.city as string) || undefined,
+      district: (app.jobData?.district as string) || undefined,
       score: app.matchScore || 0,
       level: (app.level as 'high' | 'mid') || 'mid',
-      time: timeLabels[app.status] || 'saved',
+      time: timeLabels[app.status ?? ''] || 'saved',
       url: app.jobUrl || '',
       resume: app.resumeId || '',
-      addedAt: app.createdAt,
-      appliedAt: app.appliedAt,
+      addedAt: app.createdAt ?? '',
+      appliedAt: app.appliedAt ?? undefined,
       notes: app.notes || '',
       salary: app.salary || '',
-      jobData: app.jobData || undefined,
+      jobData: (app.jobData as PipelineJob['jobData']) || undefined,
     }
 
     let col: keyof ApplicationBoard = 'bookmark'
     if (app.status === 'bookmarked') col = 'bookmark'
     else if (app.status === 'offered') col = 'offers'
-    else if (['applied', 'interviewing', 'rejected'].includes(app.status)) {
+    else if (app.status && ['applied', 'interviewing', 'rejected'].includes(app.status)) {
       col = app.status as keyof ApplicationBoard
     }
     board[col].push(job)

@@ -25,7 +25,7 @@ export const UploadCardMessage = memo(function UploadCardMessage({
 
   // Check for data-upload part
   const uploadPart = (message.parts ?? []).find(
-    (p: any) => p.type === 'data-upload'
+    (p) => p.type === 'data-upload'
   ) as { type: 'data-upload'; data: { resumeId: string } } | undefined
 
   const resumeId = uploadPart?.data.resumeId

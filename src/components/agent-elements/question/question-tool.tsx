@@ -1,3 +1,5 @@
+// Agent-elements library: hooks deliberately use refined dep arrays for stable identity.
+/* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect, useMemo, useState } from "react";
 import {
   IconChevronDown,

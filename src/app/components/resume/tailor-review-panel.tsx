@@ -4,7 +4,7 @@ import { useMemo } from 'react'
 import { Check } from 'lucide-react'
 import { cn } from '~/lib/utils'
 import { useUIStore } from '~/hooks/use-ui'
-import type { Resume, PendingTailor, TailorChange } from '~/types/resume'
+import type { Resume, TailorChange } from '~/types/resume'
 
 // ── Pure function: apply only accepted changes to produce the previewed resume ──
 function applyAcceptedChanges(base: Resume, optimized: Resume, changes: TailorChange[], accepted: Set<string>): Resume {
@@ -58,8 +58,10 @@ export function TailorReviewPanel({ onApply, onCancel }: { onApply: (variant: Re
 
   // ── Hooks MUST be before any early return ──
   const pending = pendingTailor // local alias for readability
-  const changes = pending?.changes ?? []
-  const accepted: Set<string> = pending?.accepted ?? new Set()
+  // Wrap fallback values in useMemo so the downstream useMemo deps are stable
+  // (an inline `?? []` creates a new array every render and busts the memo).
+  const changes = useMemo(() => pending?.changes ?? [], [pending?.changes])
+  const accepted = useMemo<Set<string>>(() => pending?.accepted ?? new Set(), [pending?.accepted])
   const opt = pending?.optimized
   const base = pending?.baseResume
 

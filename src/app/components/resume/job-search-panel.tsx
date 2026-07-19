@@ -5,13 +5,10 @@ import { useRouter } from '~/i18n/routing'
 import {
   Search, Bookmark, Loader2, AlertCircle,
   RefreshCw, Filter, X, Globe, Clock, Star, Plane,
-  ChevronDown,
 } from 'lucide-react'
 import { cn } from '~/lib/utils'
 import { compareJobs } from '~/lib/job-sources/scoring'
 import { useApplications, useCreateApplication, useDeleteApplication } from '~/hooks/use-apps'
-import { useCreateResume } from '~/hooks/use-resumes'
-import { useUIStore } from '~/hooks/use-ui'
 import { notify } from '~/lib/toast'
 import { companyColor, companyLogo } from '~/lib/company-data'
 import type { Resume, PipelineJob } from '~/types/resume'
@@ -68,8 +65,6 @@ export function JobSearchPanel({ resume }: { resume: Resume }) {
   const { data: applications } = useApplications()
   const { mutateAsync: createBookmark } = useCreateApplication()
   const { mutateAsync: deleteBookmark } = useDeleteApplication()
-  const { mutate: addResume } = useCreateResume()
-  const setActiveResumeId = useUIStore((s) => s.setActiveResumeId)
 
   const isBookmarked = (key: string) => applications?.bookmark.some((j) => j.key === key) ?? false
 
@@ -135,7 +130,7 @@ export function JobSearchPanel({ resume }: { resume: Resume }) {
     setCards(q, loc, resume.id, data)
   }
 
-  function loadSearchFromCache(q: string, loc: string): { jobs: ScoredJob[]; total: number; descriptionsIncluded: boolean } | null {
+  function loadSearchFromCache(q: string, loc: string): { jobs: ScoredJob[]; total: number; descriptionsIncluded: boolean; timestamp: number } | null {
     return getCards(q, loc, resume.id)
   }
 
@@ -213,6 +208,9 @@ export function JobSearchPanel({ resume }: { resume: Resume }) {
     } finally {
       setBackgroundRefreshing(false)
     }
+    // countryCode is read via closure but excluded to avoid recreating the
+    // SWR refresher on every keystroke in the location input.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [resume.skills, resume.role, newJobs])
 
   const handleShowNewJobs = useCallback(() => {
@@ -226,6 +224,9 @@ export function JobSearchPanel({ resume }: { resume: Resume }) {
       return merged
     })
     setNewJobs([])
+    // saveSearchToCache is a stable module-level function — adding it would
+    // invalidate the callback unnecessarily.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [newJobs, query, location, mergeResults])
 
   const handleSearch = useCallback(async (q?: string, loc?: string, fresh?: boolean) => {
@@ -313,6 +314,8 @@ export function JobSearchPanel({ resume }: { resume: Resume }) {
         setLoading(false)
       }
     }
+    // saveSearchToCache is a stable module-level function — exclude from deps.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [query, location, countryCode, resume.skills, resume.role, mergeResults])
 
   // Auto-search on mount — check sessionStorage first for instant back-nav
@@ -329,7 +332,7 @@ export function JobSearchPanel({ resume }: { resume: Resume }) {
       setCached(true)
 
       // SWR: If cache is older than 30 minutes, trigger background refresh silently
-      const age = Date.now() - (cached as any).timestamp
+      const age = Date.now() - cached.timestamp
       if (age > 30 * 60 * 1000) {
         backgroundRefresh(q, loc)
       }
@@ -407,13 +410,6 @@ export function JobSearchPanel({ resume }: { resume: Resume }) {
     (filters.sourceFilter.size > 0 ? 1 : 0)
 
   const toggleSet = (set: Set<string>, value: string): Set<string> => {
-    const next = new Set(set)
-    if (next.has(value)) next.delete(value)
-    else next.add(value)
-    return next
-  }
-
-  const toggleSourceSet = (set: Set<JobSource>, value: JobSource): Set<JobSource> => {
     const next = new Set(set)
     if (next.has(value)) next.delete(value)
     else next.add(value)
@@ -817,7 +813,7 @@ export function JobSearchPanel({ resume }: { resume: Resume }) {
 // SUB-COMPONENTS
 // ═══════════════════════════════════════════════════════════════
 
-function JobCard({ job, bookmarked, onBookmark, onAts, onInterview, onClick }: {
+function JobCard({ job, bookmarked, onBookmark, onAts: _onAts, onInterview: _onInterview, onClick }: {
   job: ScoredJob
   bookmarked: boolean
   onBookmark: () => void
@@ -825,6 +821,8 @@ function JobCard({ job, bookmarked, onBookmark, onAts, onInterview, onClick }: {
   onInterview: () => void
   onClick: () => void
 }) {
+  void _onAts
+  void _onInterview
   return (
     <div
       className="cursor-pointer rounded-sm border border-border bg-card p-4 transition-colors hover:border-primary"

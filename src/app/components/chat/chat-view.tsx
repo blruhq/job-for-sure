@@ -4,24 +4,28 @@ import { useRef, useState, useEffect, useCallback, useMemo } from 'react'
 import { useRouter } from '~/i18n/routing'
 import { useChat } from '@ai-sdk/react'
 import { DefaultChatTransport } from 'ai'
+import type { UIMessage } from 'ai'
 import { AgentChat } from '@/components/agent-elements/agent-chat'
 import { InputBar } from '@/components/agent-elements/input-bar'
 import type { InputBarProps } from '@/components/agent-elements/input-bar'
 import { useActiveResume } from '~/hooks/use-active-resume'
-import { useUpdateResume, useCreateResume } from '~/hooks/use-resumes'
+import { useCreateResume } from '~/hooks/use-resumes'
 import { useResumes } from '~/hooks/use-resumes'
 import { useApplications } from '~/hooks/use-apps'
 import { useUIStore } from '~/hooks/use-ui'
 import { createResume } from '~/lib/company-data'
+import { normalizeParsed, type ParsedResumeFields } from '~/lib/resume-normalize'
 import { notify } from '~/lib/toast'
 import { cn } from '~/lib/utils'
-import type { Resume } from '~/types/resume'
 import { BuildWizard, type WizardData } from '~/components/chat/build-wizard'
 import { PasteJDModal } from '~/components/chat/paste-jd-modal'
 import { ConfirmDialog } from '~/components/ui/confirm-dialog'
 import { Skeleton } from '~/components/ui/skeleton'
 import { UploadCardMessage } from '~/components/chat/upload-card-message'
 import { Upload, FileText, ClipboardList, Loader2, Paperclip, RotateCcw, Sparkles, Save, Pencil } from 'lucide-react'
+
+// (ParsedResumeFields + normalizeParsed now live in ~/lib/resume-normalize and
+// are imported above.)
 
 export function ChatView() {
   const router = useRouter()
@@ -32,7 +36,6 @@ export function ChatView() {
   const targetCompanyKey = useUIStore((s) => s.targetCompanyKey)
   const setTargetCompanyKey = useUIStore((s) => s.setTargetCompanyKey)
   const { mutate: addResume } = useCreateResume()
-  const { mutate: updateResume } = useUpdateResume()
   const { data: applications } = useApplications()
   const fileRef = useRef<HTMLInputElement>(null)
   const [wizardOpen, setWizardOpen] = useState(false)
@@ -147,9 +150,9 @@ export function ChatView() {
     if (!buildDataRef.current) return
     if (status === 'streaming' || status === 'submitted') return
     // Find the last assistant message
-    const lastAssistant = [...messages].reverse().find((m: any) => m.role === 'assistant')
+    const lastAssistant = [...messages].reverse().find((m) => m.role === 'assistant')
     if (!lastAssistant) return
-    const text = lastAssistant.parts?.map((p: any) => p.text || '').join('') || ''
+    const text = lastAssistant.parts?.map((p) => (p.type === 'text' ? p.text : '')).join('') || ''
     // Match ALL progress markers, take the LAST one (in case AI included multiple)
     const matches = text.matchAll(/<!--jfs-progress:(\w+)-->/g)
     const matchesArray = Array.from(matches)
@@ -252,51 +255,12 @@ export function ChatView() {
         const errData = await res.json().catch(() => ({}))
         throw new Error(errData.error || 'Failed to parse resume')
       }
-      const parsed = await res.json()
+      const parsed = (await res.json()) as ParsedResumeFields
+      const norm = normalizeParsed(parsed)
 
-      // Create resume from parsed data — no role fallback fabrication
       const resume = createResume({
         name: file.name.replace(/\.(pdf|docx|txt|md)$/i, ''),
-        role: parsed.role || '',
-        persona: parsed.name || 'Your Name',
-        email: parsed.email,
-        phone: parsed.phone,
-        location: parsed.location,
-        github: parsed.github,
-        summary: parsed.summary,
-        skills: parsed.skills?.length > 0 ? parsed.skills : [],
-        experience: parsed.experience?.map((e: any) => ({
-          company: e.company || '',
-          role: e.role || '',
-          dates: e.dates || '',
-          bullets: e.bullets || [],
-        })),
-        education: parsed.education?.map((e: any) => ({
-          institution: e.institution || '',
-          degree: e.degree || '',
-          field: e.field || '',
-          dates: e.dates || '',
-        })),
-        projects: parsed.projects?.map((p: any) => ({
-          name: p.name || '',
-          description: p.description || '',
-          techStack: p.techStack || [],
-          link: p.link || '',
-        })),
-        certifications: parsed.certifications?.map((c: any) => ({
-          name: c.name || '',
-          issuer: c.issuer || '',
-          date: c.date || '',
-        })),
-        languages: parsed.languages?.map((l: any) => ({
-          name: l.name || '',
-          proficiency: l.proficiency || '',
-        })),
-        customSections: parsed.customSections?.map((cs: any) => ({
-          title: cs.title || '',
-          bullets: cs.bullets || [],
-          ...(cs.id ? { id: cs.id } : {}),
-        })),
+        ...norm,
       })
 
       addResume({ id: resume.id, data: resume })
@@ -317,12 +281,12 @@ export function ChatView() {
           { type: 'text', text: uploadText },
         ],
         createdAt: new Date(),
-      } as any, {
+      } as unknown as UIMessage, {
         id: `upload-ack-${Date.now()}`,
         role: 'assistant',
         parts: [{ type: 'text', text: ackText }],
         createdAt: new Date(),
-      } as any])
+      } as unknown as UIMessage])
 
       setUploadStage('idle')
     } catch (err) {
@@ -356,9 +320,9 @@ export function ChatView() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          messages: messages.map((m: any) => ({
+          messages: messages.map((m) => ({
             role: m.role,
-            content: m.parts?.map((p: any) => p.text || '').join(' ') || '',
+            content: m.parts?.map((p) => (p.type === 'text' ? p.text : '')).join(' ') || '',
           })),
           template: buildDataRef.current.template,
           role: buildDataRef.current.role,
@@ -371,24 +335,13 @@ export function ChatView() {
         throw new Error(errData.error || 'Failed to build resume')
       }
 
-      const parsed = await res.json()
+      const parsed = (await res.json()) as ParsedResumeFields
+      const norm = normalizeParsed(parsed)
 
       const resume = createResume({
-        name: `${parsed.persona || buildDataRef.current.role} Resume`,
-        role: buildDataRef.current.role,
-        persona: parsed.persona || 'Your Name',
-        email: parsed.email,
-        phone: parsed.phone,
-        location: parsed.location,
-        github: parsed.github,
-        summary: parsed.summary,
-        skills: parsed.skills || [],
-        experience: parsed.experience || [],
-        education: parsed.education || [],
-        projects: parsed.projects || [],
-        certifications: parsed.certifications || [],
-        languages: parsed.languages || [],
-        customSections: parsed.customSections || [],
+        name: `${norm.persona || buildDataRef.current.role} Resume`,
+        ...norm,
+        role: buildDataRef.current.role, // role wins over parsed
         template: buildDataRef.current.template,
       })
 
@@ -396,12 +349,12 @@ export function ChatView() {
       setActiveResumeId(resume.id)
 
       const ackText = `✅ Resume saved! I've created your **${buildDataRef.current.role}** resume with the **${buildDataRef.current.template}** template. You can open the editor to make any changes.`
-      setMessages((prev: any[]) => [...prev, {
+      setMessages(prev => [...prev, {
         id: `save-ack-${Date.now()}`,
         role: 'assistant',
         parts: [{ type: 'text', text: ackText }],
         createdAt: new Date(),
-      } as any])
+      } as unknown as UIMessage])
 
       // Exit build mode
       buildDataRef.current = null
@@ -431,16 +384,16 @@ export function ChatView() {
     setShowManualDialog(false)
 
     // If there are enough messages, try to extract partial data
-    const userMessages = messages.filter((m: any) => m.role === 'user')
+    const userMessages = messages.filter((m) => m.role === 'user')
     if (userMessages.length >= 2) {
       try {
         const res = await fetch('/api/resume/from-chat', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            messages: messages.map((m: any) => ({
+            messages: messages.map((m) => ({
               role: m.role,
-              content: m.parts?.map((p: any) => p.text || '').join(' ') || '',
+              content: m.parts?.map((p) => (p.type === 'text' ? p.text : '')).join(' ') || '',
             })),
             template: data.template,
             role: data.role,
@@ -449,26 +402,15 @@ export function ChatView() {
         })
 
         if (res.ok) {
-          const parsed = await res.json()
-          const resume = createResume({
-            name: `${data.role} Resume`,
-            role: data.role,
-            persona: parsed.persona || 'Your Name',
-            email: parsed.email,
-            phone: parsed.phone,
-            location: parsed.location,
-            github: parsed.github,
-            summary: parsed.summary,
-            skills: parsed.skills || [],
-            experience: parsed.experience || [],
-            education: parsed.education || [],
-            projects: parsed.projects || [],
-            certifications: parsed.certifications || [],
-            languages: parsed.languages || [],
-            customSections: parsed.customSections || [],
-            template: data.template,
-          })
+      const parsed = (await res.json()) as ParsedResumeFields
+      const norm = normalizeParsed(parsed)
 
+      const resume = createResume({
+        ...norm,
+        name: `${data.role} Resume`,
+        role: data.role,
+        template: data.template,
+      })
       addResume({ id: resume.id, data: resume })
       setActiveResumeId(resume.id)
 
@@ -531,7 +473,10 @@ export function ChatView() {
 
   // Stable custom InputBar — never recreates, so InputBar inside never remounts
   const CustomInputBar = useCallback(function CustomInputBar(props: InputBarProps) {
-    const { onAttach, ...inputBarProps } = props
+    // onAttach is currently unused but kept in the destructure to prevent it
+    // from being passed through to the underlying <InputBar>.
+    const { onAttach: _onAttach, ...inputBarProps } = props
+    void _onAttach
 
     const building = buildDataRef.current
     const saving = savingResumeRef.current
@@ -643,8 +588,15 @@ export function ChatView() {
         />
       </div>
     )
+    // Empty deps are correct: BUILD_STEPS is a module constant and the
+    // InputBar must keep a stable identity so the underlying chat doesn't
+    // remount on every keystroke.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
+  // CustomInputBar identity is preserved by the empty-deps useCallback above;
+  // adding it here would invalidate slots on every render.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const slots = useMemo(() => ({ InputBar: CustomInputBar, UserMessage: UploadCardMessage }), [])
 
   // ── ENTRY CARDS (shown above AgentChat when no messages) ──

@@ -101,9 +101,7 @@ export async function streamWithFailover(
   params: StreamParams,
 ): Promise<Response> {
   const { system, messages, temperature = 0.7, maxOutputTokens = 1024 } = params
-  const modelMessages = await convertToModelMessages(messages as any)
-
-  let lastError: Error | null = null
+  const modelMessages = await convertToModelMessages(messages as Parameters<typeof convertToModelMessages>[0])
 
   for (const provider of providers) {
     try {
@@ -184,7 +182,6 @@ export async function streamWithFailover(
       const msg = err instanceof Error ? err.message : String(err)
       const sanitized = msg.replace(/(sk-|api[_-]?key|authorization)[^\s"']+/gi, '$1***')
       console.warn(`⚠️  [AI] ${provider.name} failed: ${sanitized}`)
-      lastError = err instanceof Error ? err : new Error(msg)
       continue
     }
   }

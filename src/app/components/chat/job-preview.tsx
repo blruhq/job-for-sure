@@ -3,15 +3,14 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { useRouter } from '~/i18n/routing'
 import {
-  Bookmark, ExternalLink, Loader2, ChevronRight, MessageSquare, Plane, X, Brain,
+  Bookmark, Loader2, ChevronRight, Plane, X, Brain,
 } from 'lucide-react'
 import { cn } from '~/lib/utils'
 import { useApplications, useCreateApplication, useDeleteApplication } from '~/hooks/use-apps'
-import { useBookmarkJob } from '~/hooks/use-bookmark'
 import { notify } from '~/lib/toast'
 import { companyColor, companyLogo } from '~/lib/company-data'
 import type { Resume, PipelineJob } from '~/types/resume'
-import type { ScoredJob, SearchResult, JobSource } from '~/lib/job-sources/types'
+import type { ScoredJob, SearchResult } from '~/lib/job-sources/types'
 import { JobDetailPanel } from '~/components/pipeline/job-detail-panel'
 import { scoredJobToPipelineJob } from '~/lib/job-utils'
 import { SOURCE_SHORT } from '~/lib/source-names'

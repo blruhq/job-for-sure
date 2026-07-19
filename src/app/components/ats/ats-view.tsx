@@ -5,7 +5,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { Wand2, Upload, FileText, ArrowRight, Sparkles, RefreshCw, CheckCircle2, AlertCircle } from 'lucide-react'
 import { useRouter } from '~/i18n/routing'
 import { useActiveResume } from '~/hooks/use-active-resume'
-import { useUpdateResume, useCreateResume } from '~/hooks/use-resumes'
+import { useUpdateResume } from '~/hooks/use-resumes'
 import { useUIStore } from '~/hooks/use-ui'
 import { notify } from '~/lib/toast'
 import { useTranslations } from 'next-intl'
@@ -33,7 +33,6 @@ export function AtsView() {
   const t = useTranslations('ats')
   const { resumes, activeResumeId, activeResume, setActiveResumeId } = useActiveResume()
   const { mutate: updateResume } = useUpdateResume()
-  const { mutate: addResume } = useCreateResume()
   const setPendingTailor = useUIStore((s) => s.setPendingTailor)
   const [jdText, setJdText] = useState('')
   const [analysisLoading, setAnalysisLoading] = useState(false)
@@ -150,7 +149,7 @@ export function AtsView() {
       }
 
       // Store the pending tailor result and navigate to editor in review mode
-      const acceptedIds = new Set<string>(changes.map((c: any) => c.id))
+      const acceptedIds = new Set<string>(changes.map((c: { id: string }) => c.id))
       setPendingTailor({
         baseResumeId: resume.id,
         baseResume: resume,
@@ -199,36 +198,6 @@ export function AtsView() {
       ? score >= 75 ? 'Your resume strongly aligns with this job description.' : score >= 50 ? 'Some requirements are missing. Review gaps below.' : 'Significant gap. Tailor your resume for better odds.'
       : score >= 75 ? 'Your resume format and impact language are highly competitive.' : score >= 50 ? 'Good baseline score, but we found a few critical improvements.' : 'High priority issues detected in format or language.'
     : 'Paste a job description and click "Analyze Match" to see your score.'
-
-  const injectKeywords = () => {
-    if (!resume || !analysisResult) {
-      notify({ message: 'Select a resume first', type: 'warning' })
-      return
-    }
-    const missingKeys = analysisResult.missing || []
-    if (missingKeys.length === 0) {
-      notify({ message: 'No missing keywords to inject', type: 'info' })
-      return
-    }
-    
-    let addedCount = 0
-    const nextSkills = [...resume.skills]
-    missingKeys.forEach((k) => {
-      if (!nextSkills.some((s) => s.toLowerCase().includes(k.toLowerCase()))) {
-        nextSkills.push(k)
-        addedCount++
-      }
-    })
-    
-    if (addedCount > 0) {
-      updateResume({ id: resume.id, data: { skills: nextSkills } })
-      notify({ message: `Injected ${addedCount} missing keyword${addedCount !== 1 ? 's' : ''}`, type: 'success' })
-      // Trigger a re-analysis with current state to refresh
-      fetchAnalysis(jdText)
-    } else {
-      notify({ message: 'Keywords already present in skills list', type: 'info' })
-    }
-  }
 
   return (
     <div className="flex h-full w-full flex-col md:flex-row">

@@ -1,3 +1,7 @@
+// Agent-elements library: hooks deliberately use refined dep arrays for stable identity.
+/* eslint-disable react-hooks/exhaustive-deps */
+// Agent-elements library: tool schemas are intentionally permissive (arbitrary tool payloads).
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { memo, useMemo } from "react";
 import { CheckIcon, IconArrowRight } from "../icons";
 import { TextShimmer } from "../text-shimmer";

@@ -35,7 +35,7 @@ import {
   GREENHOUSE_FETCH_LIMIT,
   ASHBY_FETCH_LIMIT,
 } from './companies'
-import { parseLocation, isRemoteRegionCompatible, getMacroRegion } from './geo'
+import { parseLocation, isRemoteRegionCompatible } from './geo'
 import { expandQueryTerms } from './role-synonyms'
 
 const SEARCH_TIMEOUT_MS = 15_000 // per-source timeout
@@ -253,7 +253,7 @@ export async function searchJobs(params: SearchParams): Promise<SearchResult> {
 
 // ── Source wrappers ──────────────────────────────────────────
 
-async function fetchRemoteOKJobs(query: string): Promise<{ jobs: JobResult[]; error?: string }> {
+async function fetchRemoteOKJobs(_query: string): Promise<{ jobs: JobResult[]; error?: string }> {
   try {
     const allJobs = await fetchRemoteOK()
     return { jobs: allJobs }
@@ -262,7 +262,7 @@ async function fetchRemoteOKJobs(query: string): Promise<{ jobs: JobResult[]; er
   }
 }
 
-async function fetchGreenhouseJobs(query: string): Promise<{ jobs: JobResult[]; error?: string }> {
+async function fetchGreenhouseJobs(_query: string): Promise<{ jobs: JobResult[]; error?: string }> {
   const slugs = GREENHOUSE_COMPANIES.slice(0, GREENHOUSE_FETCH_LIMIT).map((c) => c.slug)
   const controller = new AbortController()
   const timer = setTimeout(() => controller.abort(), SEARCH_TIMEOUT_MS)
@@ -284,7 +284,7 @@ async function fetchGreenhouseJobs(query: string): Promise<{ jobs: JobResult[]; 
   }
 }
 
-async function fetchAshbyJobs(query: string): Promise<{ jobs: JobResult[]; error?: string }> {
+async function fetchAshbyJobs(_query: string): Promise<{ jobs: JobResult[]; error?: string }> {
   const slugs = ASHBY_COMPANIES.slice(0, ASHBY_FETCH_LIMIT).map((c) => c.slug)
   const controller = new AbortController()
   const timer = setTimeout(() => controller.abort(), SEARCH_TIMEOUT_MS)
@@ -309,7 +309,11 @@ async function fetchAshbyJobs(query: string): Promise<{ jobs: JobResult[]; error
 // ── Helpers ──────────────────────────────────────────────────
 
 function stripScore(job: ScoredJob): JobResult {
-  const { score: _score, matchedSkills: _matched, isLocal: _local, ...rest } = job
+  // Drop internal scoring fields before returning to the API layer.
+  const { score, matchedSkills, isLocal, ...rest } = job
+  void score
+  void matchedSkills
+  void isLocal
   return rest
 }
 

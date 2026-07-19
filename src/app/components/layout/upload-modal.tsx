@@ -6,6 +6,7 @@ import { X, Upload, FileText, Loader2 } from 'lucide-react'
 import { useUIStore } from '~/hooks/use-ui'
 import { useCreateResume } from '~/hooks/use-resumes'
 import { createResume } from '~/lib/company-data'
+import { normalizeParsed, type ParsedResumeFields } from '~/lib/resume-normalize'
 import { notify } from '~/lib/toast'
 import { BuildWizard, type WizardData } from '~/components/chat/build-wizard'
 import { cn } from '~/lib/utils'
@@ -52,50 +53,11 @@ export function UploadModal({ open, onClose }: UploadModalProps) {
         throw new Error(errData.error || 'Failed to parse resume')
       }
 
-      const parsed = await res.json()
+      const parsed = (await res.json()) as ParsedResumeFields
 
       const resume = createResume({
         name: file.name.replace(/\.(pdf|docx|txt|md)$/i, ''),
-        role: parsed.role || '',
-        persona: parsed.name || 'Your Name',
-        email: parsed.email,
-        phone: parsed.phone,
-        location: parsed.location,
-        github: parsed.github,
-        summary: parsed.summary,
-        skills: parsed.skills?.length > 0 ? parsed.skills : [],
-        experience: parsed.experience?.map((exp: any) => ({
-          company: exp.company || '',
-          role: exp.role || '',
-          dates: exp.dates || '',
-          bullets: exp.bullets || [],
-        })),
-        education: parsed.education?.map((ed: any) => ({
-          institution: ed.institution || '',
-          degree: ed.degree || '',
-          field: ed.field || '',
-          dates: ed.dates || '',
-        })),
-        projects: parsed.projects?.map((p: any) => ({
-          name: p.name || '',
-          description: p.description || '',
-          techStack: p.techStack || [],
-          link: p.link || '',
-        })),
-        certifications: parsed.certifications?.map((cert: any) => ({
-          name: cert.name || '',
-          issuer: cert.issuer || '',
-          date: cert.date || '',
-        })),
-        languages: parsed.languages?.map((l: any) => ({
-          name: l.name || '',
-          proficiency: l.proficiency || '',
-        })),
-        customSections: parsed.customSections?.map((cs: any) => ({
-          title: cs.title || '',
-          bullets: cs.bullets || [],
-          ...(cs.id ? { id: cs.id } : {}),
-        })),
+        ...normalizeParsed(parsed),
       })
 
       addResume({ id: resume.id, data: resume })

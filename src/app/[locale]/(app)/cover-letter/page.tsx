@@ -1,22 +1,20 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
-import { useRouter } from '~/i18n/routing'
 import { useActiveResume } from '~/hooks/use-active-resume'
-import { useUpdateResume, useCreateResume } from '~/hooks/use-resumes'
+import { useCreateResume } from '~/hooks/use-resumes'
 import { useCoverLetters } from '~/hooks/use-cover-letters'
 import { createResume } from '~/lib/company-data'
+import { normalizeParsed, type ParsedResumeFields } from '~/lib/resume-normalize'
 import { notify } from '~/lib/toast'
 import { Wand2, Download, Copy, Save, Upload, FileText, Loader2, Trash2 } from 'lucide-react'
 import { ConfirmDialog } from '~/components/ui/confirm-dialog'
 import { useTranslations } from 'next-intl'
 
 export default function StandaloneCoverLetterPage() {
-  const router = useRouter()
   const t = useTranslations('coverLetter')
   const { resumes, activeResumeId, setActiveResumeId } = useActiveResume()
   const { mutate: addResume } = useCreateResume()
-  const { mutate: updateResume } = useUpdateResume()
 
   // Select first resume by default if activeResumeId is not set
   const [selectedResumeId, setSelectedResumeId] = useState(activeResumeId || 'none')
@@ -72,15 +70,19 @@ export default function StandaloneCoverLetterPage() {
 
   useEffect(() => {
     if (selectedResume) {
-      const activeLetter = coverLettersData.find((l: any) => l.resumeId === selectedResume.id)
+      const activeLetter = coverLettersData.find((l) => l.resumeId === selectedResume.id)
       if (activeLetter) {
-        setLetterText(activeLetter.content)
+        setLetterText(activeLetter.content ?? '')
         if (activeLetter.company) setCompany(activeLetter.company)
         if (activeLetter.role) setRole(activeLetter.role)
       } else {
         setLetterText('')
       }
     }
+    // Run only when the selected resume changes — we intentionally read the
+    // latest coverLettersData/selectedResume via closure without re-running
+    // on every query refetch (would cause a write-back loop).
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedResume?.id])
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -103,48 +105,11 @@ export default function StandaloneCoverLetterPage() {
         const errData = await res.json().catch(() => ({}))
         throw new Error(errData.error || 'Failed to parse resume')
       }
-      const parsed = await res.json()
+      const parsed = (await res.json()) as ParsedResumeFields
 
       const resume = createResume({
         name: file.name.replace(/\.(pdf|docx|txt|md)$/i, ''),
-        role: parsed.role || '',
-        persona: parsed.name || 'Your Name',
-        email: parsed.email,
-        location: parsed.location,
-        summary: parsed.summary,
-        skills: parsed.skills || [],
-        experience: parsed.experience?.map((exp: any) => ({
-          company: exp.company || '',
-          role: exp.role || '',
-          dates: exp.dates || '',
-          bullets: exp.bullets || [],
-        })),
-        education: parsed.education?.map((edu: any) => ({
-          institution: edu.institution || '',
-          degree: edu.degree || '',
-          field: edu.field || '',
-          dates: edu.dates || '',
-        })),
-        projects: parsed.projects?.map((p: any) => ({
-          name: p.name || '',
-          description: p.description || '',
-          techStack: p.techStack || [],
-          link: p.link || '',
-        })),
-        certifications: parsed.certifications?.map((c: any) => ({
-          name: c.name || '',
-          issuer: c.issuer || '',
-          date: c.date || '',
-        })),
-        languages: parsed.languages?.map((l: any) => ({
-          name: l.name || '',
-          proficiency: l.proficiency || '',
-        })),
-        customSections: parsed.customSections?.map((cs: any) => ({
-          title: cs.title || '',
-          bullets: cs.bullets || [],
-          ...(cs.id ? { id: cs.id } : {}),
-        })),
+        ...normalizeParsed(parsed),
       })
 
       addResume({ id: resume.id, data: resume })

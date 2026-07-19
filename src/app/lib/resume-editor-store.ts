@@ -13,7 +13,6 @@ import type {
   ResumeLanguage,
   ResumeCustomSection,
 } from '~/types/resume'
-import { DEFAULT_SECTION_ORDER } from '~/types/resume'
 
 // ═══════════════════════════════════════════════════════════════
 // Editor section identifiers — shared with component
@@ -271,8 +270,9 @@ export function useEditorStore<T>(
   selector: (state: ResumeEditorStore) => T,
 ): T {
   // If no store, return a default. This shouldn't happen in practice.
-  return useStore(
-    store ?? createResumeEditorStore(),
-    selector as any,
-  )
+  // The cast is intentional: useStore's selector type uses zustand's
+  // internal StoreApi wrapper, while callers pass a selector over the
+  // public state shape. The shapes are compatible at runtime.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return useStore(store ?? createResumeEditorStore(), selector as any)
 }

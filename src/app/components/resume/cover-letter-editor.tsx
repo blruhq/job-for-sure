@@ -18,7 +18,7 @@ export function CoverLetterEditor({ resume }: CoverLetterEditorProps) {
   const { mutateAsync: updateCoverLetter } = useUpdateCoverLetter()
 
   // Find the latest cover letter for this resume
-  const activeLetter = coverLetters.find((cl: any) => cl.resumeId === resume.id)
+  const activeLetter = coverLetters.find((cl) => cl.resumeId === resume.id)
 
   const [jdText, setJdText] = useState('')
   const [letterText, setLetterText] = useState('')

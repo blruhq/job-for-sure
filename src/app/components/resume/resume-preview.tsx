@@ -47,8 +47,8 @@ export const ResumePreview = memo(function ResumePreview({ resume }: { resume: R
       setBlobUrl(url)
       setLoading(false)
       setError(false)
-    } catch (err: any) {
-      if (err?.name === 'AbortError') return  // superseded by newer request
+    } catch (err) {
+      if (err instanceof DOMException && err.name === 'AbortError') return  // superseded by newer request
       console.error('PDF preview generation failed:', err)
       if (gen === genRef.current) {
         setLoading(false)

@@ -31,3 +31,19 @@ export interface InterviewExchange {
   answer: string
   feedback: AnswerFeedback
 }
+
+// A saved interview session row from the DB (interview_sessions table).
+export interface InterviewSessionRow {
+  id: string
+  userId?: string
+  resumeId?: string | null
+  company: string
+  role: string
+  type: string
+  difficulty: string
+  score: string | number
+  exchanges: InterviewExchange[]
+  createdAt?: string
+  updatedAt?: string
+  deletedAt?: string | null
+}

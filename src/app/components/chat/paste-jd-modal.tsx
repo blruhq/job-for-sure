@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { X, ClipboardList, Loader2 } from 'lucide-react'
+import { X, ClipboardList } from 'lucide-react'
 
 interface PasteJDModalProps {
   open: boolean

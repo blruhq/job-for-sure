@@ -1,3 +1,5 @@
+// Agent-elements library: tool schemas are intentionally permissive (arbitrary tool payloads).
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { memo, useEffect, useMemo, useRef, useState } from "react";
 import { toolRegistry } from "./tool-registry";
 import { GenericTool } from "./generic-tool";

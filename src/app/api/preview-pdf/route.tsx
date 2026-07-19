@@ -3,10 +3,11 @@ import ReactPDF from '@react-pdf/renderer'
 import { ResumePDF } from '~/components/resume/resume-pdf'
 import { withAuth } from '~/lib/with-auth'
 import { ResumeDataSchema } from '~/lib/schemas'
+import type { Resume } from '~/types/resume'
 import { registerFonts } from '~/components/resume/templates/shared-pdf'
 
 export const runtime = 'nodejs'
-export const maxDuration = 10
+export const maxDuration = 30
 
 // POST /api/preview-pdf
 // Accepts resume data in the body, returns a PDF stream for inline display.
@@ -32,7 +33,7 @@ export const POST = withAuth(async (request, { user: _user }) => {
   registerFonts()
 
   try {
-    const doc = <ResumePDF resume={result.data as any} />
+    const doc = <ResumePDF resume={result.data as unknown as Resume} />
     const stream = await ReactPDF.renderToStream(doc)
 
     // Buffer the stream

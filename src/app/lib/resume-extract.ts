@@ -75,12 +75,13 @@ async function extractPdfText(file: File | Blob): Promise<string> {
     const content = await page.getTextContent()
 
     // Group text items by Y coordinate with a baseline tolerance of 5px
+    type PdfTextItem = { str: string; transform: number[]; width?: number }
     const tolerance = 5
-    const rows: { y: number; items: any[] }[] = []
+    const rows: { y: number; items: PdfTextItem[] }[] = []
 
     for (const item of content.items) {
       if (!('str' in item)) continue // Skip TextMark elements
-      const textItem = item as any
+      const textItem = item as unknown as PdfTextItem
       if (!textItem.str.trim() && textItem.str !== ' ') continue
 
       const y = textItem.transform[5] // Y coordinate in PDF viewport space
@@ -123,7 +124,7 @@ async function extractPdfText(file: File | Blob): Promise<string> {
 
         rowString += item.str
         lastX = x
-        lastWidth = item.width
+        lastWidth = item.width ?? 0
       }
 
       return rowString

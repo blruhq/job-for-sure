@@ -115,7 +115,7 @@ Keep everything concise. This is a quick-read overview, not an essay.`
 
     const experienceText =
       resumeData?.experience
-        ?.map((e: any) => `${e.role || ''} at ${e.company || ''} (${e.dates || ''})`)
+        ?.map((e: { role?: string; company?: string; dates?: string }) => `${e.role || ''} at ${e.company || ''} (${e.dates || ''})`)
         .join('; ') || 'None'
 
     const userPrompt = `Analyze this job for this candidate:

@@ -4,11 +4,28 @@ let registered = false
 
 /**
  * Returns the correct font URL for the current environment.
- * - Browser: /fonts/{filename} (served by Next.js from /public/)
- * - Server:  {process.cwd()}/public/fonts/{filename} (filesystem path)
+ *
+ * - Browser:  /fonts/{filename}  (served by Next.js from /public/)
+ * - Vercel:   https://{deployment}/fonts/{filename}
+ *             /public/ is NOT on the Lambda filesystem (/var/task/public/
+ *             doesn't exist), so the server must fetch via the deployment URL.
+ *             VERCEL_URL is set automatically for every deployment (incl.
+ *             previews); VERCEL_PROJECT_PRODUCTION_URL is the prod fallback.
+ * - Local dev: {process.cwd()}/public/fonts/{filename}  (filesystem path)
  */
 function fontSrc(filename: string): string {
+  // Browser: relative URL served from /public
   if (typeof window !== 'undefined') return `/fonts/${filename}`
+
+  // Vercel serverless: fetch via deployment URL
+  const base =
+    (process.env.VERCEL_URL && `https://${process.env.VERCEL_URL}`) ||
+    (process.env.VERCEL_PROJECT_PRODUCTION_URL &&
+      `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`)
+
+  if (base) return `${base}/fonts/${filename}`
+
+  // Local dev: filesystem path (only works when /public is on disk)
   return `${process.cwd()}/public/fonts/${filename}`
 }
 
