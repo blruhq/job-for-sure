@@ -343,4 +343,11 @@ html[lang="th"] {
   color: #D5D4D0;
 }
 
+/* ── Focus-visible ring for keyboard accessibility ── */
+*:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
 

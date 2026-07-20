@@ -58,7 +58,20 @@ export function useDeleteResume() {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: ApiClient.deleteResume.bind(ApiClient),
-    onSuccess: () => {
+    onMutate: async (id: string) => {
+      await queryClient.cancelQueries({ queryKey: ['resumes'] })
+      const previous = queryClient.getQueryData<Resume[]>(['resumes'])
+      queryClient.setQueryData<Resume[]>(['resumes'], (old) =>
+        old ? old.filter((r) => r.id !== id) : old,
+      )
+      return { previous }
+    },
+    onError: (_err, _id, context) => {
+      if (context?.previous) {
+        queryClient.setQueryData(['resumes'], context.previous)
+      }
+    },
+    onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ['resumes'] })
     },
   })

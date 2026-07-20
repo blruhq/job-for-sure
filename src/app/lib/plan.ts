@@ -2,6 +2,7 @@ import { db } from '~/lib/db'
 import { usageEvents, user, resumes } from '~/lib/schema'
 import { eq, and, gte, count } from 'drizzle-orm'
 import { NextResponse } from 'next/server'
+import { getRedis } from '~/lib/redis'
 
 // ── Ownership check ──
 
@@ -199,11 +200,66 @@ export async function getUserPlan(userId: string): Promise<PlanTier> {
 }
 
 /**
- * Combination check + record for route handlers.
- * Returns a NextResponse (402/429) if the user hits a limit, or null if allowed.
- * Callers should check the result and short-circuit:
+ * Atomic quota claim via Redis INCR (fail-open to DB on Redis outage).
+ * Prevents TOCTOU race where N parallel requests all pass checkLimit at count=X.
+ * On success the claim is consumed even if the subsequent AI call fails —
+ * slightly over-strict for free users, never under-strict (no quota abuse).
+ */
+async function claimQuotaAtomic(
+  userId: string,
+  feature: Feature,
+  limit: number,
+  period: FeaturePeriod,
+): Promise<'allowed' | 'denied' | 'unknown'> {
+  try {
+    const redis = getRedis()
+    const since = periodBoundary(period)
+    // Day key: YYYY-MM-DD. Week key: ISO of Monday. Total: constant.
+    const periodKey =
+      period === 'total'
+        ? 'all'
+        : (since?.toISOString().slice(0, 10) ?? 'all')
+    const key = `jfs:quota:${userId}:${feature}:${periodKey}`
+    const used = await redis.incr(key)
+    if (used === 1) {
+      // TTL so keys self-expire when the period rolls over
+      const ttl =
+        period === 'day' ? 86_400 + 3_600 : // 25h cushion
+        period === 'week' ? 604_800 + 3_600 : // 7d + 1h
+        365 * 86_400 // total: 1 year
+      await redis.expire(key, ttl)
+    }
+    if (used > limit) {
+      // Roll back so permanent over-claim doesn't stick
+      await redis.decr(key)
+      return 'denied'
+    }
+    return 'allowed'
+  } catch {
+    return 'unknown' // Redis down → caller falls back to DB check
+  }
+}
+
+function limitReachedResponse(feature: Feature, limit: number, plan: PlanTier) {
+  return NextResponse.json(
+    {
+      error: 'Limit reached',
+      feature,
+      limit,
+      plan,
+      upgradeUrl: '/pricing',
+    },
+    { status: 402 },
+  )
+}
+
+/**
+ * Combination check for route handlers.
+ * Returns a NextResponse (402) if the user hits a limit, or null if allowed.
+ * Uses Redis atomic INCR to prevent parallel-request quota bypass.
+ * Callers should still call recordUsage for DB-side usage history.
  *
- *   const gate = await gateFeature(user.id, 'chat')
+ *   const gate = await gateFeature(user.id, 'chat', user.role, user.plan)
  *   if (gate) return gate
  *   await recordUsage(user.id, 'chat')
  */
@@ -213,18 +269,33 @@ export async function gateFeature(
   role: string,
   plan: string,
 ): Promise<NextResponse | null> {
+  const effectivePlan = getEffectivePlan(role, plan)
+  const config = FEATURES[feature]
+  const limit = config.limit[effectivePlan]
+
+  // Unlimited (admins or pro)
+  if (limit === -1) return null
+
+  // resume_create is row-count based (DB is source of truth), not event-based
+  if (feature === 'resume_create') {
+    const used = await getResumeCount(userId)
+    if (used >= limit) {
+      return limitReachedResponse(feature, limit, effectivePlan)
+    }
+    return null
+  }
+
+  // Atomic claim via Redis
+  const claim = await claimQuotaAtomic(userId, feature, limit, config.period)
+  if (claim === 'denied') {
+    return limitReachedResponse(feature, limit, effectivePlan)
+  }
+  if (claim === 'allowed') return null
+
+  // Redis unavailable — fall back to non-atomic DB check (fail-open for availability)
   const result = await checkLimit(userId, feature, role, plan)
   if (!result.allowed) {
-    return NextResponse.json(
-      {
-        error: 'Limit reached',
-        feature,
-        limit: result.limit,
-        plan: result.plan,
-        upgradeUrl: '/pricing',
-      },
-      { status: 402 },
-    )
+    return limitReachedResponse(feature, result.limit, result.plan)
   }
   return null
 }

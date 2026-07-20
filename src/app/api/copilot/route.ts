@@ -2,16 +2,22 @@ import { streamWithFailover } from '~/lib/ai-providers'
 import { withAuth } from '~/lib/with-auth'
 import { NextResponse } from 'next/server'
 import { ChatMessagesSchema, ResumeDataSchema } from '~/lib/schemas'
+import { gateFeature, recordUsage } from '~/lib/plan'
 
 export const maxDuration = 30
 
-export const POST = withAuth(async (req, { user: _user }) => {
+export const POST = withAuth(async (req, { user }) => {
   const raw = await req.json()
 
   const messagesResult = ChatMessagesSchema.safeParse(raw.messages)
   if (!messagesResult.success) {
     return NextResponse.json({ error: 'Invalid messages payload' }, { status: 400 })
   }
+
+  // Gate as 'chat' — copilot is the same free daily LLM budget
+  const gate = await gateFeature(user.id, 'chat', user.role, user.plan)
+  if (gate) return gate
+  await recordUsage(user.id, 'chat')
 
   const resumeResult = ResumeDataSchema.safeParse(raw.resume)
   const resume = resumeResult.success ? resumeResult.data : undefined

@@ -8,6 +8,7 @@ import {
 import { useState } from 'react'
 import * as Links from '~/lib/area-links'
 import { detectArea } from '~/lib/geo'
+import { notify } from '~/lib/toast'
 
 interface AreaIntelligenceProps {
   job: {
@@ -66,6 +67,8 @@ export function AreaIntelligence({ job, homeLocation, city, district, countryCod
       setEditing(false)
     } catch {
       // GPS denied or geocode failed — fall back to manual input
+      console.error('Failed to detect area')
+      notify({ message: 'Could not detect location. Type your area manually.', type: 'error' })
       setEditing(true)
     }
     setDetecting(false)

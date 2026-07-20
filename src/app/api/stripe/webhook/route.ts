@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import type Stripe from 'stripe'
-import { stripe, STRIPE_WEBHOOK_SECRET } from '~/lib/stripe'
+import { stripe, STRIPE_WEBHOOK_SECRET, PRO_PRICE_IDS } from '~/lib/stripe'
 import { db } from '~/lib/db'
 import { user, subscriptions } from '~/lib/schema'
 import { eq } from 'drizzle-orm'
@@ -86,8 +86,12 @@ export async function POST(req: Request) {
           return NextResponse.json({ error: 'No userId' }, { status: 200 })
         }
 
-        // Determine plan from the subscription items
-        const plan = sub.items?.data?.[0]?.price?.metadata?.plan || 'pro'
+        // Determine plan: only known price IDs (or explicit metadata.plan=pro) grant Pro.
+        // Fail-closed — unknown/misconfigured prices default to 'free'.
+        const priceId = sub.items?.data?.[0]?.price?.id
+        const priceMeta = sub.items?.data?.[0]?.price?.metadata?.plan
+        const plan =
+          (priceId && PRO_PRICE_IDS.has(priceId)) || priceMeta === 'pro' ? 'pro' : 'free'
         const interval = sub.items?.data?.[0]?.price?.recurring?.interval || null
         // Stripe SDK 2026 exposes current_period_end as camelCase in TS but the
         // runtime payload uses snake_case; tolerate both.

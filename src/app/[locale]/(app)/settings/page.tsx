@@ -96,7 +96,7 @@ export default function SettingsPage() {
         setUser(u)
         setName(u.name)
         setEmail(u.email)
-      } catch { /* ignore */ }
+      } catch { notify('Failed to load user session', 'error') }
 
       try {
         const res = await fetch('/api/user/preferences')
@@ -105,7 +105,7 @@ export default function SettingsPage() {
           setPrefs(data)
           setHomeLocation(data.homeLocation || '')
         }
-      } catch { /* ignore */ }
+      } catch { notify('Failed to load settings', 'error') }
 
       setLoading(false)
     }
@@ -196,6 +196,7 @@ export default function SettingsPage() {
       }
     } catch {
       setPrefs(prefs) // revert
+      notify('Failed to update preference', 'error')
     }
   }
 

@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { generateObjectWithFailover } from '~/lib/ai-providers'
 import { withAuth } from '~/lib/with-auth'
 import { ResumeDataSchema, JobDataSchema } from '~/lib/schemas'
+import { gateFeature, recordUsage } from '~/lib/plan'
 import { z } from 'zod'
 
 export const maxDuration = 60
@@ -42,11 +43,16 @@ const TailorSchema = z.object({
   ),
 })
 
-export const POST = withAuth(async (req, { user: _user }) => {
+export const POST = withAuth(async (req, { user }) => {
   const body = TailorInputBody.safeParse(await req.json())
   if (!body.success) {
     return NextResponse.json({ error: 'Invalid request' }, { status: 400 })
   }
+
+  // Gate as 'ats_match' — tailor is the same daily AI budget as ATS match
+  const gate = await gateFeature(user.id, 'ats_match', user.role, user.plan)
+  if (gate) return gate
+
   const { resume, job } = body.data
 
   const result = await generateObjectWithFailover<z.infer<typeof TailorSchema>>({
@@ -81,5 +87,6 @@ List EVERY change. If you rewrote the summary, that's one change. If you rewrote
     maxOutputTokens: 2048,
   })
 
+  await recordUsage(user.id, 'ats_match')
   return NextResponse.json(result)
 }, { rateLimitType: 'ai', route: '/api/ai/tailor' })

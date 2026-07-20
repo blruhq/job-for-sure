@@ -5,6 +5,7 @@ import { useRouter } from '~/i18n/routing'
 import { Menu } from '@base-ui/react/menu'
 import { Settings, LogOut } from 'lucide-react'
 import { authClient } from '~/lib/auth-client'
+import { notify } from '~/lib/toast'
 
 export function UserMenu() {
   const router = useRouter()
@@ -31,7 +32,10 @@ export function UserMenu() {
             setInitials(u.email[0].toUpperCase())
           }
         }
-      } catch { /* ignore */ }
+      } catch {
+        console.error('Failed to load user session')
+        notify({ message: 'Failed to load user session', type: 'error' })
+      }
     }
     loadUser()
   }, [])
@@ -39,7 +43,10 @@ export function UserMenu() {
   const handleSignOut = async () => {
     try {
       await authClient.signOut()
-    } catch { /* ignore */ }
+    } catch {
+      console.error('Failed to sign out')
+      notify({ message: 'Failed to sign out', type: 'error' })
+    }
     window.location.href = '/login'
   }
 

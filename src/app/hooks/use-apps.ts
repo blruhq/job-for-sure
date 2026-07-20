@@ -1,6 +1,7 @@
 import { useRef } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { ApiClient } from '~/lib/api-client'
+import type { CreateApplicationPayload } from '~/lib/api-client'
 import type { PipelineJob, ApplicationBoard } from '~/types/resume'
 import { notify } from '~/lib/toast'
 
@@ -95,9 +96,52 @@ export function useApplications() {
 
 export function useCreateApplication() {
   const queryClient = useQueryClient()
-  return useMutation({
-    mutationFn: ApiClient.createApplication.bind(ApiClient),
-    onSuccess: () => {
+  return useMutation<
+    { id: string },
+    Error,
+    CreateApplicationPayload,
+    { previous: ApplicationBoard | undefined }
+  >({
+    mutationFn: (payload) => ApiClient.createApplication(payload),
+    onMutate: async (payload) => {
+      await queryClient.cancelQueries({ queryKey: ['applications'] })
+      const previous = queryClient.getQueryData<ApplicationBoard>(['applications'])
+      // Optimistic bookmark insert so heart toggles instantly
+      const temp: PipelineJob = {
+        key: payload.sourceKey,
+        applicationId: `temp-${payload.sourceKey}`,
+        logo: payload.logoUrl || '',
+        color: payload.color || '',
+        company: payload.company,
+        title: payload.jobTitle,
+        loc: payload.location || '',
+        score: payload.matchScore || 0,
+        level: (payload.level as 'high' | 'mid') || 'mid',
+        time: 'saved',
+        url: payload.jobUrl || '',
+        resume: payload.resumeId || '',
+        addedAt: new Date().toISOString(),
+        notes: '',
+        salary: payload.salary || '',
+        jobData: (payload.jobData as PipelineJob['jobData']) || undefined,
+      }
+      queryClient.setQueryData<ApplicationBoard>(['applications'], (old) => {
+        if (!old) {
+          return { bookmark: [temp], applied: [], interviewing: [], offers: [], rejected: [] }
+        }
+        // Skip if already present (double-click guard)
+        if (old.bookmark.some((j) => j.key === payload.sourceKey)) return old
+        return { ...old, bookmark: [temp, ...old.bookmark] }
+      })
+      return { previous }
+    },
+    onError: (_err, _payload, context) => {
+      if (context?.previous) {
+        queryClient.setQueryData(['applications'], context.previous)
+      }
+      notify({ message: 'Failed to save bookmark', type: 'error' })
+    },
+    onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ['applications'] })
     },
   })
@@ -105,9 +149,32 @@ export function useCreateApplication() {
 
 export function useDeleteApplication() {
   const queryClient = useQueryClient()
-  return useMutation({
-    mutationFn: ApiClient.deleteApplication.bind(ApiClient),
-    onSuccess: () => {
+  return useMutation<void, Error, string, { previous: ApplicationBoard | undefined }>({
+    mutationFn: (id) => ApiClient.deleteApplication(id),
+    onMutate: async (id) => {
+      await queryClient.cancelQueries({ queryKey: ['applications'] })
+      const previous = queryClient.getQueryData<ApplicationBoard>(['applications'])
+      // Remove from every column so delete feels instant
+      queryClient.setQueryData<ApplicationBoard>(['applications'], (old) => {
+        if (!old) return old
+        const strip = (list: PipelineJob[]) => list.filter((j) => j.applicationId !== id)
+        return {
+          bookmark: strip(old.bookmark),
+          applied: strip(old.applied),
+          interviewing: strip(old.interviewing),
+          offers: strip(old.offers),
+          rejected: strip(old.rejected),
+        }
+      })
+      return { previous }
+    },
+    onError: (_err, _id, context) => {
+      if (context?.previous) {
+        queryClient.setQueryData(['applications'], context.previous)
+      }
+      notify({ message: 'Failed to remove application', type: 'error' })
+    },
+    onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ['applications'] })
     },
   })

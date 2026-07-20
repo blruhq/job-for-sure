@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { notify } from '~/lib/toast'
 import {
   Sparkles,
   RefreshCw,
@@ -81,7 +82,9 @@ export function SmartOverview(props: SmartOverviewProps) {
       }
       setOverview(data)
       setState('complete')
-    } catch {
+    } catch (err) {
+      console.error(err)
+      notify({ message: 'Failed to generate AI overview', type: 'error' })
       setState('error')
     }
   }

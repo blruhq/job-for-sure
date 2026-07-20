@@ -422,8 +422,9 @@ export function ChatView() {
           router.push(`/resume/${resume.id}`)
           return
         }
-      } catch {
-        // Extraction failed — fall through to blank resume
+      } catch (err) {
+        console.error(err)
+        notify({ message: 'Failed to extract resume data', type: 'error' })
       }
     }
 

@@ -68,14 +68,22 @@ export const GET = withAuth(async (request, { user }) => {
     return NextResponse.json({ error: 'Failed to generate PDF' }, { status: 500 })
   }
 
+  // Sanitize user-controlled resume.name for Content-Disposition.
+  // Strip CRLF (header injection), quotes (breaks filename), and other unsafe chars.
+  // Keep unicode letters/digits/spaces/dots/hyphens; collapse the rest to '_'.
+  const safeName = (resume.name || 'resume')
+    .replace(/[\r\n"]/g, '')
+    .replace(/[^\w\u0080-\uFFFF .-]/g, '_')
+    .slice(0, 60) || 'resume'
+
   const filename = type === 'cover-letter'
-    ? `${resume.name || 'resume'}-cover-letter.pdf`
-    : `${resume.name || 'resume'}.pdf`
+    ? `${safeName}-cover-letter.pdf`
+    : `${safeName}.pdf`
 
   return new NextResponse(new Blob([pdfBuffer as BlobPart], { type: 'application/pdf' }), {
     headers: {
       'Content-Type': 'application/pdf',
-      'Content-Disposition': `attachment; filename="${filename}"`,
+      'Content-Disposition': `attachment; filename="${filename}"; filename*=UTF-8''${encodeURIComponent(filename)}`,
     },
   })
 }, { rateLimitType: 'general', route: '/api/export/pdf' })

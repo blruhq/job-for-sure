@@ -1,5 +1,6 @@
 import { useCreateApplication, useDeleteApplication, useApplications } from '~/hooks/use-apps'
 import type { CreateApplicationPayload } from '~/lib/api-client'
+import { notify } from '~/lib/toast'
 
 /**
  * Shared bookmark toggle hook.
@@ -24,9 +25,11 @@ export function useBookmarkJob() {
     const existing = applications?.bookmark.find((j) => j.key === payload.sourceKey)
     if (existing?.applicationId) {
       deleteBookmark(existing.applicationId)
+      notify({ message: 'Removed from bookmarks', type: 'info' })
       return
     }
     createBookmark(payload)
+    notify({ message: 'Saved to bookmarks', type: 'success' })
   }
 
   return { isBookmarked, toggleBookmark }

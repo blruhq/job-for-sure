@@ -59,14 +59,15 @@ export const providers: ProviderConfig[] = [
   {
     model: deepseekOfficial.chat(MODEL_ID),
     name: 'DeepSeek Official',
-    // DeepInfra fallback can be slower than the primary; keep enough headroom
-    // under the route's maxDuration while still giving slow providers a chance.
-    timeout: 55_000,
+    // Primary must fail fast enough that fallback still has time to complete
+    // within the route's maxDuration (30s for chat/copilot, 60s for ats/tailor).
+    // 15s primary + 20s fallback = 35s worst-case, fits the 60s ceiling.
+    timeout: 15_000,
   },
   {
     model: deepinfraBackup.chat('deepseek-ai/DeepSeek-V4-Flash'),
     name: 'DeepInfra',
-    timeout: 55_000,
+    timeout: 20_000,
   },
 ]
 
@@ -137,9 +138,10 @@ export async function streamWithFailover(
         throw new Error(`${provider.name}: stream ended before any data`)
       }
 
-      // Decode the first chunk to check for errors
+      // Decode the first chunk to check for errors.
+      // Tolerate whitespace variance in SSE payloads (`"type": "error"` vs `"type":"error"`).
       const firstText = new TextDecoder().decode(firstChunk.value)
-      if (firstText.includes('"type":"error"')) {
+      if (/"type"\s*:\s*"error"/.test(firstText)) {
         throw new Error(`${provider.name}: stream error — ${firstText.slice(0, 200)}`)
       }
 

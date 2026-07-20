@@ -30,6 +30,7 @@ export function InterviewView() {
       setHistory(data)
     } catch (err) {
       console.error(err)
+      notify({ message: 'Failed to load interview history', type: 'error' })
     } finally {
       setLoadingHistory(false)
     }
@@ -112,12 +113,12 @@ export function InterviewView() {
 
       {/* Detail Modal for Past Session */}
       {selectedPastSession && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-[2px]">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-[2px]" role="dialog" aria-modal="true" aria-labelledby="interview-modal-title">
           <div className="flex h-[85vh] w-full max-w-[680px] flex-col rounded-lg border border-border bg-card shadow-lg overflow-hidden animate-fade-up">
             {/* Modal Header */}
             <div className="flex shrink-0 items-center justify-between border-b border-border bg-muted/20 px-5 py-4">
               <div>
-                <h3 className="text-sm font-semibold text-foreground">
+                <h3 id="interview-modal-title" className="text-sm font-semibold text-foreground">
                   Mock Interview Review: {selectedPastSession.company}
                 </h3>
                 <p className="text-[10px] text-muted-foreground mt-0.5">
@@ -130,6 +131,7 @@ export function InterviewView() {
                 </span>
                 <button
                   onClick={() => setSelectedPastSession(null)}
+                  aria-label="Close"
                   className="rounded-sm border border-border bg-card px-2.5 py-1 text-[10px] hover:bg-muted font-medium cursor-pointer"
                 >
                   Close

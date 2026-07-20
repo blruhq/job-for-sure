@@ -134,7 +134,9 @@ export const subscriptions = pgTable(
     index("subscriptions_userId_idx").on(table.userId),
     index("subscriptions_status_idx").on(table.status),
     index("subscriptions_stripeCustomerId_idx").on(table.stripeCustomerId),
-    uniqueIndex("subscriptions_stripeCustomer_plan_idx").on(table.stripeCustomerId, table.plan),
+    // No uniqueIndex on (stripeCustomerId, plan): cancel + re-subscribe creates
+    // a new subscription with same (customer, 'pro') tuple → unique violation
+    // → webhook 500 → Stripe retries forever. PK on subscriptions.id handles dedup.
   ],
 );
 
@@ -158,7 +160,10 @@ export const usageEvents = pgTable(
     createdAt: timestamp("created_at").defaultNow().notNull(),
   },
   (table) => [
-    uniqueIndex("usage_events_userId_feature_createdAt_idx").on(
+    // Index (not unique) for period-count queries. Unique was wrong: two
+    // recordUsage in same µs collided → unique violation → swallowed by
+    // plan.ts try/catch → silent under-count → free users got extra quota.
+    index("usage_events_userId_feature_createdAt_idx").on(
       table.userId,
       table.feature,
       table.createdAt,

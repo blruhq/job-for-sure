@@ -58,8 +58,9 @@ export default function StandaloneCoverLetterPage() {
         if (!res.ok) return
         const data = await res.json()
         setSavedLetters(data)
-      } catch {
-        // ignore
+      } catch (err) {
+        console.error(err)
+        notify({ message: 'Failed to load cover letters', type: 'error' })
       }
     }
     loadLetters()
@@ -392,9 +393,10 @@ export default function StandaloneCoverLetterPage() {
           <div className="space-y-1.5 pt-2 border-t border-border/50">
             <label className="label-mono block">Saved Letters ({savedLetters.length})</label>
             {savedLetters.map((letter) => (
-              <div
+              <button
                 key={letter.id}
-                className={`group flex items-center gap-1.5 rounded-xs border px-2 py-1.5 cursor-pointer transition-colors ${
+                type="button"
+                className={`group flex w-full items-center gap-1.5 rounded-xs border px-2 py-1.5 cursor-pointer transition-colors text-left ${
                   activeLetterId === letter.id
                     ? 'border-primary bg-primary/5'
                     : 'border-border hover:bg-muted/30'
@@ -419,7 +421,7 @@ export default function StandaloneCoverLetterPage() {
                 >
                   <Trash2 size={12} />
                 </button>
-              </div>
+              </button>
             ))}
           </div>
         )}

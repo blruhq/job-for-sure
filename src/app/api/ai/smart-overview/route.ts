@@ -3,6 +3,7 @@ import { generateObjectWithFailover } from '~/lib/ai-providers'
 import { withAuth } from '~/lib/with-auth'
 import { captureServerEvent } from '~/lib/posthog-server'
 import { getRedis } from '~/lib/redis'
+import { gateFeature, recordUsage } from '~/lib/plan'
 import { z } from 'zod'
 
 export const maxDuration = 60
@@ -100,6 +101,11 @@ export const POST = withAuth(
       // fail-open: continue to generate if Redis is down
     }
 
+    // Gate as 'ats_match' — smart overview is the same daily AI budget.
+    // Only gate cache misses so free users can re-open cached overviews.
+    const gate = await gateFeature(user.id, 'ats_match', user.role, user.plan)
+    if (gate) return gate
+
     // ── Build prompt ──
     const systemPrompt = `You are an expert career coach analyzing a job for a specific candidate.
 You have the candidate's resume, the job description, and match data.
@@ -168,6 +174,7 @@ Provide your analysis as a structured overview.`
       // fail-open: return result even if cache fails
     }
 
+    await recordUsage(user.id, 'ats_match')
     await captureServerEvent(user.id, 'smart_overview_generated')
 
     return NextResponse.json(result)

@@ -304,8 +304,12 @@ export const POST = withAuth(async (req, { user }) => {
       // recordUsage is now called INSIDE handleQuestion after the AI call succeeds.
       return handleQuestion(body, user.id)
     }
-    case 'evaluate':
+    case 'evaluate': {
+      // Gate evaluate the same as question — both burn interview LLM budget
+      const evalGate = await gateFeature(user.id, 'interview', user.role, user.plan)
+      if (evalGate) return evalGate
       return handleEvaluate(body)
+    }
     case 'save':
       return handleSave(body, user.id)
     default:

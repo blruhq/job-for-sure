@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { FileText, Loader2 } from 'lucide-react'
 import { useUpdateApplication } from '~/hooks/use-apps'
+import { notify } from '~/lib/toast'
 
 // ═══════════════════════════════════════════════════════════════
 // JobNotes — auto-saving textarea for application notes.
@@ -36,8 +37,9 @@ export function JobNotes({ applicationId, initialNotes }: JobNotesProps) {
       setSaving(true)
       try {
         await updateApp({ id: applicationId, notes: value || '' })
-      } catch {
-        // Silent fail — notes are non-critical
+      } catch (err) {
+        console.error(err)
+        notify({ message: 'Failed to save notes', type: 'error' })
       } finally {
         setSaving(false)
       }

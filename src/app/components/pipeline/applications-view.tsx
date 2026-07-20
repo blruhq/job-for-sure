@@ -511,9 +511,9 @@ export function ApplicationsView() {
                   <SortableContext items={jobs.map((j) => j.key)} strategy={verticalListSortingStrategy}>
                     {jobs.map((job) => (
                       <DraggableJobCard key={job.key} job={job}>
-                        <div onClick={() => setSelectedJob(job)} className="cursor-pointer">
+                        <button type="button" onClick={() => setSelectedJob(job)} className="w-full text-left cursor-pointer">
                           <JobCardContent job={job} />
-                        </div>
+                        </button>
                         <div className="mt-1.5 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                           {job.url && (
                             <a

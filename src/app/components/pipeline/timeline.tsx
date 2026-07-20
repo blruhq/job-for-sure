@@ -2,6 +2,7 @@
 
 import { Clock, Bookmark, Send, CalendarCheck, XCircle } from 'lucide-react'
 import type { PipelineJob } from '~/types/resume'
+import { notify } from '~/lib/toast'
 
 // ═══════════════════════════════════════════════════════════════
 // Timeline — shows the lifecycle of a job application.
@@ -102,6 +103,7 @@ function formatTimelineDate(iso: string): string {
     const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
     return `${months[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()}`
   } catch {
+    console.error('Failed to format timeline date')
     return ''
   }
 }

@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { Link, useRouter } from '~/i18n/routing'
 import { FileText, Brain, KanbanSquare, CheckSquare, MessageSquare, Plus, ArrowRight, Mail } from 'lucide-react'
+import { notify } from '~/lib/toast'
 import { useResumes } from '~/hooks/use-resumes'
 import { useApplications } from '~/hooks/use-apps'
 import { useCoverLetters } from '~/hooks/use-cover-letters'
@@ -31,6 +32,7 @@ export function DashboardView() {
         }
       } catch (err) {
         console.error('Failed to get session user name:', err)
+        notify({ message: 'Failed to load user data', type: 'error' })
       }
     }
 
@@ -45,6 +47,7 @@ export function DashboardView() {
         }
       } catch (err) {
         console.error('Failed to get last interview score:', err)
+        notify({ message: 'Failed to load interview score', type: 'error' })
       }
     }
 

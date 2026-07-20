@@ -307,14 +307,13 @@ export function InterviewSetup({ onStart, history, loadingHistory, onViewSession
                 </div>
               ) : (
                 history.map((session) => (
-                  <div
+                  <button
                     key={session.id}
-                    className="group flex items-center justify-between border border-border/80 bg-background/50 hover:bg-muted/30 hover:border-primary/25 rounded-md p-3.5 transition-all cursor-pointer"
+                    type="button"
+                    className="group flex w-full items-center justify-between border border-border/80 bg-background/50 hover:bg-muted/30 hover:border-primary/25 rounded-md p-3.5 transition-all cursor-pointer text-left"
+                    onClick={() => onViewSession(session)}
                   >
-                    <div
-                      className="min-w-0 flex-1"
-                      onClick={() => onViewSession(session)}
-                    >
+                    <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-1.5">
                         <span className="text-xs font-semibold text-foreground group-hover:text-primary transition-colors truncate">
                           {session.company}
@@ -352,7 +351,7 @@ export function InterviewSetup({ onStart, history, loadingHistory, onViewSession
                       </button>
                       <ArrowRight size={13} className="text-muted-foreground opacity-0 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all" />
                     </div>
-                  </div>
+                  </button>
                 ))
               )}
             </div>

@@ -215,12 +215,15 @@ export function JobDetailPanel({
       <div
         className="fixed right-0 top-0 z-[101] flex h-full w-full max-w-lg flex-col border-l border-border bg-card shadow-xl animate-in slide-in-from-right"
         onClick={(e) => e.stopPropagation()}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="job-detail-title"
       >
         {/* ── Header ── */}
         <div className="shrink-0 border-b border-border px-5 py-4">
           <div className="flex items-start justify-between gap-3">
             <div className="min-w-0 flex-1">
-              <h2 className="text-base font-semibold text-foreground">{job.title}</h2>
+              <h2 id="job-detail-title" className="text-base font-semibold text-foreground">{job.title}</h2>
               <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
                 <span className="font-medium text-foreground">{job.company}</span>
                 <span>·</span>
@@ -232,6 +235,7 @@ export function JobDetailPanel({
             </div>
             <button
               onClick={onClose}
+              aria-label="Close"
               className="cursor-pointer rounded-sm p-1 text-muted-foreground hover:bg-muted hover:text-foreground"
             >
               <X size={16} />
@@ -338,7 +342,10 @@ export function JobDetailPanel({
                   headers: { 'Content-Type': 'application/json' },
                   body: JSON.stringify({ homeLocation: location || null }),
                 })
-              } catch { /* fail silent */ }
+              } catch {
+                console.error('Failed to save home location')
+                notify({ message: 'Failed to save home location', type: 'error' })
+              }
             }}
           />
           <CompanyIntelligence
@@ -488,6 +495,7 @@ function formatDate(iso: string): string {
     const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
     return `${months[date.getMonth()]} ${date.getDate()}`
   } catch {
+    console.error('Failed to format date')
     return ''
   }
 }

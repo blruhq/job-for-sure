@@ -61,6 +61,11 @@ export class ApiClient {
         ...init?.headers,
       },
     })
+    if (res.status === 401 && typeof window !== 'undefined') {
+      const redirect = encodeURIComponent(window.location.pathname + window.location.search)
+      window.location.href = `/login?redirect=${redirect}`
+      throw new Error('Unauthorized')
+    }
     if (!res.ok) {
       const errorData = await res.json().catch(() => ({}))
       throw new Error(errorData.message || errorData.error || `HTTP error! status: ${res.status}`)

@@ -24,4 +24,13 @@ export const STRIPE_PRICES = {
   yearly: process.env.STRIPE_PRICE_YEARLY,
 } as const
 
+/**
+ * Allowlist of price IDs that map to the 'pro' plan.
+ * The webhook rejects (fail-closed) any subscription whose price is not in this set,
+ * preventing misconfigured or foreign prices from silently granting Pro.
+ */
+export const PRO_PRICE_IDS: ReadonlySet<string> = new Set(
+  [STRIPE_PRICES.monthly, STRIPE_PRICES.yearly].filter((p): p is string => !!p)
+)
+
 export const STRIPE_WEBHOOK_SECRET = process.env.STRIPE_WEBHOOK_SECRET!
