@@ -30,12 +30,14 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
           return
         }
 
-        // Identify user in PostHog
+        // Identify user in PostHog (with plan for segmentation)
         try {
           const posthog = (await import('posthog-js')).default
+          const plan = (session.user as { plan?: string }).plan ?? 'free'
           posthog.identify(session.user.id, {
             email: session.user.email,
             name: session.user.name,
+            plan,
           })
         } catch {
           // PostHog not loaded yet — skip

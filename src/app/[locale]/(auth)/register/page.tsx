@@ -24,7 +24,8 @@ export default function RegisterPage() {
       } else if (data) {
         try {
           const posthog = (await import('posthog-js')).default
-          posthog.identify(data.user.id, { email, name })
+          const plan = (data.user as { plan?: string }).plan ?? 'free'
+          posthog.identify(data.user.id, { email, name, plan })
           posthog.capture('user_signed_up', { method: 'email' })
         } catch {
           // PostHog not loaded — skip

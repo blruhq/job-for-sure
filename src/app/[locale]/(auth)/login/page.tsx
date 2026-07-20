@@ -36,7 +36,8 @@ function LoginForm() {
       } else if (data) {
         try {
           const posthog = (await import('posthog-js')).default
-          posthog.identify(data.user.id, { email })
+          const plan = (data.user as { plan?: string }).plan ?? 'free'
+          posthog.identify(data.user.id, { email, plan })
           posthog.capture('user_signed_in', { method: 'email' })
         } catch {
           // PostHog not loaded — skip
