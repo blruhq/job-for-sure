@@ -22,6 +22,16 @@ export default async function AdminPage() {
     // Table might not exist yet if Task B migration hasn't run
   }
 
+  // ── Plan breakdown (Free vs Pro) ──
+  const [freeUsers] = await db
+    .select({ total: count() })
+    .from(user)
+    .where(sql`${user.plan} = 'free'`)
+  const [proUsers] = await db
+    .select({ total: count() })
+    .from(user)
+    .where(sql`${user.plan} = 'pro'`)
+
   // ── Recent signups (last 10) ──
   const recentUsers = await db
     .select({
@@ -69,8 +79,9 @@ export default async function AdminPage() {
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
           <StatCard label="Users" value={userCount.total} />
           <StatCard label="New This Week" value={weekCount.total} />
+          <StatCard label="Free Users" value={freeUsers.total} />
+          <StatCard label="Pro Users" value={proUsers.total} />
           <StatCard label="Resumes" value={resumeCount.total} />
-          <StatCard label="Tailored" value={resumeCount.total} />
           <StatCard label="Applications" value={applicationCount.total} />
           <StatCard label="Interviews" value={interviewCount.total} />
           <StatCard label="Cover Letters" value={coverLetterCount.total} />

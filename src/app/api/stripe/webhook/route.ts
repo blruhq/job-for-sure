@@ -136,6 +136,16 @@ export async function POST(req: Request) {
           })
           .where(eq(user.id, userId))
 
+        // Track subscription events in PostHog
+        if (effectivePlan === 'pro') {
+          const { captureServerEvent } = await import('~/lib/posthog-server')
+          captureServerEvent(userId, 'subscription_created', {
+            plan: 'pro',
+            interval: interval || 'unknown',
+            status: sub.status,
+          }).catch(() => {})
+        }
+
         break
       }
 
@@ -159,6 +169,13 @@ export async function POST(req: Request) {
             .update(user)
             .set({ plan: 'free', planUpdatedAt: new Date() })
             .where(eq(user.id, subUser.id))
+
+          // Track cancellation in PostHog
+          const { captureServerEvent } = await import('~/lib/posthog-server')
+          captureServerEvent(subUser.id, 'subscription_canceled', {
+            plan: 'pro',
+            reason: 'user_canceled',
+          }).catch(() => {})
         }
         break
       }
