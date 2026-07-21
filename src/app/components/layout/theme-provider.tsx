@@ -25,12 +25,14 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     setMounted(true)
     // Prefer explicit user choice in localStorage over the system-pref fallback
-    // the no-flash script may have used.
+    // the no-flash script may have used. Runs once on mount — closure captures
+    // initial theme so we only reconcile if the stored pref differs.
     const stored = localStorage.getItem('theme') as Theme | null
     if (stored && stored !== theme) {
       setTheme(stored)
     }
-  }, [theme])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   useEffect(() => {
     if (!mounted) return
