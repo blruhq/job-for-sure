@@ -4,6 +4,23 @@ import type { Resume } from '~/types/resume'
 // intentionally — callers narrow via runtime use, and the upstream route handlers
 // already validate input. Strongly-typed wrappers exist at the hook layer.
 
+/**
+ * Typed API error that preserves the HTTP status code and parsed response body,
+ * so callers can branch on specific statuses (e.g. 402 for plan-limit errors).
+ * Still extends Error so existing `catch (err)` / `err.message` callers keep working.
+ */
+export class ApiError extends Error {
+  readonly status: number
+  readonly body: Record<string, unknown>
+
+  constructor(status: number, message: string, body: Record<string, unknown> = {}) {
+    super(message)
+    this.name = 'ApiError'
+    this.status = status
+    this.body = body
+  }
+}
+
 export type ApplicationRow = Record<string, unknown> & { id: string }
 export type CoverLetterRow = {
   id: string
@@ -68,7 +85,11 @@ export class ApiClient {
     }
     if (!res.ok) {
       const errorData = await res.json().catch(() => ({}))
-      throw new Error(errorData.message || errorData.error || `HTTP error! status: ${res.status}`)
+      throw new ApiError(
+        res.status,
+        (errorData.message as string) || (errorData.error as string) || `HTTP error! status: ${res.status}`,
+        errorData,
+      )
     }
     return res.json()
   }

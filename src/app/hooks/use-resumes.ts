@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { ApiClient } from '~/lib/api-client'
+import { handleResumeLimitError } from '~/lib/resume-limit'
 import type { Resume } from '~/types/resume'
 
 export function useResumes() {
@@ -31,6 +32,10 @@ export function useCreateResume() {
       return { previous }
     },
     onError: (_err, _payload, context) => {
+      // If the error is a 402 (resume limit reached), show an actionable
+      // upgrade toast and swallow the generic error path. Any other error
+      // is left for the caller to surface.
+      handleResumeLimitError(_err)
       // Rollback to the pre-mutation state
       if (context?.previous) {
         queryClient.setQueryData(['resumes'], context.previous)

@@ -1,6 +1,6 @@
 import { db } from '~/lib/db'
 import { usageEvents, user, resumes } from '~/lib/schema'
-import { eq, and, gte, count } from 'drizzle-orm'
+import { eq, and, gte, count, isNull } from 'drizzle-orm'
 import { NextResponse } from 'next/server'
 import { getRedis } from '~/lib/redis'
 
@@ -175,12 +175,14 @@ export async function getUsageBreakdown(
 
 /**
  * Get the total resume count (used by resume_create limit).
+ * Counts only non-deleted base resumes — tailored variants and soft-deleted
+ * rows do NOT count against the Free-plan limit of 3.
  */
 export async function getResumeCount(userId: string): Promise<number> {
   const [row] = await db
     .select({ total: count() })
     .from(resumes)
-    .where(and(eq(resumes.userId, userId), eq(resumes.isBase, true)))
+    .where(and(eq(resumes.userId, userId), eq(resumes.isBase, true), isNull(resumes.deletedAt)))
   return row?.total ?? 0
 }
 
