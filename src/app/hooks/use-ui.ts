@@ -2,11 +2,19 @@ import { create } from 'zustand'
 import { immer } from 'zustand/middleware/immer'
 import type { PendingTailor } from '~/types/resume'
 
+export type UpgradeModalState = {
+  feature?: string
+  limit?: number
+  featureLabel?: string
+  period?: string
+}
+
 interface UIState {
   sidebarCollapsed: boolean
   activeResumeId: string | null
   targetCompanyKey: string
   pendingTailor: PendingTailor | null
+  upgradeModal: { open: boolean; data: UpgradeModalState }
 
   toggleSidebar: () => void
   setSidebarCollapsed: (collapsed: boolean) => void
@@ -14,6 +22,8 @@ interface UIState {
   setTargetCompanyKey: (key: string) => void
   setPendingTailor: (pending: PendingTailor | null) => void
   toggleAcceptedChange: (changeId: string) => void
+  openUpgradeModal: (data?: UpgradeModalState) => void
+  closeUpgradeModal: () => void
 }
 
 export const useUIStore = create<UIState>()(
@@ -22,6 +32,7 @@ export const useUIStore = create<UIState>()(
     activeResumeId: null,
     targetCompanyKey: 'none',
     pendingTailor: null,
+    upgradeModal: { open: false, data: {} },
 
     toggleSidebar: () =>
       set((state) => {
@@ -53,6 +64,14 @@ export const useUIStore = create<UIState>()(
           accepted.add(changeId)
         }
         state.pendingTailor.accepted = accepted
+      }),
+    openUpgradeModal: (data = {}) =>
+      set((state) => {
+        state.upgradeModal = { open: true, data }
+      }),
+    closeUpgradeModal: () =>
+      set((state) => {
+        state.upgradeModal.open = false
       }),
   }))
 )

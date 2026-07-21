@@ -6,6 +6,7 @@ import { useUIStore } from '~/hooks/use-ui'
 import { Sidebar } from '~/components/layout/sidebar'
 import { Topbar } from '~/components/layout/navbar'
 import { Skeleton } from '~/components/ui/skeleton'
+import { UpgradeModal } from '~/components/ui/upgrade-modal'
 import { authClient } from '~/lib/auth-client'
 
 // Routes an admin is allowed to land on inside (app). Everything else
@@ -94,6 +95,9 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
 function AppShell({ children }: { children: React.ReactNode }) {
   const sidebarCollapsed = useUIStore((s) => s.sidebarCollapsed)
   const toggleSidebar = useUIStore((s) => s.toggleSidebar)
+  const closeUpgradeModal = useUIStore((s) => s.closeUpgradeModal)
+  const upgradeModalOpen = useUIStore((s) => s.upgradeModal.open)
+  const upgradeModalData = useUIStore((s) => s.upgradeModal.data)
   const sidebarOpen = !sidebarCollapsed
 
   // Lock body scroll while the mobile sidebar overlay is open so the
@@ -140,6 +144,13 @@ function AppShell({ children }: { children: React.ReactNode }) {
 
         <main className="flex flex-1 flex-col overflow-hidden min-w-0">{children}</main>
       </div>
+
+      {/* Global upgrade prompt — triggered by any feature's 402 limit */}
+      <UpgradeModal
+        open={upgradeModalOpen}
+        onClose={closeUpgradeModal}
+        data={upgradeModalData}
+      />
     </div>
   )
 }

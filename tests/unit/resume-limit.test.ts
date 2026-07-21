@@ -3,19 +3,17 @@ import { NextResponse } from 'next/server'
 
 // ── Mocks ──
 
-// sonner toast — capture calls without rendering
-const { mockToastError, mockToastSuccess, mockToastWarning, mockToastInfo } = vi.hoisted(() => ({
-  mockToastError: vi.fn(),
-  mockToastSuccess: vi.fn(),
-  mockToastWarning: vi.fn(),
-  mockToastInfo: vi.fn(),
+// UI store — capture openUpgradeModal calls
+const { mockOpenUpgradeModal, mockCloseUpgradeModal } = vi.hoisted(() => ({
+  mockOpenUpgradeModal: vi.fn(),
+  mockCloseUpgradeModal: vi.fn(),
 }))
-vi.mock('sonner', () => ({
-  toast: {
-    error: mockToastError,
-    success: mockToastSuccess,
-    warning: mockToastWarning,
-    info: mockToastInfo,
+vi.mock('~/hooks/use-ui', () => ({
+  useUIStore: {
+    getState: () => ({
+      openUpgradeModal: mockOpenUpgradeModal,
+      closeUpgradeModal: mockCloseUpgradeModal,
+    }),
   },
 }))
 
@@ -47,7 +45,7 @@ describe('handleResumeLimitError', () => {
     vi.clearAllMocks()
   })
 
-  it('returns true and shows an actionable toast for a 402 ApiError', () => {
+  it('returns true and opens the upgrade modal for a 402 ApiError', () => {
     const err = new ApiError(
       402,
       'Limit reached',
@@ -57,38 +55,40 @@ describe('handleResumeLimitError', () => {
     const handled = handleResumeLimitError(err)
 
     expect(handled).toBe(true)
-    expect(mockToastError).toHaveBeenCalledTimes(1)
-    const [message, opts] = mockToastError.mock.calls[0]
-    expect(message).toContain('3')
-    expect(opts).toHaveProperty('description')
-    expect(opts).toHaveProperty('action.label', 'Upgrade')
-    expect(opts).toHaveProperty('action.onClick')
+    expect(mockOpenUpgradeModal).toHaveBeenCalledTimes(1)
+    const [data] = mockOpenUpgradeModal.mock.calls[0]
+    expect(data).toHaveProperty('feature', 'resume_create')
+    expect(data).toHaveProperty('limit', 3)
+    expect(data).toHaveProperty('featureLabel', 'resumes')
+    expect(data).toHaveProperty('period', 'total')
   })
 
-  it('falls back to default limit (3) and /pricing when body omits them', () => {
+  it('falls back to default limit (3) and resume_create feature when body omits them', () => {
     const err = new ApiError(402, 'Limit reached', { error: 'Limit reached' })
     handleResumeLimitError(err)
-    const [message] = mockToastError.mock.calls[0]
-    expect(message).toContain('3')
+    const [data] = mockOpenUpgradeModal.mock.calls[0]
+    expect(data).toHaveProperty('limit', 3)
+    expect(data).toHaveProperty('feature', 'resume_create')
   })
 
   it('uses the limit from the body when provided', () => {
     const err = new ApiError(402, 'Limit reached', { limit: 5, upgradeUrl: '/settings/billing' })
     handleResumeLimitError(err)
-    const [message] = mockToastError.mock.calls[0]
-    expect(message).toContain('5')
+    const [data] = mockOpenUpgradeModal.mock.calls[0]
+    expect(data).toHaveProperty('limit', 5)
   })
 
-  it('returns false (no toast) for a non-402 ApiError', () => {
+  it('returns false (no modal) for a non-402 ApiError', () => {
     const err = new ApiError(500, 'Server error', {})
     expect(handleResumeLimitError(err)).toBe(false)
-    expect(mockToastError).not.toHaveBeenCalled()
+    expect(mockOpenUpgradeModal).not.toHaveBeenCalled()
   })
 
-  it('returns false (no toast) for a generic Error', () => {
+  it('returns false (no modal) for a generic Error or nullish', () => {
     expect(handleResumeLimitError(new Error('boom'))).toBe(false)
     expect(handleResumeLimitError(null)).toBe(false)
     expect(handleResumeLimitError(undefined)).toBe(false)
+    expect(mockOpenUpgradeModal).not.toHaveBeenCalled()
   })
 })
 
@@ -129,10 +129,6 @@ describe('gateFeature — resume_create', () => {
   })
 
   it('excludes soft-deleted resumes via getResumeCount (count reflects only active rows)', async () => {
-    // The DB mock returns whatever count we set. The key assertion here is that
-    // the gate respects the *active* count: if only 2 active resumes exist
-    // (soft-deleted rows excluded upstream by the isNull(deletedAt) filter),
-    // a free user is allowed even if their historical row count was higher.
     mockResumeCount.mockReturnValue(2)
     const res = await gateFeature('u1', 'resume_create', 'user', 'free')
     expect(res).toBeNull()
