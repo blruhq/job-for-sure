@@ -17,13 +17,14 @@ function fontSrc(filename: string): string {
   // Browser: relative URL served from /public
   if (typeof window !== 'undefined') return `/fonts/${filename}`
 
-  // Vercel serverless: fetch via deployment URL
-  const base =
-    (process.env.VERCEL_URL && `https://${process.env.VERCEL_URL}`) ||
-    (process.env.VERCEL_PROJECT_PRODUCTION_URL &&
-      `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`)
-
-  if (base) return `${base}/fonts/${filename}`
+  // Vercel serverless: fetch via production URL (NOT VERCEL_URL — SSO-gated).
+  // VERCEL_PROJECT_PRODUCTION_URL is the production alias, never SSO-gated.
+  // The hardcoded fallback covers preview deployments where only VERCEL is set.
+  if (process.env.VERCEL) {
+    const prodUrl =
+      process.env.VERCEL_PROJECT_PRODUCTION_URL || 'job-for-sure-ecru.vercel.app'
+    return `https://${prodUrl}/fonts/${filename}`
+  }
 
   // Local dev: filesystem path (only works when /public is on disk)
   return `${process.cwd()}/public/fonts/${filename}`
