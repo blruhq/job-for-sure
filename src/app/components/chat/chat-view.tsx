@@ -20,6 +20,7 @@ import { cn } from '~/lib/utils'
 import { BuildWizard, type WizardData } from '~/components/chat/build-wizard'
 import { PasteJDModal } from '~/components/chat/paste-jd-modal'
 import { ConfirmDialog } from '~/components/ui/confirm-dialog'
+import { UpgradeModal, type UpgradeModalData } from '~/components/ui/upgrade-modal'
 import { Skeleton } from '~/components/ui/skeleton'
 import { UploadCardMessage } from '~/components/chat/upload-card-message'
 import { Upload, FileText, ClipboardList, Loader2, Paperclip, RotateCcw, Sparkles, Save, Pencil } from 'lucide-react'
@@ -57,6 +58,8 @@ export function ChatView() {
   const [savingResume, setSavingResume] = useState(false)
   const [showCancelBuildDialog, setShowCancelBuildDialog] = useState(false)
   const [showManualDialog, setShowManualDialog] = useState(false)
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false)
+  const [upgradeModalData, setUpgradeModalData] = useState<UpgradeModalData | undefined>(undefined)
   const [buildStep, setBuildStep] = useState<string>('experience')
 
   // ── CHAT PERSISTENCE (sessionStorage) ──
@@ -111,6 +114,22 @@ export function ChatView() {
   // Transport sends resume context with every chat request
   const transport = useMemo(() => {
     return new DefaultChatTransport({
+      // Intercept 402 (Free-plan limit reached) responses before the AI SDK
+      // processes them. Parse the structured body and open the UpgradeModal.
+      fetch: async (input, init) => {
+        const res = await fetch(input, init)
+        if (res.status === 402) {
+          const body = await res.json().catch(() => ({}))
+          setUpgradeModalData({
+            feature: body.feature,
+            limit: body.limit,
+            featureLabel: 'chat messages',
+            period: 'today',
+          })
+          setShowUpgradeModal(true)
+        }
+        return res
+      },
       body: () => ({
         mode: buildDataRef.current ? 'build' : 'coach',
         buildRole: buildDataRef.current?.role || '',
@@ -140,7 +159,15 @@ export function ChatView() {
     })
   }, [])
 
-  const { messages, status, sendMessage, stop, setMessages } = useChat({ transport, messages: savedMessages })
+  const { messages, status, sendMessage, stop, setMessages, error, clearError } = useChat({ transport, messages: savedMessages })
+
+  // When the upgrade modal opens (402 from the chat API), clear the useChat
+  // error state so the chat UI doesn't show a stuck error indicator.
+  useEffect(() => {
+    if (showUpgradeModal && error) {
+      clearError()
+    }
+  }, [showUpgradeModal, error, clearError])
 
   // ── Parse AI progress marker from last assistant message ──
   // The AI appends <!--jfs-progress:STEP--> to every response.
@@ -785,6 +812,13 @@ export function ChatView() {
         description="We'll create a resume with what you've shared so far and open it in the editor. You can continue editing there."
         confirmLabel="Open in Editor"
         variant="default"
+      />
+
+      {/* Upgrade prompt — shown when Free-plan chat limit (15/day) is hit */}
+      <UpgradeModal
+        open={showUpgradeModal}
+        onClose={() => setShowUpgradeModal(false)}
+        data={upgradeModalData}
       />
     </div>
   )
