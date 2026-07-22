@@ -1205,9 +1205,11 @@ export function ResumeDetail({ resumeId }: { resumeId: string }) {
                 </div>
               </div>
             </div>
-            {/* PDF preview — fills remaining space */}
+            {/* PDF preview — fills remaining space.
+                Uses liveResume (not raw resume) so the View tab stays in sync
+                with unsaved editor changes — same data the editor preview shows. */}
             <div className="min-h-0 flex-1 bg-muted/30">
-              <ResumePreview resume={resume} />
+              <ResumePreview resume={liveResume} />
             </div>
           </div>
         )}
