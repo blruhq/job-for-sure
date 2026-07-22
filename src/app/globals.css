@@ -344,10 +344,16 @@ html[lang="th"] {
 }
 
 /* ── Focus-visible ring for keyboard accessibility ── */
-*:focus-visible {
+/* Excludes textarea (chat input) — user requested no focus indicator there */
+*:focus-visible:not(textarea) {
   outline: 2px solid var(--ring);
   outline-offset: 2px;
   border-radius: 4px;
+}
+
+textarea:focus-visible {
+  outline: none !important;
+  box-shadow: none !important;
 }
 
 
