@@ -602,6 +602,7 @@ export function ChatView() {
 
         <InputBar
           {...inputBarProps}
+          autoFocus={false}
           disabled={isUploadingRef.current || saving}
           leftActions={
             <button
