@@ -210,7 +210,6 @@ async function fetchLinkedInGuestPage(
         description: '',
         descriptionHtml: '',
         salary: salary || undefined,
-        experienceYears: extractExperienceYears(title),
         postedAt,
       })
     })
