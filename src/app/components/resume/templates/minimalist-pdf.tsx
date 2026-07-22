@@ -21,7 +21,7 @@ const styles = StyleSheet.create({
   name: {
     fontSize: 20,
     fontWeight: 700,
-    marginBottom: 4,
+    marginBottom: 10,
     color: COLORS.ink,
   },
   role: {

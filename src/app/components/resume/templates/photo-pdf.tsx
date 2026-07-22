@@ -82,10 +82,10 @@ const styles = StyleSheet.create({
     textTransform: 'uppercase',
     letterSpacing: 0.5,
     color: COLORS.primary,
-    marginBottom: 4,
+    marginBottom: 10,
   },
-  sidebarLabel: {
-    fontSize: 8,
+  role: {
+    fontSize: 11,
     color: COLORS.muted,
     fontWeight: 600,
     marginBottom: 0,
