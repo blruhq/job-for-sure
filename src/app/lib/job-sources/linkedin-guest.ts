@@ -21,6 +21,7 @@
 
 import * as cheerio from 'cheerio'
 import type { JobResult } from './types'
+import { extractExperienceYears } from './types'
 import { parseLocation } from './geo'
 
 const GUEST_SEARCH_URL = 'https://www.linkedin.com/jobs-guest/jobs/api/seeMoreJobPostings/search'
@@ -291,6 +292,20 @@ export async function fetchLinkedInGuestDetail(
       if (text) criteria.push(text)
     })
 
+    // Extract experience years from criteria HTML items
+    // LinkedIn criteria look like: "Seniority levelMid-Senior Level" or "Mid-Senior Level\n3-5 years experience"
+    let experienceYears: string | undefined
+    $('.description__job-criteria-item').each((_i, el) => {
+      const label = $(el).find('.description__job-criteria-subheader').text().trim().toLowerCase()
+      const value = $(el).find('.description__job-criteria-text').text().trim()
+      if (label.includes('seniority') || label.includes('experience')) {
+        const extracted = extractExperienceYears(value)
+        if (extracted && !experienceYears) experienceYears = extracted
+        // Also keep raw label like "Mid-Senior Level" if no years found
+        if (!experienceYears && value) experienceYears = value
+      }
+    })
+
     const fullDescription = [description, ...criteria]
       .filter(Boolean)
       .join('\n\n')
@@ -312,6 +327,7 @@ export async function fetchLinkedInGuestDetail(
         url: `https://www.linkedin.com/jobs/view/${jobId}/`,
         description: fullDescription,
         descriptionHtml,
+        experienceYears,
       },
     }
   } catch (err) {

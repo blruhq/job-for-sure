@@ -6,6 +6,7 @@
 // ═══════════════════════════════════════════════════════════════
 
 import type { JobResult } from './types'
+import { extractExperienceYears } from './types'
 import { parseLocation } from './geo'
 
 interface GreenhouseJob {
@@ -58,8 +59,21 @@ export async function fetchGreenhouseCompany(
       (m) => m.name.toLowerCase().includes('salary') || m.name.toLowerCase().includes('compensation'),
     )
 
+    // Check metadata for experience years / seniority
+    const expMeta = job.metadata?.find(
+      (m) => m.name.toLowerCase().includes('experience') || m.name.toLowerCase().includes('years') || m.name.toLowerCase().includes('seniority'),
+    )
+
+    // Employment type from metadata (many Greenhouse boards expose this)
+    const empTypeMeta = job.metadata?.find(
+      (m) => m.name.toLowerCase().includes('employment') || m.name.toLowerCase().includes('job type') || m.name.toLowerCase().includes('work type'),
+    )
+
     const locName = job.location?.name || 'Unknown'
     const parsed = parseLocation(locName)
+
+    // Extract experience from description text as fallback
+    const experienceYears = expMeta?.value || extractExperienceYears(description)
 
     return {
       id: `greenhouse:${job.id}`,
@@ -75,6 +89,8 @@ export async function fetchGreenhouseCompany(
       description: description.slice(0, 8000),
       descriptionHtml,
       salary: salaryMeta?.value,
+      experienceYears,
+      employmentType: empTypeMeta?.value,
       postedAt: job.first_published,
       department: job.departments?.[0]?.name,
     }

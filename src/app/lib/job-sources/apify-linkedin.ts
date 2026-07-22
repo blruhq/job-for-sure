@@ -10,6 +10,7 @@
 // ═══════════════════════════════════════════════════════════════
 
 import type { JobResult } from './types'
+import { extractExperienceYears } from './types'
 import { parseLocation } from './geo'
 
 interface ApifyLinkedInJob {
@@ -62,6 +63,7 @@ export async function fetchApifyLinkedIn(
       .filter((job) => job.title && job.company)
       .map((job) => {
         const description = job.description || ''
+        const experienceYears = extractExperienceYears(description)
         const jobLocation = job.location || 'Remote'
         const parsed = parseLocation(jobLocation)
 
@@ -78,6 +80,7 @@ export async function fetchApifyLinkedIn(
           url: job.applyUrl || job.jobUrl || 'https://www.linkedin.com',
           description: description.slice(0, 8000),
           salary: job.salary || undefined,
+          experienceYears,
           postedAt: job.postedDate,
           companyLogo: job.companyLogo || undefined,
         }

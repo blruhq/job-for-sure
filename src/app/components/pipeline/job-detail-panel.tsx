@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { useRouter } from '~/i18n/routing'
 import {
   X, FileText, Brain, ExternalLink, Bookmark, Globe, Plane,
-  Clock, Sparkles, ChevronDown, Zap, Target,
+  Clock, Sparkles, ChevronDown, Zap, Target, DollarSign, Briefcase,
 } from 'lucide-react'
 import { cn } from '~/lib/utils'
 import { useActiveResume } from '~/hooks/use-active-resume'
@@ -123,6 +123,10 @@ export function JobDetailPanel({
   const visaSponsorship = job.jobData?.visaSponsorship as boolean | undefined
   const country = (job.jobData?.country as string) || ''
   const postedAt = (job.jobData?.postedAt as string) || ''
+  const experienceYears = (job.jobData?.experienceYears as string) || ''
+  const salaryMin = job.jobData?.salaryMin as number | undefined
+  const salaryMax = job.jobData?.salaryMax as number | undefined
+  const salaryCurrency = (job.jobData?.salaryCurrency as string) || 'USD'
 
   // ── Structured location ──
   // extractCity is smarter than jobData.city (which comes from parseLocation
@@ -256,9 +260,12 @@ export function JobDetailPanel({
             >
               {job.score}% Match
             </span>
-            {job.salary && (
-              <span className="rounded-xs border border-border bg-background px-1.5 py-0.5 text-[11px] text-muted-foreground">
-                {job.salary}
+            {(salaryMin || job.salary) && (
+              <span className="flex items-center gap-0.5 rounded-xs border border-emerald-500/30 bg-emerald-50/50 px-2 py-0.5 text-[11px] font-semibold text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-400">
+                <DollarSign size={10} />
+                {salaryMin && salaryMax
+                  ? `${salaryCurrency === 'USD' ? '$' : salaryCurrency === 'GBP' ? '£' : salaryCurrency === 'EUR' ? '€' : `${salaryCurrency} `}${Math.round(salaryMin / 1000)}k–${Math.round(salaryMax / 1000)}k`
+                  : job.salary}
               </span>
             )}
             {locationType && locationType !== 'unknown' && (
@@ -270,6 +277,12 @@ export function JobDetailPanel({
             {visaSponsorship && (
               <span className="flex items-center gap-0.5 rounded-xs bg-accent-soft px-1.5 py-0.5 text-[10px] font-medium text-primary">
                 <Plane size={9} /> Visa Sponsor
+              </span>
+            )}
+            {experienceYears && (
+              <span className="flex items-center gap-0.5 rounded-xs border border-border bg-background px-1.5 py-0.5 text-[11px] text-muted-foreground">
+                <Briefcase size={10} />
+                {experienceYears}
               </span>
             )}
             {postedAt && (

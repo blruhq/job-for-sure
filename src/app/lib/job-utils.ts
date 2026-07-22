@@ -43,7 +43,11 @@ export function scoredJobToPipelineJob(
       region: job.region,
       postedAt: job.postedAt,
       experienceLevel: job.experienceLevel,
+      experienceYears: job.experienceYears,
       employmentType: job.employmentType,
+      salaryMin: job.salaryMin,
+      salaryMax: job.salaryMax,
+      salaryCurrency: job.salaryCurrency,
     },
     ...overrides,
   }

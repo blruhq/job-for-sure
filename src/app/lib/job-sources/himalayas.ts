@@ -9,6 +9,7 @@
 // ═══════════════════════════════════════════════════════════════
 
 import type { JobResult } from './types'
+import { extractExperienceYears } from './types'
 import { parseLocation } from './geo'
 
 interface HimalayasJob {
@@ -57,6 +58,10 @@ export async function fetchHimalayas(
       const description = descriptionHtml.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim()
       const location = (job.locationRestrictions || []).join(', ') || 'Remote'
       const salary = formatSalary(job.minSalary, job.maxSalary, job.salaryPeriod, job.currency)
+      const salaryMin = job.minSalary || undefined
+      const salaryMax = job.maxSalary || undefined
+      const salaryCurrency = job.currency || undefined
+      const experienceYears = extractExperienceYears(description)
       const parsed = parseLocation(location)
 
       return {
@@ -73,6 +78,10 @@ export async function fetchHimalayas(
         description: description.slice(0, 8000),
         descriptionHtml,
         salary,
+        salaryMin,
+        salaryMax,
+        salaryCurrency,
+        experienceYears,
         postedAt: job.pubDate,
         companyLogo: job.companyLogo || undefined,
         employmentType: job.employmentType,

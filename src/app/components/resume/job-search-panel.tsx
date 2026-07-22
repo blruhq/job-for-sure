@@ -5,6 +5,7 @@ import { useRouter } from '~/i18n/routing'
 import {
   Search, Bookmark, Loader2, AlertCircle,
   RefreshCw, Filter, X, Globe, Clock, Star, Plane,
+  DollarSign, Briefcase,
 } from 'lucide-react'
 import { cn } from '~/lib/utils'
 import { compareJobs } from '~/lib/job-sources/scoring'
@@ -446,6 +447,7 @@ export function JobSearchPanel({ resume }: { resume: Resume }) {
           locationType: job.locationType,
           visaSponsorship: job.visaSponsorship,
           experienceLevel: job.experienceLevel,
+          experienceYears: job.experienceYears,
           employmentType: job.employmentType,
           source: job.source,
           companyLogo: job.companyLogo,
@@ -454,6 +456,9 @@ export function JobSearchPanel({ resume }: { resume: Resume }) {
           region: job.region,
           city: job.city,
           district: job.district,
+          salaryMin: job.salaryMin,
+          salaryMax: job.salaryMax,
+          salaryCurrency: job.salaryCurrency,
         },
       })
       notify({ message: `Bookmarked: ${job.title} at ${job.company}`, type: 'success' })
@@ -864,9 +869,13 @@ function JobCard({ job, bookmarked, onBookmark, onAts: _onAts, onInterview: _onI
         <span className="rounded-xs border border-border bg-background px-1.5 py-0.5 text-[11px] uppercase text-muted-foreground">
           {SOURCE_NAMES[job.source] || job.source}
         </span>
-        {job.salary && (
-          <span className="rounded-xs border border-border bg-background px-1.5 py-0.5 text-[11px] text-muted-foreground">
-            {job.salary}
+        {/* Salary — prefer structured range, fallback to free-text */}
+        {(job.salaryMin || job.salary) && (
+          <span className="flex items-center gap-0.5 rounded-xs border border-emerald-500/30 bg-emerald-50/50 px-1.5 py-0.5 text-[11px] font-medium text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-400">
+            <DollarSign size={9} />
+            {job.salaryMin && job.salaryMax
+              ? `${job.salaryCurrency === 'USD' ? '$' : job.salaryCurrency === 'GBP' ? '£' : job.salaryCurrency === 'EUR' ? '€' : `${job.salaryCurrency ?? ''} `}${Math.round(job.salaryMin / 1000)}k–${Math.round(job.salaryMax / 1000)}k`
+              : job.salary}
           </span>
         )}
         {job.postedAt && (
@@ -877,6 +886,12 @@ function JobCard({ job, bookmarked, onBookmark, onAts: _onAts, onInterview: _onI
         {job.experienceLevel && (
           <span className="rounded-xs border border-border bg-background px-1.5 py-0.5 text-[11px] capitalize text-muted-foreground">
             {job.experienceLevel}
+          </span>
+        )}
+        {job.experienceYears && (
+          <span className="flex items-center gap-0.5 rounded-xs border border-border bg-background px-1.5 py-0.5 text-[11px] text-muted-foreground">
+            <Briefcase size={9} />
+            {job.experienceYears}
           </span>
         )}
         {job.visaSponsorship && (

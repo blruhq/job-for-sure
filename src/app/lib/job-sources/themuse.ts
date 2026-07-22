@@ -9,6 +9,7 @@
 // ═══════════════════════════════════════════════════════════════
 
 import type { JobResult } from './types'
+import { extractExperienceYears } from './types'
 import { parseLocation } from './geo'
 
 interface MuseJob {
@@ -50,6 +51,7 @@ export async function fetchTheMuse(
     const jobs: JobResult[] = (data.results || []).map((job) => {
       const descriptionHtml = job.contents || ''
       const description = descriptionHtml.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim()
+      const experienceYears = extractExperienceYears(description)
       const locations = (job.locations || []).map((l) => l.name).join(', ') || 'Unspecified'
       const levels = (job.levels || []).map((l) => l.name).join(', ')
       const parsed = parseLocation(locations)
@@ -67,6 +69,7 @@ export async function fetchTheMuse(
         url: job.refs?.landing_page || `https://www.themuse.com/jobs/${job.id}`,
         description: description.slice(0, 8000),
         descriptionHtml,
+        experienceYears,
         postedAt: job.publication_date,
         department: (job.categories || []).map((c) => c.name).join(', ') || undefined,
         experienceLevel: inferExperience(job.name, levels),

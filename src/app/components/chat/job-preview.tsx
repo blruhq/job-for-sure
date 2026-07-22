@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback, useRef } from 'react'
 import { useRouter } from '~/i18n/routing'
 import {
   Bookmark, Loader2, ChevronRight, Plane, X, Brain,
+  DollarSign, Briefcase,
 } from 'lucide-react'
 import { cn } from '~/lib/utils'
 import { useApplications, useCreateApplication, useDeleteApplication } from '~/hooks/use-apps'
@@ -188,14 +189,23 @@ export function JobPreview({ resume, onDismiss, onLoadComplete }: { resume: Resu
                   <span className="rounded-xs bg-muted/50 px-1.5 py-0.5 text-[9px] text-muted-foreground">
                     {SOURCE_SHORT[job.source] || job.source}
                   </span>
-                  {job.salary && (
-                    <span className="rounded-xs bg-muted/50 px-1.5 py-0.5 text-[9px] text-muted-foreground">
-                      {job.salary}
+                  {(job.salaryMin || job.salary) && (
+                    <span className="flex items-center gap-0.5 rounded-xs bg-emerald-50/50 px-1.5 py-0.5 text-[9px] font-medium text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-400">
+                      <DollarSign size={8} />
+                      {job.salaryMin && job.salaryMax
+                        ? `${job.salaryCurrency === 'USD' ? '$' : job.salaryCurrency === 'GBP' ? '£' : job.salaryCurrency === 'EUR' ? '€' : `${job.salaryCurrency ?? ''} `}${Math.round(job.salaryMin / 1000)}k–${Math.round(job.salaryMax / 1000)}k`
+                        : job.salary}
                     </span>
                   )}
                   {job.visaSponsorship && (
                     <span className="rounded-xs bg-accent-soft px-1.5 py-0.5 text-[9px] font-medium text-primary">
                       <Plane size={8} className="mr-0.5 inline" />Visa
+                    </span>
+                  )}
+                  {job.experienceYears && (
+                    <span className="flex items-center gap-0.5 rounded-xs bg-muted/50 px-1.5 py-0.5 text-[9px] text-muted-foreground">
+                      <Briefcase size={8} />
+                      {job.experienceYears}
                     </span>
                   )}
                   {job.postedAt && (
@@ -233,6 +243,7 @@ export function JobPreview({ resume, onDismiss, onLoadComplete }: { resume: Resu
                             locationType: job.locationType,
                             visaSponsorship: job.visaSponsorship,
                             experienceLevel: job.experienceLevel,
+                            experienceYears: job.experienceYears,
                             employmentType: job.employmentType,
                             source: job.source,
                             companyLogo: job.companyLogo,
@@ -241,6 +252,9 @@ export function JobPreview({ resume, onDismiss, onLoadComplete }: { resume: Resu
                             region: job.region,
                             city: job.city,
                             district: job.district,
+                            salaryMin: job.salaryMin,
+                            salaryMax: job.salaryMax,
+                            salaryCurrency: job.salaryCurrency,
                           },
                         })
                         notify({ message: `Bookmarked: ${job.title}`, type: 'success' })

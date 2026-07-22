@@ -34,7 +34,11 @@ export interface JobResult {
   url: string              // real apply link on the ORIGINAL source
   description: string      // full JD text (HTML stripped for scoring, raw kept separately)
   descriptionHtml?: string // original HTML (for display)
-  salary?: string          // salary string if disclosed
+  salary?: string          // salary string if disclosed (free text or formatted)
+  salaryMin?: number       // structured: numeric minimum salary (in currency units)
+  salaryMax?: number       // structured: numeric maximum salary (in currency units)
+  salaryCurrency?: string  // structured: ISO currency code e.g. 'USD', 'THB', 'GBP'
+  experienceYears?: string // e.g. "3-5 years", "2+ years" — from structured data or regex
   postedAt?: string        // ISO date
   companyLogo?: string
   department?: string
@@ -42,6 +46,55 @@ export interface JobResult {
   visaSponsorship?: boolean // only from arbeitnow (partial coverage)
   experienceLevel?: 'entry' | 'mid' | 'senior'  // inferred from title
   employmentType?: string  // Full-time, Part-time, Contract, etc.
+}
+
+/**
+ * Extract "N-M years" experience requirement from job description text.
+ * Supports English and Thai language patterns.
+ * Returns the FIRST match found (e.g. "3-5 years", "2+ years").
+ * Returns undefined if no match — fail-open.
+ *
+ * Thai patterns use direct keyword matching instead of \b (word boundary),
+ * because Thai script has no spaces between words and \b doesn't work.
+ */
+export function extractExperienceYears(text: string): string | undefined {
+  // ── English range: "3-5 years", "3 to 5 years", "3–5 yrs" ──
+  const enRange = text.match(
+    /\b(\d+)\s*[-–to]+\s*(\d+)\s*(?:years?|yrs?)\b/i
+  )
+  if (enRange?.[1] && enRange?.[2]) return `${enRange[1]}-${enRange[2]} years`
+
+  // ── English single: "2+ years", "5 years experience", "at least 3 years" ──
+  const enSingle = text.match(
+    /\b(\d+)\+?\s*(?:years?|yrs?)\s*(?:of\s*)?(?:experience)?\b/i
+  )
+  if (enSingle) return `${enSingle[1]}+ years`
+
+  // ── Thai range with experience context: "ประสบการณ์ 3-5 ปี", "อายุงาน 2-4 ปี" ──
+  const thRange = text.match(
+    /(?:ประสบการณ์|อายุงาน|อายุการทำงาน)\s*[:：]?\s*(\d+)\s*[-–]\s*(\d+)\s*ปี/
+  )
+  if (thRange?.[1] && thRange?.[2]) return `${thRange[1]}-${thRange[2]} years`
+
+  // ── Thai "X ปีขึ้นไป" (X years up): "3 ปีขึ้นไป" ──
+  const thUp = text.match(/(\d+)\s*ปี\s*ขึ้นไป/)
+  if (thUp?.[1]) return `${thUp[1]}+ years`
+
+  // ── Thai "อย่างน้อย X ปี" (at least X years) ──
+  const thAtLeast = text.match(/อย่างน้อย\s*(\d+)\s*ปี/)
+  if (thAtLeast?.[1]) return `${thAtLeast[1]}+ years`
+
+  // ── Thai "ไม่น้อยกว่า X ปี" (not less than X years) ──
+  const thNotLess = text.match(/ไม่น้อยกว่า\s*(\d+)\s*ปี/)
+  if (thNotLess?.[1]) return `${thNotLess[1]}+ years`
+
+  // ── Thai context keyword + years: "ประสบการณ์ 3 ปี", "อายุงาน 5 ปี" ──
+  const thContext = text.match(
+    /(?:ประสบการณ์|อายุงาน|อายุการทำงาน)\s*[:：]?\s*(\d+)\s*ปี/
+  )
+  if (thContext?.[1]) return `${thContext[1]}+ years`
+
+  return undefined
 }
 
 export interface ScoredJob extends JobResult {

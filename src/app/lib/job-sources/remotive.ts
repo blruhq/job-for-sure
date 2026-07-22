@@ -8,6 +8,7 @@
 // ═══════════════════════════════════════════════════════════════
 
 import type { JobResult } from './types'
+import { extractExperienceYears } from './types'
 import { parseLocation } from './geo'
 
 interface RemotiveJob {
@@ -47,6 +48,7 @@ export async function fetchRemotive(
     const jobs: JobResult[] = (data.jobs || []).map((job) => {
       const descriptionHtml = job.description || ''
       const description = descriptionHtml.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim()
+      const experienceYears = extractExperienceYears(description)
       const location = job.candidate_required_location || 'Remote'
       const parsed = parseLocation(location)
 
@@ -63,6 +65,7 @@ export async function fetchRemotive(
         description: description.slice(0, 8000),
         descriptionHtml,
         salary: job.salary || undefined,
+        experienceYears,
         postedAt: job.publication_date,
         companyLogo: job.company_logo || undefined,
         department: job.category,
