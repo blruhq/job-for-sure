@@ -10,6 +10,7 @@
 // ═══════════════════════════════════════════════════════════════
 
 import type { JobResult } from './types'
+import { extractExperienceYears } from './types'
 import { parseLocation } from './geo'
 
 interface ApifyJobsDBJob {
@@ -62,6 +63,7 @@ export async function fetchApifyJobsDB(
       .filter((job) => job.title && job.company)
       .map((job) => {
         const description = job.description || ''
+        const experienceYears = extractExperienceYears(description)
         const jobLocation = job.location || 'Thailand'
         const parsed = parseLocation(jobLocation)
 
@@ -78,6 +80,7 @@ export async function fetchApifyJobsDB(
           url: job.url || 'https://www.jobsdb.com/th',
           description: description.slice(0, 8000),
           salary: job.salary || undefined,
+          experienceYears,
           postedAt: job.postedDate,
           companyLogo: job.companyLogo || undefined,
           employmentType: job.employmentType,

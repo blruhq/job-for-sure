@@ -34,7 +34,11 @@ export interface JobResult {
   url: string              // real apply link on the ORIGINAL source
   description: string      // full JD text (HTML stripped for scoring, raw kept separately)
   descriptionHtml?: string // original HTML (for display)
-  salary?: string          // salary string if disclosed
+  salary?: string          // salary string if disclosed (free text or formatted)
+  salaryMin?: number       // structured: numeric minimum salary (in currency units)
+  salaryMax?: number       // structured: numeric maximum salary (in currency units)
+  salaryCurrency?: string  // structured: ISO currency code e.g. 'USD', 'THB', 'GBP'
+  experienceYears?: string // e.g. "3-5 years", "2+ years" — from structured data or regex
   postedAt?: string        // ISO date
   companyLogo?: string
   department?: string
@@ -42,6 +46,22 @@ export interface JobResult {
   visaSponsorship?: boolean // only from arbeitnow (partial coverage)
   experienceLevel?: 'entry' | 'mid' | 'senior'  // inferred from title
   employmentType?: string  // Full-time, Part-time, Contract, etc.
+}
+
+/**
+ * Extract "N-M years" experience requirement from job description text.
+ * Returns the FIRST match found (e.g. "3-5 years", "2+ years").
+ * Returns undefined if no match — fail-open.
+ */
+export function extractExperienceYears(text: string): string | undefined {
+  // Match patterns like: "3-5 years", "3 to 5 years", "2+ years", "at least 3 years"
+  const match = text.match(
+    /\b(\d+)\s*[-–to]+\s*(\d+)\s*(?:years?|yrs?)\b|\b(\d+)\+?\s*(?:years?|yrs?)\s*(?:of\s*)?(?:experience)?\b/i
+  )
+  if (!match) return undefined
+  if (match[1] && match[2]) return `${match[1]}-${match[2]} years`
+  if (match[3]) return `${match[3]}+ years`
+  return undefined
 }
 
 export interface ScoredJob extends JobResult {

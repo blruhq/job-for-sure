@@ -19,6 +19,7 @@
 // ═══════════════════════════════════════════════════════════════
 
 import type { JobResult } from './types'
+import { extractExperienceYears } from './types'
 import { parseLocation } from './geo'
 
 interface JSearchJob {
@@ -124,6 +125,25 @@ export async function fetchJSearch(
         salary = `${job.job_min_salary}-${job.job_max_salary}${period} ${job.job_salary_currency || ''}`.trim()
       }
 
+      // Structured salary fields (JSearch has the best salary data of all sources)
+      const salaryMin = job.job_min_salary || undefined
+      const salaryMax = job.job_max_salary || undefined
+      const salaryCurrency = job.job_salary_currency || undefined
+
+      // experienceYears: try to extract numeric range from seniority_level first,
+      // then from description (JSearch descriptions are rich)
+      let experienceYears: string | undefined
+      if (job.seniority_level) {
+        // Some entries have years directly: "3 - 5 years", "2+ years"
+        const fromSeniority = extractExperienceYears(job.seniority_level)
+        if (fromSeniority) {
+          experienceYears = fromSeniority
+        }
+      }
+      if (!experienceYears) {
+        experienceYears = extractExperienceYears(description)
+      }
+
       return {
         id: `jsearch:${job.job_id || Math.random()}`,
         source: 'jsearch' as const,
@@ -137,6 +157,10 @@ export async function fetchJSearch(
         url: job.job_apply_link || 'https://www.google.com/search?q=' + encodeURIComponent(`${job.job_title} ${job.employer_name}`),
         description,
         salary,
+        salaryMin,
+        salaryMax,
+        salaryCurrency,
+        experienceYears,
         postedAt: job.job_posted_at_datetime_utc || (job.job_posted_at_timestamp ? new Date(job.job_posted_at_timestamp * 1000).toISOString() : undefined),
         companyLogo: job.employer_logo || job.job_employer_logo || undefined,
         employmentType: job.job_employment_type || job.employment_type,

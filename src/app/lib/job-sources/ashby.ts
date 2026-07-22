@@ -6,7 +6,16 @@
 // ═══════════════════════════════════════════════════════════════
 
 import type { JobResult } from './types'
+import { extractExperienceYears } from './types'
 import { parseLocation } from './geo'
+
+interface AshbyCompensation {
+  compensationTierSummary?: string   // e.g. "$120,000 - $160,000"
+  minValue?: number
+  maxValue?: number
+  currency?: string
+  interval?: string                  // "year" | "month" etc.
+}
 
 interface AshbyJob {
   id: string
@@ -20,6 +29,7 @@ interface AshbyJob {
   jobUrl?: string
   publishedDate?: string
   externalLink?: string
+  compensation?: AshbyCompensation   // ← ADD THIS
 }
 
 interface AshbyResponse {
@@ -55,6 +65,32 @@ export async function fetchAshbyCompany(
     const location = job.location || job.locationName || 'Unknown'
     const parsed = parseLocation(location)
 
+    // Compensation (was requested with ?includeCompensation=true but never read — fix)
+    const comp = job.compensation
+    let salary: string | undefined
+    let salaryMin: number | undefined
+    let salaryMax: number | undefined
+    let salaryCurrency: string | undefined
+
+    if (comp) {
+      if (comp.compensationTierSummary) {
+        salary = comp.compensationTierSummary
+      }
+      if (comp.minValue && comp.maxValue) {
+        salaryMin = comp.minValue
+        salaryMax = comp.maxValue
+        salaryCurrency = comp.currency || 'USD'
+        if (!salary) {
+          const sym = salaryCurrency === 'USD' ? '$' : salaryCurrency === 'GBP' ? '£' : salaryCurrency === 'EUR' ? '€' : `${salaryCurrency} `
+          const period = comp.interval === 'year' ? '/yr' : comp.interval === 'month' ? '/mo' : ''
+          salary = `${sym}${Math.round(salaryMin / 1000)}k-${Math.round(salaryMax / 1000)}k${period}`
+        }
+      }
+    }
+
+    // Extract experience years from description
+    const experienceYears = extractExperienceYears(description)
+
     return {
       id: `ashby:${job.id}`,
       source: 'ashby' as const,
@@ -68,6 +104,12 @@ export async function fetchAshbyCompany(
       url: job.jobUrl || job.externalLink || `https://app.ashbyhq.com/posting-api/job-board/${slug}`,
       description: description.slice(0, 8000),
       descriptionHtml,
+      salary,
+      salaryMin,
+      salaryMax,
+      salaryCurrency,
+      experienceYears,
+      employmentType: job.employmentType,
       postedAt: job.publishedDate,
       department: job.department,
     }

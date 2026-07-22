@@ -7,6 +7,7 @@
 // ═══════════════════════════════════════════════════════════════
 
 import type { JobResult } from './types'
+import { extractExperienceYears } from './types'
 import { parseLocation } from './geo'
 
 interface RemoteOKJob {
@@ -61,6 +62,11 @@ export async function fetchRemoteOK(
         salary = `$${(job.salary_min / 1000).toFixed(0)}k-${(job.salary_max / 1000).toFixed(0)}k`
       }
 
+      const salaryMin = job.salary_min || undefined
+      const salaryMax = job.salary_max || undefined
+      const salaryCurrency = 'USD'   // RemoteOK is USD-only
+      const experienceYears = extractExperienceYears(description)
+
       return {
         id: `remoteok:${job.id}`,
         source: 'remoteok' as const,
@@ -75,6 +81,10 @@ export async function fetchRemoteOK(
         description: description.slice(0, 8000),
         descriptionHtml,
         salary,
+        salaryMin,
+        salaryMax,
+        salaryCurrency,
+        experienceYears,
         postedAt: job.date,
         companyLogo: job.company_logo || undefined,
         tags: job.tags,

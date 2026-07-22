@@ -19,6 +19,7 @@
 // ═══════════════════════════════════════════════════════════════
 
 import type { JobResult } from './types'
+import { extractExperienceYears } from './types'
 import { parseLocation } from './geo'
 
 // ── Country → SEEK endpoint mapping ──────────────────────────
@@ -192,6 +193,7 @@ export async function fetchJobsDBRest(
           descParts.push(job.bulletPoints.map((bp) => `• ${bp}`).join('\n'))
         }
         const description = descParts.join('\n\n')
+        const experienceYears = extractExperienceYears(description)
 
         // Job URL
         const jobUrl = `https://${config.domain}/job/${job.id}`
@@ -213,6 +215,7 @@ export async function fetchJobsDBRest(
           url: jobUrl,
           description,
           salary: job.salaryLabel || undefined,
+          experienceYears,
           postedAt: job.listingDate,
           companyLogo,
           tags: tags.length > 0 ? tags : undefined,

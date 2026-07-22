@@ -237,12 +237,16 @@ export async function searchJobs(params: SearchParams): Promise<SearchResult> {
       description: '',        // stripped — saves ~80% Redis storage
       descriptionHtml: '',     // stripped
       salary: j.salary,
+      salaryMin: j.salaryMin,
+      salaryMax: j.salaryMax,
+      salaryCurrency: j.salaryCurrency,
       postedAt: j.postedAt,
       companyLogo: j.companyLogo,
       department: j.department,
       tags: j.tags,
       visaSponsorship: j.visaSponsorship,
       experienceLevel: j.experienceLevel,
+      experienceYears: j.experienceYears,
       employmentType: j.employmentType,
     }))
     setCached(key, { ...result, jobs: leanJobs, descriptionsIncluded: false })

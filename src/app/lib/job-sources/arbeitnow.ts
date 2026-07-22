@@ -11,6 +11,7 @@
 // ═══════════════════════════════════════════════════════════════
 
 import type { JobResult } from './types'
+import { extractExperienceYears } from './types'
 import { parseLocation } from './geo'
 
 interface ArbeitnowJob {
@@ -59,6 +60,7 @@ export async function fetchArbeitnow(
       .map((job) => {
         const descriptionHtml = job.description || ''
         const description = descriptionHtml.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim()
+        const experienceYears = extractExperienceYears(description)
         const location = job.location || (job.remote ? 'Remote' : 'Unspecified')
         const parsed = parseLocation(location)
 
@@ -67,15 +69,16 @@ export async function fetchArbeitnow(
           source: 'arbeitnow' as const,
           company: job.company_name || 'Unknown',
           title: job.title || 'Unknown',
-        location,
-        city: parsed.city,
-        country: parsed.country,
+          location,
+          city: parsed.city,
+          country: parsed.country,
           region: parsed.region,
           locationType: job.remote ? 'remote' as const : detectLocationType(location),
           url: job.url || `https://www.arbeitnow.com/jobs/${job.slug}`,
           description: description.slice(0, 8000),
           descriptionHtml,
           salary: job.salary || undefined,
+          experienceYears,
           postedAt: job.createdAt,
           tags: job.tags,
           visaSponsorship: job.visa_sponsorship ?? false,

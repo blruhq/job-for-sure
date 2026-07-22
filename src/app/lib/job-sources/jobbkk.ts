@@ -9,6 +9,7 @@
 
 import * as cheerio from 'cheerio'
 import type { JobResult } from './types'
+import { extractExperienceYears } from './types'
 import { parseLocation } from './geo'
 import { getBroadSearchTerm } from './role-synonyms'
 
@@ -107,6 +108,8 @@ export async function fetchJobbKK(
         .filter(Boolean)
         .join('\n')
 
+      const experienceYears = extractExperienceYears(description)
+
       // Generate a stable ID from the URL
       const idMatch = relativeUrl.match(/\/detail(?:urgent)?\/(\d+)\/(\d+)/)
       const id = idMatch
@@ -128,6 +131,7 @@ export async function fetchJobbKK(
         salary: salary && salary !== 'ตามตกลง' ? salary : undefined,
         postedAt,
         experienceLevel: inferExperienceLevel(title),
+        experienceYears,
       })
     })
 

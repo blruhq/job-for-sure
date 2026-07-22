@@ -14,6 +14,7 @@
 // ═══════════════════════════════════════════════════════════════
 
 import type { JobResult } from './types'
+import { extractExperienceYears } from './types'
 import { parseLocation } from './geo'
 
 interface AdzunaJob {
@@ -109,6 +110,12 @@ export async function fetchAdzuna(
         salary = `$${Math.round(job.salary_min / 1000)}k+`
       }
 
+      // Structured salary fields
+      const salaryMin = job.salary_min || undefined
+      const salaryMax = job.salary_max || undefined
+      const salaryCurrency = 'USD'  // Adzuna doesn't expose currency — USD is the safe default for the supported country list
+      const experienceYears = extractExperienceYears(job.description || '')
+
       // Contract type mapping
       const employmentType = job.contract_time === 'full_time' ? 'Full-time'
         : job.contract_time === 'part_time' ? 'Part-time'
@@ -128,6 +135,10 @@ export async function fetchAdzuna(
         url: job.redirect_url || 'https://www.adzuna.com',
         description: (job.description || '').slice(0, 8000),
         salary,
+        salaryMin,
+        salaryMax,
+        salaryCurrency,
+        experienceYears,
         postedAt: job.created,
         department: job.category?.label,
         employmentType,

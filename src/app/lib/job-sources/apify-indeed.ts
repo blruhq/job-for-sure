@@ -10,6 +10,7 @@
 // ═══════════════════════════════════════════════════════════════
 
 import type { JobResult } from './types'
+import { extractExperienceYears } from './types'
 import { parseLocation } from './geo'
 
 interface ApifyIndeedJob {
@@ -63,6 +64,7 @@ export async function fetchApifyIndeed(
       .filter((job) => job.title && job.company)
       .map((job) => {
         const description = job.description || ''
+        const experienceYears = extractExperienceYears(description)
         const jobLocation = job.location || 'Remote'
         const parsed = parseLocation(jobLocation)
 
@@ -79,6 +81,7 @@ export async function fetchApifyIndeed(
           url: job.jobUrl || 'https://www.indeed.com',
           description: description.slice(0, 8000),
           salary: job.salary || undefined,
+          experienceYears,
           postedAt: job.datePosted,
           companyLogo: job.companyLogo || undefined,
         }
