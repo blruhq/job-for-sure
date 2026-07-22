@@ -71,7 +71,8 @@ const styles = StyleSheet.create({
   role: {
     fontSize: 11,
     color: COLORS.muted,
-    marginBottom: 10,
+    fontWeight: 600,
+    marginBottom: 4,
   },
   sidebarSection: {
     marginBottom: 10,
@@ -84,15 +85,17 @@ const styles = StyleSheet.create({
     color: COLORS.primary,
     marginBottom: 10,
   },
-  role: {
-    fontSize: 11,
-    color: COLORS.muted,
-    fontWeight: 600,
-    marginBottom: 0,
-  },
   sidebarValue: {
     fontSize: 9,
     marginBottom: 4,
+  },
+  sidebarLabel: {
+    fontSize: 8,
+    fontWeight: 600,
+    color: COLORS.muted,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+    marginTop: 4,
   },
   skillBadge: {
     fontSize: 8,
