@@ -50,12 +50,12 @@ export function BuildWizard({ open, onClose, onComplete }: BuildWizardProps) {
 
   return (
     <Dialog open={open} onOpenChange={(o) => { if (!o) handleClose() }}>
-      <DialogContent className="max-w-xl gap-0 p-0" showCloseButton={false}>
+      <DialogContent className="max-w-2xl gap-0 p-0" showCloseButton={false}>
         {/* Header */}
-        <div className="flex items-center justify-between border-b border-border px-5 py-3">
+        <div className="flex items-center justify-between border-b border-border px-6 py-4">
           <div className="flex items-center gap-2">
-            <span className="font-mono text-[10px] font-semibold text-primary">STEP {step + 1} / 2</span>
-            <span className="text-sm font-semibold text-foreground">
+            <span className="font-mono text-[11px] font-semibold text-primary">STEP {step + 1} / 2</span>
+            <span className="text-base font-semibold text-foreground">
               {['Choose Template', 'Your Target Role'][step]}
             </span>
           </div>
@@ -78,17 +78,17 @@ export function BuildWizard({ open, onClose, onComplete }: BuildWizardProps) {
         </div>
 
         {/* Body */}
-        <div className="p-5">
+        <div className="p-6">
           {step === 0 && (
-            <div className="space-y-3">
-              <label className="block font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
+            <div className="space-y-4">
+              <label className="block font-mono text-[11px] uppercase tracking-wider text-muted-foreground">
                 Pick a template for your resume
               </label>
               <TemplateGallery
                 value={data.template}
                 onChange={(t: ResumeTemplate) => setData({ ...data, template: t })}
               />
-              <p className="text-[10px] text-muted-foreground italic">
+              <p className="text-[11px] text-muted-foreground italic">
                 You can change the template anytime without losing your content.
               </p>
             </div>
@@ -97,7 +97,7 @@ export function BuildWizard({ open, onClose, onComplete }: BuildWizardProps) {
           {step === 1 && (
             <div className="space-y-4">
               <div>
-                <label className="mb-1 block font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
+                <label className="mb-1 block font-mono text-[11px] uppercase tracking-wider text-muted-foreground">
                   What role are you applying for? *
                 </label>
                 <Input
@@ -109,7 +109,7 @@ export function BuildWizard({ open, onClose, onComplete }: BuildWizardProps) {
                 />
               </div>
               <div>
-                <label className="mb-1 block font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
+                <label className="mb-1 block font-mono text-[11px] uppercase tracking-wider text-muted-foreground">
                   What industry? <span className="text-muted-foreground/50">(optional — helps tailor questions)</span>
                 </label>
                 <Input
@@ -119,7 +119,7 @@ export function BuildWizard({ open, onClose, onComplete }: BuildWizardProps) {
                   className="w-full rounded-md px-3 py-2 text-sm"
                 />
               </div>
-              <p className="font-mono text-[10px] text-muted-foreground">
+              <p className="font-mono text-[11px] text-muted-foreground">
                 After this, our AI assistant will guide you through building your resume step by step.
               </p>
             </div>
@@ -127,7 +127,7 @@ export function BuildWizard({ open, onClose, onComplete }: BuildWizardProps) {
         </div>
 
         {/* Footer */}
-        <div className="flex items-center justify-between border-t border-border px-5 py-3">
+        <div className="flex items-center justify-between border-t border-border px-6 py-4">
           <Button
             variant="ghost"
             onClick={() => step > 0 ? setStep(step - 1) : handleClose()}
@@ -140,7 +140,7 @@ export function BuildWizard({ open, onClose, onComplete }: BuildWizardProps) {
               variant="default"
               onClick={() => setStep(step + 1)}
               disabled={!canProceed[step]}
-              className="flex items-center gap-1 rounded-md px-4 py-1.5 text-xs"
+              className="flex items-center gap-1 rounded-md px-5 py-2 text-sm"
             >
               Next <ArrowRight size={12} />
             </Button>
@@ -149,7 +149,7 @@ export function BuildWizard({ open, onClose, onComplete }: BuildWizardProps) {
               variant="default"
               onClick={handleComplete}
               disabled={!canProceed[1]}
-              className="flex items-center gap-1 rounded-md px-4 py-1.5 text-xs"
+              className="flex items-center gap-1 rounded-md px-5 py-2 text-sm"
             >
               <Check size={12} /> Start Building
             </Button>

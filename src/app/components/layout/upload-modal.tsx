@@ -107,7 +107,7 @@ export function UploadModal({ open, onClose }: UploadModalProps) {
             <DialogTitle>Add a Resume</DialogTitle>
           </DialogHeader>
 
-          <div className="space-y-4">
+          <div className="space-y-5">
             {/* Drag & drop zone */}
             <Button
               variant="ghost"
@@ -117,7 +117,7 @@ export function UploadModal({ open, onClose }: UploadModalProps) {
               onDrop={handleDrop}
               disabled={parsing}
               className={cn(
-                'w-full rounded-lg border-2 border-dashed p-8 text-center',
+                'w-full rounded-lg border-2 border-dashed p-10 text-center',
                 dragOver
                   ? 'border-primary bg-primary/5'
                   : 'border-border hover:border-primary/40 hover:bg-muted/30',
@@ -135,7 +135,7 @@ export function UploadModal({ open, onClose }: UploadModalProps) {
                     <Upload size={18} />
                   </div>
                   <span className="text-sm font-semibold text-foreground">Drop your file here or click to browse</span>
-                  <span className="text-[11px] text-muted-foreground">PDF · DOCX · TXT · MD (max 5MB)</span>
+                  <span className="text-xs text-muted-foreground">PDF · DOCX · TXT · MD (max 5MB)</span>
                 </div>
               )}
             </Button>
@@ -143,7 +143,7 @@ export function UploadModal({ open, onClose }: UploadModalProps) {
             {/* Divider */}
             <div className="flex items-center gap-3">
               <div className="h-px flex-1 bg-border" />
-              <span className="text-[10px] font-mono text-muted-foreground">OR</span>
+              <span className="text-xs font-mono text-muted-foreground">OR</span>
               <div className="h-px flex-1 bg-border" />
             </div>
 
@@ -159,7 +159,7 @@ export function UploadModal({ open, onClose }: UploadModalProps) {
               </div>
               <div>
                 <div className="text-sm font-semibold text-foreground">Build with AI</div>
-                <div className="text-[11px] text-muted-foreground">Answer questions · Takes 5 min</div>
+                <div className="text-xs text-muted-foreground">Answer questions · Takes 5 min</div>
               </div>
             </Button>
           </div>
