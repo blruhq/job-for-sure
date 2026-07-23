@@ -130,6 +130,7 @@ function ResetPasswordForm() {
                 required
                 minLength={8}
                 className="w-full rounded-md px-3 py-2 text-sm"
+                neumorphic
               />
             </div>
 
@@ -145,6 +146,7 @@ function ResetPasswordForm() {
                 required
                 minLength={8}
                 className="w-full rounded-md px-3 py-2 text-sm"
+                neumorphic
               />
             </div>
 

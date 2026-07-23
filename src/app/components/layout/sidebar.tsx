@@ -126,7 +126,7 @@ export function Sidebar() {
     <>
       <aside
         className={cn(
-          'flex h-full flex-col border-r border-border neuro-surface overflow-hidden transition-[width] duration-200 ease-[cubic-bezier(0.2,0,0,1)]',
+          'flex h-full flex-col neuro-surface overflow-hidden transition-[width] duration-200 ease-[cubic-bezier(0.2,0,0,1)]',
           c ? 'w-[var(--sidebar-collapsed-width)]' : 'w-[var(--sidebar-width)]',
         )}
       >

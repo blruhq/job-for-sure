@@ -206,7 +206,7 @@ export function AtsView() {
   return (
     <div className="flex h-full w-full flex-col md:flex-row">
       {/* Left panel — inputs + analysis */}
-      <div className="flex w-full md:w-[45%] flex-col gap-5 overflow-y-auto border-b md:border-b-0 md:border-r border-border neuro-surface p-4 md:p-6">
+      <div className="flex w-full md:w-[45%] flex-col gap-5 overflow-y-auto border-b md:border-b-0 md:border-r neuro-surface p-4 md:p-6">
         <div>
           <h1 className="text-lg font-semibold">ATS Optimizer</h1>
           <div className="text-xs text-muted-foreground">
@@ -363,7 +363,7 @@ export function AtsView() {
             <div className="label-mono mb-2">Recommended Improvements</div>
             <div className="flex flex-col gap-2">
               {analysisResult.suggestions.map((sug, idx) => (
-                <div key={idx} className="flex items-start gap-2 text-xs text-muted-foreground bg-accent-soft p-2.5 rounded-sm border border-border/50">
+                <div key={idx} className="flex items-start gap-2 text-xs text-muted-foreground bg-accent-soft p-2.5 rounded-sm shadow-[0_1px_2px_rgba(0,0,0,0.04)]">
                   <AlertCircle size={14} className="text-warn shrink-0 mt-0.5" />
                   <span>{sug}</span>
                 </div>

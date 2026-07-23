@@ -393,7 +393,7 @@ html[lang="th"] {
   border-radius: 4px;
 }
 
-textarea:focus-visible {
+textarea:focus-visible:not(.neuro-inset) {
   outline: none !important;
   box-shadow: none !important;
 }
@@ -417,6 +417,14 @@ textarea:focus-visible {
   background-color: var(--neuro-surface);
 }
 
+/* Divider — transparent in light mode, visible in dark mode */
+.neuro-divider {
+  background-color: transparent;
+}
+.dark .neuro-divider {
+  background-color: var(--border);
+}
+
 /* Card — raised/extruded dual shadow */
 .neuro-card {
   background-color: var(--neuro-surface);
@@ -430,6 +438,15 @@ textarea:focus-visible {
 .neuro-inset {
   background-color: var(--neuro-surface);
   box-shadow: inset 4px 4px 8px rgba(0, 0, 0, 0.10), inset -4px -4px 8px rgba(255, 255, 255, 0.9);
+}
+
+/* Focus state — stacks inset shadow + focus ring (light mode) */
+.neuro-inset:focus-visible,
+.neuro-inset:focus-within {
+  box-shadow:
+    inset 4px 4px 8px rgba(0, 0, 0, 0.10),
+    inset -4px -4px 8px rgba(255, 255, 255, 0.9),
+    0 0 0 2px rgba(99, 102, 241, 0.35);
 }
 
 /* Icon well — smaller inset for icon containers */
@@ -512,6 +529,11 @@ textarea:focus-visible {
 
 .dark .neuro-pill:active {
   box-shadow: var(--shadow-sm);
+}
+
+.dark .neuro-inset:focus-visible,
+.dark .neuro-inset:focus-within {
+  box-shadow: var(--shadow-md), 0 0 0 2px rgba(139, 152, 224, 0.4);
 }
 
 .dark .neuro-title {

@@ -111,6 +111,7 @@ function LoginForm() {
                 placeholder="you@example.com"
                 required
                 className="w-full rounded-md px-3 py-2 text-sm"
+                neumorphic
               />
             </div>
 
@@ -133,6 +134,7 @@ function LoginForm() {
                 placeholder="••••••••"
                 required
                 className="w-full rounded-md px-3 py-2 text-sm"
+                neumorphic
               />
             </div>
 

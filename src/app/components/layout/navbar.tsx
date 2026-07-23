@@ -1,7 +1,7 @@
 'use client'
 
 import Image from 'next/image'
-import { PanelLeft, Sun, Moon, Globe, Search } from 'lucide-react'
+import { PanelLeft, Sun, Moon, Globe } from 'lucide-react'
 import { Button } from '~/components/ui/button'
 import { UserMenu } from '~/components/layout/user-menu'
 import { cn } from '~/lib/utils'
@@ -46,23 +46,25 @@ export function Topbar() {
   const toggleSidebar = useUIStore((s) => s.toggleSidebar)
 
   return (
-    <header className="flex h-[var(--topbar-height)] shrink-0 items-center border-b border-border neuro-surface z-50">
+    <header className="flex h-[var(--topbar-height)] shrink-0 items-center neuro-surface z-50">
       {/* Brand area — matches sidebar width, collapses */}
       <div
         className={cn(
-          'flex h-full items-center border-r border-border px-3 transition-all duration-200 ease-[cubic-bezier(0.2,0,0,1)] shrink-0',
+          'flex h-full items-center px-3 transition-all duration-200 ease-[cubic-bezier(0.2,0,0,1)] shrink-0',
           sidebarCollapsed ? 'w-[var(--sidebar-collapsed-width)] justify-center px-0' : 'w-[var(--sidebar-width)]',
         )}
       >
         <Link href="/chat" className="flex items-center gap-2">
-          <Image
-            src="/logo.png"
-            alt="Job For Sure"
-            width={sidebarCollapsed ? 20 : 24}
-            height={sidebarCollapsed ? 20 : 24}
-            className="shrink-0 transition-all duration-200"
-            priority
-          />
+          <div className="neuro-icon-well rounded-[3px] p-0.5">
+            <Image
+              src="/logo.png"
+              alt="Job For Sure"
+              width={sidebarCollapsed ? 20 : 24}
+              height={sidebarCollapsed ? 20 : 24}
+              className="shrink-0 transition-all duration-200"
+              priority
+            />
+          </div>
           {!sidebarCollapsed && (
             <span className="text-sm font-semibold tracking-[-0.02em]">JOB FOR SURE</span>
           )}
@@ -81,20 +83,6 @@ export function Topbar() {
       </Button>
 
       <div className="flex-1" />
-
-      {/* ⌘K Command Palette trigger */}
-      <Button
-        variant="outline"
-        onClick={() => {
-          const event = new KeyboardEvent('keydown', { key: 'k', metaKey: true, bubbles: true })
-          document.dispatchEvent(event)
-        }}
-        className="hidden sm:flex items-center gap-2 rounded-md px-3 py-1.5 text-sm mr-2 max-w-[200px] w-full"
-      >
-        <Search size={13} className="shrink-0" />
-        <span className="flex-1 text-left text-xs">Search...</span>
-        <kbd className="ml-auto rounded border border-border bg-muted px-1.5 py-0.5 font-mono text-[10px]">⌘K</kbd>
-      </Button>
 
       {/* Actions */}
       <div className="flex items-center gap-1 pr-3">

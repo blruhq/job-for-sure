@@ -320,6 +320,7 @@ export default function SettingsPage() {
                   onChange={(e) => setName(e.target.value)}
                   className="flex-1 rounded-sm text-xs px-3 py-1.5"
                   placeholder="Your name"
+                  neumorphic
                 />
                 <Button
                   onClick={handleUpdateName}
@@ -342,6 +343,7 @@ export default function SettingsPage() {
                   className="flex-1 rounded-sm text-xs px-3 py-1.5"
                   placeholder="email@example.com"
                   type="email"
+                  neumorphic
                 />
                 <Button
                   onClick={handleUpdateEmail}
@@ -373,6 +375,7 @@ export default function SettingsPage() {
                   onKeyDown={(e) => { if (e.key === 'Enter') handleSaveHomeLocation() }}
                   className="flex-1 rounded-sm text-xs px-3 py-1.5"
                   placeholder="e.g. Bang Na, Bangkok"
+                  neumorphic
                 />
                 <Button
                   onClick={handleSaveHomeLocation}
@@ -405,6 +408,7 @@ export default function SettingsPage() {
                     type={showCurrent ? 'text' : 'password'}
                     className="w-full rounded-sm text-xs px-3 py-1.5 pr-8"
                     placeholder="Current password"
+                    neumorphic
                   />
                   <Button
                     variant="ghost"
@@ -423,6 +427,7 @@ export default function SettingsPage() {
                     type={showNew ? 'text' : 'password'}
                     className="w-full rounded-sm text-xs px-3 py-1.5 pr-8"
                     placeholder="New password (min 8 chars)"
+                    neumorphic
                   />
                   <Button
                     variant="ghost"
@@ -440,6 +445,7 @@ export default function SettingsPage() {
                   type="password"
                   className="w-full rounded-sm text-xs px-3 py-1.5"
                   placeholder="Confirm new password"
+                  neumorphic
                 />
                 <Button
                   onClick={handleChangePassword}
@@ -528,6 +534,7 @@ export default function SettingsPage() {
                 onChange={(e) => setConfirmDelete(e.target.value)}
                 className="flex-1 rounded-sm text-xs px-3 py-1.5 border-red-500/30 focus:border-red-500/50"
                 placeholder="Type DELETE"
+                neumorphic
               />
               <Button
                 variant="destructive"

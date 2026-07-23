@@ -210,6 +210,7 @@ export function InterviewSetup({ onStart, history, loadingHistory, onViewSession
                         onChange={(e) => setCustomCompany(e.target.value)}
                         placeholder="Company (e.g. Stripe)"
                         className="w-full px-3 py-1.5 text-xs"
+                        neumorphic
                       />
                     </div>
                     <div>
@@ -218,6 +219,7 @@ export function InterviewSetup({ onStart, history, loadingHistory, onViewSession
                         onChange={(e) => setCustomRole(e.target.value)}
                         placeholder="Role (e.g. Frontend Engineer)"
                         className="w-full px-3 py-1.5 text-xs"
+                        neumorphic
                       />
                     </div>
                   </div>

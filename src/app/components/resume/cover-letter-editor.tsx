@@ -147,7 +147,7 @@ export function CoverLetterEditor({ resume }: CoverLetterEditorProps) {
   return (
     <div className="flex w-full flex-col lg:flex-row overflow-hidden h-full">
       {/* Configuration & Input Panel */}
-      <div className="w-full lg:w-[320px] shrink-0 border-b lg:border-b-0 lg:border-r border-border neuro-surface p-5 flex flex-col gap-4 overflow-y-auto">
+      <div className="w-full lg:w-[320px] shrink-0 border-b lg:border-b-0 lg:border-r neuro-surface p-5 flex flex-col gap-4 overflow-y-auto">
         <div className="flex gap-1.5 rounded-sm bg-border/30 p-0.5 mb-1 shrink-0">
           <Button
             variant="ghost"
@@ -203,6 +203,7 @@ export function CoverLetterEditor({ resume }: CoverLetterEditorProps) {
                 onChange={(e) => setCompany(e.target.value)}
                 placeholder={t('placeholderCompany')}
                 className="w-full px-2.5 py-1.5 text-[11px]"
+                neumorphic
               />
             </div>
             <div>
@@ -212,6 +213,7 @@ export function CoverLetterEditor({ resume }: CoverLetterEditorProps) {
                 onChange={(e) => setRole(e.target.value)}
                 placeholder={t('placeholderRole')}
                 className="w-full px-2.5 py-1.5 text-[11px]"
+                neumorphic
               />
             </div>
             <div>
@@ -222,6 +224,7 @@ export function CoverLetterEditor({ resume }: CoverLetterEditorProps) {
                 placeholder={t('placeholderFocus')}
                 rows={4}
                 className="w-full resize-none px-2.5 py-1.5 text-[11px] font-sans"
+                neumorphic
               />
             </div>
           </div>
@@ -236,6 +239,7 @@ export function CoverLetterEditor({ resume }: CoverLetterEditorProps) {
               onChange={(e) => setJdText(e.target.value)}
               placeholder="Paste Job Description here..."
               className="w-full h-56 px-2.5 py-1.5 text-[11px] resize-none font-sans"
+              neumorphic
             />
           </div>
         )}
@@ -254,7 +258,7 @@ export function CoverLetterEditor({ resume }: CoverLetterEditorProps) {
       {/* Preview / Edit Panel */}
       <div className="flex-1 flex flex-col overflow-hidden bg-background">
         {/* Actions bar */}
-        <div className="flex shrink-0 items-center justify-between border-b border-border neuro-surface px-4 md:px-6 py-2.5">
+        <div className="flex shrink-0 items-center justify-between neuro-surface px-4 md:px-6 py-2.5">
           <div className="flex items-center gap-2">
             <span className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">{t('generatedLetter')}</span>
           </div>
@@ -308,7 +312,7 @@ export function CoverLetterEditor({ resume }: CoverLetterEditorProps) {
               </div>
             </div>
 
-            <div className="border-b border-border/50 mb-6"></div>
+            <div className="mb-6"></div>
 
             {/* Letter Textarea */}
             <Textarea

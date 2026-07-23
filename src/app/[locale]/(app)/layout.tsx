@@ -5,7 +5,6 @@ import { useRouter, usePathname } from '~/i18n/routing'
 import { useUIStore } from '~/hooks/use-ui'
 import { Sidebar } from '~/components/layout/sidebar'
 import { Topbar } from '~/components/layout/navbar'
-import { CommandPalette } from '~/components/layout/command-palette'
 import { Skeleton } from '~/components/ui/skeleton'
 import { UpgradeModal } from '~/components/ui/upgrade-modal'
 import { authClient } from '~/lib/auth-client'
@@ -145,9 +144,6 @@ function AppShell({ children }: { children: React.ReactNode }) {
 
         <main className="flex flex-1 flex-col overflow-hidden min-w-0">{children}</main>
       </div>
-
-      {/* Global ⌘K Command Palette */}
-      <CommandPalette />
 
       {/* Global upgrade prompt — triggered by any feature's 402 limit */}
       <UpgradeModal
