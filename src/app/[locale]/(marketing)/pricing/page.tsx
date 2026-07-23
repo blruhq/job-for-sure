@@ -78,7 +78,7 @@ export default function PricingPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen neuro-surface">
       <div className="mx-auto max-w-4xl px-4 py-16 sm:px-6 sm:py-24">
         {/* Header */}
         <div className="text-center">
@@ -98,8 +98,8 @@ export default function PricingPage() {
               className={cn(
                 'rounded-xl border p-6',
                 plan.highlight
-                  ? 'border-primary/40 bg-card ring-1 ring-primary/20'
-                  : 'border-border bg-card',
+                  ? 'border-primary/40 neuro-card ring-1 ring-primary/20'
+                  : 'border-border neuro-card',
               )}
             >
               <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">

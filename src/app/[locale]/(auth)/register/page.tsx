@@ -52,7 +52,7 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background px-6">
+    <div className="flex min-h-screen items-center justify-center neuro-surface px-6">
       <div className="w-full max-w-sm">
         {/* Logo */}
         <div className="mb-6 text-center">
@@ -62,8 +62,8 @@ export default function RegisterPage() {
           </Link>
         </div>
 
-        {emailSent ? (
-          <div className="rounded-lg border border-border bg-card p-8 shadow-sm text-center">
+    {emailSent ? (
+              <div className="rounded-lg neuro-card p-8 text-center">
             <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-primary">
                 <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
@@ -86,7 +86,7 @@ export default function RegisterPage() {
             </Link>
           </div>
         ) : (
-        <div className="rounded-lg border border-border bg-card p-8 shadow-sm">
+        <div className="rounded-lg neuro-card p-8">
           <div className="text-center">
             <h1
               className="text-2xl text-foreground"
@@ -162,7 +162,7 @@ export default function RegisterPage() {
               <div className="w-full border-t border-border" />
             </div>
             <div className="relative flex justify-center">
-              <span className="bg-card px-2 text-[10px] text-muted-foreground">or</span>
+              <span className="neuro-surface px-2 text-[10px] text-muted-foreground">or</span>
             </div>
           </div>
 

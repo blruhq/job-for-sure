@@ -72,7 +72,7 @@ function NavSection({
               className={cn(
                 'flex items-center gap-2 rounded-sm text-sm font-medium transition-[padding,background-color,color] duration-200 ease-[cubic-bezier(0.2,0,0,1)]',
                 isActive
-                  ? 'bg-sidebar-active text-foreground font-semibold'
+                  ? 'neuro-inset text-foreground font-semibold'
                   : 'text-muted-foreground hover:bg-sidebar-hover hover:text-foreground',
                 collapsed ? 'pl-[16px] pr-[17px] py-2' : 'px-2.5 py-2',
               )}
@@ -126,7 +126,7 @@ export function Sidebar() {
     <>
       <aside
         className={cn(
-          'flex h-full flex-col border-r border-border bg-sidebar bg-grid-blueprint overflow-hidden transition-[width] duration-200 ease-[cubic-bezier(0.2,0,0,1)]',
+          'flex h-full flex-col border-r border-border neuro-surface overflow-hidden transition-[width] duration-200 ease-[cubic-bezier(0.2,0,0,1)]',
           c ? 'w-[var(--sidebar-collapsed-width)]' : 'w-[var(--sidebar-width)]',
         )}
       >
@@ -142,7 +142,7 @@ export function Sidebar() {
                 className={cn(
                   'flex items-center gap-2 rounded-sm text-xs font-medium transition-[padding,background-color,color] duration-200 ease-[cubic-bezier(0.2,0,0,1)]',
                   pathname === '/admin'
-                    ? 'bg-sidebar-active text-foreground font-semibold'
+                    ? 'neuro-inset text-foreground font-semibold'
                     : 'text-muted-foreground hover:bg-sidebar-hover hover:text-foreground',
                   c ? 'pl-[16px] pr-[17px] py-1.5' : 'px-2.5 py-1.5',
                 )}
@@ -179,7 +179,7 @@ export function Sidebar() {
                   className={cn(
                     'flex items-center gap-2 rounded-sm text-sm font-medium transition-[padding,background-color,color] duration-200 ease-[cubic-bezier(0.2,0,0,1)]',
                     pathname === '/resumes'
-                      ? 'bg-sidebar-active text-foreground font-semibold'
+                      ? 'neuro-inset text-foreground font-semibold'
                       : 'text-muted-foreground hover:bg-sidebar-hover hover:text-foreground',
                     c ? 'pl-[16px] pr-[17px] py-2' : 'px-2.5 py-2',
                   )}
@@ -236,7 +236,7 @@ export function Sidebar() {
               className={cn(
                 'flex items-center gap-2 rounded-sm text-xs font-medium transition-[padding,background-color,color] duration-200 ease-[cubic-bezier(0.2,0,0,1)]',
                 pathname === '/settings'
-                  ? 'bg-sidebar-active text-foreground font-semibold'
+                  ? 'neuro-inset text-foreground font-semibold'
                   : 'text-muted-foreground hover:bg-sidebar-hover hover:text-foreground',
                 c ? 'pl-[16px] pr-[17px] py-2' : 'px-2.5 py-2',
               )}

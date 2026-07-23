@@ -24,7 +24,7 @@ export default function LandingPage() {
   ]
 
   return (
-    <div className="flex min-h-screen flex-col bg-background">
+    <div className="flex min-h-screen flex-col neuro-surface">
       <GridPattern>
         {/* ── HERO ── */}
         <section className="relative flex min-h-screen flex-col items-center px-6 pt-[12vh] md:pt-[15vh]">
@@ -60,7 +60,7 @@ export default function LandingPage() {
             </div>
             <div className="flex justify-center md:justify-end">
               <div className="relative w-full max-w-lg">
-                <div className="relative overflow-hidden rounded-2xl border border-border bg-card shadow-paper">
+                <div className="relative overflow-hidden rounded-2xl neuro-card">
                   <div className="flex items-center gap-1.5 border-b border-border px-4 py-2.5">
                     <span className="h-2.5 w-2.5 rounded-full bg-[#FF5F57]" />
                     <span className="h-2.5 w-2.5 rounded-full bg-[#FFBD2E]" />
@@ -87,7 +87,7 @@ export default function LandingPage() {
                       {statItems.map((stat) => (
                         <div
                           key={stat.label}
-                          className="rounded-lg border border-border/60 bg-muted/30 p-2.5"
+                          className="rounded-lg neuro-inset p-2.5"
                         >
                           <span className="text-[11px] text-muted-foreground">{stat.label}</span>
                           <div className="mt-0.5 flex items-baseline gap-1">
@@ -96,7 +96,7 @@ export default function LandingPage() {
                         </div>
                       ))}
                     </div>
-                    <div className="animate-fade-up rounded-xl border border-border/60 bg-muted/20 p-3 [animation-delay:2s] [animation-fill-mode:backwards]">
+                    <div className="animate-fade-up rounded-xl neuro-inset p-3 [animation-delay:2s] [animation-fill-mode:backwards]">
                       <div className="flex items-start gap-2.5">
                         <div className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-primary/10 text-[11px] font-bold text-primary">
                           AI

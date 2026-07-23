@@ -10,7 +10,7 @@ interface CompanyIntelligenceProps {
 
 export function CompanyIntelligence({ company, countryCode }: CompanyIntelligenceProps) {
   return (
-    <div className="rounded-lg border border-border bg-card p-4 space-y-3">
+    <div className="rounded-lg neuro-card p-4 space-y-3">
       <div className="flex items-center gap-1.5 text-xs font-semibold text-foreground">
         <Building2 size={12} className="text-primary" />
         Company Intelligence
@@ -41,7 +41,7 @@ function LinkButton({ href, icon, label }: { href: string; icon: React.ReactNode
       href={href}
       target="_blank"
       rel="noopener noreferrer"
-      className="inline-flex items-center gap-1.5 rounded-xs border border-border bg-background px-2.5 py-1.5 text-[11px] font-medium text-foreground transition-colors hover:bg-sidebar-hover"
+      className="inline-flex items-center gap-1.5 rounded-xs neuro-pill px-2.5 py-1.5 text-[11px] font-medium text-foreground transition-shadow hover:bg-sidebar-hover"
     >
       {icon}
       {label}

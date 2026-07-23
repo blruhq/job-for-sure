@@ -72,7 +72,7 @@ function DraggableJobCard({ job, children }: { job: PipelineJob; children: React
       {...attributes}
       {...listeners}
       className={cn(
-        'group cursor-grab rounded-sm border border-border/60 bg-card p-2.5 active:cursor-grabbing hover:border-primary/50',
+        'group cursor-grab rounded-sm neuro-card p-2.5 active:cursor-grabbing hover:border-primary/50',
       )}
     >
       {children}
@@ -173,7 +173,7 @@ function InlineAddForm({ colId: _colId, onCancel, onSave, titleRef }: InlineAddF
   }
 
   return (
-    <div className="mt-1.5 flex flex-col gap-2 rounded-xs border border-border bg-card p-2.5">
+    <div className="mt-1.5 flex flex-col gap-2 rounded-xs neuro-card p-2.5">
       <Input
         ref={titleRef}
         value={title}
@@ -255,7 +255,7 @@ export function ApplicationsView() {
   // ── Loading state ──
   if (isLoading) {
     return (
-      <div className="flex h-full w-full items-center justify-center bg-background">
+      <div className="flex h-full w-full items-center justify-center neuro-surface">
         <div className="flex flex-col items-center gap-3">
           <Loader2 size={20} className="animate-spin text-muted-foreground" />
           <p className="text-xs text-muted-foreground">Loading applications…</p>
@@ -267,7 +267,7 @@ export function ApplicationsView() {
   // ── Error state ──
   if (isError) {
     return (
-      <div className="flex h-full w-full flex-col items-center justify-center bg-background gap-3 px-6 text-center">
+      <div className="flex h-full w-full flex-col items-center justify-center neuro-surface gap-3 px-6 text-center">
         <AlertCircle size={24} className="text-destructive/60" />
         <div className="max-w-xs">
           <p className="text-sm font-medium text-foreground">Failed to load applications</p>
@@ -392,7 +392,7 @@ export function ApplicationsView() {
   }
 
   return (
-    <div className="flex h-full w-full flex-col bg-background">
+    <div className="flex h-full w-full flex-col neuro-surface">
       {/* ── Header ── */}
       <div className="flex flex-col gap-2 border-b border-border px-4 py-2.5 shrink-0">
         <div className="flex items-center justify-between">
@@ -555,7 +555,7 @@ export function ApplicationsView() {
         {/* ── Floating drag overlay ── */}
         <DragOverlay dropAnimation={null}>
           {activeJob ? (
-            <div className="w-72 rounded-sm border border-border/60 bg-card p-2.5 shadow-[0_8px_30px_rgba(0,0,0,0.12)]">
+            <div className="w-72 rounded-sm neuro-card p-2.5">
               <JobCardContent job={activeJob} />
             </div>
           ) : null}

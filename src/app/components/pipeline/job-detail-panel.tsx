@@ -228,7 +228,7 @@ export function JobDetailPanel({
               </span>
             )}
             {locationType && locationType !== 'unknown' && (
-              <span className="flex items-center gap-0.5 rounded-xs border border-border bg-background px-1.5 py-0.5 text-[11px] capitalize text-muted-foreground">
+              <span className="flex items-center gap-0.5 rounded-xs border border-border neuro-surface px-1.5 py-0.5 text-[11px] capitalize text-muted-foreground">
                 {locationType === 'remote' && <Globe size={9} />}
                 {locationType}
               </span>
@@ -239,13 +239,13 @@ export function JobDetailPanel({
               </span>
             )}
             {experienceYears && (
-              <span className="flex items-center gap-0.5 rounded-xs border border-border bg-background px-1.5 py-0.5 text-[11px] text-muted-foreground">
+              <span className="flex items-center gap-0.5 rounded-xs border border-border neuro-surface px-1.5 py-0.5 text-[11px] text-muted-foreground">
                 <Briefcase size={10} />
                 {experienceYears}
               </span>
             )}
             {postedAt && (
-              <span className="flex items-center gap-0.5 rounded-xs border border-border bg-background px-1.5 py-0.5 text-[11px] text-muted-foreground">
+              <span className="flex items-center gap-0.5 rounded-xs border border-border neuro-surface px-1.5 py-0.5 text-[11px] text-muted-foreground">
                 <Clock size={9} /> {formatDate(postedAt)}
               </span>
             )}
@@ -384,7 +384,7 @@ export function JobDetailPanel({
         </div>
 
         {/* ── Footer: Actions ── */}
-        <div className="shrink-0 border-t border-border bg-card/95 backdrop-blur-sm px-5 py-4">
+        <div className="shrink-0 border-t border-border neuro-surface px-5 py-4">
           {/* AI tools grid */}
           <div className="mb-2 grid grid-cols-2 gap-2">
             <Button variant="secondary" onClick={handleTailor} className="flex items-center justify-center gap-1.5 rounded-xs px-3 py-2.5 text-sm">

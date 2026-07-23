@@ -97,7 +97,7 @@ export function JobPreview({ resume, onDismiss, onLoadComplete }: { resume: Resu
   // ── Loading ──
   if (loading) {
     return (
-      <div className="w-full rounded-md border border-border bg-card p-4">
+      <div className="w-full rounded-md neuro-card p-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2 text-muted-foreground">
             <Loader2 size={12} className="animate-spin text-primary" />
@@ -122,7 +122,7 @@ export function JobPreview({ resume, onDismiss, onLoadComplete }: { resume: Resu
 
   // ── Results ──
   return (
-    <div className="w-full rounded-md border border-border bg-card p-4">
+    <div className="w-full rounded-md neuro-card p-4">
       <div>
         {/* Header */}
         <div className="mb-2 flex items-center justify-between">

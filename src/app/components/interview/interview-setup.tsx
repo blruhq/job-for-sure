@@ -75,7 +75,7 @@ export function InterviewSetup({ onStart, history, loadingHistory, onViewSession
   if (resumes.length === 0) {
     return (
       <div className="flex h-full w-full flex-col items-center justify-center p-6 text-center">
-        <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-xl border border-border bg-card">
+        <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-xl neuro-icon-well">
           <Brain size={24} className="text-muted-foreground/50 animate-pulse" />
         </div>
         <h3 className="mb-1 text-sm font-semibold text-foreground">Create a Resume Profile First</h3>
@@ -139,10 +139,10 @@ export function InterviewSetup({ onStart, history, loadingHistory, onViewSession
   const hasHistory = history.length > 0
 
   return (
-    <div className="flex h-full w-full items-center justify-center overflow-y-auto p-4 md:p-8 bg-background">
+    <div className="flex h-full w-full items-center justify-center overflow-y-auto p-4 md:p-8 neuro-surface">
       <div className={`flex flex-col md:flex-row gap-6 w-full ${hasHistory ? 'max-w-[960px]' : 'max-w-[520px]'} items-stretch justify-center`}>
         {/* Left Column: Setup Config Card */}
-        <div className="w-full md:max-w-[520px] shrink-0 rounded-lg border border-border bg-card p-6 shadow-sm flex flex-col justify-between">
+        <div className="w-full md:max-w-[520px] shrink-0 rounded-lg neuro-card p-6 shadow-sm flex flex-col justify-between">
           <div>
             <div className="mb-6 text-center">
               <div className="mx-auto mb-3 flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 text-primary">
@@ -297,7 +297,7 @@ export function InterviewSetup({ onStart, history, loadingHistory, onViewSession
 
         {/* Right Column: Past Attempts History */}
         {hasHistory && (
-          <div className="flex-1 rounded-lg border border-border bg-card p-6 shadow-sm flex flex-col min-w-0">
+          <div className="flex-1 rounded-lg neuro-card p-6 shadow-sm flex flex-col min-w-0">
             <h2 className="text-sm font-semibold tracking-tight text-foreground flex items-center gap-1.5 border-b border-border/60 pb-3 mb-4">
               <Clock size={15} className="text-muted-foreground" />
               Past Mock Interviews
@@ -322,7 +322,7 @@ export function InterviewSetup({ onStart, history, loadingHistory, onViewSession
                         <span className="text-xs font-semibold text-foreground group-hover:text-primary transition-colors truncate">
                           {session.company}
                         </span>
-                        <span className="text-[9px] font-mono text-muted-foreground uppercase px-1 border border-border bg-card rounded-xs shrink-0">
+                        <span className="text-[9px] font-mono text-muted-foreground uppercase px-1 border border-border neuro-icon-well rounded-xs shrink-0">
                           {session.difficulty}
                         </span>
                       </div>

@@ -47,7 +47,7 @@ export default function ResumesPage() {
   return (
     <div className="flex h-full flex-col overflow-auto">
       {/* Page header */}
-      <div className="shrink-0 border-b border-border bg-card/60 backdrop-blur-sm px-6 py-4">
+      <div className="shrink-0 border-b border-border neuro-surface px-6 py-4">
         <div className="flex items-center justify-between">
           <div>
             <div className="label-mono mb-1" style={{ fontSize: '11px' }}>[ 02 // RESUME COLLECTION ]</div>
@@ -68,14 +68,14 @@ export default function ResumesPage() {
         {isLoading && (
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
             {[1, 2, 3].map((i) => (
-              <div key={i} className="h-48 animate-pulse rounded-sm border border-border bg-card" />
+              <div key={i} className="h-48 animate-pulse rounded-sm neuro-card" />
             ))}
           </div>
         )}
 
         {!isLoading && baseResumes.length === 0 && (
-          <div className="flex flex-col items-center justify-center gap-4 py-24 text-center rounded-sm border border-dashed border-border bg-grid-card">
-            <div className="flex h-14 w-14 items-center justify-center rounded-sm border border-border bg-card">
+          <div className="flex flex-col items-center justify-center gap-4 py-24 text-center rounded-sm neuro-inset border border-dashed border-border">
+            <div className="flex h-14 w-14 items-center justify-center rounded-sm neuro-icon-well">
               <FileText size={24} className="text-muted-foreground" />
             </div>
             <div>
@@ -99,7 +99,7 @@ export default function ResumesPage() {
               return (
                 <div
                   key={resume.id}
-                  className="group relative flex flex-col rounded-lg border border-border bg-card shadow-sm transition-all hover:border-foreground/15 hover:shadow-md"
+                  className="group relative flex flex-col rounded-lg neuro-card transition-all hover:shadow-none"
                 >
                   {/* Card header */}
                   <div className="flex items-start justify-between gap-2 border-b border-border px-4 py-3">
@@ -208,9 +208,9 @@ export default function ResumesPage() {
             <Button
               variant="ghost"
               onClick={() => setUploadModalOpen(true)}
-              className="flex min-h-[180px] w-full flex-col items-center justify-center gap-3 rounded-sm border border-dashed border-border bg-card/50 text-muted-foreground hover:border-primary/50 hover:bg-accent-soft hover:text-primary h-auto"
+              className="flex min-h-[180px] w-full flex-col items-center justify-center gap-3 rounded-sm neuro-inset border border-dashed border-border text-muted-foreground hover:border-primary/50 hover:bg-accent-soft hover:text-primary h-auto"
             >
-              <div className="flex h-10 w-10 items-center justify-center rounded-sm border border-border bg-background">
+              <div className="flex h-10 w-10 items-center justify-center rounded-sm neuro-icon-well">
                 <Plus size={18} strokeWidth={2} />
               </div>
               <span className="text-sm font-medium">New Resume</span>

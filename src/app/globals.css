@@ -104,6 +104,9 @@
   --accent-soft: rgba(91, 106, 191, 0.06);
   --accent-blueprint: rgba(91, 106, 191, 0.04);
 
+  /* ── Neumorphic surface (light mode only; dark mode neutralizes via .dark .neuro-* rules) ── */
+  --neuro-surface: #E9ECEF;
+
   /* ── Typography ── */
   --font-sans: var(--font-inter, 'Inter Variable'), 'Inter', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
   --font-display: 'Instrument Serif', Georgia, 'Times New Roman', serif;
@@ -218,6 +221,8 @@ html[lang="th"] {
   --danger-soft: rgba(239, 68, 68, 0.10);
   --accent-soft: rgba(139, 152, 224, 0.10);
   --accent-blueprint: rgba(139, 152, 224, 0.06);
+
+  --neuro-surface: var(--background);
 
   --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
   --shadow-md: 0 1px 3px rgba(0, 0, 0, 0.4);
@@ -404,17 +409,17 @@ textarea:focus-visible {
 /* ═══════════════════════════════════════════════════════════════
    NEUMORPHISM / SOFT UI UTILITY CLASSES
    Light-mode only. Dark mode neutralizes back to flat shadows.
-   Surface color: #E9ECEF (darker than --background #F8F9FA)
+   Surface color: var(--neuro-surface) (darker than --background #F8F9FA)
    ═══════════════════════════════════════════════════════════════ */
 
 /* Surface — just the background color, no shadow */
 .neuro-surface {
-  background-color: #E9ECEF;
+  background-color: var(--neuro-surface);
 }
 
 /* Card — raised/extruded dual shadow */
 .neuro-card {
-  background-color: #E9ECEF;
+  background-color: var(--neuro-surface);
   box-shadow: 6px 6px 12px rgba(0, 0, 0, 0.12), -6px -6px 12px rgba(255, 255, 255, 0.9);
 }
 .neuro-card:hover {
@@ -423,19 +428,19 @@ textarea:focus-visible {
 
 /* Inset / pressed — recessed into surface */
 .neuro-inset {
-  background-color: #E9ECEF;
+  background-color: var(--neuro-surface);
   box-shadow: inset 4px 4px 8px rgba(0, 0, 0, 0.10), inset -4px -4px 8px rgba(255, 255, 255, 0.9);
 }
 
 /* Icon well — smaller inset for icon containers */
 .neuro-icon-well {
-  background-color: #E9ECEF;
+  background-color: var(--neuro-surface);
   box-shadow: inset 3px 3px 6px rgba(0, 0, 0, 0.10), inset -3px -3px 6px rgba(255, 255, 255, 0.9);
 }
 
 /* Pill / raised button — extruded with active press-down */
 .neuro-pill {
-  background-color: #E9ECEF;
+  background-color: var(--neuro-surface);
   box-shadow: 3px 3px 6px rgba(0, 0, 0, 0.12), -3px -3px 6px rgba(255, 255, 255, 0.9);
 }
 .neuro-pill:hover {
@@ -447,7 +452,7 @@ textarea:focus-visible {
 
 /* Modal surface — larger, softer shadow for dialog overlays */
 .neuro-modal {
-  background-color: #E9ECEF;
+  background-color: var(--neuro-surface);
   box-shadow: 8px 8px 24px rgba(0, 0, 0, 0.15), -8px -8px 24px rgba(255, 255, 255, 0.9);
 }
 
@@ -460,13 +465,13 @@ textarea:focus-visible {
 /* The InputBar is from agent-elements and styled via CSS variables.
    We scope overrides via .neuro-chat parent class. */
 .neuro-chat {
-  background-color: #E9ECEF;
-  --an-input-background: #E9ECEF;
+  background-color: var(--neuro-surface);
+  --an-input-background: var(--neuro-surface);
   --an-input-border-color: transparent;
   --an-input-border-radius: 16px;
   --an-border-radius: 16px;
   --an-message-border-radius: 16px;
-  --an-background: #E9ECEF;
+  --an-background: var(--neuro-surface);
 }
 
 /* Input bar container — pressed/recessed inset shadow */
@@ -482,7 +487,7 @@ textarea:focus-visible {
 
 /* Suggestions bar in InputBar — match surface */
 .neuro-chat .bg-an-background-secondary {
-  background-color: #E9ECEF;
+  background-color: var(--neuro-surface);
 }
 
 /* ── Dark mode: neutralize all neumorphic effects ── */

@@ -146,7 +146,7 @@ export function TailorReviewPanel({ onApply, onCancel }: { onApply: (variant: Re
               key={change.id}
               className={cn(
                 'rounded-sm border p-3 transition-colors',
-                isAccepted ? 'border-primary/30 bg-primary/5' : 'border-border bg-card opacity-60',
+                isAccepted ? 'border-primary/30 bg-primary/5' : 'border-border neuro-surface opacity-60',
               )}
             >
               {/* Toggle row */}

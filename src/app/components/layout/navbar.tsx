@@ -46,7 +46,7 @@ export function Topbar() {
   const toggleSidebar = useUIStore((s) => s.toggleSidebar)
 
   return (
-    <header className="flex h-[var(--topbar-height)] shrink-0 items-center border-b border-border bg-card z-50">
+    <header className="flex h-[var(--topbar-height)] shrink-0 items-center border-b border-border neuro-surface z-50">
       {/* Brand area — matches sidebar width, collapses */}
       <div
         className={cn(

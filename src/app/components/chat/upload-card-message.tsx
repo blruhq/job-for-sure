@@ -52,7 +52,7 @@ export const UploadCardMessage = memo(function UploadCardMessage({
     return (
       <div className="w-full space-y-3">
         {/* Resume summary card */}
-        <div className="rounded-md border border-border bg-card p-4">
+        <div className="rounded-md neuro-card p-4">
           <div className="flex items-center justify-between mb-3">
             <span className="text-[13px] font-semibold text-foreground">{resume.persona || 'Your Name'}</span>
             {!isEditing && (

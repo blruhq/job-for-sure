@@ -206,7 +206,7 @@ export function AtsView() {
   return (
     <div className="flex h-full w-full flex-col md:flex-row">
       {/* Left panel — inputs + analysis */}
-      <div className="flex w-full md:w-[45%] flex-col gap-5 overflow-y-auto border-b md:border-b-0 md:border-r border-border bg-card p-4 md:p-6">
+      <div className="flex w-full md:w-[45%] flex-col gap-5 overflow-y-auto border-b md:border-b-0 md:border-r border-border neuro-surface p-4 md:p-6">
         <div>
           <h1 className="text-lg font-semibold">ATS Optimizer</h1>
           <div className="text-xs text-muted-foreground">
@@ -253,6 +253,7 @@ export function AtsView() {
             )}
           </div>
           <Textarea
+            neumorphic
             value={jdText}
             onChange={(e) => setJdText(e.target.value)}
             rows={6}
@@ -307,7 +308,7 @@ export function AtsView() {
         </div>
 
         {/* Gauge / Score Output */}
-        <div className="flex items-center gap-4 rounded-md border border-border bg-card p-4">
+        <div className="flex items-center gap-4 rounded-md neuro-card p-4">
           <div className="relative h-20 w-20 shrink-0">
             <svg className="h-20 w-20" style={{ transform: 'rotate(-90deg)' }}>
               <circle cx="40" cy="40" r="35" fill="none" stroke="var(--border)" strokeWidth="6" />
@@ -333,7 +334,7 @@ export function AtsView() {
 
         {/* Category breakdown (multi-dimensional audit) */}
         {analysisResult?.categories && (
-          <div className="rounded-md border border-border p-4 bg-background flex flex-col gap-3">
+          <div className="rounded-md neuro-inset p-4 flex flex-col gap-3">
             <div className="label-mono text-[9px] uppercase tracking-wider text-muted-foreground">Scoring Categories</div>
             {analysisResult.categories.map((cat) => (
               <div key={cat.name} className="flex flex-col gap-1">
@@ -464,8 +465,8 @@ export function AtsView() {
       </div>
 
       {/* Right panel — live resume preview */}
-      <div className="flex w-full md:w-[55%] flex-col items-center overflow-y-auto bg-background p-4 md:p-6">
-        <div className="mb-4 flex w-full max-w-[550px] items-center justify-between rounded-sm border border-border bg-card p-2 px-3">
+      <div className="flex w-full md:w-[55%] flex-col items-center overflow-y-auto neuro-surface p-4 md:p-6">
+        <div className="mb-4 flex w-full max-w-[550px] items-center justify-between rounded-sm neuro-card p-2 px-3">
           <span className="text-[11px] font-semibold text-muted-foreground">ATS Real-Time Sheet</span>
           <Button
             variant="outline"
@@ -489,7 +490,7 @@ export function AtsView() {
           </div>
         ) : (
           <div className="flex flex-col items-center justify-center py-16 text-center">
-            <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-xl border border-border bg-card">
+            <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-xl neuro-icon-well">
               <FileText size={24} className="text-muted-foreground/50" />
             </div>
             <h3 className="mb-1 text-sm font-semibold text-foreground">No resume selected</h3>
@@ -503,13 +504,13 @@ export function AtsView() {
               <span className="hidden items-center text-muted-foreground sm:flex">
                 <ArrowRight size={14} />
               </span>
-              <div className="flex items-center gap-1.5 rounded-sm border border-border bg-card px-3 py-1.5 text-xs text-muted-foreground">
+              <div className="flex items-center gap-1.5 rounded-sm neuro-inset px-3 py-1.5 text-xs text-muted-foreground">
                 Select Profile
               </div>
               <span className="hidden items-center text-muted-foreground sm:flex">
                 <ArrowRight size={14} />
               </span>
-              <div className="flex items-center gap-1.5 rounded-sm border border-border bg-card px-3 py-1.5 text-xs text-muted-foreground">
+              <div className="flex items-center gap-1.5 rounded-sm neuro-inset px-3 py-1.5 text-xs text-muted-foreground">
                 Paste JD
               </div>
             </div>

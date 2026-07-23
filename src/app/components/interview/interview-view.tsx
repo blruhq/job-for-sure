@@ -89,7 +89,7 @@ export function InterviewView() {
   }
 
   return (
-    <div className="flex h-full w-full flex-col overflow-hidden bg-background">
+    <div className="flex h-full w-full flex-col overflow-hidden neuro-surface">
       {phase === 'setup' && (
         <Suspense fallback={
           <div className="flex h-full w-full items-center justify-center p-6">
@@ -115,7 +115,7 @@ export function InterviewView() {
       {/* Detail Modal for Past Session */}
       {selectedPastSession && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-[2px]" role="dialog" aria-modal="true" aria-labelledby="interview-modal-title">
-          <div className="flex h-[85vh] w-full max-w-[680px] flex-col rounded-lg border border-border bg-card shadow-lg overflow-hidden animate-fade-up">
+          <div className="flex h-[85vh] w-full max-w-[680px] flex-col rounded-lg neuro-card shadow-lg overflow-hidden animate-fade-up">
             {/* Modal Header */}
             <div className="flex shrink-0 items-center justify-between border-b border-border bg-muted/20 px-5 py-4">
               <div>
@@ -151,7 +151,7 @@ export function InterviewView() {
                   </div>
                   
                   {/* Question */}
-                  <div className="rounded-md border border-border bg-background p-3.5">
+                  <div className="rounded-md border border-border neuro-surface p-3.5">
                     <div className="flex items-center gap-1.5 mb-1.5">
                       <span className="text-[9px] font-mono uppercase tracking-wider bg-muted text-muted-foreground px-1.5 py-0.5 rounded">
                         {exchange.question?.category}
@@ -172,7 +172,7 @@ export function InterviewView() {
                   </div>
 
                   {/* Feedback */}
-                  <div className="rounded-md border border-border bg-card p-3.5 space-y-2.5">
+                  <div className="rounded-md neuro-card p-3.5 space-y-2.5">
                     <div className="flex items-center justify-between border-b border-border pb-2">
                       <span className="text-[10px] font-bold text-foreground">AI Review</span>
                       <span className="text-[10px] font-bold text-success font-mono">Score: {exchange.feedback?.score}/10</span>

@@ -77,8 +77,8 @@ export function InterviewSummary({ exchanges, onRestart }: InterviewSummaryProps
   }
 
   return (
-    <div className="flex h-full w-full items-center justify-center overflow-y-auto p-4 md:p-8 bg-background">
-      <div className="w-full max-w-[620px] rounded-lg border border-border bg-card p-6 shadow-sm">
+    <div className="flex h-full w-full items-center justify-center overflow-y-auto p-4 md:p-8 neuro-surface">
+      <div className="w-full max-w-[620px] rounded-lg neuro-card p-6">
         <div className="mb-6 text-center">
           <div className="mx-auto mb-3 flex h-10 w-10 items-center justify-center rounded-lg bg-success-soft text-success border border-success/10">
             <CheckCircle2 size={20} />
@@ -89,19 +89,19 @@ export function InterviewSummary({ exchanges, onRestart }: InterviewSummaryProps
 
         {/* Stats Row */}
         <div className="grid grid-cols-3 gap-3 mb-6">
-          <div className="rounded-md border border-border bg-background p-3 text-center">
+          <div className="rounded-md border border-border neuro-surface p-3 text-center">
             <div className="text-[10px] font-mono uppercase text-muted-foreground mb-1">Questions</div>
             <div className="text-lg font-bold text-foreground">{totalQuestions} Qs</div>
             <div className="text-[9px] text-muted-foreground mt-0.5">answered</div>
           </div>
           
-          <div className="rounded-md border border-border bg-background p-3 text-center">
+          <div className="rounded-md border border-border neuro-surface p-3 text-center">
             <div className="text-[10px] font-mono uppercase text-muted-foreground mb-1">Avg Score</div>
             <div className="text-lg font-bold text-foreground">{avgScore} / 10</div>
             <div className="text-[9px] text-muted-foreground mt-0.5">{Math.round(avgScore * 10)}% match</div>
           </div>
 
-          <div className="rounded-md border border-border bg-background p-3 text-center flex flex-col justify-between items-center">
+          <div className="rounded-md border border-border neuro-surface p-3 text-center flex flex-col justify-between items-center">
             <div className="text-[10px] font-mono uppercase text-muted-foreground mb-1">Comparison</div>
             <div className="flex items-center gap-1 text-xs font-semibold">
               {deltaDirection === 'up' && <TrendingUp size={14} className="text-success" />}
@@ -167,7 +167,7 @@ export function InterviewSummary({ exchanges, onRestart }: InterviewSummaryProps
             </h3>
             <div className="space-y-3">
               {exchanges.map((exchange, idx) => (
-                <div key={idx} className="rounded-md border border-border bg-background p-3.5 space-y-2">
+                <div key={idx} className="rounded-md border border-border neuro-surface p-3.5 space-y-2">
                   <div className="flex items-start justify-between gap-2">
                     <div className="flex items-center gap-1.5">
                       <span className="text-[9px] font-mono uppercase bg-muted text-muted-foreground px-1.5 py-0.5 rounded">

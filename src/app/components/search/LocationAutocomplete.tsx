@@ -219,7 +219,7 @@ export function LocationAutocomplete({
 
       {/* Suggestions Dropdown */}
       {isOpen && suggestions.length > 0 && (
-        <div className="absolute left-0 right-0 z-50 mt-1 max-h-[220px] overflow-y-auto rounded-sm border border-border bg-card shadow-lg">
+        <div className="absolute left-0 right-0 z-50 mt-1 max-h-[220px] overflow-y-auto rounded-sm neuro-card shadow-lg">
           {suggestions.map((item: CitySuggestion, idx: number) => (
             <Button
               key={idx}

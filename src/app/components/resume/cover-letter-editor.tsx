@@ -147,13 +147,13 @@ export function CoverLetterEditor({ resume }: CoverLetterEditorProps) {
   return (
     <div className="flex w-full flex-col lg:flex-row overflow-hidden h-full">
       {/* Configuration & Input Panel */}
-      <div className="w-full lg:w-[320px] shrink-0 border-b lg:border-b-0 lg:border-r border-border bg-card p-5 flex flex-col gap-4 overflow-y-auto">
+      <div className="w-full lg:w-[320px] shrink-0 border-b lg:border-b-0 lg:border-r border-border neuro-surface p-5 flex flex-col gap-4 overflow-y-auto">
         <div className="flex gap-1.5 rounded-sm bg-border/30 p-0.5 mb-1 shrink-0">
           <Button
             variant="ghost"
             onClick={() => setMode('quick')}
             className={`flex-1 rounded-xs py-1 text-[10px] font-semibold text-center ${
-              mode === 'quick' ? 'bg-card text-foreground shadow-sm' : 'text-muted-foreground'
+              mode === 'quick' ? 'neuro-card text-foreground' : 'text-muted-foreground'
             }`}
           >
             {t('quickFill')}
@@ -162,7 +162,7 @@ export function CoverLetterEditor({ resume }: CoverLetterEditorProps) {
             variant="ghost"
             onClick={() => setMode('jd')}
             className={`flex-1 rounded-xs py-1 text-[10px] font-semibold text-center ${
-              mode === 'jd' ? 'bg-card text-foreground shadow-sm' : 'text-muted-foreground'
+              mode === 'jd' ? 'neuro-card text-foreground' : 'text-muted-foreground'
             }`}
           >
             {t('jobDescription')}
@@ -177,7 +177,7 @@ export function CoverLetterEditor({ resume }: CoverLetterEditorProps) {
               variant="ghost"
               onClick={() => setOutputLanguage('en')}
               className={`flex-1 rounded-xs py-1 text-[10px] font-semibold text-center ${
-                outputLanguage === 'en' ? 'bg-card text-foreground shadow-sm' : 'text-muted-foreground'
+                outputLanguage === 'en' ? 'neuro-card text-foreground' : 'text-muted-foreground'
               }`}
             >
               English
@@ -186,7 +186,7 @@ export function CoverLetterEditor({ resume }: CoverLetterEditorProps) {
               variant="ghost"
               onClick={() => setOutputLanguage('th')}
               className={`flex-1 rounded-xs py-1 text-[10px] font-semibold text-center ${
-                outputLanguage === 'th' ? 'bg-card text-foreground shadow-sm' : 'text-muted-foreground'
+                outputLanguage === 'th' ? 'neuro-card text-foreground' : 'text-muted-foreground'
               }`}
             >
               ภาษาไทย
@@ -254,7 +254,7 @@ export function CoverLetterEditor({ resume }: CoverLetterEditorProps) {
       {/* Preview / Edit Panel */}
       <div className="flex-1 flex flex-col overflow-hidden bg-background">
         {/* Actions bar */}
-        <div className="flex shrink-0 items-center justify-between border-b border-border bg-card px-4 md:px-6 py-2.5">
+        <div className="flex shrink-0 items-center justify-between border-b border-border neuro-surface px-4 md:px-6 py-2.5">
           <div className="flex items-center gap-2">
             <span className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">{t('generatedLetter')}</span>
           </div>
@@ -297,7 +297,7 @@ export function CoverLetterEditor({ resume }: CoverLetterEditorProps) {
         {/* Paper Container */}
         <div className="flex-1 overflow-y-auto p-6 md:p-8 flex justify-center items-start">
           <div
-            className="resume-paper w-full max-w-[650px] min-h-[800px] rounded-xs p-10 bg-card border border-border flex flex-col shadow-sm"
+            className="resume-paper w-full max-w-[650px] min-h-[800px] rounded-xs p-10 neuro-card flex flex-col"
             style={{ boxShadow: 'var(--shadow-paper)' }}
           >
             {/* Header layout matching PDF/Resume style */}

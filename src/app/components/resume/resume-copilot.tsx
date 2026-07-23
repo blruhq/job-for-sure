@@ -75,7 +75,7 @@ export function ResumeCopilot({ resume }: { resume: Resume }) {
               <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-sm bg-primary text-[11px] font-bold text-primary-foreground">AI</div>
               <div className="flex-1 pt-0.5">
                 <div className="mb-0.5 text-xs font-semibold">Co-Pilot</div>
-                <div className="rounded-md border border-border bg-card px-3.5 py-2.5 text-xs leading-relaxed text-muted-foreground">
+                <div className="rounded-md neuro-card px-3.5 py-2.5 text-xs leading-relaxed text-muted-foreground">
                   Hey! I'm your AI Resume Co-pilot. I can rewrite sections, add keywords, generate bullet points, or tailor your resume for specific companies.
                 </div>
               </div>
@@ -114,7 +114,7 @@ export function ResumeCopilot({ resume }: { resume: Resume }) {
             {msg.role === 'assistant' && (
               <div className="flex max-w-[85%] flex-col pt-0.5">
                 <div className="mb-0.5 text-xs font-semibold">Co-Pilot</div>
-                <div className="rounded-md border border-border bg-card px-3.5 py-2.5 text-xs leading-relaxed prose prose-sm max-w-none">
+                <div className="rounded-md neuro-card px-3.5 py-2.5 text-xs leading-relaxed prose prose-sm max-w-none">
                   {msg.parts.map((part, i) => {
                     if (part.type === 'text') return <MarkdownLite key={i} text={part.text} />
                     return null
@@ -146,7 +146,7 @@ export function ResumeCopilot({ resume }: { resume: Resume }) {
       </div>
 
       {/* Input */}
-      <div className="flex shrink-0 items-center gap-1.5 border-t border-border/50 bg-card p-2.5">
+      <div className="flex shrink-0 items-center gap-1.5 border-t border-border/50 neuro-surface p-2.5">
         <Input
           placeholder="Ask co-pilot to rewrite…"
           className="flex-1 px-2.5 py-1.5 text-[11px]"

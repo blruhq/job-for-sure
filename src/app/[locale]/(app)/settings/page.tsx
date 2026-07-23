@@ -37,7 +37,7 @@ function Toast({ notif, onClose }: { notif: NonNullable<ReturnType<typeof useNot
           ? 'border-emerald-500/30 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400'
           : notif.type === 'error'
             ? 'border-red-500/30 bg-red-500/10 text-red-600 dark:text-red-400'
-            : 'border-border bg-card text-foreground'
+            : 'neuro-surface text-foreground'
       }`}
     >
       {notif.type === 'success' && <Check size={13} />}
@@ -312,7 +312,7 @@ export default function SettingsPage() {
         {tab === 'profile' && (
           <div className="space-y-5">
             {/* Name */}
-            <div className="rounded-sm border border-border bg-card p-4">
+            <div className="rounded-sm neuro-card p-4">
               <div className="mb-3 text-xs font-medium">Display Name</div>
               <div className="flex gap-2">
                 <Input
@@ -333,7 +333,7 @@ export default function SettingsPage() {
             </div>
 
             {/* Email */}
-            <div className="rounded-sm border border-border bg-card p-4">
+            <div className="rounded-sm neuro-card p-4">
               <div className="mb-3 text-xs font-medium">Email Address</div>
               <div className="flex gap-2">
                 <Input
@@ -360,7 +360,7 @@ export default function SettingsPage() {
             </div>
 
             {/* My Area */}
-            <div className="rounded-sm border border-border bg-card p-4">
+            <div className="rounded-sm neuro-card p-4">
               <div className="mb-1 text-xs font-medium">My Area</div>
               <p className="mb-3 text-[10px] text-muted-foreground">
                 District or neighborhood is enough — we use this for commute
@@ -395,7 +395,7 @@ export default function SettingsPage() {
             </div>
 
             {/* Change Password */}
-            <div className="rounded-sm border border-border bg-card p-4">
+            <div className="rounded-sm neuro-card p-4">
               <div className="mb-3 text-xs font-medium">Change Password</div>
               <div className="space-y-2.5">
                 <div className="relative">
@@ -453,7 +453,7 @@ export default function SettingsPage() {
             </div>
 
             {/* Account info (read-only) */}
-            <div className="rounded-sm border border-border bg-card px-4 py-3">
+            <div className="rounded-sm neuro-card px-4 py-3">
               <div className="flex justify-between text-[11px]">
                 <span className="text-muted-foreground">Account ID</span>
                 <span className="font-mono text-[10px]">{user?.id}</span>
@@ -461,7 +461,7 @@ export default function SettingsPage() {
             </div>
 
             {/* Theme */}
-            <div className="rounded-sm border border-border bg-card px-4 py-3">
+            <div className="rounded-sm neuro-card px-4 py-3">
               <div className="flex items-center justify-between">
                 <div>
                   <div className="text-xs font-medium">Theme</div>
@@ -483,7 +483,7 @@ export default function SettingsPage() {
 
         {/* ── NOTIFICATIONS TAB ── */}
         {tab === 'notifications' && (
-          <div className="rounded-sm border border-border bg-card">
+          <div className="rounded-sm neuro-card">
             {[
               { key: 'emailNotifications' as keyof Prefs, label: 'Email Notifications', desc: 'Receive emails about resume views, interview invites, and job matches' },
               { key: 'weeklyDigest' as keyof Prefs, label: 'Weekly Digest', desc: 'Get a weekly summary of your application activity and new opportunities' },

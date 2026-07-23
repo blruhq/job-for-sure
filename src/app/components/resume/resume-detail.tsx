@@ -811,7 +811,7 @@ export function ResumeDetail({ resumeId }: { resumeId: string }) {
             <PlusCircle size={13} /> Add Section
           </Button>
           {showAddSectionPicker && (
-            <div className="absolute left-0 right-0 top-full z-10 mt-1 rounded-xs border border-border bg-card shadow-lg">
+            <div className="absolute left-0 right-0 top-full z-10 mt-1 rounded-xs neuro-card shadow-lg">
               {availableSections.map((s) => (
                 <Button
                   key={s}
@@ -1119,7 +1119,7 @@ export function ResumeDetail({ resumeId }: { resumeId: string }) {
   return (
     <div className="flex h-full flex-col">
       {/* Header with tabs */}
-      <div className="flex shrink-0 flex-col md:flex-row md:items-center justify-between gap-2 border-b border-border bg-card px-4 md:px-6 py-3">
+      <div className="flex shrink-0 flex-col md:flex-row md:items-center justify-between gap-2 border-b border-border neuro-surface px-4 md:px-6 py-3">
         <div className="flex items-center gap-2 overflow-x-auto min-w-0 max-w-full">
           <Button variant="outline" size="sm" onClick={() => router.push('/chat')} className="flex shrink-0 items-center gap-1 rounded-sm px-2 py-1 text-[11px]">
             <ArrowLeft size={12} /> Back
@@ -1135,7 +1135,7 @@ export function ResumeDetail({ resumeId }: { resumeId: string }) {
                 }}
                 className={cn(
                   'shrink-0 rounded-xs px-3 py-1 text-[11px] font-medium transition-all',
-                  tab === t ? 'bg-card text-foreground shadow-sm font-semibold' : 'text-muted-foreground',
+                  tab === t ? 'neuro-card text-foreground font-semibold' : 'text-muted-foreground',
                 )}
               >
                 {t === 'jobs' ? 'Find Jobs' : t === 'view' ? 'View Resume' : 'Resume Editor'}
@@ -1163,7 +1163,7 @@ export function ResumeDetail({ resumeId }: { resumeId: string }) {
         {tab === 'view' && (
           <div className="flex w-full flex-col overflow-hidden">
             {/* Template gallery bar */}
-            <div className="shrink-0 border-b border-border bg-card p-3">
+            <div className="shrink-0 border-b border-border neuro-surface p-3">
               <div className="mx-auto max-w-[794px]">
                 <div className="flex items-center justify-between">
                   <Button variant="outline" size="sm" onClick={() => setGalleryOpen(!galleryOpen)} className="flex items-center gap-1.5 rounded-sm px-2.5 py-1 text-[11px] font-semibold">
@@ -1234,7 +1234,7 @@ export function ResumeDetail({ resumeId }: { resumeId: string }) {
         {tab === 'editor' && !isReviewMode && (
           <>
             {/* Mobile tab toggle */}
-            <div className="flex shrink-0 border-b border-border bg-card lg:hidden">
+            <div className="flex shrink-0 border-b border-border neuro-surface lg:hidden">
               <Button
                 variant="ghost"
                 onClick={() => setMobileView('edit')}
@@ -1258,7 +1258,7 @@ export function ResumeDetail({ resumeId }: { resumeId: string }) {
                 <ResizablePanel defaultSize="55%" minSize="30%" maxSize="80%">
                   <div className="flex h-full flex-col gap-3 overflow-y-auto p-4 md:p-6">
                     {/* Toolbar */}
-                    <div className="flex items-center justify-between rounded-sm border border-border bg-card p-2 px-3 shrink-0">
+                    <div className="flex items-center justify-between rounded-sm neuro-card p-2 px-3 shrink-0">
                       <div className="flex gap-2">
                         {/* Save status indicator */}
                         <div className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
@@ -1328,7 +1328,7 @@ export function ResumeDetail({ resumeId }: { resumeId: string }) {
               {mobileView === 'edit' && (
                 <div className="flex flex-col gap-3 p-4">
                   {/* Toolbar — simplified for mobile */}
-                  <div className="flex items-center justify-between rounded-sm border border-border bg-card p-2 px-3 shrink-0">
+                  <div className="flex items-center justify-between rounded-sm neuro-card p-2 px-3 shrink-0">
                     <div className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
                       {saveStatus === 'saving' && <span>Saving…</span>}
                       {saveStatus === 'saved' && <span className="text-green-600">Saved</span>}
@@ -1364,9 +1364,9 @@ export function ResumeDetail({ resumeId }: { resumeId: string }) {
             />
             {/* Drawer */}
             <div className="fixed right-0 top-0 z-50 h-full w-full max-w-[380px] shadow-2xl animate-in slide-in-from-right duration-200">
-              <div className="relative flex h-full flex-col bg-card">
+              <div className="relative flex h-full flex-col neuro-surface">
                 {/* Drawer header with close */}
-                <div className="flex shrink-0 items-center justify-between border-b border-border bg-card px-4 py-2.5">
+                <div className="flex shrink-0 items-center justify-between border-b border-border neuro-surface px-4 py-2.5">
                   <div className="flex items-center gap-2">
                     <div className="flex h-6 w-6 items-center justify-center rounded-sm bg-primary text-[10px] font-bold text-primary-foreground">AI</div>
                     <span className="text-xs font-semibold">AI Co-Pilot</span>

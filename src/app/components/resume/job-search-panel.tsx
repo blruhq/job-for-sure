@@ -516,7 +516,7 @@ export function JobSearchPanel({ resume }: { resume: Resume }) {
   return (
     <div className="flex w-full flex-col">
       {/* Search bar */}
-      <div className="shrink-0 border-b border-border bg-card px-4 md:px-6 py-3">
+      <div className="shrink-0 border-b border-border neuro-surface px-4 md:px-6 py-3">
         <div className="flex flex-wrap items-center gap-2">
           <RoleAutocomplete
             value={query}
@@ -684,7 +684,7 @@ export function JobSearchPanel({ resume }: { resume: Resume }) {
               Searching 13 sources…
             </div>
             {Array.from({ length: 8 }).map((_, i) => (
-              <div key={i} className="rounded-sm border border-border bg-card p-4 animate-pulse">
+              <div key={i} className="rounded-sm neuro-card p-4 animate-pulse">
                 <div className="flex items-start justify-between gap-2">
                   <div className="flex-1 space-y-1.5">
                     <div className="h-3.5 w-2/3 rounded-xs bg-muted" />
@@ -835,7 +835,7 @@ function JobCard({ job, bookmarked, onBookmark, onAts: _onAts, onInterview: _onI
   void _onInterview
   return (
     <div
-      className="cursor-pointer rounded-sm border border-border bg-card p-4 transition-colors hover:border-primary"
+      className="cursor-pointer rounded-sm neuro-card p-4 transition-colors hover:border-primary"
       onClick={onClick}
     >
       <div className="mb-0.5 flex items-start justify-between gap-2">

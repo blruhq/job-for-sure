@@ -21,7 +21,7 @@ function ResetPasswordForm() {
   // Token invalid or expired — show error state
   if (hasError || !token) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-background px-6">
+      <div className="flex min-h-screen items-center justify-center neuro-surface px-6">
         <div className="w-full max-w-sm">
           <div className="mb-6 text-center">
             <Link href="/" className="inline-flex cursor-pointer items-center gap-2 no-underline">
@@ -29,7 +29,7 @@ function ResetPasswordForm() {
               <span className="text-sm font-semibold tracking-tight text-foreground">JOB FOR SURE</span>
             </Link>
           </div>
-          <div className="rounded-lg border border-border bg-card p-8 shadow-sm text-center">
+            <div className="rounded-lg neuro-card p-8 text-center">
             <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-destructive/10">
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-destructive">
                 <circle cx="12" cy="12" r="10" />
@@ -88,7 +88,7 @@ function ResetPasswordForm() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background px-6">
+    <div className="flex min-h-screen items-center justify-center neuro-surface px-6">
       <div className="w-full max-w-sm">
         {/* Logo */}
         <div className="mb-6 text-center">
@@ -98,7 +98,7 @@ function ResetPasswordForm() {
           </Link>
         </div>
 
-        <div className="rounded-lg border border-border bg-card p-8 shadow-sm">
+        <div className="rounded-lg neuro-card p-8">
           <div className="text-center">
             <h1
               className="text-2xl text-foreground"
@@ -172,7 +172,7 @@ function ResetPasswordForm() {
 export default function ResetPasswordPage() {
   return (
     <Suspense fallback={
-      <div className="flex min-h-screen items-center justify-center bg-background">
+      <div className="flex min-h-screen items-center justify-center neuro-surface">
         <div className="h-1.5 w-1.5 animate-pulse rounded-full bg-primary" />
       </div>
     }>

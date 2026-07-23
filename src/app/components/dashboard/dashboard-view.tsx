@@ -75,7 +75,7 @@ export function DashboardView() {
   // Loading State
   if (resumesLoading) {
     return (
-      <div className="flex-1 overflow-y-auto p-6 bg-background">
+      <div className="flex-1 overflow-y-auto p-6 neuro-surface">
         <div className="mx-auto max-w-[900px] space-y-6">
           <div className="flex items-center justify-between">
             <div className="space-y-2">
@@ -102,7 +102,7 @@ export function DashboardView() {
   // Empty State
   if (resumeCount === 0) {
     return (
-      <div className="flex h-full w-full flex-col items-center justify-center p-6 text-center bg-background">
+      <div className="flex h-full w-full flex-col items-center justify-center p-6 text-center neuro-surface">
         <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-lg bg-accent-soft text-primary">
           <FileText size={24} />
         </div>
@@ -123,7 +123,7 @@ export function DashboardView() {
 
   // Main Dashboard State
   return (
-    <div className="flex-1 overflow-y-auto p-6 bg-background">
+    <div className="flex-1 overflow-y-auto p-6 neuro-surface">
       <div className="mx-auto max-w-[900px]">
         {/* Section A: Header */}
         <div className="mb-6 flex items-center justify-between">
@@ -147,7 +147,7 @@ export function DashboardView() {
           {/* Card 1: Resumes */}
           <Link
             href={`/resume/${topResumes[0].id}`}
-            className="rounded-sm border border-border bg-card p-4 transition-colors hover:border-primary flex flex-col justify-between h-24"
+            className="rounded-sm neuro-card p-4 transition-colors hover:border-primary flex flex-col justify-between h-24"
           >
             <div className="flex justify-between items-start">
               <span className="text-[10px] font-mono uppercase text-muted-foreground tracking-wider">{t('resumes')}</span>
@@ -164,7 +164,7 @@ export function DashboardView() {
           {/* Card 2: Applications */}
           <Link
             href="/applications"
-            className="rounded-sm border border-border bg-card p-4 transition-colors hover:border-primary flex flex-col justify-between h-24"
+            className="rounded-sm neuro-card p-4 transition-colors hover:border-primary flex flex-col justify-between h-24"
           >
             <div className="flex justify-between items-start">
               <span className="text-[10px] font-mono uppercase text-muted-foreground tracking-wider">{t('applications')}</span>
@@ -181,7 +181,7 @@ export function DashboardView() {
           {/* Card 3: Interview */}
           <Link
             href="/interview"
-            className="rounded-sm border border-border bg-card p-4 transition-colors hover:border-primary flex flex-col justify-between h-24"
+            className="rounded-sm neuro-card p-4 transition-colors hover:border-primary flex flex-col justify-between h-24"
           >
             <div className="flex justify-between items-start">
               <span className="text-[10px] font-mono uppercase text-muted-foreground tracking-wider">{t('interview')}</span>
@@ -205,7 +205,7 @@ export function DashboardView() {
           {/* Card 4: Cover Letters */}
           <Link
             href={coverLetters.length > 0 ? `/cover-letter` : '/chat'}
-            className="rounded-sm border border-border bg-card p-4 transition-colors hover:border-primary flex flex-col justify-between h-24"
+            className="rounded-sm neuro-card p-4 transition-colors hover:border-primary flex flex-col justify-between h-24"
           >
             <div className="flex justify-between items-start">
               <span className="text-[10px] font-mono uppercase text-muted-foreground tracking-wider">{t('letters')}</span>
@@ -223,14 +223,14 @@ export function DashboardView() {
         {/* Section C: Two-column Panel (Top Resumes + Pipeline Snapshot) */}
         <div className="mb-5 grid grid-cols-1 lg:grid-cols-2 gap-4">
           {/* Left card: Top Resumes */}
-          <div className="rounded-sm border border-border bg-card p-4">
+          <div className="rounded-sm neuro-card p-4">
             <div className="label-mono mb-3 text-foreground font-semibold">{t('topResumes')}</div>
             <div className="space-y-2">
               {topResumes.map((r) => (
                 <Link
                   key={r.id}
                   href={`/resume/${r.id}`}
-                  className="flex items-center gap-2.5 rounded-sm px-2 py-1.5 hover:bg-background transition-colors"
+                  className="flex items-center gap-2.5 rounded-sm px-2 py-1.5 hover:neuro-surface transition-colors"
                 >
                   <span
                     className={cn(
@@ -246,7 +246,7 @@ export function DashboardView() {
           </div>
 
           {/* Right card: Applications Snapshot */}
-          <div className="rounded-sm border border-border bg-card p-4">
+          <div className="rounded-sm neuro-card p-4">
             <div className="label-mono mb-3 text-foreground font-semibold">{t('applications')}</div>
             <div className="space-y-2">
               {[
@@ -258,7 +258,7 @@ export function DashboardView() {
                 <Link
                   key={stage.label}
                   href="/applications"
-                  className="flex items-center gap-2.5 rounded-sm px-2 py-1.5 hover:bg-background transition-colors"
+                  className="flex items-center gap-2.5 rounded-sm px-2 py-1.5 hover:neuro-surface transition-colors"
                 >
                   <span className={cn('h-2 w-2 shrink-0 rounded-full', stage.color)} />
                   <span className="flex-1 text-xs font-medium text-foreground">{stage.label}</span>
@@ -273,7 +273,7 @@ export function DashboardView() {
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
           <Link
             href="/chat"
-            className="flex flex-col items-center gap-2 rounded-sm border border-border bg-card p-4 text-center transition-colors hover:border-primary"
+            className="flex flex-col items-center gap-2 rounded-sm neuro-card p-4 text-center transition-colors hover:border-primary"
           >
             <MessageSquare size={18} className="text-primary" />
             <span className="text-xs font-medium text-foreground">{t('chatWithCoach')}</span>
@@ -281,7 +281,7 @@ export function DashboardView() {
 
           <Link
             href="/interview"
-            className="flex flex-col items-center gap-2 rounded-sm border border-border bg-card p-4 text-center transition-colors hover:border-primary"
+            className="flex flex-col items-center gap-2 rounded-sm neuro-card p-4 text-center transition-colors hover:border-primary"
           >
             <Brain size={18} className="text-primary" />
             <span className="text-xs font-medium text-foreground">{t('practiceInterview')}</span>
@@ -289,7 +289,7 @@ export function DashboardView() {
 
           <Link
             href="/ats"
-            className="flex flex-col items-center gap-2 rounded-sm border border-border bg-card p-4 text-center transition-colors hover:border-primary"
+            className="flex flex-col items-center gap-2 rounded-sm neuro-card p-4 text-center transition-colors hover:border-primary"
           >
             <CheckSquare size={18} className="text-primary" />
             <span className="text-xs font-medium text-foreground">{t('atsOptimizer')}</span>
@@ -297,7 +297,7 @@ export function DashboardView() {
 
           <Link
             href="/applications"
-            className="flex flex-col items-center gap-2 rounded-sm border border-border bg-card p-4 text-center transition-colors hover:border-primary"
+            className="flex flex-col items-center gap-2 rounded-sm neuro-card p-4 text-center transition-colors hover:border-primary"
           >
             <KanbanSquare size={18} className="text-primary" />
             <span className="text-xs font-medium text-foreground">{t('viewApplications')}</span>

@@ -112,7 +112,7 @@ export function SmartOverview(props: SmartOverviewProps) {
   // ── STATE 1: Not generated yet ──
   if (state === 'idle' && !overview) {
     return (
-      <div className="rounded-lg border border-border bg-card p-4">
+      <div className="rounded-lg neuro-card p-4">
         <Button
           variant="default"
           onClick={generate}
@@ -131,7 +131,7 @@ export function SmartOverview(props: SmartOverviewProps) {
   // ── STATE 2: Loading ──
   if (state === 'loading') {
     return (
-      <div className="rounded-lg border border-border bg-card p-4">
+      <div className="rounded-lg neuro-card p-4">
         <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
           <Loader2 size={16} className="animate-spin" />
           Generating your overview...

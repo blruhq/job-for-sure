@@ -14,6 +14,7 @@ const buttonVariants = cva(
         secondary: "bg-muted text-foreground hover:bg-muted/80",
         ghost: "hover:bg-accent-soft hover:text-foreground",
         link: "text-primary underline-offset-4 hover:underline",
+        neumorphic: "neuro-pill text-foreground border-transparent",
       },
       size: {
         default: "h-10 px-4 py-2",

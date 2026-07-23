@@ -38,7 +38,7 @@ export default function ForgotPasswordPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background px-6">
+    <div className="flex min-h-screen items-center justify-center neuro-surface px-6">
       <div className="w-full max-w-sm">
         {/* Logo */}
         <div className="mb-6 text-center">
@@ -48,7 +48,7 @@ export default function ForgotPasswordPage() {
           </Link>
         </div>
 
-        <div className="rounded-lg border border-border bg-card p-8 shadow-sm">
+        <div className="rounded-lg neuro-card p-8">
           {sent ? (
             <div className="text-center">
               <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">

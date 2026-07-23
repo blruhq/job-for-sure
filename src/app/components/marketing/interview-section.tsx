@@ -67,7 +67,7 @@ export function InterviewSection() {
 
           {/* ── Right: Mockup ── */}
           <div className="relative w-full max-w-lg justify-self-end">
-            <div className="relative overflow-hidden rounded-2xl border border-border bg-card shadow-paper">
+            <div className="relative overflow-hidden rounded-2xl neuro-card">
               {/* Window chrome */}
               <div className="flex items-center gap-1.5 border-b border-border px-4 py-2.5">
                 <span className="h-2.5 w-2.5 rounded-full bg-[#FF5F57]" />
@@ -114,7 +114,7 @@ export function InterviewSection() {
                 </div>
 
                 {/* AI feedback card */}
-                <div className="animate-fade-up rounded-lg border border-border bg-card p-4 [animation-delay:800ms] [animation-fill-mode:backwards]">
+                <div className="animate-fade-up rounded-lg neuro-card p-4 [animation-delay:800ms] [animation-fill-mode:backwards]">
                   <div className="flex items-center justify-between border-b border-border pb-3">
                     <div className="flex items-center gap-1.5">
                       <Sparkles size={14} className="text-primary" />

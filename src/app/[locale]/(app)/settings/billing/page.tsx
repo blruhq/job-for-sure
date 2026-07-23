@@ -105,7 +105,7 @@ export default function BillingPage() {
       </div>
 
       {/* Current plan card */}
-      <div className="rounded-lg border border-border bg-card p-5">
+      <div className="rounded-lg neuro-card p-5">
         <div className="flex items-center justify-between">
           <div>
             <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Current Plan</p>
@@ -165,7 +165,7 @@ export default function BillingPage() {
 
       {/* Usage breakdown */}
       {!isPro && data?.usage && (
-        <div className="rounded-lg border border-border bg-card p-5">
+        <div className="rounded-lg neuro-card p-5">
           <h2 className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
             Usage this period
           </h2>

@@ -9,7 +9,7 @@ export const metadata: Metadata = {
 
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="relative min-h-screen bg-background">
+    <div className="relative min-h-screen neuro-surface">
       <header className="absolute left-0 right-0 top-0 z-50 flex h-14 items-center px-6">
         <Link
           href="/"

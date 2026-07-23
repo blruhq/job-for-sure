@@ -244,7 +244,7 @@ export default function StandaloneCoverLetterPage() {
   }
 
   return (
-    <div className="flex h-full w-full flex-col lg:flex-row overflow-hidden bg-background">
+    <div className="flex h-full w-full flex-col lg:flex-row overflow-hidden neuro-surface">
       {/* Hidden file input */}
       <input
         ref={fileInputRef}
@@ -255,7 +255,7 @@ export default function StandaloneCoverLetterPage() {
       />
 
       {/* Configuration Column */}
-      <div className="w-full lg:w-[350px] shrink-0 border-b lg:border-b-0 lg:border-r border-border bg-card p-5 flex flex-col gap-4 overflow-y-auto justify-between">
+      <div className="w-full lg:w-[350px] shrink-0 border-b lg:border-b-0 lg:border-r border-border neuro-surface p-5 flex flex-col gap-4 overflow-y-auto justify-between">
         <div className="space-y-4">
           <div className="text-center pb-2 border-b border-border/50">
             <h1 className="text-sm font-semibold tracking-tight text-foreground">{t('generatorTitle')}</h1>
@@ -301,11 +301,11 @@ export default function StandaloneCoverLetterPage() {
           {/* 2. Generation Mode Selector */}
           <div className="space-y-2 pt-2 border-t border-border/50">
             <label className="label-mono block">{t('detailsMode')}</label>
-            <div className="flex gap-1.5 rounded-sm bg-border/30 p-0.5 shrink-0">
+            <div className="flex gap-1.5 rounded-sm neuro-inset p-0.5 shrink-0">
               <button
                 onClick={() => setMode('quick')}
                 className={`flex-1 rounded-xs py-1 text-[10px] font-semibold transition-all cursor-pointer text-center ${
-                  mode === 'quick' ? 'bg-card text-foreground shadow-sm font-semibold' : 'text-muted-foreground hover:text-foreground'
+                  mode === 'quick' ? 'neuro-card text-foreground font-semibold' : 'text-muted-foreground hover:text-foreground'
                 }`}
               >
                 {t('quickFields')}
@@ -313,7 +313,7 @@ export default function StandaloneCoverLetterPage() {
               <button
                 onClick={() => setMode('jd')}
                 className={`flex-1 rounded-xs py-1 text-[10px] font-semibold transition-all cursor-pointer text-center ${
-                  mode === 'jd' ? 'bg-card text-foreground shadow-sm font-semibold' : 'text-muted-foreground hover:text-foreground'
+                  mode === 'jd' ? 'neuro-card text-foreground font-semibold' : 'text-muted-foreground hover:text-foreground'
                 }`}
               >
                 {t('fullJobDescription')}
@@ -324,11 +324,11 @@ export default function StandaloneCoverLetterPage() {
           {/* 2.5 Language Selector */}
           <div className="space-y-2 pt-2 border-t border-border/50">
             <label className="label-mono block">{t('outputLanguage')}</label>
-            <div className="flex gap-1.5 rounded-sm bg-border/30 p-0.5 shrink-0">
+            <div className="flex gap-1.5 rounded-sm neuro-inset p-0.5 shrink-0">
               <button
                 onClick={() => setOutputLanguage('en')}
                 className={`flex-1 rounded-xs py-1 text-[10px] font-semibold transition-all cursor-pointer text-center ${
-                  outputLanguage === 'en' ? 'bg-card text-foreground shadow-sm font-semibold' : 'text-muted-foreground hover:text-foreground'
+                  outputLanguage === 'en' ? 'neuro-card text-foreground font-semibold' : 'text-muted-foreground hover:text-foreground'
                 }`}
               >
                 English
@@ -336,7 +336,7 @@ export default function StandaloneCoverLetterPage() {
               <button
                 onClick={() => setOutputLanguage('th')}
                 className={`flex-1 rounded-xs py-1 text-[10px] font-semibold transition-all cursor-pointer text-center ${
-                  outputLanguage === 'th' ? 'bg-card text-foreground shadow-sm font-semibold' : 'text-muted-foreground hover:text-foreground'
+                  outputLanguage === 'th' ? 'neuro-card text-foreground font-semibold' : 'text-muted-foreground hover:text-foreground'
                 }`}
               >
                 ภาษาไทย
@@ -456,9 +456,9 @@ export default function StandaloneCoverLetterPage() {
       </div>
 
       {/* Document Preview Panel */}
-      <div className="flex-1 flex flex-col overflow-hidden bg-background">
+      <div className="flex-1 flex flex-col overflow-hidden neuro-surface">
         {/* Actions bar */}
-        <div className="flex shrink-0 items-center justify-between border-b border-border bg-card px-4 md:px-6 py-2.5">
+        <div className="flex shrink-0 items-center justify-between border-b border-border neuro-surface px-4 md:px-6 py-2.5">
           <div className="flex items-center gap-2">
             <span className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">Document Preview</span>
           </div>
@@ -496,7 +496,7 @@ export default function StandaloneCoverLetterPage() {
         <div className="flex-1 overflow-y-auto p-6 md:p-8 flex justify-center items-start">
           {letterText ? (
             <div
-              className="resume-paper w-full max-w-[650px] min-h-[800px] rounded-xs p-10 bg-card border border-border flex flex-col shadow-sm animate-fade-up"
+              className="resume-paper w-full max-w-[650px] min-h-[800px] rounded-xs p-10 neuro-card flex flex-col animate-fade-up"
               style={{ boxShadow: 'var(--shadow-paper)' }}
             >
               {/* Header layout matching PDF/Resume style */}
@@ -520,7 +520,7 @@ export default function StandaloneCoverLetterPage() {
             </div>
           ) : (
             <div className="flex flex-col items-center justify-center py-20 text-center max-w-sm">
-              <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-xl border border-border bg-card text-muted-foreground/40">
+              <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-xl neuro-icon-well text-muted-foreground/40">
                 <FileText size={24} />
               </div>
               <h3 className="mb-1 text-sm font-semibold text-foreground">No Cover Letter Generated</h3>

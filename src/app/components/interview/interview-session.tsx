@@ -314,9 +314,9 @@ export function InterviewSession({ config, resume, onEnd }: InterviewSessionProp
   const isLastQuestion = config.maxQuestions > 0 && exchanges.length + 1 >= config.maxQuestions
 
   return (
-    <div className="flex h-full w-full flex-col bg-background">
+    <div className="flex h-full w-full flex-col neuro-surface">
       {/* Header bar */}
-      <div className="flex items-center justify-between border-b border-border bg-card px-4 md:px-6 py-3.5 shrink-0">
+      <div className="flex items-center justify-between border-b border-border neuro-surface px-4 md:px-6 py-3.5 shrink-0">
         <div className="flex items-center gap-2">
           <div className="rounded bg-primary/10 p-1 text-primary">
             <Brain size={16} />
@@ -361,7 +361,7 @@ export function InterviewSession({ config, resume, onEnd }: InterviewSessionProp
               </div>
 
               {/* Historical Question Card */}
-              <div className="rounded-lg border border-border bg-card p-4">
+              <div className="rounded-lg neuro-card p-4">
                 <div className="flex items-center gap-2 mb-2">
                   <div className="flex h-5 w-5 items-center justify-center rounded bg-primary/10 text-primary">
                     <Brain size={12} />
@@ -389,7 +389,7 @@ export function InterviewSession({ config, resume, onEnd }: InterviewSessionProp
               </div>
 
               {/* Historical Feedback Card */}
-              <div className="rounded-lg border border-border bg-card p-4 ml-6 mr-6">
+              <div className="rounded-lg neuro-card p-4 ml-6 mr-6">
                 <div className="flex items-center justify-between border-b border-border pb-3 mb-3">
                   <div className="flex items-center gap-1.5">
                     <Sparkles size={14} className="text-primary" />
@@ -438,7 +438,7 @@ export function InterviewSession({ config, resume, onEnd }: InterviewSessionProp
           {loading === 'question' && (
             <div className="space-y-3 animate-pulse">
               <Skeleton className="h-4 w-20" />
-              <div className="rounded-lg border border-border bg-card p-5 space-y-3">
+              <div className="rounded-lg neuro-card p-5 space-y-3">
                 <div className="flex gap-2">
                   <Skeleton className="h-5 w-5 rounded" />
                   <Skeleton className="h-4 w-12" />
@@ -476,7 +476,7 @@ export function InterviewSession({ config, resume, onEnd }: InterviewSessionProp
               </div>
 
               {/* Question Card */}
-              <div className="rounded-lg border border-border bg-card p-4">
+              <div className="rounded-lg neuro-card p-4">
                 <div className="flex items-center gap-2 mb-2">
                   <div className="flex h-5 w-5 items-center justify-center rounded bg-primary/10 text-primary">
                     <Brain size={12} />
@@ -586,7 +586,7 @@ export function InterviewSession({ config, resume, onEnd }: InterviewSessionProp
                   </div>
 
                   {/* Feedback Card */}
-                  <div className="rounded-lg border border-border bg-card p-4 ml-6 mr-6">
+                  <div className="rounded-lg neuro-card p-4 ml-6 mr-6">
                     <div className="flex items-center justify-between border-b border-border pb-3 mb-3">
                       <div className="flex items-center gap-1.5">
                         <Sparkles size={14} className="text-primary" />

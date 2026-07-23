@@ -66,7 +66,7 @@ function LoginForm() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background px-6">
+    <div className="flex min-h-screen items-center justify-center neuro-surface px-6">
       <div className="w-full max-w-sm">
         {/* Logo */}
         <div className="mb-6 text-center">
@@ -76,7 +76,7 @@ function LoginForm() {
           </Link>
         </div>
 
-        <div className="rounded-lg border border-border bg-card p-8 shadow-sm">
+        <div className="rounded-lg neuro-card p-8">
           <div className="text-center">
             <h1
               className="text-2xl text-foreground"
@@ -151,7 +151,7 @@ function LoginForm() {
               <div className="w-full border-t border-border" />
             </div>
             <div className="relative flex justify-center">
-              <span className="bg-card px-2 text-[10px] text-muted-foreground">or</span>
+              <span className="neuro-surface px-2 text-[10px] text-muted-foreground">or</span>
             </div>
           </div>
 
@@ -192,7 +192,7 @@ function LoginForm() {
 export default function LoginPage() {
   return (
     <Suspense fallback={
-      <div className="flex min-h-screen items-center justify-center bg-background">
+      <div className="flex min-h-screen items-center justify-center neuro-surface">
         <div className="h-1.5 w-1.5 animate-pulse rounded-full bg-primary" />
       </div>
     }>

@@ -20,7 +20,7 @@ export function MarketingNav() {
   ]
 
   return (
-    <header className="sticky top-0 z-50 h-14 border-b border-border bg-background/80 backdrop-blur-md">
+    <header className="sticky top-0 z-50 h-14 border-b border-border neuro-surface">
       <div className="mx-auto flex h-full max-w-[1120px] items-center justify-between px-6">
         {/* Brand */}
         <Link href="/" className="flex cursor-pointer items-center gap-2 no-underline">
@@ -83,7 +83,7 @@ export function MarketingNav() {
 
       {/* Mobile dropdown */}
       {open && (
-        <div className="border-t border-border bg-background md:hidden">
+        <div className="border-t border-border neuro-surface md:hidden">
           <div className="flex flex-col gap-0 px-6 py-3">
             {links.map((link) =>
               link.scroll ? (
