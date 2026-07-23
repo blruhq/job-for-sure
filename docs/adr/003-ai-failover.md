@@ -9,7 +9,7 @@
 1. **Primary**: DeepSeek Official (`api.deepseek.com`) — cheapest with cache discount
 2. **Fallback**: DeepInfra (`api.deepinfra.com`) — fast bare-metal inference backup
 
-The `generateTextWithFailover()`, `generateObjectWithFailover()`, and `streamWithFailover()` wrappers in `app/lib/ai-providers.ts` handle retry logic transparently. All API route handlers and server components must use these wrappers instead of calling the AI SDK directly.
+The `generateTextWithFailover()`, `generateObjectWithFailover()`, and `streamWithFailover()` wrappers in `src/app/lib/ai-providers.ts` handle retry logic transparently. All API route handlers and server components must use these wrappers instead of calling the AI SDK directly.
 
 **DeepSeek-Specific Adaptations:**
 - The `createNoThinkingProvider()` wrapper disables DeepSeek's chain-of-thought (`thinking: { type: 'disabled' }`) for structured JSON responses — this prevents wasted tokens and makes temperature/top_p work correctly.
