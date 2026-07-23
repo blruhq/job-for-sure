@@ -74,7 +74,7 @@ export const ResumePreview = memo(function ResumePreview({ resume }: { resume: R
       if (debounceRef.current) clearTimeout(debounceRef.current)
       debounceRef.current = setTimeout(() => {
         if (thisGen === genRef.current) generatePreview(resume, thisGen)
-      }, 200)
+      }, 500)
     }
 
     return () => {

@@ -86,4 +86,4 @@ export const GET = withAuth(async (request, { user }) => {
       'Content-Disposition': `attachment; filename="${filename}"; filename*=UTF-8''${encodeURIComponent(filename)}`,
     },
   })
-}, { rateLimitType: 'general', route: '/api/export/pdf' })
+}, { rateLimitType: 'pdf', route: '/api/export/pdf' })
