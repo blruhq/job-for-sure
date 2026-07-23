@@ -402,85 +402,87 @@ textarea:focus-visible {
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   NEUMORPHISM / SOFT UI UTILITY CLASSES — WHITE EDITION
+   NEUMORPHISM / SOFT UI UTILITY CLASSES
    Light-mode only. Dark mode neutralizes back to flat shadows.
-   Surface: #F1F3F5 (barely-grey) · Cards: #FFFFFF (pure white)
+   Surface color: #E9ECEF (darker than --background #F8F9FA)
    ═══════════════════════════════════════════════════════════════ */
 
-/* Surface — barely-grey background so white cards pop */
+/* Surface — just the background color, no shadow */
 .neuro-surface {
-  background-color: #F1F3F5;
+  background-color: #E9ECEF;
 }
 
-/* Card — pure white, soft dual shadow (dark bottom + faint light top) */
+/* Card — raised/extruded dual shadow */
 .neuro-card {
-  background-color: #FFFFFF;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06), -2px -2px 8px rgba(255, 255, 255, 0.5);
+  background-color: #E9ECEF;
+  box-shadow: 6px 6px 12px rgba(0, 0, 0, 0.12), -6px -6px 12px rgba(255, 255, 255, 0.9);
 }
 .neuro-card:hover {
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08), -3px -3px 10px rgba(255, 255, 255, 0.6);
+  box-shadow: 8px 8px 16px rgba(0, 0, 0, 0.14), -8px -8px 16px rgba(255, 255, 255, 0.95);
 }
 
-/* Inset / pressed — white surface with subtle recess */
+/* Inset / pressed — recessed into surface */
 .neuro-inset {
-  background-color: #FFFFFF;
-  box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.06), inset 0 -1px 2px rgba(255, 255, 255, 0.5);
+  background-color: #E9ECEF;
+  box-shadow: inset 4px 4px 8px rgba(0, 0, 0, 0.10), inset -4px -4px 8px rgba(255, 255, 255, 0.9);
 }
 
-/* Icon well — small inset on white for pressed-icon feel */
+/* Icon well — smaller inset for icon containers */
 .neuro-icon-well {
-  background-color: #FFFFFF;
-  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05), inset 0 -1px 2px rgba(255, 255, 255, 0.5);
+  background-color: #E9ECEF;
+  box-shadow: inset 3px 3px 6px rgba(0, 0, 0, 0.10), inset -3px -3px 6px rgba(255, 255, 255, 0.9);
 }
 
-/* Pill / raised button — white with soft elevation, press on active */
+/* Pill / raised button — extruded with active press-down */
 .neuro-pill {
-  background-color: #FFFFFF;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06), -1px -1px 4px rgba(255, 255, 255, 0.5);
+  background-color: #E9ECEF;
+  box-shadow: 3px 3px 6px rgba(0, 0, 0, 0.12), -3px -3px 6px rgba(255, 255, 255, 0.9);
 }
 .neuro-pill:hover {
-  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08), -2px -2px 6px rgba(255, 255, 255, 0.6);
+  box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.14), -4px -4px 8px rgba(255, 255, 255, 0.95);
 }
 .neuro-pill:active {
-  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.06), inset 0 -1px 2px rgba(255, 255, 255, 0.5);
+  box-shadow: inset 2px 2px 4px rgba(0, 0, 0, 0.10), inset -2px -2px 4px rgba(255, 255, 255, 0.9);
 }
 
-/* Modal surface — white with large soft shadow */
+/* Modal surface — larger, softer shadow for dialog overlays */
 .neuro-modal {
-  background-color: #FFFFFF;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.10), -4px -4px 16px rgba(255, 255, 255, 0.5);
+  background-color: #E9ECEF;
+  box-shadow: 8px 8px 24px rgba(0, 0, 0, 0.15), -8px -8px 24px rgba(255, 255, 255, 0.9);
 }
 
-/* Title text — full contrast on white cards */
+/* Title text — softer than --foreground (#0F1115) for neumorphic context */
 .neuro-title {
-  color: var(--foreground);
+  color: #3A3F45;
 }
 
 /* ── Scoped overrides for agent-elements InputBar ── */
+/* The InputBar is from agent-elements and styled via CSS variables.
+   We scope overrides via .neuro-chat parent class. */
 .neuro-chat {
-  background-color: #F1F3F5;
-  --an-input-background: #FFFFFF;
+  background-color: #E9ECEF;
+  --an-input-background: #E9ECEF;
   --an-input-border-color: transparent;
   --an-input-border-radius: 16px;
   --an-border-radius: 16px;
   --an-message-border-radius: 16px;
-  --an-background: #F1F3F5;
+  --an-background: #E9ECEF;
 }
 
-/* Input bar container — pressed/recessed on white */
+/* Input bar container — pressed/recessed inset shadow */
 .neuro-chat .bg-an-input-background {
   border-color: transparent;
-  box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.06), inset 0 -1px 2px rgba(255, 255, 255, 0.5);
+  box-shadow: inset 4px 4px 8px rgba(0, 0, 0, 0.10), inset -4px -4px 8px rgba(255, 255, 255, 0.9);
 }
 
-/* Send button — raised white */
+/* Send button — extruded raised */
 .neuro-chat .bg-an-send-button-bg {
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06), -1px -1px 4px rgba(255, 255, 255, 0.5);
+  box-shadow: 3px 3px 6px rgba(0, 0, 0, 0.12), -3px -3px 6px rgba(255, 255, 255, 0.9);
 }
 
 /* Suggestions bar in InputBar — match surface */
 .neuro-chat .bg-an-background-secondary {
-  background-color: #F1F3F5;
+  background-color: #E9ECEF;
 }
 
 /* ── Dark mode: neutralize all neumorphic effects ── */
