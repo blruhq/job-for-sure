@@ -1,5 +1,6 @@
 'use client'
 
+import Image from 'next/image'
 import { PanelLeft, Sun, Moon, Globe, Search } from 'lucide-react'
 import { UserMenu } from '~/components/layout/user-menu'
 import { cn } from '~/lib/utils'
@@ -63,9 +64,14 @@ export function Topbar() {
         )}
       >
         <Link href="/chat" className="flex items-center gap-2">
-          {/* Always show the brand mark */}
-          <div className="h-3.5 w-3.5 shrink-0 rounded-[3px] bg-primary transition-transform duration-200 hover:scale-110" />
-          {/* Show text when expanded */}
+          <Image
+            src="/logo.png"
+            alt="Job For Sure"
+            width={sidebarCollapsed ? 20 : 24}
+            height={sidebarCollapsed ? 20 : 24}
+            className="shrink-0 transition-all duration-200"
+            priority
+          />
           {!sidebarCollapsed && (
             <span className="text-sm font-semibold tracking-[-0.02em]">JOB FOR SURE</span>
           )}
