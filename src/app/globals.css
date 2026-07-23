@@ -393,4 +393,12 @@ textarea:focus-visible {
   box-shadow: none !important;
 }
 
+/* ── Command palette: exempt from global focus-visible ring ── */
+[data-cmdk-root]:focus,
+[data-cmdk-root]:focus-visible,
+[cmdk-root]:focus,
+[cmdk-root]:focus-visible {
+  outline: none !important;
+}
+
 

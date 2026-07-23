@@ -73,10 +73,10 @@ export function CommandPalette() {
       {/* Palette */}
       <div className="fixed left-1/2 top-[20%] z-[200] w-full max-w-xl -translate-x-1/2">
         <Command
-          className="overflow-hidden rounded-lg border border-border bg-popover shadow-2xl"
+          className="overflow-hidden rounded-lg border border-border bg-popover shadow-2xl outline-none focus:outline-none focus:ring-0 focus:border-transparent"
           loop
         >
-          <div className="flex items-center border-b border-border px-3">
+          <div className="flex items-center border-b border-border px-3 outline-none">
             <Search size={14} className="shrink-0 text-muted-foreground mr-2" />
             <Command.Input
               className="flex-1 bg-transparent py-3 text-sm text-foreground outline-none placeholder:text-muted-foreground"
