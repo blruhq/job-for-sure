@@ -54,29 +54,29 @@
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   DESIGN TOKENS — Warm paper + steel blue
+   DESIGN TOKENS — Cool canvas + steel blue (Cloudflare/Greptile style)
    Inspired by demo, Mercor minimalism, Path.cv polish
    ═══════════════════════════════════════════════════════════════ */
 :root {
   /* ── shadcn semantic tokens ── */
-  --background: #F7F6F2;           /* warm paper */
-  --foreground: #1C1B16;           /* warm off-black */
+  --background: #F8F9FA;           /* cool canvas */
+  --foreground: #0F1115;           /* near-black */
   --card: #FFFFFF;                 /* clean white surface */
-  --card-foreground: #1C1B16;
+  --card-foreground: #0F1115;
   --popover: #FFFFFF;
-  --popover-foreground: #1C1B16;
+  --popover-foreground: #0F1115;
   --primary: #5B6ABF;              /* steel blue */
   --primary-foreground: #FFFFFF;
-  --secondary: #EFEEE9;            /* warm gray */
-  --secondary-foreground: #1C1B16;
-  --muted: #F0EFEA;                /* subtle warm divider bg */
-  --muted-foreground: #71706A;     /* warm secondary text */
-  --accent: rgba(91, 106, 191, 0.08); /* accent soft */
+  --secondary: #F1F3F5;            /* cool gray */
+  --secondary-foreground: #0F1115;
+  --muted: #F1F3F5;                /* subtle cool divider bg */
+  --muted-foreground: #646E7B;     /* cool secondary text */
+  --accent: rgba(91, 106, 191, 0.06); /* accent soft */
   --accent-foreground: #5B6ABF;
   --destructive: #DC2626;
   --destructive-foreground: #FFFFFF;
-  --border: #E6E5DF;               /* warm border */
-  --input: #E6E5DF;
+  --border: #E0E3E8;               /* cool border */
+  --input: #E0E3E8;
   --ring: #5B6ABF;
   --radius: 0.5rem;                /* 8px base radius */
 
@@ -88,21 +88,21 @@
   --chart-5: #9F9E98;
 
   /* ── Sidebar tokens ── */
-  --sidebar: #EFEEE9;
-  --sidebar-foreground: #1C1B16;
-  --sidebar-hover: #E8E7E1;
-  --sidebar-active: #D8D6CE;
-  --sidebar-border: #E6E5DF;
+  --sidebar: #F3F4F6;
+  --sidebar-foreground: #0F1115;
+  --sidebar-hover: #E9EBEF;
+  --sidebar-active: #DDE0E6;
+  --sidebar-border: #E0E3E8;
   --sidebar-accent: #5B6ABF;
 
   /* ── Extended palette ── */
-  --success: #2B5F45;
-  --success-soft: rgba(43, 95, 69, 0.08);
-  --warn: #D4A316;
+  --success: #1A8849;
+  --success-soft: rgba(26, 136, 73, 0.08);
+  --warn: #C68A03;
   --warn-soft: rgba(212, 163, 22, 0.08);
   --danger-soft: rgba(220, 38, 38, 0.08);
-  --accent-soft: rgba(91, 106, 191, 0.08);
-  --accent-blueprint: rgba(91, 106, 191, 0.06);
+  --accent-soft: rgba(91, 106, 191, 0.06);
+  --accent-blueprint: rgba(91, 106, 191, 0.04);
 
   /* ── Typography ── */
   --font-sans: var(--font-inter, 'Inter Variable'), 'Inter', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
@@ -135,10 +135,10 @@
   --ease: cubic-bezier(0.2, 0, 0, 1);
 
   /* ── Shadows ── */
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04);
-  --shadow-md: 0 1px 3px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.06);
-  --shadow-lg: 0 4px 12px rgba(0, 0, 0, 0.06), 0 2px 4px rgba(0, 0, 0, 0.04);
-  --shadow-paper: 0 8px 32px rgba(0, 0, 0, 0.06), 0 0 0 1px var(--border);
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.03);
+  --shadow-md: 0 1px 3px rgba(0, 0, 0, 0.04);
+  --shadow-lg: 0 2px 8px rgba(0, 0, 0, 0.06);
+  --shadow-paper: 0 0 0 1px var(--border);
 
   /* ── Agent Elements overrides (match our design system) ── */
   --an-border-radius: 6px;              /* enterprise, not 16px pills */
@@ -147,7 +147,7 @@
   --an-tool-border-radius: 6px;
   --an-message-radius-inner-offset: 2px;
   --an-max-width: 680px;                /* match our chat container */
-  --an-background: var(--background);   /* #F7F6F2 warm paper */
+  --an-background: var(--background);   /* #F8F9FA cool canvas */
   --an-background-secondary: var(--secondary);
   --an-background-tertiary: var(--muted);
   --an-foreground: var(--foreground);   /* #1C1B16 warm off-black */
@@ -178,25 +178,25 @@ html[lang="th"] {
 
 /* ── Dark mode ── */
 .dark {
-  --background: #131312;
-  --foreground: #EFEEE9;
-  --card: #1A1A18;
-  --card-foreground: #EFEEE9;
-  --popover: #1A1A18;
-  --popover-foreground: #EFEEE9;
-  --primary: #7B8AD8;
+  --background: #0D0E11;
+  --foreground: #E4E7EC;
+  --card: #16181D;
+  --card-foreground: #E4E7EC;
+  --popover: #16181D;
+  --popover-foreground: #E4E7EC;
+  --primary: #8B98E0;
   --primary-foreground: #FFFFFF;
-  --secondary: #1F1F1D;
-  --secondary-foreground: #EFEEE9;
-  --muted: #1F1F1D;
-  --muted-foreground: #A5A49D;
-  --accent: rgba(123, 138, 216, 0.12);
-  --accent-foreground: #7B8AD8;
+  --secondary: #1C1E24;
+  --secondary-foreground: #E4E7EC;
+  --muted: #1C1E24;
+  --muted-foreground: #9CA3B0;
+  --accent: rgba(139, 152, 224, 0.10);
+  --accent-foreground: #8B98E0;
   --destructive: #EF4444;
   --destructive-foreground: #FFFFFF;
   --border: rgba(255, 255, 255, 0.07);
   --input: rgba(255, 255, 255, 0.07);
-  --ring: #7B8AD8;
+  --ring: #8B98E0;
 
   --chart-1: #7B8AD8;
   --chart-2: #4ADE80;
@@ -204,47 +204,47 @@ html[lang="th"] {
   --chart-4: #EF4444;
   --chart-5: #7D7C76;
 
-  --sidebar: #161614;
-  --sidebar-foreground: #EFEEE9;
-  --sidebar-hover: #1F1F1D;
-  --sidebar-active: #2E2E2B;
+  --sidebar: #0F1014;
+  --sidebar-foreground: #E4E7EC;
+  --sidebar-hover: #1C1E24;
+  --sidebar-active: #262932;
   --sidebar-border: rgba(255, 255, 255, 0.07);
-  --sidebar-accent: #7B8AD8;
+  --sidebar-accent: #8B98E0;
 
   --success: #4ADE80;
   --success-soft: rgba(74, 222, 128, 0.10);
   --warn: #EAB308;
   --warn-soft: rgba(234, 179, 8, 0.10);
   --danger-soft: rgba(239, 68, 68, 0.10);
-  --accent-soft: rgba(123, 138, 216, 0.12);
-  --accent-blueprint: rgba(123, 138, 216, 0.08);
+  --accent-soft: rgba(139, 152, 224, 0.10);
+  --accent-blueprint: rgba(139, 152, 224, 0.06);
 
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.2);
-  --shadow-md: 0 1px 3px rgba(0, 0, 0, 0.3), 0 1px 2px rgba(0, 0, 0, 0.2);
-  --shadow-lg: 0 4px 12px rgba(0, 0, 0, 0.3), 0 2px 4px rgba(0, 0, 0, 0.2);
-  --shadow-paper: 0 8px 32px rgba(0, 0, 0, 0.3), 0 0 0 1px var(--border);
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 1px 3px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 2px 8px rgba(0, 0, 0, 0.4);
+  --shadow-paper: 0 0 0 1px var(--border);
 
   /* ── Agent Elements dark overrides ── */
-  --an-background: #131312;
-  --an-background-secondary: #1F1F1D;
-  --an-background-tertiary: #1A1A18;
-  --an-foreground: #EFEEE9;
-  --an-foreground-muted: #A5A49D;
+  --an-background: #0D0E11;
+  --an-background-secondary: #1C1E24;
+  --an-background-tertiary: #16181D;
+  --an-foreground: #E4E7EC;
+  --an-foreground-muted: #9CA3B0;
   --an-foreground-subtle: #7D7C76;
   --an-border-color: rgba(255, 255, 255, 0.07);
-  --an-primary-color: #7B8AD8;
-  --an-user-message-bg: rgba(123, 138, 216, 0.12);
-  --an-user-message-text: #EFEEE9;
-  --an-input-background: #1A1A18;
+  --an-primary-color: #8B98E0;
+  --an-user-message-bg: rgba(139, 152, 224, 0.10);
+  --an-user-message-text: #E4E7EC;
+  --an-input-background: #16181D;
   --an-input-border-color: rgba(255, 255, 255, 0.07);
-  --an-input-color: #EFEEE9;
+  --an-input-color: #E4E7EC;
   --an-input-placeholder-color: #7D7C76;
-  --an-send-button-bg: #7B8AD8;
+  --an-send-button-bg: #8B98E0;
   --an-send-button-color: #0a0a0a;
-  --an-tool-background: #1A1A18;
+  --an-tool-background: #16181D;
   --an-tool-border-color: rgba(255, 255, 255, 0.07);
-  --an-tool-color: #EFEEE9;
-  --an-tool-color-muted: #A5A49D;
+  --an-tool-color: #E4E7EC;
+  --an-tool-color-muted: #9CA3B0;
 }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -280,6 +280,18 @@ html[lang="th"] {
     font-weight: 600;
   }
 
+  /* Bracket label utility — Greptile style */
+  .label-bracket {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--muted-foreground);
+    font-weight: 500;
+  }
+  .label-bracket::before { content: "[ "; }
+  .label-bracket::after { content: " ]"; }
+
   /* Display serif for headings */
   h1.display, h2.display, .font-display {
     font-family: var(--font-display);
@@ -293,9 +305,26 @@ html[lang="th"] {
   }
 }
 
-/* ── Blueprint grid background ── */
+/* ── Blueprint grid backgrounds ── */
+/* Page/app background — subtle */
 .bg-grid-blueprint {
-  background-image: radial-gradient(var(--border) 1px, transparent 1px);
+  background-image: radial-gradient(var(--accent-blueprint) 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+
+/* Card interior — even subtler */
+.bg-grid-card {
+  background-image: radial-gradient(var(--accent-blueprint) 0.8px, transparent 0.8px);
+  background-size: 16px 16px;
+}
+
+/* Dark mode variants — brighter dots on dark */
+.dark .bg-grid-blueprint {
+  background-image: radial-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+.dark .bg-grid-card {
+  background-image: radial-gradient(rgba(255, 255, 255, 0.025) 0.8px, transparent 0.8px);
   background-size: 16px 16px;
 }
 

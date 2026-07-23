@@ -54,7 +54,7 @@ function NavSection({
   return (
     <div className="flex flex-col gap-0.5 p-1">
         <div className="relative h-[32px] px-2.5 shrink-0">
-          <span className={cn('label-mono absolute inset-0 flex items-center px-2.5 transition-opacity duration-150', collapsed ? 'opacity-0' : 'opacity-100')} style={{ fontSize: '11px' }}>
+          <span className={cn('label-bracket absolute inset-0 flex items-center px-2.5 transition-opacity duration-150', collapsed ? 'opacity-0' : 'opacity-100')}>
             {label}
           </span>
           {showSeparator && (
@@ -133,7 +133,7 @@ export function Sidebar() {
         {isAdmin ? (
           /* ── ADMIN: monitor-only nav — just the Admin link ── */
           <div className="flex flex-col gap-0.5 p-1">
-            <div className="label-mono px-2.5 pt-3 pb-1">
+            <div className="label-bracket px-2.5 pt-3 pb-1">
               {c ? '' : 'Admin'}
             </div>
             <Tooltip label="Admin" disabled={!c}>
@@ -168,7 +168,7 @@ export function Sidebar() {
             {/* ── MY RESUMES — single link to collection page ── */}
             <div className="flex flex-col gap-0.5 p-1">
               <div className="relative h-[32px] px-2.5 shrink-0">
-                <span className={cn('label-mono absolute inset-0 flex items-center px-2.5 transition-opacity duration-150', c ? 'opacity-0' : 'opacity-100')} style={{ fontSize: '11px' }}>
+                <span className={cn('label-bracket absolute inset-0 flex items-center px-2.5 transition-opacity duration-150', c ? 'opacity-0' : 'opacity-100')}>
                   {t('resumes')}
                 </span>
                 <span className={cn('absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 h-0.5 w-5 bg-muted-foreground/30 transition-opacity duration-150', c ? 'opacity-100' : 'opacity-0')} />
@@ -225,7 +225,7 @@ export function Sidebar() {
         {/* ── ACCOUNT ── */}
         <div className="flex flex-col gap-0.5 p-1 mt-auto">
           <div className="relative h-[28px] px-2.5 shrink-0">
-            <span className={cn('label-mono absolute inset-0 flex items-center px-2.5 transition-opacity duration-150', c ? 'opacity-0' : 'opacity-100')}>
+            <span className={cn('label-bracket absolute inset-0 flex items-center px-2.5 transition-opacity duration-150', c ? 'opacity-0' : 'opacity-100')}>
               Account
             </span>
             <span className={cn('absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 h-0.5 w-5 bg-muted-foreground/30 transition-opacity duration-150', c ? 'opacity-100' : 'opacity-0')} />

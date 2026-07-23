@@ -1,6 +1,6 @@
 'use client'
 
-import { PanelLeft, Sun, Moon, Globe } from 'lucide-react'
+import { PanelLeft, Sun, Moon, Globe, Search } from 'lucide-react'
 import { UserMenu } from '~/components/layout/user-menu'
 import { cn } from '~/lib/utils'
 import { useTheme } from '~/components/layout/theme-provider'
@@ -82,6 +82,19 @@ export function Topbar() {
       </button>
 
       <div className="flex-1" />
+
+      {/* ⌘K Command Palette trigger */}
+      <button
+        onClick={() => {
+          const event = new KeyboardEvent('keydown', { key: 'k', metaKey: true, bubbles: true })
+          document.dispatchEvent(event)
+        }}
+        className="hidden sm:flex items-center gap-2 rounded-md border border-border bg-card px-3 py-1.5 text-sm text-muted-foreground hover:bg-accent-soft transition-colors mr-2 max-w-[200px] w-full"
+      >
+        <Search size={13} className="shrink-0" />
+        <span className="flex-1 text-left text-xs">Search...</span>
+        <kbd className="ml-auto rounded border border-border bg-muted px-1.5 py-0.5 font-mono text-[10px]">⌘K</kbd>
+      </button>
 
       {/* Actions */}
       <div className="flex items-center gap-1 pr-3">

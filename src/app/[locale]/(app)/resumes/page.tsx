@@ -73,7 +73,7 @@ export default function ResumesPage() {
         )}
 
         {!isLoading && baseResumes.length === 0 && (
-          <div className="flex flex-col items-center justify-center gap-4 py-24 text-center">
+          <div className="flex flex-col items-center justify-center gap-4 py-24 text-center rounded-sm border border-dashed border-border bg-grid-card">
             <div className="flex h-14 w-14 items-center justify-center rounded-sm border border-border bg-card">
               <FileText size={24} className="text-muted-foreground" />
             </div>
@@ -98,7 +98,7 @@ export default function ResumesPage() {
               return (
                 <div
                   key={resume.id}
-                  className="group relative flex flex-col rounded-sm border border-border bg-card transition-all hover:border-primary/40 hover:shadow-md"
+                  className="group relative flex flex-col rounded-sm border border-border bg-card transition-all hover:border-foreground/15"
                 >
                   {/* Card header */}
                   <div className="flex items-start justify-between gap-2 border-b border-border px-4 py-3">

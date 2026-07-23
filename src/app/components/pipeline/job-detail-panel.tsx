@@ -435,25 +435,25 @@ export function JobDetailPanel({
           <div className="mb-2 grid grid-cols-2 gap-2">
             <button
               onClick={handleTailor}
-              className="flex cursor-pointer items-center justify-center gap-1.5 rounded-xs bg-primary px-3 py-2.5 text-sm font-semibold text-primary-foreground transition-all hover:opacity-90 active:scale-[0.98]"
+              className="flex cursor-pointer items-center justify-center gap-1.5 rounded-xs bg-muted border border-border px-3 py-2.5 text-sm font-medium text-foreground transition-all hover:bg-accent-soft hover:border-primary/30 active:scale-[0.98]"
             >
               <Zap size={13} /> Tailor Resume
             </button>
             <button
               onClick={handleCoverLetter}
-              className="flex cursor-pointer items-center justify-center gap-1.5 rounded-xs bg-primary px-3 py-2.5 text-sm font-semibold text-primary-foreground transition-all hover:opacity-90 active:scale-[0.98]"
+              className="flex cursor-pointer items-center justify-center gap-1.5 rounded-xs bg-muted border border-border px-3 py-2.5 text-sm font-medium text-foreground transition-all hover:bg-accent-soft hover:border-primary/30 active:scale-[0.98]"
             >
               <FileText size={13} /> Cover Letter
             </button>
             <button
               onClick={handleAts}
-              className="flex cursor-pointer items-center justify-center gap-1.5 rounded-xs bg-primary px-3 py-2.5 text-sm font-semibold text-primary-foreground transition-all hover:opacity-90 active:scale-[0.98]"
+              className="flex cursor-pointer items-center justify-center gap-1.5 rounded-xs bg-muted border border-border px-3 py-2.5 text-sm font-medium text-foreground transition-all hover:bg-accent-soft hover:border-primary/30 active:scale-[0.98]"
             >
               <Target size={13} /> ATS Match
             </button>
             <button
               onClick={handleInterview}
-              className="flex cursor-pointer items-center justify-center gap-1.5 rounded-xs bg-primary px-3 py-2.5 text-sm font-semibold text-primary-foreground transition-all hover:opacity-90 active:scale-[0.98]"
+              className="flex cursor-pointer items-center justify-center gap-1.5 rounded-xs bg-muted border border-border px-3 py-2.5 text-sm font-medium text-foreground transition-all hover:bg-accent-soft hover:border-primary/30 active:scale-[0.98]"
             >
               <Brain size={13} /> Interview
             </button>
