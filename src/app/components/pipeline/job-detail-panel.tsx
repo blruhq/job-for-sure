@@ -217,7 +217,7 @@ export function JobDetailPanel({
 
       {/* Slide-over panel */}
       <div
-        className="fixed right-0 top-0 z-[101] flex h-full w-full max-w-lg flex-col border-l border-border bg-card shadow-xl animate-in slide-in-from-right"
+        className="fixed right-0 top-0 z-[101] flex h-full w-full max-w-2xl flex-col border-l border-border bg-card shadow-xl animate-in slide-in-from-right"
         onClick={(e) => e.stopPropagation()}
         role="dialog"
         aria-modal="true"
@@ -430,59 +430,57 @@ export function JobDetailPanel({
         </div>
 
         {/* ── Footer: Actions ── */}
-        <div className="shrink-0 border-t border-border bg-background/50 px-5 py-3">
+        <div className="shrink-0 border-t border-border bg-card/95 backdrop-blur-sm px-5 py-4">
           {/* AI tools grid */}
           <div className="mb-2 grid grid-cols-2 gap-2">
             <button
               onClick={handleTailor}
-              className="flex cursor-pointer items-center justify-center gap-1.5 rounded-xs bg-primary px-3 py-2 text-[12px] font-semibold text-primary-foreground transition-all hover:opacity-90 active:scale-[0.98]"
+              className="flex cursor-pointer items-center justify-center gap-1.5 rounded-xs bg-primary px-3 py-2.5 text-sm font-semibold text-primary-foreground transition-all hover:opacity-90 active:scale-[0.98]"
             >
               <Zap size={13} /> Tailor Resume
             </button>
             <button
               onClick={handleCoverLetter}
-              className="flex cursor-pointer items-center justify-center gap-1.5 rounded-xs bg-primary px-3 py-2 text-[12px] font-semibold text-primary-foreground transition-all hover:opacity-90 active:scale-[0.98]"
+              className="flex cursor-pointer items-center justify-center gap-1.5 rounded-xs bg-primary px-3 py-2.5 text-sm font-semibold text-primary-foreground transition-all hover:opacity-90 active:scale-[0.98]"
             >
               <FileText size={13} /> Cover Letter
             </button>
             <button
               onClick={handleAts}
-              className="flex cursor-pointer items-center justify-center gap-1.5 rounded-xs bg-primary px-3 py-2 text-[12px] font-semibold text-primary-foreground transition-all hover:opacity-90 active:scale-[0.98]"
+              className="flex cursor-pointer items-center justify-center gap-1.5 rounded-xs bg-primary px-3 py-2.5 text-sm font-semibold text-primary-foreground transition-all hover:opacity-90 active:scale-[0.98]"
             >
               <Target size={13} /> ATS Match
             </button>
             <button
               onClick={handleInterview}
-              className="flex cursor-pointer items-center justify-center gap-1.5 rounded-xs bg-primary px-3 py-2 text-[12px] font-semibold text-primary-foreground transition-all hover:opacity-90 active:scale-[0.98]"
+              className="flex cursor-pointer items-center justify-center gap-1.5 rounded-xs bg-primary px-3 py-2.5 text-sm font-semibold text-primary-foreground transition-all hover:opacity-90 active:scale-[0.98]"
             >
               <Brain size={13} /> Interview
             </button>
           </div>
 
-          {/* Bottom row */}
-          <div className="flex items-center justify-between gap-2">
-            <div className="flex items-center gap-2">
-              {mode === 'search' && (
-                <button
-                  onClick={onSaveToTracker}
-                  className={cn(
-                    'flex cursor-pointer items-center gap-1 rounded-xs border px-2.5 py-1.5 text-[11px] transition-all',
-                    isSaved
-                      ? 'border-primary bg-primary text-primary-foreground'
-                      : 'border-border bg-card hover:border-primary hover:text-primary',
-                  )}
-                >
-                  <Bookmark size={11} fill={isSaved ? 'currentColor' : 'none'} />
-                  {isSaved ? 'Saved' : 'Save to Tracker'}
-                </button>
-              )}
-            </div>
+          {/* Bottom row — primary actions */}
+          <div className="flex items-center gap-3 mt-3">
+            {mode === 'search' && (
+              <button
+                onClick={onSaveToTracker}
+                className={cn(
+                  'flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-xs border h-11 text-sm font-semibold transition-all',
+                  isSaved
+                    ? 'border-primary bg-primary text-primary-foreground'
+                    : 'border-border bg-card hover:border-primary hover:text-primary',
+                )}
+              >
+                <Bookmark size={14} fill={isSaved ? 'currentColor' : 'none'} />
+                {isSaved ? 'Saved to Tracker' : 'Save to Tracker'}
+              </button>
+            )}
             {job.url && (
               <button
                 onClick={handleApply}
-                className="flex cursor-pointer items-center gap-1 rounded-xs border border-border bg-card px-2.5 py-1.5 text-[11px] font-medium text-muted-foreground transition-colors hover:border-primary hover:text-primary"
+                className="flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-xs border border-primary bg-primary h-11 text-sm font-semibold text-primary-foreground transition-all hover:opacity-90 active:scale-[0.98]"
               >
-                Apply <ExternalLink size={10} />
+                Apply <ExternalLink size={14} />
               </button>
             )}
           </div>

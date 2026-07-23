@@ -116,7 +116,7 @@ function AppShell({ children }: { children: React.ReactNode }) {
   }, [sidebarOpen])
 
   return (
-    <div className="flex h-screen flex-col">
+    <div className="flex h-screen flex-col bg-grid-blueprint">
       <Topbar />
       <div className="relative flex flex-1 overflow-hidden">
         {/* Desktop sidebar — in flow, toggles between 220px and 56px */}
