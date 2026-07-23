@@ -580,25 +580,25 @@ export function ChatView() {
             <div className="mx-auto max-w-an">
               <div className="flex items-center gap-1.5 pb-1.5">
                 <Button
-                  variant="outline"
+                  variant="ghost"
                   onClick={() => fileRef.current?.click()}
-                  className="inline-flex items-center gap-1 px-2 py-1 text-[11px] font-medium"
+                  className="neuro-pill rounded-xl inline-flex items-center gap-1 px-2 py-1 text-[11px] font-medium hover:bg-transparent hover:-translate-y-0.5"
                 >
                   <Upload size={11} />
                   Upload Resume
                 </Button>
                 <Button
-                  variant="outline"
+                  variant="ghost"
                   onClick={() => setWizardOpen(true)}
-                  className="inline-flex items-center gap-1 px-2 py-1 text-[11px] font-medium"
+                  className="neuro-pill rounded-xl inline-flex items-center gap-1 px-2 py-1 text-[11px] font-medium hover:bg-transparent hover:-translate-y-0.5"
                 >
                   <FileText size={11} />
                   Build with AI
                 </Button>
                 <Button
-                  variant="outline"
+                  variant="ghost"
                   onClick={() => setPasteOpen(true)}
-                  className="inline-flex items-center gap-1 px-2 py-1 text-[11px] font-medium"
+                  className="neuro-pill rounded-xl inline-flex items-center gap-1 px-2 py-1 text-[11px] font-medium hover:bg-transparent hover:-translate-y-0.5"
                 >
                   <ClipboardList size={11} />
                   Paste Job
@@ -641,10 +641,10 @@ export function ChatView() {
   const showEntryCards = messages.length === 0 && uploadStage === 'idle'
 
   return (
-    <div className="flex h-full flex-col">
+    <div className="neuro-chat flex h-full flex-col">
       {/* Status bar — hidden during build mode */}
       {!buildData && (
-      <div className="flex shrink-0 flex-wrap items-center justify-between gap-2 border-b border-border/50 bg-card px-4 md:px-8 py-2.5 text-[11px]">
+      <div className="neuro-surface flex shrink-0 flex-wrap items-center justify-between gap-2 px-4 md:px-8 py-2.5 text-[11px]">
         <div className="flex items-center gap-1.5">
           <span className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">Profile:</span>
           <Select
@@ -705,7 +705,7 @@ export function ChatView() {
       {showEntryCards && (
         <div className="flex flex-col items-center justify-center px-6 py-10">
           <div
-            className="mb-6 animate-fade-up text-center text-2xl text-foreground"
+            className="neuro-title mb-6 animate-fade-up text-center text-2xl"
             style={{ fontFamily: 'var(--font-instrument-serif), serif', animationDelay: '0ms', animationFillMode: 'both' }}
           >
             How do you want to start?
@@ -714,39 +714,39 @@ export function ChatView() {
             {/* Upload */}
             <div
               onClick={() => fileRef.current?.click()}
-              className="group flex cursor-pointer flex-col items-center rounded-lg border border-border bg-card p-5 text-center shadow-sm transition-all hover:border-primary/30 hover:shadow-md animate-fade-up"
+              className="neuro-card group flex cursor-pointer flex-col items-center rounded-2xl p-5 text-center transition-all hover:-translate-y-0.5 active:translate-y-0 animate-fade-up"
               style={{ animationDelay: '100ms', animationFillMode: 'both' }}
             >
-              <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-md bg-accent-soft text-primary transition-transform group-hover:scale-110">
+              <div className="neuro-icon-well mb-3 flex h-10 w-10 items-center justify-center rounded-full text-primary transition-transform group-hover:scale-110">
                 <Upload size={18} />
               </div>
-              <div className="text-sm font-semibold text-foreground">Upload Resume</div>
+              <div className="neuro-title text-sm font-semibold">Upload Resume</div>
               <div className="mt-0.5 text-[11px] text-muted-foreground">PDF, DOCX, or text</div>
             </div>
 
             {/* Build from Template */}
             <div
               onClick={() => setWizardOpen(true)}
-              className="group flex cursor-pointer flex-col items-center rounded-lg border border-border bg-card p-5 text-center shadow-sm transition-all hover:border-primary/30 hover:shadow-md animate-fade-up"
+              className="neuro-card group flex cursor-pointer flex-col items-center rounded-2xl p-5 text-center transition-all hover:-translate-y-0.5 active:translate-y-0 animate-fade-up"
               style={{ animationDelay: '200ms', animationFillMode: 'both' }}
             >
-              <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-md bg-success-soft text-success transition-transform group-hover:scale-110">
+              <div className="neuro-icon-well mb-3 flex h-10 w-10 items-center justify-center rounded-full text-success transition-transform group-hover:scale-110">
                 <FileText size={18} />
               </div>
-              <div className="text-sm font-semibold text-foreground">Build with AI</div>
+              <div className="neuro-title text-sm font-semibold">Build with AI</div>
               <div className="mt-0.5 text-[11px] text-muted-foreground">Answer questions · 5 min</div>
             </div>
 
             {/* Paste Job Posting */}
             <div
               onClick={() => setPasteOpen(true)}
-              className="group flex cursor-pointer flex-col items-center rounded-lg border border-border bg-card p-5 text-center shadow-sm transition-all hover:border-primary/30 hover:shadow-md animate-fade-up"
+              className="neuro-card group flex cursor-pointer flex-col items-center rounded-2xl p-5 text-center transition-all hover:-translate-y-0.5 active:translate-y-0 animate-fade-up"
               style={{ animationDelay: '300ms', animationFillMode: 'both' }}
             >
-              <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-md bg-warn-soft text-[var(--warn)] transition-transform group-hover:scale-110">
+              <div className="neuro-icon-well mb-3 flex h-10 w-10 items-center justify-center rounded-full text-[var(--warn)] transition-transform group-hover:scale-110">
                 <ClipboardList size={18} />
               </div>
-              <div className="text-sm font-semibold text-foreground">Paste Job Posting</div>
+              <div className="neuro-title text-sm font-semibold">Paste Job Posting</div>
               <div className="mt-0.5 text-[11px] text-muted-foreground">Analyze a JD</div>
             </div>
           </div>
@@ -771,7 +771,7 @@ export function ChatView() {
             bottomContent={
               uploadStage === 'parsing' ? (
                 <div className="mx-auto max-w-an w-full px-4 py-3">
-                  <div className="rounded-md border border-border bg-card p-4">
+                  <div className="neuro-card rounded-2xl p-4">
                     <div className="flex items-center gap-2 text-muted-foreground">
                       <Loader2 size={12} className="animate-spin text-primary" />
                       <span className="font-mono text-[11px]">Parsing your resume…</span>

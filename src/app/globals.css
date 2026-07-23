@@ -401,4 +401,138 @@ textarea:focus-visible {
   outline: none !important;
 }
 
+/* ═══════════════════════════════════════════════════════════════
+   NEUMORPHISM / SOFT UI UTILITY CLASSES
+   Light-mode only. Dark mode neutralizes back to flat shadows.
+   Surface color: #E9ECEF (darker than --background #F8F9FA)
+   ═══════════════════════════════════════════════════════════════ */
+
+/* Surface — just the background color, no shadow */
+.neuro-surface {
+  background-color: #E9ECEF;
+}
+
+/* Card — raised/extruded dual shadow */
+.neuro-card {
+  background-color: #E9ECEF;
+  box-shadow: 6px 6px 12px rgba(0, 0, 0, 0.12), -6px -6px 12px rgba(255, 255, 255, 0.9);
+}
+.neuro-card:hover {
+  box-shadow: 8px 8px 16px rgba(0, 0, 0, 0.14), -8px -8px 16px rgba(255, 255, 255, 0.95);
+}
+
+/* Inset / pressed — recessed into surface */
+.neuro-inset {
+  background-color: #E9ECEF;
+  box-shadow: inset 4px 4px 8px rgba(0, 0, 0, 0.10), inset -4px -4px 8px rgba(255, 255, 255, 0.9);
+}
+
+/* Icon well — smaller inset for icon containers */
+.neuro-icon-well {
+  background-color: #E9ECEF;
+  box-shadow: inset 3px 3px 6px rgba(0, 0, 0, 0.10), inset -3px -3px 6px rgba(255, 255, 255, 0.9);
+}
+
+/* Pill / raised button — extruded with active press-down */
+.neuro-pill {
+  background-color: #E9ECEF;
+  box-shadow: 3px 3px 6px rgba(0, 0, 0, 0.12), -3px -3px 6px rgba(255, 255, 255, 0.9);
+}
+.neuro-pill:hover {
+  box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.14), -4px -4px 8px rgba(255, 255, 255, 0.95);
+}
+.neuro-pill:active {
+  box-shadow: inset 2px 2px 4px rgba(0, 0, 0, 0.10), inset -2px -2px 4px rgba(255, 255, 255, 0.9);
+}
+
+/* Modal surface — larger, softer shadow for dialog overlays */
+.neuro-modal {
+  background-color: #E9ECEF;
+  box-shadow: 8px 8px 24px rgba(0, 0, 0, 0.15), -8px -8px 24px rgba(255, 255, 255, 0.9);
+}
+
+/* Title text — softer than --foreground (#0F1115) for neumorphic context */
+.neuro-title {
+  color: #3A3F45;
+}
+
+/* ── Scoped overrides for agent-elements InputBar ── */
+/* The InputBar is from agent-elements and styled via CSS variables.
+   We scope overrides via .neuro-chat parent class. */
+.neuro-chat {
+  background-color: #E9ECEF;
+  --an-input-background: #E9ECEF;
+  --an-input-border-color: transparent;
+  --an-input-border-radius: 16px;
+  --an-border-radius: 16px;
+  --an-message-border-radius: 16px;
+  --an-background: #E9ECEF;
+}
+
+/* Input bar container — pressed/recessed inset shadow */
+.neuro-chat .bg-an-input-background {
+  border-color: transparent;
+  box-shadow: inset 4px 4px 8px rgba(0, 0, 0, 0.10), inset -4px -4px 8px rgba(255, 255, 255, 0.9);
+}
+
+/* Send button — extruded raised */
+.neuro-chat .bg-an-send-button-bg {
+  box-shadow: 3px 3px 6px rgba(0, 0, 0, 0.12), -3px -3px 6px rgba(255, 255, 255, 0.9);
+}
+
+/* Suggestions bar in InputBar — match surface */
+.neuro-chat .bg-an-background-secondary {
+  background-color: #E9ECEF;
+}
+
+/* ── Dark mode: neutralize all neumorphic effects ── */
+.dark .neuro-surface,
+.dark .neuro-chat {
+  background-color: var(--background);
+}
+
+.dark .neuro-card,
+.dark .neuro-inset,
+.dark .neuro-icon-well,
+.dark .neuro-pill,
+.dark .neuro-modal {
+  background-color: var(--card);
+  box-shadow: var(--shadow-md);
+}
+
+.dark .neuro-card:hover,
+.dark .neuro-pill:hover {
+  box-shadow: var(--shadow-lg);
+}
+
+.dark .neuro-pill:active {
+  box-shadow: var(--shadow-sm);
+}
+
+.dark .neuro-title {
+  color: var(--foreground);
+}
+
+.dark .neuro-chat {
+  --an-input-background: var(--card);
+  --an-input-border-color: var(--border);
+  --an-input-border-radius: 6px;
+  --an-border-radius: 6px;
+  --an-message-border-radius: 6px;
+  --an-background: var(--background);
+}
+
+.dark .neuro-chat .bg-an-input-background {
+  border-color: var(--border);
+  box-shadow: none;
+}
+
+.dark .neuro-chat .bg-an-send-button-bg {
+  box-shadow: none;
+}
+
+.dark .neuro-chat .bg-an-background-secondary {
+  background-color: var(--secondary);
+}
+
 

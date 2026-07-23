@@ -29,7 +29,7 @@ export function PasteJDModal({ open, onClose, onSubmit }: PasteJDModalProps) {
 
   return (
     <Dialog open={open} onOpenChange={(o) => { if (!o) handleClose() }}>
-      <DialogContent className="max-w-lg">
+      <DialogContent className="neuro-modal max-w-lg rounded-2xl ring-0">
         <DialogHeader>
           <DialogTitle>
             <div className="flex items-center gap-2">
@@ -48,7 +48,7 @@ export function PasteJDModal({ open, onClose, onSubmit }: PasteJDModalProps) {
             onChange={(e) => setJdText(e.target.value)}
             rows={10}
             placeholder="Paste the full job description here…"
-            className="w-full resize-y rounded-md px-3 py-2.5 text-sm leading-relaxed"
+            className="neuro-inset w-full resize-y rounded-2xl border-0 px-3 py-2.5 text-sm leading-relaxed"
             autoFocus
           />
           <div className="mt-2 flex items-center justify-between">

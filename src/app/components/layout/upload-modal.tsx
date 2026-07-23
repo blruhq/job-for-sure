@@ -102,7 +102,7 @@ export function UploadModal({ open, onClose }: UploadModalProps) {
   return (
     <>
       <Dialog open={open} onOpenChange={(o) => { if (!o && !parsing) onClose() }}>
-        <DialogContent className="max-w-lg">
+        <DialogContent className="neuro-modal max-w-lg rounded-2xl ring-0">
           <DialogHeader>
             <DialogTitle>Add a Resume</DialogTitle>
           </DialogHeader>
@@ -117,10 +117,8 @@ export function UploadModal({ open, onClose }: UploadModalProps) {
               onDrop={handleDrop}
               disabled={parsing}
               className={cn(
-                'w-full rounded-lg border-2 border-dashed p-10 text-center',
-                dragOver
-                  ? 'border-primary bg-primary/5'
-                  : 'border-border hover:border-primary/40 hover:bg-muted/30',
+                'neuro-inset w-full rounded-2xl border-0 p-10 text-center',
+                dragOver && 'ring-2 ring-primary',
                 parsing && 'opacity-60 cursor-not-allowed',
               )}
             >
@@ -131,7 +129,7 @@ export function UploadModal({ open, onClose }: UploadModalProps) {
                 </div>
               ) : (
                 <div className="flex flex-col items-center gap-2">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-md bg-accent-soft text-primary">
+                  <div className="neuro-icon-well flex h-10 w-10 items-center justify-center rounded-full text-primary">
                     <Upload size={18} />
                   </div>
                   <span className="text-sm font-semibold text-foreground">Drop your file here or click to browse</span>
@@ -152,9 +150,9 @@ export function UploadModal({ open, onClose }: UploadModalProps) {
               variant="ghost"
               onClick={() => setWizardOpen(true)}
               disabled={parsing}
-              className="w-full flex items-center gap-3 rounded-lg border border-border p-4 text-left transition-colors hover:border-primary/40 hover:bg-muted/30 disabled:opacity-60"
+              className="neuro-card w-full flex items-center gap-3 rounded-2xl border-0 p-4 text-left transition-all hover:-translate-y-0.5 disabled:opacity-60"
             >
-              <div className="flex h-10 w-10 items-center justify-center rounded-md bg-success-soft text-success shrink-0">
+              <div className="neuro-icon-well flex h-10 w-10 items-center justify-center rounded-full text-success shrink-0">
                 <FileText size={18} />
               </div>
               <div>

@@ -50,7 +50,7 @@ export function BuildWizard({ open, onClose, onComplete }: BuildWizardProps) {
 
   return (
     <Dialog open={open} onOpenChange={(o) => { if (!o) handleClose() }}>
-      <DialogContent className="max-w-2xl gap-0 p-0" showCloseButton={false}>
+      <DialogContent className="neuro-modal max-w-2xl gap-0 rounded-2xl p-0 ring-0" showCloseButton={false}>
         {/* Header */}
         <div className="flex items-center justify-between border-b border-border px-6 py-4">
           <div className="flex items-center gap-2">
@@ -87,6 +87,7 @@ export function BuildWizard({ open, onClose, onComplete }: BuildWizardProps) {
               <TemplateGallery
                 value={data.template}
                 onChange={(t: ResumeTemplate) => setData({ ...data, template: t })}
+                neumorphic
               />
               <p className="text-[11px] text-muted-foreground italic">
                 You can change the template anytime without losing your content.
@@ -104,7 +105,7 @@ export function BuildWizard({ open, onClose, onComplete }: BuildWizardProps) {
                   value={data.role}
                   onChange={(e) => setData({ ...data, role: e.target.value })}
                   placeholder="e.g. Senior Product Designer, Registered Nurse, Marketing Manager"
-                  className="w-full rounded-md px-3 py-2 text-sm"
+                  className="neuro-inset w-full rounded-2xl border-0 px-3 py-2 text-sm"
                   autoFocus
                 />
               </div>
@@ -116,7 +117,7 @@ export function BuildWizard({ open, onClose, onComplete }: BuildWizardProps) {
                   value={data.industry}
                   onChange={(e) => setData({ ...data, industry: e.target.value })}
                   placeholder="e.g. Tech, Healthcare, Finance, Education"
-                  className="w-full rounded-md px-3 py-2 text-sm"
+                  className="neuro-inset w-full rounded-2xl border-0 px-3 py-2 text-sm"
                 />
               </div>
               <p className="font-mono text-[11px] text-muted-foreground">

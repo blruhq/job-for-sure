@@ -8,6 +8,7 @@ import { Check } from 'lucide-react'
 interface TemplateGalleryProps {
   value: ResumeTemplate | undefined
   onChange: (template: ResumeTemplate) => void
+  neumorphic?: boolean
 }
 
 function TemplateThumbnail({ templateId, selected }: { templateId: string; selected: boolean }) {
@@ -91,7 +92,7 @@ function TemplateThumbnail({ templateId, selected }: { templateId: string; selec
   }
 }
 
-export function TemplateGallery({ value, onChange }: TemplateGalleryProps) {
+export function TemplateGallery({ value, onChange, neumorphic = false }: TemplateGalleryProps) {
   return (
     <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
       {TEMPLATES.map(t => (
@@ -102,10 +103,18 @@ export function TemplateGallery({ value, onChange }: TemplateGalleryProps) {
           onClick={() => onChange(t.id)}
           onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onChange(t.id) } }}
           className={cn(
-            'group relative cursor-pointer rounded-md border p-2.5 text-left transition-all shadow-sm',
-            value === t.id
-              ? 'border-primary bg-accent-soft ring-1 ring-primary'
-              : 'border-border hover:border-primary/40 hover:shadow-md',
+            'group relative cursor-pointer p-2.5 text-left transition-all',
+            neumorphic
+              ? cn(
+                  'rounded-2xl neuro-card',
+                  value === t.id && 'ring-1 ring-primary',
+                )
+              : cn(
+                  'rounded-md border shadow-sm',
+                  value === t.id
+                    ? 'border-primary bg-accent-soft ring-1 ring-primary'
+                    : 'border-border hover:border-primary/40 hover:shadow-md',
+                ),
           )}
         >
           <TemplateThumbnail templateId={t.id} selected={value === t.id} />
