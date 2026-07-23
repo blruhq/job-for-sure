@@ -710,12 +710,11 @@ export function ChatView() {
           >
             How do you want to start?
           </div>
-          <div className="grid w-full max-w-2xl grid-cols-1 gap-3 sm:grid-cols-3">
+          <div className="grid w-full max-w-2xl grid-cols-1 gap-4 sm:grid-cols-3">
             {/* Upload */}
-            <Button
-              variant="outline"
+            <div
               onClick={() => fileRef.current?.click()}
-              className="group flex flex-col items-center p-5 text-center animate-fade-up"
+              className="group flex cursor-pointer flex-col items-center rounded-lg border border-border bg-card p-5 text-center shadow-sm transition-all hover:border-primary/30 hover:shadow-md animate-fade-up"
               style={{ animationDelay: '100ms', animationFillMode: 'both' }}
             >
               <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-md bg-accent-soft text-primary transition-transform group-hover:scale-110">
@@ -723,13 +722,12 @@ export function ChatView() {
               </div>
               <div className="text-sm font-semibold text-foreground">Upload Resume</div>
               <div className="mt-0.5 text-[11px] text-muted-foreground">PDF, DOCX, or text</div>
-            </Button>
+            </div>
 
             {/* Build from Template */}
-            <Button
-              variant="outline"
+            <div
               onClick={() => setWizardOpen(true)}
-              className="group flex flex-col items-center p-5 text-center animate-fade-up"
+              className="group flex cursor-pointer flex-col items-center rounded-lg border border-border bg-card p-5 text-center shadow-sm transition-all hover:border-primary/30 hover:shadow-md animate-fade-up"
               style={{ animationDelay: '200ms', animationFillMode: 'both' }}
             >
               <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-md bg-success-soft text-success transition-transform group-hover:scale-110">
@@ -737,13 +735,12 @@ export function ChatView() {
               </div>
               <div className="text-sm font-semibold text-foreground">Build with AI</div>
               <div className="mt-0.5 text-[11px] text-muted-foreground">Answer questions · 5 min</div>
-            </Button>
+            </div>
 
             {/* Paste Job Posting */}
-            <Button
-              variant="outline"
+            <div
               onClick={() => setPasteOpen(true)}
-              className="group flex flex-col items-center p-5 text-center animate-fade-up"
+              className="group flex cursor-pointer flex-col items-center rounded-lg border border-border bg-card p-5 text-center shadow-sm transition-all hover:border-primary/30 hover:shadow-md animate-fade-up"
               style={{ animationDelay: '300ms', animationFillMode: 'both' }}
             >
               <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-md bg-warn-soft text-[var(--warn)] transition-transform group-hover:scale-110">
@@ -751,7 +748,7 @@ export function ChatView() {
               </div>
               <div className="text-sm font-semibold text-foreground">Paste Job Posting</div>
               <div className="mt-0.5 text-[11px] text-muted-foreground">Analyze a JD</div>
-            </Button>
+            </div>
           </div>
         </div>
       )}
