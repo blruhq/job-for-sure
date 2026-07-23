@@ -99,7 +99,7 @@ export default function ResumesPage() {
               return (
                 <div
                   key={resume.id}
-                  className="group relative flex flex-col rounded-sm border border-border bg-card transition-all hover:border-foreground/15"
+                  className="group relative flex flex-col rounded-lg border border-border bg-card shadow-sm transition-all hover:border-foreground/15 hover:shadow-md"
                 >
                   {/* Card header */}
                   <div className="flex items-start justify-between gap-2 border-b border-border px-4 py-3">
