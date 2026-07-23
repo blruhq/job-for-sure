@@ -1,11 +1,12 @@
 'use client'
 
+import { Button } from '~/components/ui/button'
+import { useState } from 'react'
 import {
   MapPin, Bus, DollarSign, Home, Hotel, Shield, Star, HeartPulse,
   UtensilsCrossed, ChevronDown, ChevronUp, ExternalLink,
   LocateFixed, Loader2, Pencil, Check,
 } from 'lucide-react'
-import { useState } from 'react'
 import * as Links from '~/lib/area-links'
 import { detectArea } from '~/lib/geo'
 import { notify } from '~/lib/toast'
@@ -184,10 +185,10 @@ export function AreaIntelligence({ job, homeLocation, city, district, countryCod
       )}
 
       {/* EXPANDABLE MORE */}
-      <button onClick={() => setExpanded(!expanded)} className="flex cursor-pointer items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors">
+      <Button variant="ghost" size="sm" onClick={() => setExpanded(!expanded)} className="flex items-center gap-1 text-xs">
         {expanded ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
         {expanded ? 'Less' : 'More'} area info
-      </button>
+      </Button>
 
       {expanded && (
         <div className="space-y-2 pt-1">

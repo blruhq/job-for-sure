@@ -1,10 +1,8 @@
-'use client'
-
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from '~/i18n/routing'
 import {
-  X, FileText, Brain, ExternalLink, Bookmark, Globe, Plane,
-  Clock, Sparkles, ChevronDown, Zap, Target, DollarSign, Briefcase,
+  FileText, Brain, ExternalLink, Bookmark, Globe, Plane,
+  Clock, Sparkles, Zap, Target, DollarSign, Briefcase,
 } from 'lucide-react'
 import { cn } from '~/lib/utils'
 import { useActiveResume } from '~/hooks/use-active-resume'
@@ -18,6 +16,9 @@ import { SmartOverview } from './smart-overview'
 import { AreaIntelligence } from './area-intelligence'
 import { CompanyIntelligence } from './company-intelligence'
 import { extractCity, extractDistrict, detectCountry } from '~/lib/area-links'
+import { Button } from '~/components/ui/button'
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '~/components/ui/select'
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from '~/components/ui/sheet'
 
 // ═══════════════════════════════════════════════════════════════
 // JobDetailPanel — slide-over panel showing everything about a job.
@@ -82,25 +83,6 @@ export function JobDetailPanel({
     setDescription(desc)
   }, [job])
 
-  // ── Key handlers ──
-  const handleKeyDown = useCallback(
-    (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose()
-    },
-    [onClose],
-  )
-
-  useEffect(() => {
-    if (job) {
-      document.addEventListener('keydown', handleKeyDown)
-      document.body.style.overflow = 'hidden'
-      return () => {
-        document.removeEventListener('keydown', handleKeyDown)
-        document.body.style.overflow = ''
-      }
-    }
-  }, [job, handleKeyDown])
-
   if (!job) return null
 
   // ── Derived data ──
@@ -129,9 +111,6 @@ export function JobDetailPanel({
   const salaryCurrency = (job.jobData?.salaryCurrency as string) || 'USD'
 
   // ── Structured location ──
-  // extractCity is smarter than jobData.city (which comes from parseLocation
-  // and grabs the first comma part — often a district like "Ratchathewi"
-  // instead of the actual city "Bangkok"). Use it first, structured as fallback.
   const city = extractCity(job.loc) || (job.jobData?.city as string) || ''
   const district = job.district || (job.jobData?.district as string) || extractDistrict(job.loc)
   const countryCode = detectCountry(job.loc) || (job.jobData?.country as string) || ''
@@ -208,26 +187,13 @@ export function JobDetailPanel({
   }
 
   return (
-    <>
-      {/* Backdrop */}
-      <div
-        className="fixed inset-0 z-[100] bg-black/40 backdrop-blur-sm"
-        onClick={onClose}
-      />
-
-      {/* Slide-over panel */}
-      <div
-        className="fixed right-0 top-0 z-[101] flex h-full w-full max-w-2xl flex-col border-l border-border bg-card shadow-xl animate-in slide-in-from-right"
-        onClick={(e) => e.stopPropagation()}
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="job-detail-title"
-      >
+    <Sheet open={!!job} onOpenChange={(o) => { if (!o) onClose() }}>
+      <SheetContent side="right" className="w-full max-w-2xl flex flex-col p-0 gap-0">
         {/* ── Header ── */}
-        <div className="shrink-0 border-b border-border px-5 py-4">
+        <SheetHeader className="shrink-0 border-b border-border px-5 py-4">
           <div className="flex items-start justify-between gap-3">
             <div className="min-w-0 flex-1">
-              <h2 id="job-detail-title" className="text-base font-semibold text-foreground">{job.title}</h2>
+              <SheetTitle className="text-base">{job.title}</SheetTitle>
               <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
                 <span className="font-medium text-foreground">{job.company}</span>
                 <span>·</span>
@@ -237,13 +203,6 @@ export function JobDetailPanel({
                 </span>
               </div>
             </div>
-            <button
-              onClick={onClose}
-              aria-label="Close"
-              className="cursor-pointer rounded-sm p-1 text-muted-foreground hover:bg-muted hover:text-foreground"
-            >
-              <X size={16} />
-            </button>
           </div>
 
           {/* Tags row */}
@@ -291,31 +250,26 @@ export function JobDetailPanel({
               </span>
             )}
           </div>
-        </div>
+        </SheetHeader>
 
         {/* ── Scrollable body ── */}
         <div className="flex-1 overflow-y-auto px-5 py-4 space-y-4">
-          {/* Tracker mode: Status dropdown */}
+          {/* Tracker mode: Status select */}
           {mode === 'tracker' && job.applicationId && (
             <div>
               <div className="label-mono mb-1.5">Status</div>
-              <div className="relative">
-                <select
-                  value={status}
-                  onChange={(e) => handleStatusChange(e.target.value)}
-                  className="w-full cursor-pointer appearance-none rounded-xs border border-border bg-background px-2 py-1.5 text-[12px] outline-none focus:border-primary"
-                >
+              <Select value={status} onValueChange={(v) => handleStatusChange(v || 'bookmarked')}>
+                <SelectTrigger className="w-full rounded-xs px-2 py-1.5 text-[12px]">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
                   {STATUS_OPTIONS.map((opt) => (
-                    <option key={opt.value} value={opt.value}>
+                    <SelectItem key={opt.value} value={opt.value}>
                       {opt.label}
-                    </option>
+                    </SelectItem>
                   ))}
-                </select>
-                <ChevronDown
-                  size={12}
-                  className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground"
-                />
-              </div>
+                </SelectContent>
+              </Select>
             </div>
           )}
 
@@ -433,60 +387,45 @@ export function JobDetailPanel({
         <div className="shrink-0 border-t border-border bg-card/95 backdrop-blur-sm px-5 py-4">
           {/* AI tools grid */}
           <div className="mb-2 grid grid-cols-2 gap-2">
-            <button
-              onClick={handleTailor}
-              className="flex cursor-pointer items-center justify-center gap-1.5 rounded-xs bg-muted border border-border px-3 py-2.5 text-sm font-medium text-foreground transition-all hover:bg-accent-soft hover:border-primary/30 active:scale-[0.98]"
-            >
+            <Button variant="secondary" onClick={handleTailor} className="flex items-center justify-center gap-1.5 rounded-xs px-3 py-2.5 text-sm">
               <Zap size={13} /> Tailor Resume
-            </button>
-            <button
-              onClick={handleCoverLetter}
-              className="flex cursor-pointer items-center justify-center gap-1.5 rounded-xs bg-muted border border-border px-3 py-2.5 text-sm font-medium text-foreground transition-all hover:bg-accent-soft hover:border-primary/30 active:scale-[0.98]"
-            >
+            </Button>
+            <Button variant="secondary" onClick={handleCoverLetter} className="flex items-center justify-center gap-1.5 rounded-xs px-3 py-2.5 text-sm">
               <FileText size={13} /> Cover Letter
-            </button>
-            <button
-              onClick={handleAts}
-              className="flex cursor-pointer items-center justify-center gap-1.5 rounded-xs bg-muted border border-border px-3 py-2.5 text-sm font-medium text-foreground transition-all hover:bg-accent-soft hover:border-primary/30 active:scale-[0.98]"
-            >
+            </Button>
+            <Button variant="secondary" onClick={handleAts} className="flex items-center justify-center gap-1.5 rounded-xs px-3 py-2.5 text-sm">
               <Target size={13} /> ATS Match
-            </button>
-            <button
-              onClick={handleInterview}
-              className="flex cursor-pointer items-center justify-center gap-1.5 rounded-xs bg-muted border border-border px-3 py-2.5 text-sm font-medium text-foreground transition-all hover:bg-accent-soft hover:border-primary/30 active:scale-[0.98]"
-            >
+            </Button>
+            <Button variant="secondary" onClick={handleInterview} className="flex items-center justify-center gap-1.5 rounded-xs px-3 py-2.5 text-sm">
               <Brain size={13} /> Interview
-            </button>
+            </Button>
           </div>
 
           {/* Bottom row — primary actions */}
           <div className="flex items-center gap-3 mt-3">
             {mode === 'search' && (
-              <button
+              <Button
+                variant={isSaved ? 'default' : 'outline'}
                 onClick={onSaveToTracker}
-                className={cn(
-                  'flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-xs border h-11 text-sm font-semibold transition-all',
-                  isSaved
-                    ? 'border-primary bg-primary text-primary-foreground'
-                    : 'border-border bg-card hover:border-primary hover:text-primary',
-                )}
+                className={cn('flex flex-1 items-center justify-center gap-2 rounded-xs h-11 text-sm font-semibold')}
               >
                 <Bookmark size={14} fill={isSaved ? 'currentColor' : 'none'} />
                 {isSaved ? 'Saved to Tracker' : 'Save to Tracker'}
-              </button>
+              </Button>
             )}
             {job.url && (
-              <button
+              <Button
+                variant="default"
                 onClick={handleApply}
-                className="flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-xs border border-primary bg-primary h-11 text-sm font-semibold text-primary-foreground transition-all hover:opacity-90 active:scale-[0.98]"
+                className="flex flex-1 items-center justify-center gap-2 rounded-xs h-11 text-sm font-semibold"
               >
                 Apply <ExternalLink size={14} />
-              </button>
+              </Button>
             )}
           </div>
         </div>
-      </div>
-    </>
+      </SheetContent>
+    </Sheet>
   )
 }
 

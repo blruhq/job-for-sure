@@ -6,6 +6,7 @@ import { useTranslations } from 'next-intl'
 import { LanguageSwitcher } from '~/components/layout/navbar'
 import { ThemeToggle } from '~/components/layout/theme-toggle'
 import { X, Menu } from 'lucide-react'
+import { Button } from '~/components/ui/button'
 
 export function MarketingNav() {
   const t = useTranslations('landing')
@@ -69,13 +70,15 @@ export function MarketingNav() {
         </div>
 
         {/* Mobile hamburger */}
-        <button
+        <Button
+          variant="ghost"
+          size="icon"
           onClick={() => setOpen(!open)}
-          className="flex cursor-pointer items-center gap-1 md:hidden"
+          className="md:hidden"
           aria-label="Toggle menu"
         >
           {open ? <X size={18} /> : <Menu size={18} />}
-        </button>
+        </Button>
       </div>
 
       {/* Mobile dropdown */}

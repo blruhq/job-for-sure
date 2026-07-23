@@ -2,6 +2,9 @@
 
 import { useState, useRef } from 'react'
 import { Trash2, Link2, RefreshCw, Plus, Loader2, AlertCircle } from 'lucide-react'
+import { Button } from '~/components/ui/button'
+import { Input } from '~/components/ui/input'
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '~/components/ui/select'
 import { cn } from '~/lib/utils'
 import { useApplications, useMoveApplication, useDeleteApplication, useCreateApplication } from '~/hooks/use-apps'
 import { JobDetailPanel } from '~/components/pipeline/job-detail-panel'
@@ -171,9 +174,8 @@ function InlineAddForm({ colId: _colId, onCancel, onSave, titleRef }: InlineAddF
 
   return (
     <div className="mt-1.5 flex flex-col gap-2 rounded-xs border border-border bg-card p-2.5">
-      <input
+      <Input
         ref={titleRef}
-        type="text"
         value={title}
         onChange={(e) => setTitle(e.target.value)}
         onKeyDown={(e) => {
@@ -182,10 +184,9 @@ function InlineAddForm({ colId: _colId, onCancel, onSave, titleRef }: InlineAddF
         }}
         placeholder="Job title *"
         autoFocus
-        className="w-full rounded-xs border border-border bg-background px-2 py-1.5 text-[11px] outline-none focus:border-primary placeholder:text-muted-foreground/50"
+        className="w-full rounded-xs px-2 py-1.5 text-[11px] placeholder:text-muted-foreground/50"
       />
-      <input
-        type="text"
+      <Input
         value={company}
         onChange={(e) => setCompany(e.target.value)}
         onKeyDown={(e) => {
@@ -193,10 +194,9 @@ function InlineAddForm({ colId: _colId, onCancel, onSave, titleRef }: InlineAddF
           if (e.key === 'Escape') onCancel()
         }}
         placeholder="Company *"
-        className="w-full rounded-xs border border-border bg-background px-2 py-1.5 text-[11px] outline-none focus:border-primary placeholder:text-muted-foreground/50"
+        className="w-full rounded-xs px-2 py-1.5 text-[11px] placeholder:text-muted-foreground/50"
       />
-      <input
-        type="text"
+      <Input
         value={loc}
         onChange={(e) => setLoc(e.target.value)}
         onKeyDown={(e) => {
@@ -204,22 +204,15 @@ function InlineAddForm({ colId: _colId, onCancel, onSave, titleRef }: InlineAddF
           if (e.key === 'Escape') onCancel()
         }}
         placeholder="Location"
-        className="w-full rounded-xs border border-border bg-background px-2 py-1.5 text-[11px] outline-none focus:border-primary placeholder:text-muted-foreground/50"
+        className="w-full rounded-xs px-2 py-1.5 text-[11px] placeholder:text-muted-foreground/50"
       />
       <div className="flex items-center justify-end gap-1.5 mt-0.5">
-        <button
-          onClick={onCancel}
-          className="rounded-xs px-2.5 py-1 text-[10px] text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
-        >
+        <Button variant="ghost" onClick={onCancel} className="rounded-xs px-2.5 py-1 text-[10px]">
           {t('cancel')}
-        </button>
-        <button
-          onClick={handleSave}
-          disabled={!title.trim() || !company.trim()}
-          className="rounded-xs bg-primary px-2.5 py-1 text-[10px] font-medium text-primary-foreground transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer"
-        >
+        </Button>
+        <Button variant="default" onClick={handleSave} disabled={!title.trim() || !company.trim()} className="rounded-xs px-2.5 py-1 text-[10px]">
           {t('add')}
-        </button>
+        </Button>
       </div>
     </div>
   )
@@ -282,12 +275,9 @@ export function ApplicationsView() {
             {error instanceof Error ? error.message : 'An unexpected error occurred. Please try again.'}
           </p>
         </div>
-        <button
-          onClick={() => window.location.reload()}
-          className="cursor-pointer rounded-sm bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground hover:opacity-90"
-        >
+        <Button variant="default" onClick={() => window.location.reload()} className="rounded-sm px-3 py-1.5 text-xs">
           Reload page
-        </button>
+        </Button>
       </div>
     )
   }
@@ -414,24 +404,24 @@ export function ApplicationsView() {
               <span className="text-[10px] text-muted-foreground font-mono">
                 {t('resume')}
               </span>
-              <select
-                value={filter}
-                onChange={(e) => setFilter(e.target.value)}
-                className="cursor-pointer rounded-xs border border-border bg-background px-2 py-1 text-[11px] outline-none focus:border-primary"
-              >
-                {resumeIds.map((id) => (
-                  <option key={id} value={id}>
-                    {id === 'all' ? t('all') : resumes.find((r) => r.id === id)?.name || id}
-                  </option>
-                ))}
-              </select>
+              <Select value={filter} onValueChange={(v) => setFilter(v || 'all')}>
+                <SelectTrigger className="rounded-xs px-2 py-1 text-[11px]">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {resumeIds.map((id) => (
+                    <SelectItem key={id} value={id}>
+                      {id === 'all' ? t('all') : resumes.find((r) => r.id === id)?.name || id}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
           </div>
         </div>
         {/* Paste URL input */}
         <div className="flex items-center gap-1.5">
-          <input
-            type="url"
+          <Input
             value={pasteUrl}
             onChange={(e) => setPasteUrl(e.target.value)}
             onKeyDown={(e) => {
@@ -439,12 +429,13 @@ export function ApplicationsView() {
             }}
             placeholder="Paste a job URL (Indeed, Greenhouse, JobsDB...) and press Enter"
             disabled={scraping}
-            className="flex-1 rounded-xs border border-border bg-background px-2.5 py-1.5 text-[11px] outline-none focus:border-primary placeholder:text-muted-foreground/50 disabled:opacity-50"
+            className="flex-1 rounded-xs px-2.5 py-1.5 text-[11px] placeholder:text-muted-foreground/50 disabled:opacity-50"
           />
-          <button
+          <Button
+            variant="default"
             onClick={handlePasteUrl}
             disabled={scraping || !pasteUrl.trim()}
-            className="flex shrink-0 cursor-pointer items-center gap-1 rounded-xs bg-primary px-3 py-1.5 text-[11px] font-medium text-primary-foreground transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
+            className="flex shrink-0 items-center gap-1 rounded-xs px-3 py-1.5 text-[11px]"
           >
             {scraping ? (
               <>
@@ -457,7 +448,7 @@ export function ApplicationsView() {
                 Add
               </>
             )}
-          </button>
+          </Button>
         </div>
       </div>
 
@@ -511,9 +502,9 @@ export function ApplicationsView() {
                   <SortableContext items={jobs.map((j) => j.key)} strategy={verticalListSortingStrategy}>
                     {jobs.map((job) => (
                       <DraggableJobCard key={job.key} job={job}>
-                        <button type="button" onClick={() => setSelectedJob(job)} className="w-full text-left cursor-pointer">
+                        <Button variant="ghost" onClick={() => setSelectedJob(job)} className="w-full text-left h-auto p-0 rounded-none">
                           <JobCardContent job={job} />
-                        </button>
+                        </Button>
                         <div className="mt-1.5 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                           {job.url && (
                             <a
@@ -526,16 +517,13 @@ export function ApplicationsView() {
                               <Link2 size={10} /> Open
                             </a>
                           )}
-                          <button
-                            onClick={(e) => {
+                          <Button variant="ghost" size="sm" onClick={(e) => {
                               e.stopPropagation()
                               removeJob(job.key)
                               notify({ message: 'Removed from board', type: 'info' })
-                            }}
-                            className="flex items-center gap-0.5 rounded-xs px-1.5 py-0.5 text-[9px] text-muted-foreground hover:text-destructive transition-colors cursor-pointer"
-                          >
+                            }} className="flex items-center gap-0.5 rounded-xs px-1.5 py-0.5 text-[9px] text-muted-foreground hover:text-destructive h-auto">
                             <Trash2 size={10} /> Remove
-                          </button>
+                          </Button>
                         </div>
                       </DraggableJobCard>
                     ))}
@@ -550,16 +538,13 @@ export function ApplicationsView() {
                       onSave={(payload) => bookmarkJob(payload)}
                     />
                   ) : (
-                    <button
-                      onClick={() => {
+                    <Button variant="ghost" size="sm" onClick={() => {
                         setAddingToCol(col.id)
                         setTimeout(() => addTitleRef.current?.focus(), 50)
-                      }}
-                      className="flex cursor-pointer items-center gap-1 rounded-xs px-2 py-1.5 text-[10px] text-muted-foreground hover:text-foreground hover:bg-accent/50 transition-colors"
-                    >
+                      }} className="flex items-center gap-1 rounded-xs px-2 py-1.5 text-[10px]">
                       <Plus size={12} />
                       Add Job
-                    </button>
+                    </Button>
                   )}
                 </div>
               </DroppableColumn>

@@ -4,6 +4,7 @@ import { memo, useState, useRef } from 'react'
 import { useRouter } from '~/i18n/routing'
 import type { UIMessage } from 'ai'
 import { Briefcase, MapPin, Check, Pencil } from 'lucide-react'
+import { Button } from '~/components/ui/button'
 import { UserMessage } from '@/components/agent-elements/user-message'
 import { useResumes, useUpdateResume } from '~/hooks/use-resumes'
 import { JobPreview } from '~/components/chat/job-preview'
@@ -54,12 +55,9 @@ export const UploadCardMessage = memo(function UploadCardMessage({
           <div className="flex items-center justify-between mb-3">
             <span className="text-[13px] font-semibold text-foreground">{resume.persona || 'Your Name'}</span>
             {!isEditing && (
-              <button 
-                onClick={() => setIsEditing(true)}
-                className="cursor-pointer text-[10px] text-muted-foreground hover:text-foreground flex items-center gap-1"
-              >
+              <Button variant="ghost" size="sm" onClick={() => setIsEditing(true)} className="text-[10px] flex items-center gap-1 h-auto p-0">
                 <Pencil size={10} /> Edit Filters
-              </button>
+              </Button>
             )}
           </div>
 

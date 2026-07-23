@@ -9,6 +9,10 @@ import { useUpdateResume } from '~/hooks/use-resumes'
 import { useUIStore } from '~/hooks/use-ui'
 import { notify } from '~/lib/toast'
 import { useTranslations } from 'next-intl'
+import { Button } from '~/components/ui/button'
+import { Input } from '~/components/ui/input'
+import { Textarea } from '~/components/ui/textarea'
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '~/components/ui/select'
 import type { Resume } from '~/types/resume'
 
 // Server-side PDF preview — same renderer as the resume editor (ADR-002)
@@ -217,25 +221,25 @@ export function AtsView() {
         {/* Resume select */}
         <div>
           <label className="label-mono mb-1.5 block">{t('targetResume')}</label>
-          <select
-            value={activeResumeId ?? 'none'}
-            onChange={(e) => {
-              if (e.target.value !== 'none') {
-                setActiveResumeId(e.target.value)
+          <Select
+            value={activeResumeId ?? undefined}
+            onValueChange={(v) => {
+              if (v && v !== 'none') {
+                setActiveResumeId(v)
                 setAnalysisResult(null)
               }
             }}
             disabled={resumes.length === 0}
-            className="w-full rounded-sm border border-border bg-background py-1.5 pl-2.5 pr-8 text-xs outline-none focus:border-primary"
           >
-            {resumes.length === 0 ? (
-              <option value="none">None (Upload first)</option>
-            ) : (
-              resumes.map((r) => (
-                <option key={r.id} value={r.id}>{r.name}</option>
-              ))
-            )}
-          </select>
+            <SelectTrigger className="w-full rounded-sm py-1.5 pl-2.5 pr-8 text-xs">
+              <SelectValue placeholder="None (Upload first)" />
+            </SelectTrigger>
+            <SelectContent>
+              {resumes.map((r) => (
+                <SelectItem key={r.id} value={r.id}>{r.name}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
 
         {/* JD input */}
@@ -243,23 +247,24 @@ export function AtsView() {
           <div className="flex items-center justify-between mb-1.5">
             <label className="label-mono block">{t('jobDescription')}</label>
             {jdText && (
-              <button onClick={handleClearJd} className="text-[10px] text-destructive hover:underline cursor-pointer">
+              <Button variant="link" onClick={handleClearJd} className="text-[10px] text-destructive">
                 Clear & Reset
-              </button>
+              </Button>
             )}
           </div>
-          <textarea
+          <Textarea
             value={jdText}
             onChange={(e) => setJdText(e.target.value)}
             rows={6}
             placeholder="Paste the job description you want to match against (optional)"
-            className="w-full resize-y rounded-sm border border-border bg-background p-2.5 text-xs outline-none focus:border-primary"
+            className="w-full resize-y rounded-sm p-2.5 text-xs"
           />
           <div className="mt-2 flex gap-2">
-            <button
+            <Button
+              variant="default"
               onClick={() => fetchAnalysis(jdText)}
               disabled={analysisLoading || !resume || !jdText.trim()}
-              className="flex flex-1 cursor-pointer items-center justify-center gap-1.5 rounded-sm bg-primary py-2 text-xs font-medium text-primary-foreground transition-opacity hover:opacity-90 disabled:opacity-40"
+              className="flex flex-1 items-center justify-center gap-1.5 rounded-sm py-2 text-xs"
             >
               {analysisLoading ? (
                 <RefreshCw size={13} className="animate-spin" />
@@ -267,15 +272,16 @@ export function AtsView() {
                 <Wand2 size={13} />
               )}
               Analyze Match
-            </button>
-            <button
+            </Button>
+            <Button
+              variant="outline"
               onClick={() => fetchAnalysis('')}
               disabled={analysisLoading || !resume}
-              className="flex cursor-pointer items-center justify-center gap-1.5 rounded-sm border border-border bg-card px-3 py-2 text-xs text-muted-foreground transition-colors hover:bg-background disabled:opacity-40"
+              className="flex items-center justify-center gap-1.5 rounded-sm px-3 py-2 text-xs"
               title="Run a general resume health check without a job description"
             >
               Health Check
-            </button>
+            </Button>
           </div>
           {!jdText.trim() && (
             <p className="mt-1.5 text-[10px] text-muted-foreground">
@@ -286,19 +292,17 @@ export function AtsView() {
 
         {/* Company / Role context (used for tailor) */}
         <div className="flex gap-2">
-          <input
-            type="text"
+          <Input
             value={company}
             onChange={(e) => setCompany(e.target.value)}
             placeholder="Company (optional)"
-            className="flex-1 rounded-sm border border-border bg-background px-2.5 py-1.5 text-xs outline-none focus:border-primary"
+            className="flex-1 rounded-sm px-2.5 py-1.5 text-xs"
           />
-          <input
-            type="text"
+          <Input
             value={role}
             onChange={(e) => setRole(e.target.value)}
             placeholder="Role (optional)"
-            className="flex-1 rounded-sm border border-border bg-background px-2.5 py-1.5 text-xs outline-none focus:border-primary"
+            className="flex-1 rounded-sm px-2.5 py-1.5 text-xs"
           />
         </div>
 
@@ -379,8 +383,10 @@ export function AtsView() {
                 <div className="flex flex-wrap gap-1.5">
                   {analysisResult.missing && analysisResult.missing.length > 0 ? (
                     analysisResult.missing.map((k) => (
-                      <button
+                      <Button
                         key={k}
+                        variant="outline"
+                        size="sm"
                         onClick={() => {
                           if (resume) {
                             const nextSkills = [...resume.skills]
@@ -391,11 +397,11 @@ export function AtsView() {
                             }
                           }
                         }}
-                        className="cursor-pointer rounded-full border px-2 py-0.5 text-[11px] transition-all hover:scale-105 active:scale-95"
+                        className="rounded-full px-2 py-0.5 text-[11px]"
                         style={{ background: 'var(--danger-soft)', color: 'var(--destructive)', borderColor: 'rgba(220,38,38,0.2)' }}
                       >
                         + {k}
-                      </button>
+                      </Button>
                     ))
                   ) : (
                     <span className="text-[11px] text-muted-foreground flex items-center gap-1">
@@ -440,10 +446,11 @@ export function AtsView() {
                 </p>
               </div>
             </div>
-            <button
+            <Button
+              variant="default"
               onClick={handleTailor}
               disabled={tailoringLoading}
-              className="flex w-full cursor-pointer items-center justify-center gap-1.5 rounded-sm bg-primary py-2 text-xs font-medium text-primary-foreground transition-opacity hover:opacity-90 disabled:opacity-50"
+              className="flex w-full items-center justify-center gap-1.5 rounded-sm py-2 text-xs"
             >
               {tailoringLoading ? (
                 <RefreshCw size={13} className="animate-spin" />
@@ -451,7 +458,7 @@ export function AtsView() {
                 <Sparkles size={13} />
               )}
               {tailoringLoading ? 'Rewriting Resume...' : 'Tailor Resume with AI'}
-            </button>
+            </Button>
           </div>
         )}
       </div>
@@ -460,7 +467,9 @@ export function AtsView() {
       <div className="flex w-full md:w-[55%] flex-col items-center overflow-y-auto bg-background p-4 md:p-6">
         <div className="mb-4 flex w-full max-w-[550px] items-center justify-between rounded-sm border border-border bg-card p-2 px-3">
           <span className="text-[11px] font-semibold text-muted-foreground">ATS Real-Time Sheet</span>
-          <button
+          <Button
+            variant="outline"
+            size="sm"
             onClick={() => {
               if (activeResumeId) {
                 router.push(`/resume/${activeResumeId}`)
@@ -469,10 +478,10 @@ export function AtsView() {
                 notify({ message: 'Select a resume first', type: 'warning' })
               }
             }}
-            className="rounded-sm border border-border bg-card px-2 py-1 text-[11px] hover:bg-background"
+            className="rounded-sm px-2 py-1 text-[11px]"
           >
             Edit Resume Based on ATS
-          </button>
+          </Button>
         </div>
         {resume ? (
           <div className="w-full max-w-[550px] min-h-[650px]">
@@ -488,12 +497,9 @@ export function AtsView() {
               Select a resume from the dropdown or upload one in chat, then paste a job description to get an ATS match score.
             </p>
             <div className="flex flex-col items-start gap-2 sm:flex-row sm:items-center">
-              <button
-                onClick={() => router.push('/chat')}
-                className="flex cursor-pointer items-center gap-1.5 rounded-sm bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground transition-opacity hover:opacity-90"
-              >
+              <Button variant="default" size="sm" onClick={() => router.push('/chat')} className="flex items-center gap-1.5 rounded-sm px-3 py-1.5 text-xs">
                 <Upload size={12} /> Upload Resume
-              </button>
+              </Button>
               <span className="hidden items-center text-muted-foreground sm:flex">
                 <ArrowRight size={14} />
               </span>

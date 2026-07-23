@@ -2,13 +2,14 @@
 
 import Image from 'next/image'
 import { PanelLeft, Sun, Moon, Globe, Search } from 'lucide-react'
+import { Button } from '~/components/ui/button'
 import { UserMenu } from '~/components/layout/user-menu'
 import { cn } from '~/lib/utils'
 import { useTheme } from '~/components/layout/theme-provider'
 import { useUIStore } from '~/hooks/use-ui'
-import { Menu } from '@base-ui/react/menu'
 import { useLocale } from 'next-intl'
 import { Link, useRouter, usePathname } from '~/i18n/routing'
+import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from '~/components/ui/dropdown-menu'
 
 export function LanguageSwitcher() {
   const locale = useLocale()
@@ -20,32 +21,22 @@ export function LanguageSwitcher() {
   }
 
   return (
-    <Menu.Root modal={false}>
-      <Menu.Trigger className="flex h-[30px] items-center gap-1 text-xs font-semibold text-muted-foreground transition-all duration-150 hover:bg-background hover:text-foreground active:scale-95 cursor-pointer rounded-sm px-1.5">
+    <DropdownMenu>
+      <DropdownMenuTrigger className="flex h-[30px] items-center gap-1 rounded-sm px-1.5 text-xs font-semibold text-muted-foreground transition-all duration-150 hover:bg-background hover:text-foreground active:scale-95 cursor-pointer">
         <Globe size={14} />
         <span className="inline-block w-5 text-center uppercase tabular-nums">{locale}</span>
-      </Menu.Trigger>
-      <Menu.Portal>
-        <Menu.Positioner side="bottom" align="end" className="z-50">
-          <Menu.Popup className="min-w-[120px] rounded-md border border-border bg-popover p-1 shadow-lg">
-            <Menu.Item
-              className="flex cursor-pointer items-center justify-between rounded-sm px-2.5 py-1.5 text-xs text-muted-foreground transition-colors hover:bg-accent hover:text-foreground data-[highlighted]:bg-accent data-[highlighted]:text-foreground"
-              onClick={() => handleLanguageChange('en')}
-            >
-              <span>English</span>
-              {locale === 'en' && <span className="text-[10px] text-primary font-bold">✓</span>}
-            </Menu.Item>
-            <Menu.Item
-              className="flex cursor-pointer items-center justify-between rounded-sm px-2.5 py-1.5 text-xs text-muted-foreground transition-colors hover:bg-accent hover:text-foreground data-[highlighted]:bg-accent data-[highlighted]:text-foreground"
-              onClick={() => handleLanguageChange('th')}
-            >
-              <span>ไทย</span>
-              {locale === 'th' && <span className="text-[10px] text-primary font-bold">✓</span>}
-            </Menu.Item>
-          </Menu.Popup>
-        </Menu.Positioner>
-      </Menu.Portal>
-    </Menu.Root>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end" className="min-w-[120px]">
+        <DropdownMenuItem onClick={() => handleLanguageChange('en')} className="flex items-center justify-between">
+          <span>English</span>
+          {locale === 'en' && <span className="text-[10px] text-primary font-bold">✓</span>}
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={() => handleLanguageChange('th')} className="flex items-center justify-between">
+          <span>ไทย</span>
+          {locale === 'th' && <span className="text-[10px] text-primary font-bold">✓</span>}
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
   )
 }
 
@@ -79,39 +70,44 @@ export function Topbar() {
       </div>
 
       {/* Sidebar toggle — visible on all sizes */}
-      <button
+      <Button
+        variant="ghost"
+        size="icon"
         onClick={toggleSidebar}
-        className="ml-1 flex h-[30px] w-[30px] items-center justify-center rounded-sm text-muted-foreground transition-all duration-150 hover:bg-background hover:text-foreground active:scale-95"
+        className="ml-1 h-[30px] w-[30px] rounded-sm text-muted-foreground"
         title="Toggle sidebar"
       >
         <PanelLeft size={15} />
-      </button>
+      </Button>
 
       <div className="flex-1" />
 
       {/* ⌘K Command Palette trigger */}
-      <button
+      <Button
+        variant="outline"
         onClick={() => {
           const event = new KeyboardEvent('keydown', { key: 'k', metaKey: true, bubbles: true })
           document.dispatchEvent(event)
         }}
-        className="hidden sm:flex items-center gap-2 rounded-md border border-border bg-card px-3 py-1.5 text-sm text-muted-foreground hover:bg-accent-soft transition-colors mr-2 max-w-[200px] w-full"
+        className="hidden sm:flex items-center gap-2 rounded-md px-3 py-1.5 text-sm mr-2 max-w-[200px] w-full"
       >
         <Search size={13} className="shrink-0" />
         <span className="flex-1 text-left text-xs">Search...</span>
         <kbd className="ml-auto rounded border border-border bg-muted px-1.5 py-0.5 font-mono text-[10px]">⌘K</kbd>
-      </button>
+      </Button>
 
       {/* Actions */}
       <div className="flex items-center gap-1 pr-3">
         <LanguageSwitcher />
-        <button
+        <Button
+          variant="ghost"
+          size="icon"
           onClick={toggle}
-          className="relative flex h-[30px] w-[30px] items-center justify-center rounded-sm text-muted-foreground transition-all duration-150 hover:bg-background hover:text-foreground active:scale-95"
+          className="relative h-[30px] w-[30px] rounded-sm text-muted-foreground"
           title="Toggle theme"
         >
           {theme === 'dark' ? <Sun size={16} /> : <Moon size={16} />}
-        </button>
+        </Button>
         <UserMenu />
       </div>
     </header>

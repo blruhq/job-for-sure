@@ -7,6 +7,7 @@ import {
   DollarSign, Briefcase,
 } from 'lucide-react'
 import { cn } from '~/lib/utils'
+import { Button } from '~/components/ui/button'
 import { useApplications, useCreateApplication, useDeleteApplication } from '~/hooks/use-apps'
 import { notify } from '~/lib/toast'
 import { companyColor, companyLogo } from '~/lib/company-data'
@@ -105,9 +106,9 @@ export function JobPreview({ resume, onDismiss, onLoadComplete }: { resume: Resu
             </span>
           </div>
           {onDismiss && (
-            <button onClick={onDismiss} className="cursor-pointer text-muted-foreground hover:text-foreground">
+            <Button variant="ghost" size="icon" onClick={onDismiss} className="h-5 w-5 text-muted-foreground hover:text-foreground">
               <X size={13} />
-            </button>
+            </Button>
           )}
         </div>
       </div>
@@ -134,16 +135,17 @@ export function JobPreview({ resume, onDismiss, onLoadComplete }: { resume: Resu
             </span>
           </div>
           <div className="flex items-center gap-2">
-            <button
+            <Button
+              variant="link"
               onClick={() => router.push(`/resume/${resume.id}`)}
-              className="flex cursor-pointer items-center gap-0.5 text-[11px] font-medium text-primary hover:underline"
+              className="flex items-center gap-0.5 text-[11px]"
             >
               View all <ChevronRight size={12} />
-            </button>
+            </Button>
             {onDismiss && (
-              <button onClick={onDismiss} className="cursor-pointer text-muted-foreground hover:text-foreground">
+              <Button variant="ghost" size="icon" onClick={onDismiss} className="h-5 w-5 text-muted-foreground hover:text-foreground">
                 <X size={13} />
-              </button>
+              </Button>
             )}
           </div>
         </div>
