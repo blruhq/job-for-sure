@@ -255,7 +255,7 @@ export default function StandaloneCoverLetterPage() {
       />
 
       {/* Configuration Column */}
-      <div className="w-full lg:w-[350px] shrink-0 border-b lg:border-b-0 lg:border-r border-border neuro-surface p-5 flex flex-col gap-4 overflow-y-auto justify-between">
+      <div className="w-full lg:w-[400px] shrink-0 border-b lg:border-b-0 lg:border-r border-border neuro-surface p-5 flex flex-col gap-4 overflow-y-auto justify-between">
         <div className="space-y-4">
           <div className="text-center pb-2 border-b border-border/50">
             <h1 className="text-sm font-semibold tracking-tight text-foreground">{t('generatorTitle')}</h1>
@@ -282,10 +282,9 @@ export default function StandaloneCoverLetterPage() {
                 ))}
               </select>
               <Button
-                variant="outline"
                 onClick={() => fileInputRef.current?.click()}
                 disabled={parsing}
-                className="flex items-center gap-1 rounded-xs border-border text-[11px] font-medium text-muted-foreground disabled:opacity-50"
+                className="flex items-center gap-1 rounded-xs text-[11px] font-medium disabled:opacity-50"
               >
                 {parsing ? (
                   <Loader2 size={12} className="animate-spin text-primary" />
@@ -348,33 +347,33 @@ export default function StandaloneCoverLetterPage() {
           {mode === 'quick' ? (
             <div className="space-y-3">
               <div>
-                <label className="label-mono mb-1 block">{t('companyName')}</label>
+                <label className="label-mono mb-1.5 block">{t('companyName')}</label>
                 <Input
                   type="text"
                   value={company}
                   onChange={(e) => setCompany(e.target.value)}
                   placeholder={t('placeholderCompany')}
-                  className="w-full rounded-xs text-[11px] px-2.5 py-1.5"
+                  className="w-full rounded-xs text-sm px-3 py-2.5"
                 />
               </div>
               <div>
-                <label className="label-mono mb-1 block">Job Title</label>
+                <label className="label-mono mb-1.5 block">Job Title</label>
                 <Input
                   type="text"
                   value={role}
                   onChange={(e) => setRole(e.target.value)}
                   placeholder="e.g. Senior Frontend Engineer"
-                  className="w-full rounded-xs text-[11px] px-2.5 py-1.5"
+                  className="w-full rounded-xs text-sm px-3 py-2.5"
                 />
               </div>
               <div>
-                <label className="label-mono mb-1 block">Focus / Highlights (Optional)</label>
+                <label className="label-mono mb-1.5 block">Focus / Highlights (Optional)</label>
                 <Textarea
                   value={focus}
                   onChange={(e) => setFocus(e.target.value)}
                   placeholder="e.g. Focus on my dashboard UI leadership..."
                   rows={4}
-                  className="w-full resize-none rounded-xs text-[11px] px-2.5 py-1.5 font-sans"
+                  className="w-full resize-none rounded-xs text-sm px-3 py-2.5 font-sans"
                 />
               </div>
             </div>
