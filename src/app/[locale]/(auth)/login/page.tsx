@@ -4,6 +4,8 @@ import { useState, Suspense, useEffect } from 'react'
 import { Link, useRouter } from '~/i18n/routing'
 import { useSearchParams } from 'next/navigation'
 import { authClient } from '~/lib/auth-client'
+import { Button } from '~/components/ui/button'
+import { Input } from '~/components/ui/input'
 
 function LoginForm() {
   const router = useRouter()
@@ -102,13 +104,13 @@ function LoginForm() {
               <label className="mb-1 block font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
                 Email
               </label>
-              <input
+              <Input
                 type="text"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="you@example.com"
                 required
-                className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground outline-none transition-colors placeholder:text-muted-foreground/50 focus:border-primary"
+                className="w-full rounded-md px-3 py-2 text-sm"
               />
             </div>
 
@@ -124,23 +126,23 @@ function LoginForm() {
                   Forgot password?
                 </Link>
               </div>
-              <input
+              <Input
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
                 required
-                className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground outline-none transition-colors placeholder:text-muted-foreground/50 focus:border-primary"
+                className="w-full rounded-md px-3 py-2 text-sm"
               />
             </div>
 
-            <button
+            <Button
               type="submit"
               disabled={loading}
-              className="w-full cursor-pointer rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-opacity hover:opacity-90 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
+              className="w-full rounded-md text-sm font-medium active:scale-[0.98]"
             >
               {loading ? 'Signing in...' : 'Sign In'}
-            </button>
+            </Button>
           </form>
 
           {/* Divider */}
@@ -154,10 +156,11 @@ function LoginForm() {
           </div>
 
           {/* Google */}
-          <button
+          <Button
             type="button"
+            variant="outline"
             onClick={handleGoogle}
-            className="w-full cursor-pointer rounded-md border border-border bg-background px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-muted active:scale-[0.98]"
+            className="w-full rounded-md border-border text-sm font-medium active:scale-[0.98]"
           >
             <span className="inline-flex items-center gap-2">
               <svg width="14" height="14" viewBox="0 0 24 24">
@@ -168,7 +171,7 @@ function LoginForm() {
               </svg>
               Continue with Google
             </span>
-          </button>
+          </Button>
 
           <p className="mt-5 text-center text-xs text-muted-foreground">
             Don&apos;t have an account?{' '}

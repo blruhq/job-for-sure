@@ -6,6 +6,8 @@ import { authClient } from '~/lib/auth-client'
 import { Loader2, User, Bell, AlertTriangle, Check, X, Eye, EyeOff, LocateFixed, CreditCard } from 'lucide-react'
 import { Sun, Moon } from 'lucide-react'
 import { useTheme } from '~/components/layout/theme-provider'
+import { Button } from '~/components/ui/button'
+import { Input } from '~/components/ui/input'
 
 // ── TYPES ──
 type Tab = 'profile' | 'notifications' | 'danger' | 'billing'
@@ -41,13 +43,15 @@ function Toast({ notif, onClose }: { notif: NonNullable<ReturnType<typeof useNot
       {notif.type === 'success' && <Check size={13} />}
       {notif.type === 'error' && <X size={13} />}
       <span className="flex-1">{notif.message}</span>
-      <button
+      <Button
+        variant="ghost"
+        size="icon"
         onClick={onClose}
-        className="ml-2 cursor-pointer text-current opacity-60 hover:opacity-100 transition-opacity"
+        className="ml-2 h-5 w-5 p-0 opacity-60 hover:opacity-100"
         aria-label="Dismiss"
       >
         <X size={13} />
-      </button>
+      </Button>
     </div>
   )
 }
@@ -311,19 +315,20 @@ export default function SettingsPage() {
             <div className="rounded-sm border border-border bg-card p-4">
               <div className="mb-3 text-xs font-medium">Display Name</div>
               <div className="flex gap-2">
-                <input
+                <Input
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  className="flex-1 rounded-sm border border-border bg-background px-3 py-1.5 text-xs outline-none focus:border-foreground/50"
+                  className="flex-1 rounded-sm text-xs px-3 py-1.5"
                   placeholder="Your name"
                 />
-                <button
+                <Button
                   onClick={handleUpdateName}
                   disabled={savingName || name === user?.name}
-                  className="rounded-sm bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground transition-opacity hover:opacity-90 disabled:opacity-50"
+                  size="sm"
+                  className="rounded-sm text-xs px-3"
                 >
                   {savingName ? <Loader2 size={13} className="animate-spin" /> : 'Save'}
-                </button>
+                </Button>
               </div>
             </div>
 
@@ -331,20 +336,21 @@ export default function SettingsPage() {
             <div className="rounded-sm border border-border bg-card p-4">
               <div className="mb-3 text-xs font-medium">Email Address</div>
               <div className="flex gap-2">
-                <input
+                <Input
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="flex-1 rounded-sm border border-border bg-background px-3 py-1.5 text-xs outline-none focus:border-foreground/50"
+                  className="flex-1 rounded-sm text-xs px-3 py-1.5"
                   placeholder="email@example.com"
                   type="email"
                 />
-                <button
+                <Button
                   onClick={handleUpdateEmail}
                   disabled={savingEmail || email === user?.email || !email.trim()}
-                  className="rounded-sm bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground transition-opacity hover:opacity-90 disabled:opacity-50"
+                  size="sm"
+                  className="rounded-sm text-xs px-3"
                 >
                   {savingEmail ? <Loader2 size={13} className="animate-spin" /> : 'Update'}
-                </button>
+                </Button>
               </div>
               {email !== user?.email && (
                 <div className="mt-2 text-[10px] text-muted-foreground">
@@ -361,29 +367,31 @@ export default function SettingsPage() {
                 directions and living cost estimates. Not your exact address.
               </p>
               <div className="flex gap-2">
-                <input
+                <Input
                   value={homeLocation}
                   onChange={(e) => setHomeLocation(e.target.value)}
                   onKeyDown={(e) => { if (e.key === 'Enter') handleSaveHomeLocation() }}
-                  className="flex-1 rounded-sm border border-border bg-background px-3 py-1.5 text-xs outline-none focus:border-foreground/50"
+                  className="flex-1 rounded-sm text-xs px-3 py-1.5"
                   placeholder="e.g. Bang Na, Bangkok"
                 />
-                <button
+                <Button
                   onClick={handleSaveHomeLocation}
                   disabled={savingHomeLocation}
-                  className="shrink-0 rounded-sm bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground transition-opacity hover:opacity-90 disabled:opacity-50"
+                  size="sm"
+                  className="shrink-0 rounded-sm text-xs px-3"
                 >
                   {savingHomeLocation ? <Loader2 size={13} className="animate-spin" /> : 'Save'}
-                </button>
+                </Button>
               </div>
-              <button
+              <Button
+                variant="link"
                 onClick={handleDetectLocation}
                 disabled={detectingLocation}
-                className="mt-2 flex cursor-pointer items-center gap-1.5 text-[11px] text-primary hover:underline disabled:opacity-50"
+                className="mt-2 flex items-center gap-1.5 text-[11px] h-auto p-0 disabled:opacity-50"
               >
                 {detectingLocation ? <Loader2 size={12} className="animate-spin" /> : <LocateFixed size={12} />}
                 {detectingLocation ? 'Detecting…' : 'Use my current location'}
-              </button>
+              </Button>
             </div>
 
             {/* Change Password */}
@@ -391,49 +399,56 @@ export default function SettingsPage() {
               <div className="mb-3 text-xs font-medium">Change Password</div>
               <div className="space-y-2.5">
                 <div className="relative">
-                  <input
+                  <Input
                     value={currentPassword}
                     onChange={(e) => setCurrentPassword(e.target.value)}
                     type={showCurrent ? 'text' : 'password'}
-                    className="w-full rounded-sm border border-border bg-background px-3 py-1.5 pr-8 text-xs outline-none focus:border-foreground/50"
+                    className="w-full rounded-sm text-xs px-3 py-1.5 pr-8"
                     placeholder="Current password"
                   />
-                  <button
+                  <Button
+                    variant="ghost"
+                    size="icon"
                     onClick={() => setShowCurrent(!showCurrent)}
-                    className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                    className="absolute right-2 top-1/2 -translate-y-1/2 h-6 w-6 p-0 text-muted-foreground hover:text-foreground"
+                    type="button"
                   >
                     {showCurrent ? <EyeOff size={13} /> : <Eye size={13} />}
-                  </button>
+                  </Button>
                 </div>
                 <div className="relative">
-                  <input
+                  <Input
                     value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
                     type={showNew ? 'text' : 'password'}
-                    className="w-full rounded-sm border border-border bg-background px-3 py-1.5 pr-8 text-xs outline-none focus:border-foreground/50"
+                    className="w-full rounded-sm text-xs px-3 py-1.5 pr-8"
                     placeholder="New password (min 8 chars)"
                   />
-                  <button
+                  <Button
+                    variant="ghost"
+                    size="icon"
                     onClick={() => setShowNew(!showNew)}
-                    className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                    className="absolute right-2 top-1/2 -translate-y-1/2 h-6 w-6 p-0 text-muted-foreground hover:text-foreground"
+                    type="button"
                   >
                     {showNew ? <EyeOff size={13} /> : <Eye size={13} />}
-                  </button>
+                  </Button>
                 </div>
-                <input
+                <Input
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   type="password"
-                  className="w-full rounded-sm border border-border bg-background px-3 py-1.5 text-xs outline-none focus:border-foreground/50"
+                  className="w-full rounded-sm text-xs px-3 py-1.5"
                   placeholder="Confirm new password"
                 />
-                <button
+                <Button
                   onClick={handleChangePassword}
                   disabled={changingPassword}
-                  className="rounded-sm bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground transition-opacity hover:opacity-90 disabled:opacity-50"
+                  size="sm"
+                  className="rounded-sm text-xs px-3"
                 >
                   {changingPassword ? <Loader2 size={13} className="animate-spin" /> : 'Change Password'}
-                </button>
+                </Button>
               </div>
             </div>
 
@@ -452,13 +467,15 @@ export default function SettingsPage() {
                   <div className="text-xs font-medium">Theme</div>
                   <div className="text-[11px] text-muted-foreground">Light or dark mode</div>
                 </div>
-                <button
+                <Button
+                  variant="outline"
                   onClick={toggle}
-                  className="flex items-center gap-1.5 rounded-sm border border-border bg-background px-3 py-1.5 text-xs hover:bg-background"
+                  size="sm"
+                  className="flex items-center gap-1.5 rounded-sm text-xs"
                 >
                   {theme === 'dark' ? <Sun size={13} /> : <Moon size={13} />}
                   Toggle
-                </button>
+                </Button>
               </div>
             </div>
           </div>
@@ -506,19 +523,21 @@ export default function SettingsPage() {
             </div>
             <div className="mb-3 text-[11px] font-medium">Type DELETE to confirm</div>
             <div className="flex gap-2">
-              <input
+              <Input
                 value={confirmDelete}
                 onChange={(e) => setConfirmDelete(e.target.value)}
-                className="flex-1 rounded-sm border border-red-500/30 bg-background px-3 py-1.5 text-xs outline-none focus:border-red-500/50"
+                className="flex-1 rounded-sm text-xs px-3 py-1.5 border-red-500/30 focus:border-red-500/50"
                 placeholder="Type DELETE"
               />
-              <button
+              <Button
+                variant="destructive"
                 onClick={handleDeleteAccount}
                 disabled={confirmDelete !== 'DELETE' || deleting}
-                className="rounded-sm bg-red-600 px-3 py-1.5 text-xs font-medium text-white transition-opacity hover:bg-red-700 disabled:opacity-50"
+                size="sm"
+                className="rounded-sm text-xs px-3"
               >
                 {deleting ? <Loader2 size={13} className="animate-spin" /> : 'Delete Account'}
-              </button>
+              </Button>
             </div>
           </div>
         )}

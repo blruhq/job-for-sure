@@ -7,6 +7,7 @@ import { InterviewSummary } from './interview-summary'
 import type { InterviewConfig, InterviewExchange, InterviewSessionRow } from '~/types/interview'
 import { useActiveResume } from '~/hooks/use-active-resume'
 import { notify } from '~/lib/toast'
+import { Button } from '~/components/ui/button'
 
 export function InterviewView() {
   const { resumes, activeResumeId } = useActiveResume()
@@ -129,13 +130,15 @@ export function InterviewView() {
                 <span className="rounded bg-success-soft px-2 py-0.5 font-mono text-[10px] font-bold text-success border border-success/15">
                   Score: {selectedPastSession.score}/10
                 </span>
-                <button
+                <Button
+                  variant="outline"
                   onClick={() => setSelectedPastSession(null)}
                   aria-label="Close"
-                  className="rounded-sm border border-border bg-card px-2.5 py-1 text-[10px] hover:bg-muted font-medium cursor-pointer"
+                  size="sm"
+                  className="rounded-sm px-2.5 py-1 text-[10px] font-medium"
                 >
                   Close
-                </button>
+                </Button>
               </div>
             </div>
 

@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { RefreshCw, CheckCircle, XCircle, HelpCircle, Loader2 } from 'lucide-react'
 import { cn } from '~/lib/utils'
+import { Button } from '~/components/ui/button'
 
 type SourceStatus = {
   source: string
@@ -58,14 +59,15 @@ export function SourceHealth() {
         <h2 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
           Job Source Health
         </h2>
-        <button
+        <Button
+          variant="link"
           onClick={fetchHealth}
           disabled={loading}
-          className="flex cursor-pointer items-center gap-1 text-[10px] text-muted-foreground hover:text-foreground disabled:opacity-50"
+          className="flex items-center gap-1 text-[10px] h-auto p-0 text-muted-foreground hover:text-foreground disabled:opacity-50"
         >
           <RefreshCw size={11} className={cn(loading && 'animate-spin')} />
           {loading ? 'Checking…' : 'Refresh'}
-        </button>
+        </Button>
       </div>
 
       {data && (

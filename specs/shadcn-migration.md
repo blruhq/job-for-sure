@@ -1,698 +1,513 @@
-# Implementation Spec & Plan: Migrate Hand-Rolled UI to shadcn/ui
+# Implementation Spec & Plan: shadcn/ui Migration (Finish Remaining Raw Elements)
+
+---
 
 ### 0. Architectural Decision Record (ADR) & Scaling Tradeoffs
 
-- **Context & Constraints**: The project has a `components.json` configured for shadcn (style: `base-nova`, baseColor: `neutral`, cssVariables: true) but almost no shadcn components installed. All UI is hand-rolled with raw `<button>`, `<input>`, `<select>`, `<textarea>`, and custom fixed-position overlays. This causes visual inconsistency and maintenance burden. The project already has `@base-ui/react` installed and uses it for menus in navbar/user-menu/tooltip. The CSS tokens in `globals.css` already define all shadcn semantic variables (`--primary`, `--border`, `--background`, etc.) and the `@theme inline` block bridges them to Tailwind utilities.
-- **Chosen Architecture**: Install shadcn/ui primitives into `src/app/components/ui/` (alias `~/components/ui`). The `base-nova` style may produce base-ui-backed components; if it fails, fall back to `--style neutral` (Radix-backed). Either way, the component API surface is identical (compound components with the same prop names). Migrate all raw HTML elements to shadcn primitives, preserving every `onClick`, state variable, prop, and behavior exactly. This is a pure markup refactor — zero functional changes.
+- **Context & Constraints**: The ui/ component suite in `src/app/components/ui/` already exists — built on `@base-ui/react` primitives with shadcn-style CVA variants. All Phase 2 variants (button), Phase 3D (Sheet/Dialog), and Phase 3E (DropdownMenu) are already done. 28 app files already import these components. The task's Phase 1 (`shadcn add`) would overwrite the working Base UI wrappers with Radix-based ones, breaking all importers (different APIs for Select, Dialog, Tabs, etc.). Decision: skip overwrite, proceed with **finishing the remaining raw elements** only.
+
+- **Chosen Architecture**: Swap remaining raw `<button>`, `<input>`, `<textarea>`, and `<select>` HTML elements in page/component files to the existing `~/components/ui/Button`, `~/components/ui/Input`, `~/components/ui/Textarea`, and native `<select>` (Select ui component uses a complex Base UI Popup API — not a drop-in for simple `<select>` usage; migrate only where the Select component is a clear fit, leave styled `<select>` elements alone if they're in autocomplete/custom-combo contexts).
+
 - **Discarded Alternatives**:
-  - *Alternative A*: Keep hand-rolled components and just normalize their styles. Rejected — no consistency guarantee, duplicated effort, no accessibility primitives (focus trap, ARIA, keyboard nav).
-  - *Alternative B*: Build a custom component library from scratch. Rejected — YAGNI, shadcn already provides everything needed with the right tokens.
+  - *Run `shadcn add`*: Overwrites all 19 working ui/ files with Radix-based versions. Would require fixing all 28 importers with different prop APIs (especially Select with `defaultValue`/`onValueChange`, Dialog `open`/`onOpenChange`, Tabs `value`/`onValueChange`). Huge risk, no user benefit.
+  - *Migrate raw `<select>` to `<Select>` component*: The Base UI Select uses `SelectPrimitive.Root`, `SelectTrigger`, `SelectContent`, `SelectItem` etc. — a fundamentally different API from native `<select>`. The cover-letter page's `<select>` has simple `onChange={(e) => setSelectedResumeId(e.target.value)}` — refactoring would be disproportionate. **Keep styled native `<select>` elements intact; they are not hand-rolled buttons/inputs.**
 
 ---
 
 ### 1. Target Files & Folder Structure
 
-**New files (shadcn primitives — created by CLI):**
-- `src/app/components/ui/button.tsx`
-- `src/app/components/ui/input.tsx`
-- `src/app/components/ui/textarea.tsx`
-- `src/app/components/ui/select.tsx`
-- `src/app/components/ui/dialog.tsx`
-- `src/app/components/ui/sheet.tsx`
-- `src/app/components/ui/dropdown-menu.tsx`
-- `src/app/components/ui/alert-dialog.tsx`
-- `src/app/components/ui/badge.tsx`
-- `src/app/components/ui/separator.tsx`
-- `src/app/components/ui/scroll-area.tsx`
-- `src/app/components/ui/tabs.tsx`
-- `src/app/components/ui/label.tsx`
-- `src/app/components/ui/avatar.tsx`
+Files to modify (raw `<button>`/`<input>`/`<textarea>` → ui components):
 
-**Files to modify (migration targets — organized by phase):**
+**Primary targets (high count):**
+- `src/app/[locale]/(app)/settings/page.tsx` — 12 `<button>`, 7 `<input>`
+- `src/app/[locale]/(app)/cover-letter/page.tsx` — 11 `<button>`, 3 `<input>`, 3 `<textarea>`
+- `src/app/[locale]/(app)/resumes/page.tsx` — 7 `<button>`
 
-Phase 3A (Buttons):
-- `src/app/components/resume/resume-detail.tsx` (27 buttons)
-- `src/app/components/pipeline/applications-view.tsx` (7 buttons)
-- `src/app/components/resume/job-search-panel.tsx` (8 buttons)
-- `src/app/components/resume/cover-letter-editor.tsx` (9 buttons)
-- `src/app/components/interview/interview-setup.tsx` (7 buttons)
-- `src/app/components/ats/ats-view.tsx` (7 buttons)
-- `src/app/components/pipeline/job-detail-panel.tsx` (7 buttons)
-- `src/app/components/chat/chat-view.tsx` (10 buttons)
-- `src/app/components/chat/job-preview.tsx` (8 buttons)
-- `src/app/components/interview/interview-session.tsx` (6 buttons)
-- `src/app/components/resume/tailor-review-panel.tsx` (5 buttons)
-- `src/app/components/layout/navbar.tsx` (3 buttons)
-- `src/app/components/layout/upload-modal.tsx` (3 buttons)
-- `src/app/components/chat/paste-jd-modal.tsx` (3 buttons)
-- `src/app/components/chat/build-wizard.tsx` (4 buttons)
-- `src/app/components/resume/resume-copilot.tsx` (3 buttons)
-- `src/app/components/pipeline/smart-overview.tsx` (3 buttons)
-- `src/app/components/pipeline/area-intelligence.tsx` (6 buttons)
-- `src/app/components/ui/confirm-dialog.tsx` (2 buttons)
-- `src/app/components/ui/upgrade-modal.tsx` (4 buttons)
-- `src/app/components/chat/upload-card-message.tsx` (4 buttons)
-- `src/app/[locale]/(app)/resumes/page.tsx` (7 buttons)
-- `src/app/[locale]/(app)/settings/page.tsx` (12 buttons)
-- `src/app/[locale]/(app)/cover-letter/page.tsx` (11 buttons)
-- `src/app/[locale]/(app)/settings/billing/page.tsx` (3 buttons)
-- `src/app/[locale]/(marketing)/pricing/page.tsx` (3 buttons)
-- `src/app/components/dashboard/dashboard-view.tsx` (2 buttons)
-- `src/app/components/interview/interview-summary.tsx` (2 buttons)
-- `src/app/components/search/RoleAutocomplete.tsx` (2 buttons)
-- `src/app/components/search/LocationAutocomplete.tsx` (2 buttons)
-- Auth pages: `src/app/[locale]/(auth)/login/page.tsx`, `register/page.tsx`, `reset-password/page.tsx`, `forgot-password/page.tsx`
+**Auth pages (low count, consistent pattern):**
+- `src/app/[locale]/(auth)/login/page.tsx` — 2 `<button>`, 2 `<input>`
+- `src/app/[locale]/(auth)/register/page.tsx` — 2 `<button>`, 3 `<input>`
+- `src/app/[locale]/(auth)/forgot-password/page.tsx` — 1 `<button>`, 1 `<input>`
+- `src/app/[locale]/(auth)/reset-password/page.tsx` — 1 `<button>`, 2 `<input>`
 
-Phase 3B (Inputs/Textareas):
-- `src/app/components/resume/resume-detail.tsx` (23 inputs, 4 textareas)
-- `src/app/[locale]/(app)/settings/page.tsx` (7 inputs)
-- `src/app/components/pipeline/applications-view.tsx` (4 inputs)
-- `src/app/components/resume/job-search-panel.tsx` (3 inputs)
-- `src/app/[locale]/(auth)/register/page.tsx` (3 inputs)
-- `src/app/[locale]/(app)/cover-letter/page.tsx` (3 inputs, 3 textareas)
-- `src/app/components/resume/cover-letter-editor.tsx` (2 inputs, 3 textareas)
-- `src/app/components/interview/interview-setup.tsx` (2 inputs)
-- `src/app/components/chat/upload-card-message.tsx` (2 inputs)
-- `src/app/components/chat/build-wizard.tsx` (2 inputs)
-- `src/app/components/ats/ats-view.tsx` (2 inputs, 1 textarea)
-- `src/app/[locale]/(auth)/login/page.tsx` (2 inputs)
-- `src/app/[locale]/(auth)/reset-password/page.tsx` (2 inputs)
-- `src/app/components/pipeline/job-notes.tsx` (1 textarea)
-- `src/app/components/interview/interview-session.tsx` (1 textarea)
-- `src/app/components/chat/paste-jd-modal.tsx` (1 textarea)
-- `src/app/components/search/RoleAutocomplete.tsx` (1 input)
-- `src/app/components/search/LocationAutocomplete.tsx` (1 input)
-- `src/app/components/resume/resume-copilot.tsx` (1 input)
-- `src/app/components/pipeline/area-intelligence.tsx` (1 input)
-- `src/app/components/chat/chat-view.tsx` (1 input)
+**Component files (small / contextual):**
+- `src/app/components/search/RoleAutocomplete.tsx` — 2 `<button>`, 1 `<input>` (careful: input needs `ref` / onKeyDown preserved; clear-button is icon-only ghost)
+- `src/app/components/search/LocationAutocomplete.tsx` — 2 `<button>`, 1 `<input>`
+- `src/app/components/interview/interview-summary.tsx` — 2 `<button>`
+- `src/app/components/pipeline/job-notes.tsx` — 1 `<textarea>`
+- `src/app/components/resume/templates/template-gallery.tsx` — 1 `<button>`
+- `src/app/components/interview/interview-view.tsx` — 1 `<button>`
+- `src/app/components/admin/source-health.tsx` — 1 `<button>`
+- `src/app/[locale]/error.tsx` — 1 `<button>`
+- `src/app/[locale]/(app)/error.tsx` — 1 `<button>`
+- `src/app/[locale]/(app)/admin/error.tsx` — 1 `<button>`
+- `src/app/global-error.tsx` — 1 `<button>`
 
-Phase 3C (Selects):
-- `src/app/components/interview/interview-setup.tsx` (2 selects)
-- `src/app/components/chat/chat-view.tsx` (2 selects)
-- `src/app/components/resume/resume-detail.tsx` (1 select)
-- `src/app/components/pipeline/job-detail-panel.tsx` (1 select)
-- `src/app/components/pipeline/applications-view.tsx` (1 select)
-- `src/app/components/ats/ats-view.tsx` (1 select)
-- `src/app/[locale]/(app)/cover-letter/page.tsx` (1 select)
-
-Phase 3D (Drawers/Dialogs):
-- `src/app/components/pipeline/job-detail-panel.tsx` → Sheet
-- `src/app/components/layout/upload-modal.tsx` → Dialog
-- `src/app/components/chat/paste-jd-modal.tsx` → Dialog
-- `src/app/components/ui/confirm-dialog.tsx` → AlertDialog
-- `src/app/components/ui/upgrade-modal.tsx` → Dialog
-
-Phase 3E (Dropdown Menus):
-- `src/app/components/layout/navbar.tsx` (LanguageSwitcher)
-- `src/app/components/layout/user-menu.tsx`
+**Skip (intentional):**
+- `src/app/[locale]/(marketing)/pricing/page.tsx` — 3 `<button>` in pricing cards; these are `role="button"` link-style elements inside anchor wrappers — SKIP unless they're pure `<button>` not wrapping links (verify first before touching)
+- `src/app/[locale]/(app)/settings/billing/page.tsx` — 3 `<button>` in billing; verify before touching
+- `src/app/components/ui/textarea.tsx` — 1 `<textarea>` inside the Textarea ui component itself; do NOT touch
 
 ---
 
 ### 2. Import Definitions & Dependencies
 
-**Path aliases (from tsconfig.json):**
-- `~/*` → `./src/app/*` (so `~/components/ui/button` = `src/app/components/ui/button.tsx`)
-- `@/*` → `./src/*`
-- `~/lib/utils` = `src/app/lib/utils.ts` (exports `cn()`)
+All ui components are imported from their `~/components/ui/` paths:
 
-**shadcn import paths to use in all migrated files:**
 ```tsx
 import { Button } from '~/components/ui/button'
 import { Input } from '~/components/ui/input'
 import { Textarea } from '~/components/ui/textarea'
-import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '~/components/ui/select'
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '~/components/ui/dialog'
-import { Sheet, SheetContent, SheetHeader, SheetTitle } from '~/components/ui/sheet'
-import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from '~/components/ui/dropdown-menu'
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '~/components/ui/alert-dialog'
-import { Badge } from '~/components/ui/badge'
-import { Label } from '~/components/ui/label'
-import { Separator } from '~/components/ui/separator'
 ```
 
-**Existing utility already available:** `cn()` from `~/lib/utils` (clsx + tailwind-merge).
+**Button component signature:**
+```tsx
+function Button({
+  className, variant = "default", size = "default", ...props
+}: ButtonPrimitive.Props & VariantProps<typeof buttonVariants>)
+```
+- Props are fully spread from `@base-ui/react/button` — accepts `onClick`, `disabled`, `type`, `aria-label`, `title`, all standard button attributes.
+- `className` is merged with `cn(buttonVariants(...))` so any utility overrides still apply.
 
-**Packages that shadcn CLI will auto-install:** `class-variance-authority`, and either `@radix-ui/react-*` (if `--style neutral` fallback) or base-ui equivalents (if `base-nova` works). The CLI handles this automatically.
+**Input component signature:**
+```tsx
+function Input({ className, type, ...props }: React.ComponentProps<"input">)
+```
+- Wraps `@base-ui/react/input`. Accepts `value`, `onChange`, `onKeyDown`, `onFocus`, `ref`, `placeholder`, `required`, `minLength`, `type`, `accept`, `readOnly` etc.
+- Use `className` to add local overrides on top.
+
+**Textarea component signature:**
+```tsx
+function Textarea({ className, ...props }: React.ComponentProps<"textarea">)
+```
+- Wraps native `<textarea>`. Accepts `value`, `onChange`, `rows`, `placeholder`, `readOnly` etc.
 
 ---
 
 ### 3. Database Schema Changes
 
-**N/A** — Pure UI refactor, no database changes.
+None. This is a UI-only migration.
 
 ---
 
 ### 4. Step-by-Step Edits
 
-#### PHASE 1: Install shadcn/ui Components
+> **Golden Rule**: Keep every `onClick`, `disabled`, `type`, `onChange`, `onKeyDown`, `value`, `placeholder`, `aria-label`, `title`, `ref` prop **exactly as-is**. Only the element tag + import changes.
 
-**Step 1.1**: Run the installation commands. Try `base-nova` style first (it's in components.json):
+> **Variant mapping guide**:
+> - `bg-primary text-primary-foreground` → `variant="default"`
+> - `border border-border bg-card hover:bg-muted` / `border border-border bg-background` → `variant="outline"`
+> - `hover:bg-muted` / `hover:bg-accent-soft` / icon-only clear buttons / dismiss buttons → `variant="ghost"`
+> - `bg-red-600` / `bg-destructive` → `variant="destructive"`
+> - Toggle-style buttons in bg-border/30 pill (tab switcher pills, mode switchers) → Keep as raw `<button>` — they are **intentional styled tab pills**, NOT generic buttons. Do NOT convert them.
+> - Saved letter list items that look like buttons → Keep as raw `<button>` since they have complex active-state className logic tied to `activeLetterId` state. Converting would add noise without benefit.
+> - `size` hints: use `size="sm"` for px-2/py-1 patterns, `size="icon"` for h-10 w-10 icon-only buttons, `size="default"` for px-4 py-2+ patterns.
 
-```bash
-pnpm dlx shadcn@latest add button input textarea select dialog sheet dropdown-menu alert-dialog badge separator scroll-area tabs label avatar
-```
+#### Step 1 — `settings/page.tsx`
 
-If the above fails or produces errors related to the `base-nova` style, run individually with fallback:
-```bash
-pnpm dlx shadcn@latest add button --style neutral
-pnpm dlx shadcn@latest add input --style neutral
-# ... etc for each component
-```
-
-If `pnpm dlx` doesn't work, use `npx shadcn@latest add <component>`.
-
-**Step 1.2**: Verify all components landed in `src/app/components/ui/`. Check with `ls src/app/components/ui/`. Expected new files: `button.tsx`, `input.tsx`, `textarea.tsx`, `select.tsx`, `dialog.tsx`, `sheet.tsx`, `dropdown-menu.tsx`, `alert-dialog.tsx`, `badge.tsx`, `separator.tsx`, `scroll-area.tsx`, `tabs.tsx`, `label.tsx`, `avatar.tsx`.
-
-**Step 1.3**: Run `npx tsc --noEmit` to verify no type errors from the new components. If the installed components import from packages not yet installed, run `pnpm install` first.
-
-**Step 1.4**: Commit:
-```bash
-git add -A && git commit -m "feat: install shadcn/ui component primitives"
-```
-
----
-
-#### PHASE 2: Configure Button Variants
-
-**Step 2.1**: Open `src/app/components/ui/button.tsx`. The shadcn CLI generated a `buttonVariants` cva config. Update it to match the project's usage patterns. Replace the `cva` config with:
-
+Add to imports at top:
 ```tsx
-const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 cursor-pointer",
-  {
-    variants: {
-      variant: {
-        default: "bg-primary text-primary-foreground hover:bg-primary/90",
-        destructive: "bg-destructive text-destructive-foreground hover:bg-destructive/90",
-        outline: "border border-border bg-card hover:bg-accent-soft hover:text-accent-foreground",
-        secondary: "bg-muted text-foreground hover:bg-muted/80",
-        ghost: "hover:bg-accent-soft hover:text-foreground",
-        link: "text-primary underline-offset-4 hover:underline",
-      },
-      size: {
-        default: "h-10 px-4 py-2",
-        sm: "h-8 rounded-md px-3 text-xs",
-        lg: "h-11 rounded-md px-8",
-        icon: "h-10 w-10",
-      },
-    },
-    defaultVariants: {
-      variant: "default",
-      size: "default",
-    },
-  }
-)
+import { Button } from '~/components/ui/button'
+import { Input } from '~/components/ui/input'
 ```
 
-> **IMPORTANT**: If the generated button already has similar variants from `base-nova`, just ensure all 6 variants and 4 sizes above exist. The `cursor-pointer` class must be in the base string (the project uses it everywhere). Keep the `cn()` merge function so extra classNames passed via `className` prop are merged correctly.
-
-**Step 2.2**: The Button component must accept `type` prop (default `"button"`). If the generated component doesn't forward `type`, add it:
+**Toast dismiss button (line 44-50):** Replace `<button onClick={onClose} className="ml-2 cursor-pointer ...">` with:
 ```tsx
-const Button = React.forwardRef<
-  React.ComponentRef<typeof Slot>,
-  React.ComponentPropsWithoutRef<typeof Slot> & {
-    variant?: VariantProps<typeof buttonVariants>["variant"]
-    size?: VariantProps<typeof buttonVariants>["size"]
-  }
->(({ className, variant, size, type = "button", ...props }, ref) => (
-  <Comp
-    className={cn(buttonVariants({ variant, size, className }))}
-    ref={ref}
-    type={type}
-    {...props}
-  />
-))
+<Button variant="ghost" size="icon" onClick={onClose} className="ml-2 h-5 w-5 p-0 opacity-60 hover:opacity-100" aria-label="Dismiss">
 ```
 
-**Step 2.3**: Run `npx tsc --noEmit`. Fix any errors.
+**Tab nav buttons (lines 280-303):** These are deliberate tab underline pills (`border-b-2`). **Leave as raw `<button>` — they are nav tabs, not actions.**
 
----
-
-#### PHASE 3A: Migrate Buttons → shadcn Button
-
-**MIGRATION PATTERN** (memorize this — apply to EVERY raw `<button>`):
-
-1. Add import at top of file (if not already present):
-   ```tsx
-   import { Button } from '~/components/ui/button'
-   ```
-
-2. Classify each `<button>` by its className and map to a variant:
-
-   | Pattern in className | Use variant |
-   |----------------------|-------------|
-   | `bg-primary text-primary-foreground` (or `text-white` + `bg-primary`) | `variant="default"` |
-   | `bg-red-600` or `bg-destructive` or `hover:text-red-500` destructive intent | `variant="destructive"` |
-   | `border border-border` + `bg-card` or `bg-background` | `variant="outline"` |
-   | `bg-muted` or `bg-secondary` | `variant="secondary"` |
-   | No border, no bg, just hover (`hover:bg-muted`, `hover:bg-background`, `hover:text-foreground`) | `variant="ghost"` |
-   | `text-primary` + underline pattern | `variant="link"` |
-
-3. **Conversion rule**: Replace `<button onClick={...} className="...bg-primary text-white...">` with `<Button variant="default" onClick={...} className="...">`. **Keep all non-base styles** in className (spacing, sizing, icons, text size). **Remove** only the redundant base styles that the variant already provides (e.g., `bg-primary`, `text-primary-foreground`, `rounded-md`, `cursor-pointer`). If unsure, keep the className — `cn()` with `tailwind-merge` will deduplicate.
-
-4. **CRITICAL**: Keep EVERY prop: `onClick`, `disabled`, `type`, `title`, `aria-label`, `ref`, `onMouseEnter`, etc. These must be identical.
-
-5. **Self-closing tags**: `<button onClick={...} className="..." />` → `<Button variant="..." onClick={...} className="..." />`.
-
-6. **Special cases — do NOT convert these buttons**:
-   - Buttons that are actually `@base-ui/react` `Menu.Trigger` or `Menu.Item` — leave for Phase 3E.
-   - Buttons inside `<TagInput>` that remove tags with `<X>` icon — these are tiny inline icon buttons; convert them to `<Button variant="ghost" size="icon" className="...">` but keep the tiny sizing classes.
-   - Drag handles (with `{...attributes} {...listeners}` spread) — convert to `<Button variant="ghost" size="icon" className="..." {...attributes} {...listeners}>`.
-   - The native file `<input type="file">` in upload-modal — leave as raw `<input>` (semantically necessary).
-
-**File-by-file instructions:**
-
-**`src/app/components/resume/resume-detail.tsx`** (27 buttons, 23 inputs, 4 textareas, 1 select — LARGEST FILE):
-- This file has the most elements. Work methodically top-to-bottom.
-- Line ~93: tag remove button → `<Button variant="ghost" size="icon" className="ml-0.5 rounded-full hover:bg-primary/20">`
-- Line ~141: drag handle button → `<Button variant="ghost" size="icon" className="absolute left-1.5 top-1/2 -translate-y-1/2 cursor-grab ..." {...attributes} {...listeners}>`
-- Line ~211: "Add" button in EditableList → `<Button variant="outline" size="sm" className="flex items-center gap-0.5 rounded-xs px-1.5 py-0.5 text-[10px]">`
-- Line ~235: remove item button → `<Button variant="ghost" size="icon" className="cursor-pointer rounded-xs p-0.5 hover:text-red-500">`
-- Line ~287: section suggestion buttons → `<Button variant="outline" size="sm" className="flex items-center gap-1 rounded-xs px-2 py-1 text-[10px]">`
-- Line ~297: dismiss button → `<Button variant="ghost" className="rounded-xs px-2 py-1 text-[10px]">`
-- Line ~336: section drag handle → `<Button variant="ghost" size="icon" className="mt-1.5 shrink-0 cursor-grab ..." {...attributes} {...listeners}>`
-- Line ~349: visibility toggle → `<Button variant="ghost" size="icon" className="mt-1.5 shrink-0 ...">`
-- Line ~744: delete custom section → `<Button variant="ghost" size="icon" className="absolute right-0 top-0 ...">`
-- Line ~801: "Add Section" button → `<Button variant="outline" className="flex items-center gap-1 rounded-xs border-dashed px-3 py-2 text-[11px] w-full justify-center">`
-- Line ~811: section picker items → `<Button variant="ghost" className="flex w-full items-center gap-2 px-3 py-2 text-[11px] text-left">`
-- Line ~844: "Add" (custom section) → `<Button variant="default" className="rounded-xs px-3 py-1.5 text-[11px]">`
-- Line ~852: "Cancel" → `<Button variant="outline" className="rounded-xs px-2 py-1.5 text-[11px]">`
-- Line ~1083: "Back to Chat" link → `<Button variant="link" className="ml-2 text-primary">` (keep onClick)
-- Line ~1127: "Back" button → `<Button variant="outline" size="sm" className="flex shrink-0 items-center gap-1 rounded-sm px-2 py-1 text-[11px]">`
-- Line ~1135: tab buttons — these are custom tab styling; convert to `<Button variant="ghost" className={cn("shrink-0 rounded-xs px-3 py-1 text-[11px]", tab === t ? "bg-card text-foreground shadow-sm font-semibold" : "text-muted-foreground")}>` (keep the cn conditional)
-- Line ~1154: "Delete" button → `<Button variant="outline" size="sm" className="flex items-center gap-1 rounded-sm px-2 py-1 text-[11px] hover:text-red-500 hover:border-red-500/30">`
-- Line ~1178: template selector → `<Button variant="outline" size="sm" className="flex items-center gap-1.5 rounded-sm px-2.5 py-1 text-[11px]">`
-- Line ~1186-1187: export buttons → `<Button variant="ghost" className="rounded-sm px-2 py-1 text-[11px]">`
-- Also migrate inputs (23) → `<Input>`, textareas (4) → `<Textarea>`, select (1, line ~699) → shadcn Select.
-  - Input pattern: `<input value={...} onChange={...} className="w-full rounded-xs border border-border bg-background px-2.5 py-1.5 text-[11px] outline-none focus:border-primary" />` → `<Input value={...} onChange={...} className="w-full rounded-xs px-2.5 py-1.5 text-[11px]" />` (shadcn Input already has border + bg + focus styles)
-  - Textarea pattern: `<textarea ... className="w-full resize-y rounded-xs border border-border bg-background px-2.5 py-1.5 text-[11px] outline-none focus:border-primary" />` → `<Textarea ... className="w-full resize-y rounded-xs px-2.5 py-1.5 text-[11px]" />`
-  - Select (proficiency, line ~699): convert to compound:
-    ```tsx
-    <Select value={lang.proficiency} onValueChange={(v) => update({ ...lang, proficiency: v })}>
-      <SelectTrigger className="w-full rounded-xs px-2 py-1 text-[11px]">
-        <SelectValue placeholder="Select..." />
-      </SelectTrigger>
-      <SelectContent>
-        <SelectItem value="Basic">Basic</SelectItem>
-        <SelectItem value="Conversational">Conversational</SelectItem>
-        <SelectItem value="Professional">Professional</SelectItem>
-        <SelectItem value="Fluent">Fluent</SelectItem>
-        <SelectItem value="Native">Native</SelectItem>
-      </SelectContent>
-    </Select>
-    ```
-  - **TagInput inner input** (line ~98): This is a special inline input inside a tag wrapper. Convert to `<Input>` but keep the borderless styling: `<Input ref={inputRef} value={input} onChange={...} onKeyDown={...} onBlur={addTag} placeholder={...} className="min-w-[80px] flex-1 border-none bg-transparent text-[11px] shadow-none focus-visible:ring-0" />`
-  - **New custom title input** (line ~832): `<Input ref={newCustomInputRef} value={newCustomTitle} onChange={...} onKeyDown={...} placeholder="..." className="flex-1 rounded-xs px-2.5 py-1.5 text-[11px]" autoFocus />`
-
-> **NOTE**: This file is the hardest. After editing, run `npx tsc --noEmit` immediately.
-
-**`src/app/components/pipeline/job-detail-panel.tsx`** (7 buttons, 1 select):
-- Line ~240: close button → `<Button variant="ghost" size="icon" className="rounded-sm p-1" onClick={onClose} aria-label="Close">`
-- Line ~436-459: AI tool buttons (Tailor, Cover Letter, ATS, Interview) → `<Button variant="secondary" className="flex items-center justify-center gap-1.5 rounded-xs px-3 py-2.5 text-sm" onClick={...}>`
-- Line ~465: "Save to Tracker" → `<Button variant={isSaved ? "default" : "outline"} className="flex flex-1 items-center justify-center gap-2 rounded-xs h-11 text-sm font-semibold" onClick={onSaveToTracker}>`
-- Line ~479: "Apply" → `<Button variant="default" className="flex flex-1 items-center justify-center gap-2 rounded-xs h-11 text-sm font-semibold" onClick={handleApply}>`
-- Select (line ~303): status dropdown → convert to shadcn Select compound (see resume-detail pattern above). Use `onValueChange` instead of `onChange`.
-- **ALSO**: This file is a custom fixed-position slide-over drawer. See Phase 3D for Sheet migration (do both button + sheet migration together for this file).
-
-**`src/app/components/pipeline/applications-view.tsx`** (7 buttons, 4 inputs, 1 select):
-- Convert all 7 buttons using the pattern. Most are action/filter buttons.
-- Convert 4 inputs → `<Input>`.
-- Convert 1 select → shadcn Select compound.
-
-**`src/app/components/resume/job-search-panel.tsx`** (8 buttons, 3 inputs):
-- Convert all buttons. Search/filter buttons.
-- Convert 3 inputs → `<Input>`.
-
-**`src/app/components/resume/cover-letter-editor.tsx`** (9 buttons, 2 inputs, 3 textareas):
-- Convert all buttons (regenerate, tone selector, export, save, etc.).
-- Convert 2 inputs → `<Input>`.
-- Convert 3 textareas → `<Textarea>`.
-
-**`src/app/components/interview/interview-setup.tsx`** (7 buttons, 2 inputs, 2 selects):
-- Convert all buttons.
-- Convert 2 inputs → `<Input>`.
-- Convert 2 selects → shadcn Select compound.
-
-**`src/app/components/ats/ats-view.tsx`** (7 buttons, 2 inputs, 1 textarea, 1 select):
-- Convert all buttons.
-- Convert 2 inputs → `<Input>`.
-- Convert 1 textarea → `<Textarea>`.
-- Convert 1 select → shadcn Select compound.
-
-**`src/app/components/chat/chat-view.tsx`** (10 buttons, 1 input, 2 selects):
-- Convert all buttons (send, attach, clear, etc.).
-- Convert 1 input → `<Input>` (if not inside an agent-elements component).
-- Convert 2 selects → shadcn Select compound.
-- **CAUTION**: This file may use agent-elements InputBar. Only convert raw `<button>`/`<input>`/`<select>` that are NOT part of agent-elements. Check imports — if the element comes from `@/components/agent-elements/*`, leave it alone.
-
-**`src/app/components/chat/job-preview.tsx`** (8 buttons):
-- Convert all buttons.
-
-**`src/app/components/interview/interview-session.tsx`** (6 buttons, 1 textarea):
-- Convert all buttons.
-- Convert 1 textarea → `<Textarea>`.
-
-**`src/app/components/resume/tailor-review-panel.tsx`** (5 buttons):
-- Convert all buttons.
-
-**`src/app/components/layout/navbar.tsx`** (3 buttons):
-- Line ~82: sidebar toggle → `<Button variant="ghost" size="icon" className="ml-1 h-[30px] w-[30px]" onClick={toggleSidebar}>`
-- Line ~93: command palette trigger → `<Button variant="outline" className="hidden sm:flex items-center gap-2 rounded-md px-3 py-1.5 text-sm" onClick={...}>`
-- Line ~108: theme toggle → `<Button variant="ghost" size="icon" className="relative h-[30px] w-[30px]" onClick={toggle}>`
-- **LanguageSwitcher** uses `@base-ui/react/menu` — migrate in Phase 3E.
-
-**`src/app/components/layout/upload-modal.tsx`** (3 buttons):
-- Line ~117: close button → `<Button variant="ghost" size="icon" className="rounded-sm p-1" onClick={...}>`
-- Line ~129: drag-drop zone button → keep as `<Button variant="ghost" className="w-full rounded-lg border-2 border-dashed p-8 text-center" onClick={...} onDragOver={...} onDragLeave={...} onDrop={...} disabled={parsing}>` (keep all drag handlers)
-- Line ~167: "Build with AI" → `<Button variant="ghost" className="w-full flex items-center gap-3 rounded-lg border p-4 text-left" onClick={...}>`
-- **ALSO**: migrate custom overlay to Dialog (see Phase 3D).
-- **Hidden file input** (line ~183): leave as raw `<input type="file">`.
-
-**`src/app/components/chat/paste-jd-modal.tsx`** (3 buttons, 1 textarea):
-- Convert buttons + textarea.
-- **ALSO**: migrate custom overlay to Dialog (see Phase 3D).
-
-**`src/app/components/chat/build-wizard.tsx`** (4 buttons, 2 inputs):
-- Convert buttons + inputs.
-
-**`src/app/components/resume/resume-copilot.tsx`** (3 buttons, 1 input):
-- Convert buttons + input.
-
-**`src/app/components/pipeline/smart-overview.tsx`** (3 buttons):
-- Convert buttons.
-
-**`src/app/components/pipeline/area-intelligence.tsx`** (6 buttons, 1 input):
-- Convert buttons + input.
-
-**`src/app/components/chat/upload-card-message.tsx`** (4 buttons, 2 inputs):
-- Convert buttons + inputs.
-
-**`src/app/components/dashboard/dashboard-view.tsx`** (2 buttons):
-- Convert buttons.
-
-**`src/app/components/interview/interview-summary.tsx`** (2 buttons):
-- Convert buttons.
-
-**`src/app/components/search/RoleAutocomplete.tsx`** (2 buttons, 1 input):
-- Convert buttons. Convert input → `<Input>`.
-- **CAUTION**: Autocomplete inputs may have special `ref`/`onKeyDown`/`onChange` behavior. Keep ALL props.
-
-**`src/app/components/search/LocationAutocomplete.tsx`** (2 buttons, 1 input):
-- Same as RoleAutocomplete.
-
-**Page files:**
-- `src/app/[locale]/(app)/resumes/page.tsx` (7 buttons) — convert all.
-- `src/app/[locale]/(app)/settings/page.tsx` (12 buttons, 7 inputs) — convert all.
-- `src/app/[locale]/(app)/cover-letter/page.tsx` (11 buttons, 3 inputs, 3 textareas, 1 select) — convert all.
-- `src/app/[locale]/(app)/settings/billing/page.tsx` (3 buttons) — convert all.
-- `src/app/[locale]/(marketing)/pricing/page.tsx` (3 buttons) — convert all.
-
-**Auth pages** (lower priority, do last):
-- `src/app/[locale]/(auth)/login/page.tsx` (buttons, 2 inputs)
-- `src/app/[locale]/(auth)/register/page.tsx` (buttons, 3 inputs)
-- `src/app/[locale]/(auth)/reset-password/page.tsx` (buttons, 2 inputs)
-- `src/app/[locale]/(auth)/forgot-password/page.tsx` (buttons, 1 input)
-
-**After Phase 3A+3B+3C, commit:**
-```bash
-git add -A && git commit -m "refactor: migrate buttons, inputs, and selects to shadcn"
-```
-
----
-
-#### PHASE 3D: Migrate Custom Overlays → shadcn Dialog/Sheet
-
-**MIGRATION PATTERN for Dialog (centered modal):**
-
-Current pattern:
+**Profile tab — "Save" (name) button (line 320-326):**
 ```tsx
-{open && (
-  <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 backdrop-blur-sm" onClick={onClose}>
-    <div className="w-full max-w-md rounded-lg border border-border bg-card shadow-lg" onClick={(e) => e.stopPropagation()}>
-      {/* header, body, footer */}
-    </div>
+<Button
+  onClick={handleUpdateName}
+  disabled={savingName || name === user?.name}
+  size="sm"
+  className="rounded-sm text-xs px-3"
+>
+  {savingName ? <Loader2 size={13} className="animate-spin" /> : 'Save'}
+</Button>
+```
+
+**Profile tab — "Update" (email) button (line 341-347):**
+```tsx
+<Button
+  onClick={handleUpdateEmail}
+  disabled={savingEmail || email === user?.email || !email.trim()}
+  size="sm"
+  className="rounded-sm text-xs px-3"
+>
+  {savingEmail ? <Loader2 size={13} className="animate-spin" /> : 'Update'}
+</Button>
+```
+
+**Profile tab — "Save" (home location) button (line 371-377):**
+```tsx
+<Button
+  onClick={handleSaveHomeLocation}
+  disabled={savingHomeLocation}
+  size="sm"
+  className="shrink-0 rounded-sm text-xs px-3"
+>
+  {savingHomeLocation ? <Loader2 size={13} className="animate-spin" /> : 'Save'}
+</Button>
+```
+
+**Profile tab — "Use my current location" link-button (line 379-386):**
+```tsx
+<Button
+  variant="link"
+  onClick={handleDetectLocation}
+  disabled={detectingLocation}
+  className="mt-2 flex items-center gap-1.5 text-[11px] h-auto p-0 disabled:opacity-50"
+>
+  {detectingLocation ? <Loader2 size={12} className="animate-spin" /> : <LocateFixed size={12} />}
+  {detectingLocation ? 'Detecting…' : 'Use my current location'}
+</Button>
+```
+
+**Password — Show/hide eye buttons (lines 401-406 and 416-421):** These are icon toggles inside `<div className="relative">`. Use ghost icon buttons:
+```tsx
+<Button
+  variant="ghost"
+  size="icon"
+  onClick={() => setShowCurrent(!showCurrent)}
+  className="absolute right-2 top-1/2 -translate-y-1/2 h-6 w-6 p-0 text-muted-foreground hover:text-foreground"
+  type="button"
+>
+  {showCurrent ? <EyeOff size={13} /> : <Eye size={13} />}
+</Button>
+```
+Same pattern for the "new password" eye toggle.
+
+**Password — "Change Password" submit button (line 430-436):**
+```tsx
+<Button
+  onClick={handleChangePassword}
+  disabled={changingPassword}
+  size="sm"
+  className="rounded-sm text-xs px-3"
+>
+  {changingPassword ? <Loader2 size={13} className="animate-spin" /> : 'Change Password'}
+</Button>
+```
+
+**Theme toggle button (lines 455-461):**
+```tsx
+<Button
+  variant="outline"
+  onClick={toggle}
+  size="sm"
+  className="flex items-center gap-1.5 rounded-sm text-xs"
+>
+  {theme === 'dark' ? <Sun size={13} /> : <Moon size={13} />}
+  Toggle
+</Button>
+```
+
+**Notifications tab — toggle switches (lines 480-491):** These are CSS toggle-switch buttons (h-5 w-9 rounded-full). **Leave as raw `<button>` — they are styled toggle switches, not action buttons.**
+
+**Danger zone — "Delete Account" button (lines 515-521):**
+```tsx
+<Button
+  variant="destructive"
+  onClick={handleDeleteAccount}
+  disabled={confirmDelete !== 'DELETE' || deleting}
+  size="sm"
+  className="rounded-sm text-xs px-3"
+>
+  {deleting ? <Loader2 size={13} className="animate-spin" /> : 'Delete Account'}
+</Button>
+```
+
+**Inputs (lines 314, 334, 364, 394, 409, 423, 509):** Replace all `<input className="...">` with `<Input className="...">` — preserve all attributes (`value`, `onChange`, `type`, `placeholder`, `onKeyDown`). Keep any className overrides for local sizing (`flex-1`, `rounded-sm`, `text-xs`) since `Input` component merges with `cn()`. For the danger zone input with `border-red-500/30` className, keep that too.
+
+> IMPORTANT: The input at line 509 (danger zone "Type DELETE") has `border-red-500/30 bg-background focus:border-red-500/50` — keep these classNames on the `Input` component.
+
+#### Step 2 — `cover-letter/page.tsx`
+
+Add to imports:
+```tsx
+import { Button } from '~/components/ui/button'
+import { Input } from '~/components/ui/input'
+import { Textarea } from '~/components/ui/textarea'
+```
+
+**Hidden file input (line 246-252):** Keep as `<input type="file" className="hidden" ...>` — do NOT wrap in `Input` component (file inputs need specific native behavior; `Input` uses `@base-ui/react/input` which may not forward file events properly).
+
+**Resume selector `<select>` (lines 266-280):** Keep as native `<select>` — the shadcn `Select` component uses a completely different API (`SelectRoot`, `SelectTrigger`, `SelectContent`, `SelectItem`) and would require significant refactoring for minimal gain. **Skip this one.**
+
+**Upload PDF `<button>` (lines 281-293):** → `variant="outline"` with same content:
+```tsx
+<Button
+  variant="outline"
+  onClick={() => fileInputRef.current?.click()}
+  disabled={parsing}
+  className="flex items-center gap-1 rounded-xs border-border text-[11px] font-medium text-muted-foreground disabled:opacity-50"
+>
+  {parsing ? <Loader2 size={12} className="animate-spin text-primary" /> : (<><Upload size={12} /> {t('uploadPdf')}</>)}
+</Button>
+```
+
+**Mode selector buttons (lines 301-316) and Language selector buttons (lines 324-339):** These are **segmented control tab pills** (bg-border/30 container, conditional bg-card active state). **Leave as raw `<button>` — intentional tab pill UI, not generic actions.**
+
+**Saved letters list buttons (lines 396-424):** These are styled list items with conditional border-primary active state. The inner Trash2 delete button (line 414-423) is a ghost icon. **Leave the outer list-item `<button>` as raw** (complex conditional classNames). **Convert the inner Trash2 button** to:
+```tsx
+<Button
+  variant="ghost"
+  size="icon"
+  onClick={(e) => { e.stopPropagation(); setDeleteTarget(letter.id) }}
+  className="shrink-0 h-5 w-5 p-0 opacity-0 group-hover:opacity-100 text-muted-foreground hover:text-destructive"
+  title="Delete"
+>
+  <Trash2 size={12} />
+</Button>
+```
+
+**"Generate Cover Letter" main CTA button (lines 430-449):** → `variant="default"`:
+```tsx
+<Button
+  onClick={handleGenerate}
+  disabled={generating || selectedResumeId === 'none' || (mode === 'quick' && (!company || !role)) || (mode === 'jd' && !jdText)}
+  className="w-full rounded-sm py-2 text-xs font-semibold tracking-wide uppercase active:scale-[0.98] shadow-sm mt-6"
+>
+  {generating ? (<><Loader2 size={13} className="animate-spin" /> Generating...</>) : (<><Wand2 size={13} /> Generate Cover Letter</>)}
+</Button>
+```
+
+**"Save Letter" button (lines 460-466):** → `variant="outline"`:
+```tsx
+<Button
+  variant="outline"
+  onClick={handleSave}
+  disabled={!letterText || selectedResumeId === 'none'}
+  size="sm"
+  className="flex items-center gap-1 rounded-sm text-[11px]"
+>
+  <Save size={11} /> Save Letter
+</Button>
+```
+
+**"Copy Text" button (lines 467-473):** → `variant="outline"`:
+```tsx
+<Button
+  variant="outline"
+  onClick={handleCopy}
+  disabled={!letterText}
+  size="sm"
+  className="flex items-center gap-1 rounded-sm text-[11px]"
+>
+  <Copy size={11} /> Copy Text
+</Button>
+```
+
+**"Export PDF" button (lines 474-480):** → `variant="default"`:
+```tsx
+<Button
+  onClick={() => window.open(`/api/export/pdf?id=${selectedResumeId}&type=cover-letter`, '_blank')}
+  disabled={!letterText || selectedResumeId === 'none'}
+  size="sm"
+  className="flex items-center gap-1 rounded-sm text-[11px] font-medium"
+>
+  <Download size={11} /> Export PDF
+</Button>
+```
+
+**Inputs (lines 348, 358) — company + role fields:** → `<Input>` with same className overrides.
+
+**Textareas (lines 368-374, 380-386) — focus + jd fields:** → `<Textarea>` with `rows` and `className` preserved. Keep `resize-none`, `font-sans` classNames.
+
+**Textarea (line 502-508) — cover letter editing area (inside paper):** This is a transparent, borderless editing textarea embedded in the paper card. Use `<Textarea>` but keep `bg-transparent border-0 outline-none resize-none focus:ring-0` classNames — these will override the component's base styles via `cn()`.
+
+#### Step 3 — `resumes/page.tsx`
+
+Add to imports:
+```tsx
+import { Button } from '~/components/ui/button'
+```
+
+**"New Resume" header button (lines 55-61):** → `variant="default"`:
+```tsx
+<Button
+  onClick={() => setUploadModalOpen(true)}
+  className="flex items-center gap-2 rounded-sm text-sm font-semibold active:scale-[0.98]"
+>
+  <Plus size={15} strokeWidth={2.5} />
+  New Resume
+</Button>
+```
+
+**"Create Resume" empty state button (lines 84-90):** → `variant="default"`:
+```tsx
+<Button
+  onClick={() => setUploadModalOpen(true)}
+  className="flex items-center gap-2 rounded-sm text-sm font-semibold"
+>
+  <Plus size={14} strokeWidth={2.5} />
+  Create Resume
+</Button>
+```
+
+**Variant list item buttons (lines 141-151):** These are `text-left text-xs text-muted-foreground hover:text-primary` nav-like buttons. → `variant="ghost"` with explicit size override:
+```tsx
+<Button
+  key={v.id}
+  variant="ghost"
+  onClick={() => handleOpen(v.id)}
+  className="flex items-center gap-1.5 text-left text-xs text-muted-foreground hover:text-primary h-auto p-0 w-full justify-start"
+>
+  <span className="text-[9px]">└</span>
+  <span className="truncate">{v.variantLabel || v.name}</span>
+  {v.score > 0 && <span className="ml-auto font-mono text-[10px] text-success shrink-0">{v.score}%</span>}
+</Button>
+```
+
+**"Open" card footer button (lines 171-177):** → `variant="default"`:
+```tsx
+<Button
+  onClick={() => handleOpen(resume.id)}
+  size="sm"
+  className="flex items-center gap-1.5 rounded-xs text-xs font-semibold active:scale-[0.98]"
+>
+  <ExternalLink size={11} />
+  Open
+</Button>
+```
+
+**"Tailor" ghost button (lines 179-186):** → `variant="ghost"`:
+```tsx
+<Button
+  variant="ghost"
+  onClick={() => handleOpen(resume.id)}
+  size="sm"
+  className="flex items-center gap-1 rounded-xs text-xs text-muted-foreground hover:bg-accent-soft hover:text-primary"
+  title="Tailor this resume"
+>
+  <Zap size={11} />
+  Tailor
+</Button>
+```
+
+**Delete icon button (lines 187-193):** → `variant="ghost" size="icon"`:
+```tsx
+<Button
+  variant="ghost"
+  size="icon"
+  onClick={() => setDeleteTarget({ id: resume.id, name: resume.name })}
+  className="rounded-xs p-1.5 h-auto w-auto text-muted-foreground hover:bg-danger-soft hover:text-destructive"
+  title="Delete resume"
+>
+  <Trash2 size={13} />
+</Button>
+```
+
+**"New Resume" card button (lines 201-209):** This is a full-card dashed add button. → `variant="ghost"`:
+```tsx
+<Button
+  variant="ghost"
+  onClick={() => setUploadModalOpen(true)}
+  className="flex min-h-[180px] w-full flex-col items-center justify-center gap-3 rounded-sm border border-dashed border-border bg-card/50 text-muted-foreground hover:border-primary/50 hover:bg-accent-soft hover:text-primary h-auto"
+>
+  <div className="flex h-10 w-10 items-center justify-center rounded-sm border border-border bg-background">
+    <Plus size={18} strokeWidth={2} />
   </div>
-)}
+  <span className="text-sm font-medium">New Resume</span>
+</Button>
 ```
 
-Convert to:
+#### Step 4 — Auth pages (login, register, forgot-password, reset-password)
+
+These four files follow the same pattern. For each:
+
+Add imports:
 ```tsx
-<Dialog open={open} onOpenChange={(o) => { if (!o) onClose() }}>
-  <DialogContent className="max-w-md">
-    <DialogHeader>
-      <DialogTitle>Title</DialogTitle>
-    </DialogHeader>
-    {/* body */}
-    <DialogFooter>
-      {/* buttons */}
-    </DialogFooter>
-  </DialogContent>
-</Dialog>
+import { Button } from '~/components/ui/button'
+import { Input } from '~/components/ui/input'
 ```
 
-> **KEY**: The Dialog component handles backdrop, escape key, focus trap, and body scroll lock automatically. Remove all manual `useEffect`/`useCallback` for keydown/scroll/focus-trap. Remove the manual backdrop `<div>`. Remove `document.body.style.overflow` manipulation. The DialogContent already has the backdrop + centered layout + animation built in.
+**Inputs** (`<input type="text/email/password">`) → `<Input type="...">` keeping `value`, `onChange`, `placeholder`, `required`, `minLength`, and `className`. Auth inputs use `rounded-md border border-border bg-background px-3 py-2 text-sm` — keep these as className overrides.
 
-**File-by-file:**
+**Submit button** (type="submit") → `<Button type="submit" disabled={loading} className="w-full rounded-md text-sm font-medium active:scale-[0.98]">...</Button>`
 
-**`src/app/components/layout/upload-modal.tsx`** → Dialog:
-- Remove the `if (!open) return null` early return (Dialog handles visibility).
-- Wrap entire return in `<Dialog open={open} onOpenChange={(o) => { if (!o && !parsing) onClose() }}>`.
-- Replace outer `<div className="fixed inset-0...">` + inner `<div className="w-full max-w-lg...">` with `<DialogContent className="max-w-lg">`.
-- Keep header, body, and all handlers (handleFileChange, handleDrop, etc.).
-- The hidden `<input type="file">` stays raw — it's outside the Dialog content (or can go inside, it's hidden anyway).
-- The BuildWizard sub-component is a separate modal — leave it as-is for now or migrate if time permits.
+**Google OAuth button** (type="button") → `<Button type="button" variant="outline" onClick={handleGoogle} className="w-full rounded-md border-border text-sm font-medium active:scale-[0.98]">...</Button>`
 
-**`src/app/components/chat/paste-jd-modal.tsx`** → Dialog:
-- Remove `if (!open) return null`.
-- Wrap in `<Dialog open={open} onOpenChange={(o) => { if (!o) handleClose() }}>`.
-- Replace overlay with `<DialogContent className="max-w-lg">`.
-- Convert the textarea to `<Textarea>`.
-- Convert buttons to `<Button>`.
-- Keep the character count validation logic.
+**forgot-password/page.tsx**: Check if it has a `handleResend` button too — convert same way.
 
-**`src/app/components/ui/confirm-dialog.tsx`** → AlertDialog:
-- Remove ALL manual focus trap, keydown handler, scroll lock, and the `useEffect`/`useCallback`/`useRef` code (lines 27-83). AlertDialog handles all of this.
-- Replace with:
-  ```tsx
-  import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '~/components/ui/alert-dialog'
-  import { Button } from '~/components/ui/button'
-  import { Loader2 } from 'lucide-react'
+**reset-password/page.tsx**: Has a password-visibility toggle button if present → `variant="ghost" size="icon"`.
 
-  export function ConfirmDialog({ open, onClose, onConfirm, title, description, confirmLabel = 'Delete', variant = 'danger', loading = false }: ConfirmDialogProps) {
-    return (
-      <AlertDialog open={open} onOpenChange={(o) => { if (!o && !loading) onClose() }}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>{title}</AlertDialogTitle>
-            <AlertDialogDescription>{description}</AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel disabled={loading} onClick={onClose}>Cancel</AlertDialogCancel>
-            <AlertDialogAction
-              disabled={loading}
-              onClick={(e) => { e.preventDefault(); onConfirm() }}
-              className={variant === 'danger' ? 'bg-destructive text-destructive-foreground hover:bg-destructive/90' : ''}
-            >
-              {loading && <Loader2 size={12} className="animate-spin" />}
-              {confirmLabel}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-    )
-  }
-  ```
-  > **NOTE**: AlertDialogAction by default closes the dialog. Since `onConfirm` may be async with loading state, we `e.preventDefault()` to prevent auto-close, and let `onConfirm` → `onClose` handle closing after the async operation completes.
+#### Step 5 — Small component files
 
-**`src/app/components/ui/upgrade-modal.tsx`** → Dialog:
-- Remove manual focus trap, keydown, scroll lock (same as confirm-dialog).
-- Wrap in `<Dialog open={open} onOpenChange={(o) => { if (!o) onClose() }}>`.
-- Replace overlay with `<DialogContent className="max-w-md">`.
-- Convert buttons to `<Button>`.
-- Keep the router.push logic for CTA buttons.
+**`search/RoleAutocomplete.tsx`:**
+- `<input>` at line 87 → `<Input>` keeping `type`, `value`, `onChange`, `onFocus`, `onKeyDown`, `placeholder`, `className`
+- Clear button (line 101, absolute right-2) → `<Button variant="ghost" size="icon" onClick={...} className="absolute right-2 top-1/2 -translate-y-1/2 h-5 w-5 p-0 text-muted-foreground hover:text-foreground">` 
+- Suggestion dropdown buttons (line 116-126): These are `block w-full px-3 py-1.5 text-left text-[11px]` list items → `<Button variant="ghost" onClick={...} className="block w-full px-3 py-1.5 text-left text-[11px] h-auto justify-start rounded-none">`
 
-**`src/app/components/pipeline/job-detail-panel.tsx`** → Sheet:
-- This is a slide-over from the right, NOT a centered modal. Use Sheet, not Dialog.
-- Current: two sibling `<div>`s — a backdrop + a fixed panel. Replace both with:
-  ```tsx
-  <Sheet open={!!job} onOpenChange={(o) => { if (!o) onClose() }}>
-    <SheetContent side="right" className="w-full max-w-2xl flex flex-col p-0 gap-0">
-      {/* Header */}
-      <SheetHeader className="shrink-0 border-b border-border px-5 py-4">
-        <SheetTitle>{job.title}</SheetTitle>
-        {/* subtitle row */}
-      </SheetHeader>
-      {/* Scrollable body */}
-      <div className="flex-1 overflow-y-auto px-5 py-4 space-y-4">
-        {/* ...existing body content... */}
-      </div>
-      {/* Footer */}
-      <div className="shrink-0 border-t border-border bg-card/95 backdrop-blur-sm px-5 py-4">
-        {/* ...existing footer content... */}
-      </div>
-    </SheetContent>
-  </Sheet>
-  ```
-- Remove the manual `handleKeyDown` callback and the `useEffect` that adds keydown listener + sets body overflow (lines 86-102). Sheet handles Escape + scroll lock.
-- Keep the close button as `<Button variant="ghost" size="icon">` inside SheetContent (SheetContent also has a built-in close X button, but keeping the custom one is fine — just ensure there's no duplicate close button conflict. If SheetContent renders its own X, remove the custom close button).
+**`search/LocationAutocomplete.tsx`:** Same pattern as RoleAutocomplete.
 
-**Commit after Phase 3D:**
-```bash
-git add -A && git commit -m "refactor: migrate custom overlays to shadcn Dialog, Sheet, and AlertDialog"
-```
+**`components/interview/interview-summary.tsx`:** Inspect and convert 2 `<button>` to appropriate `<Button>` variants based on their look.
 
----
+**`components/pipeline/job-notes.tsx`:** 1 `<textarea>` → `<Textarea>` with same className.
 
-#### PHASE 3E: Migrate @base-ui/react Menus → shadcn DropdownMenu
+**`components/resume/templates/template-gallery.tsx`:** 1 `<button>` → `<Button variant="ghost">` or appropriate variant.
 
-**MIGRATION PATTERN:**
+**`components/interview/interview-view.tsx`:** 1 `<button>` → `<Button>` appropriate variant.
 
-Current (base-ui):
-```tsx
-import { Menu } from '@base-ui/react/menu'
-<Menu.Root>
-  <Menu.Trigger className="...">Trigger</Menu.Trigger>
-  <Menu.Portal>
-    <Menu.Positioner side="bottom" align="end" className="z-50">
-      <Menu.Popup className="...">
-        <Menu.Item className="..." onClick={...}>Item</Menu.Item>
-      </Menu.Popup>
-    </Menu.Positioner>
-  </Menu.Portal>
-</Menu.Root>
-```
+**`components/admin/source-health.tsx`:** 1 `<button>` → `<Button>` appropriate variant.
 
-Convert to (shadcn):
-```tsx
-import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from '~/components/ui/dropdown-menu'
-<DropdownMenu>
-  <DropdownMenuTrigger asChild>
-    <Button variant="ghost" className="...">Trigger</Button>
-  </DropdownMenuTrigger>
-  <DropdownMenuContent align="end" className="...">
-    <DropdownMenuItem onClick={...}>Item</DropdownMenuItem>
-  </DropdownMenuContent>
-</DropdownMenu>
-```
-
-> **KEY**: `DropdownMenuTrigger` with `asChild` wraps the trigger button. `DropdownMenuContent` takes `align` and `sideOffset` props. Items take `onClick`. Use `<DropdownMenuSeparator />` for dividers.
-
-**File-by-file:**
-
-**`src/app/components/layout/navbar.tsx`** — LanguageSwitcher:
-- Replace `import { Menu } from '@base-ui/react/menu'` with shadcn DropdownMenu imports.
-- `Menu.Root` → `<DropdownMenu>`
-- `Menu.Trigger` → `<DropdownMenuTrigger asChild><Button variant="ghost" className="flex h-[30px] items-center gap-1 ...">...</Button></DropdownMenuTrigger>`
-- Remove `Menu.Portal`, `Menu.Positioner` (shadcn handles portal/positioning internally).
-- `Menu.Popup` → `<DropdownMenuContent align="end" className="min-w-[120px]">`
-- `Menu.Item` → `<DropdownMenuItem>`
-- Keep the locale checkmarks.
-
-**`src/app/components/layout/user-menu.tsx`**:
-- Replace `import { Menu } from '@base-ui/react/menu'` with shadcn DropdownMenu imports.
-- `Menu.Root` → `<DropdownMenu>`
-- `Menu.Trigger` → `<DropdownMenuTrigger asChild><Button variant="ghost" className="flex h-[30px] w-[30px] ...">...</Button></DropdownMenuTrigger>`
-- `Menu.Popup` → `<DropdownMenuContent align="end" className="min-w-[180px]">`
-- The header div (user name/email) stays as a plain `<div>`.
-- The separator `<div className="mx-2 h-px bg-border" />` → `<DropdownMenuSeparator />`
-- `Menu.Item` → `<DropdownMenuItem>`
-- Keep all onClick handlers (router.push, handleSignOut).
-
-**`src/app/components/ui/tooltip.tsx`** — uses `@base-ui/react/tooltip`:
-- **DO NOT migrate** this file. The shadcn `tooltip` is not in the install list and the base-ui tooltip works fine. Leave it as-is.
-
-**Commit after Phase 3E:**
-```bash
-git add -A && git commit -m "refactor: migrate base-ui menus to shadcn DropdownMenu"
-```
-
----
-
-#### PHASE 4: Worklog
-
-**Step 4.1**: Create or append to `.worklog.md` in project root:
-```markdown
-## shadcn/ui Migration — [date]
-
-### Phase 1: Component Installation
-- Installed: button, input, textarea, select, dialog, sheet, dropdown-menu, alert-dialog, badge, separator, scroll-area, tabs, label, avatar
-- Style used: [base-nova | neutral fallback]
-
-### Phase 2: Button Variants
-- Configured 6 variants (default, destructive, outline, secondary, ghost, link)
-- Configured 4 sizes (sm, default, lg, icon)
-
-### Phase 3A-3C: Element Migration
-- [list files completed]
-
-### Phase 3D: Overlay Migration
-- [list files completed]
-
-### Phase 3E: Menu Migration
-- [list files completed]
-
-### Issues Encountered
-- [any issues]
-```
+**Error pages (`error.tsx`, `(app)/error.tsx`, `(app)/admin/error.tsx`, `global-error.tsx`):** Each has a "Try again" / "Reload" button → `<Button>` `variant="outline"` or `variant="default"`.
 
 ---
 
 ### 4.5 Vertical-Slice Order
 
-Execute phases in this exact order — each phase produces a testable checkpoint:
+Work file-by-file in this order (highest-impact first, minimizing intermediate broken states):
+1. `settings/page.tsx` (12 buttons, 7 inputs) — self-contained, no shared state with other files
+2. `cover-letter/page.tsx` (11 buttons, 3 inputs, 3 textareas)
+3. `resumes/page.tsx` (7 buttons)
+4. Auth pages batch: `login`, `register`, `forgot-password`, `reset-password` (small, identical patterns)
+5. Small components batch: autocomplete, interview-summary, job-notes, template-gallery, interview-view, source-health, error pages
 
-1. **Slice 1**: Phase 1 (install) + Phase 2 (button variants) → checkpoint: `tsc --noEmit` passes, components exist
-2. **Slice 2**: Phase 3A buttons in `resume-detail.tsx` ONLY → checkpoint: `tsc --noEmit` + `pnpm lint` passes (proves the pattern works)
-3. **Slice 3**: Phase 3A buttons in all remaining files → checkpoint: `tsc --noEmit` passes
-4. **Slice 4**: Phase 3B inputs/textareas in all files → checkpoint: `tsc --noEmit` passes
-5. **Slice 5**: Phase 3C selects in all files → checkpoint: `tsc --noEmit` passes
-6. **Slice 6**: Phase 3D dialogs/sheets → checkpoint: `tsc --noEmit` passes
-7. **Slice 7**: Phase 3E dropdown menus → checkpoint: `tsc --noEmit` passes
-8. **Slice 8**: Phase 5 final verification → `tsc`, `lint`, `build` all pass
-
-> **If you hit the SAME error twice or reach turn limit, STOP and return: (1) partial diff via `git diff`, (2) exact blocker, (3) which step you're stuck on.**
+Run `npx tsc --noEmit && pnpm lint` after steps 1-3 complete, and again after step 5 completes.
 
 ---
 
 ### 5. Assertion & Testing Requirements
 
-This is a **pure UI markup refactor** — no behavior, API, data, or auth changes. The existing test suite should pass unchanged.
-
-- **Unit Tests**: N/A — no behavior change. Run existing `pnpm test` to verify nothing breaks.
-- **Integration Tests**: N/A — no multi-module contract changes.
-- **E2E UI Tests**: Run `pnpm test:e2e` if time permits. E2E selectors should still work since we're not changing data attributes or text content. If E2E tests use `getByRole('button')`, they'll still find shadcn Buttons (they render as `<button>`).
-
-**Manual verification checklist** (if dev server available):
-- [ ] Resume editor: all form inputs work, drag-and-drop reordering works, tab switching works
-- [ ] Job detail panel: slide-over opens/closes, AI action buttons navigate correctly
-- [ ] Chat: message send works, paste-JD modal opens/closes
-- [ ] Settings: form inputs save correctly
-- [ ] Upload modal: drag-drop + file upload works
-- [ ] Confirm dialog: delete confirmation works with async loading
-- [ ] Language switcher: locale changes work
-- [ ] User menu: sign out works
+- **Unit Tests**: N/A — no behavior change. All onClick, state, props identical.
+- **Integration Tests**: N/A — no API or multi-module contract changes.
+- **E2E UI Tests**: N/A — markup swap only. Visual regression acceptable per task spec.
 
 ---
 
 ### 6. Verification Commands & Log Files
 
-| Check | Command | Expected Result |
-|-------|---------|-----------------|
-| TypeScript | `npx tsc --noEmit` | 0 errors |
-| Lint | `pnpm lint` | 0 errors |
-| Build | `pnpm build` | Succeeds |
-| Unit tests | `pnpm test` | All pass (no behavior change) |
+- **TypeScript check**: `npx tsc --noEmit` → 0 errors
+- **Lint**: `pnpm lint` → 0 errors (or warnings only; no new errors)
+- **Build**: `pnpm build` → exit 0
+- **Server Log Location**: `pnpm build` output to stdout/stderr. If build fails, error appears in terminal with file + line.
+- **Commit messages**: `chore: migrate raw buttons/inputs/textareas to shadcn ui components` per commit
 
-**Run `npx tsc --noEmit` after EACH major file migration** to catch errors early. Do not wait until the end.
+---
 
-**Server log location**: If `pnpm build` fails, check stderr output in terminal. Next.js build errors include file path + line number.
+### Additional Notes for Engineer
 
-**Final raw-element audit** (after all migrations):
-```bash
-# Should return ZERO results in components/ (excluding auth pages and special cases)
-rg '<button ' src/app/components/ --include='*.tsx' -l
-rg '<input ' src/app/components/ --include='*.tsx' -l
-rg '<textarea ' src/app/components/ --include='*.tsx' -l
-rg '<select ' src/app/components/ --include='*.tsx' -l
-```
-> Acceptable exceptions: `<input type="file">` in upload-modal.tsx, inputs inside agent-elements components, and any inputs with `className="hidden"`.
+1. **DO NOT run `pnpm dlx shadcn@latest add ...`** — components already exist and are correctly configured. Running shadcn add would overwrite them.
+
+2. **Import path is `~/components/ui/button`** (resolves to `src/app/components/ui/button`), NOT `@/components/ui/button`.
+
+3. **className is always safe to add** — both `Button` and `Input` use `cn(baseVariants, className)` so your utility overrides take effect via tailwind-merge.
+
+4. **`<button type="submit">` inside `<form>`**: The `Button` component uses `@base-ui/react/button` which renders as `<button>` by default — `type="submit"` works correctly.
+
+5. **Do NOT push** per task rules.
+
+6. **Append `.worklog.md`** after finishing.
+
+7. **Selective non-conversions (intentional keeps)**:
+   - CSS toggle-switch buttons (h-5 w-9 rounded-full) in Notifications tab
+   - Tab-underline nav buttons (border-b-2) in Settings tab nav
+   - Segmented control pills (bg-border/30 container) in cover-letter mode/language selectors
+   - Saved letters list-item buttons with complex conditional className
+   - The `<select>` in cover-letter (native select — too complex to convert to Base UI Select)
+   - `<input type="file" className="hidden">` (file input — keep native)
+   - The `<textarea>` inside `src/app/components/ui/textarea.tsx` itself

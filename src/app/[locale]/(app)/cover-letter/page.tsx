@@ -9,6 +9,9 @@ import { normalizeParsed, type ParsedResumeFields } from '~/lib/resume-normalize
 import { notify } from '~/lib/toast'
 import { Wand2, Download, Copy, Save, Upload, FileText, Loader2, Trash2 } from 'lucide-react'
 import { ConfirmDialog } from '~/components/ui/confirm-dialog'
+import { Button } from '~/components/ui/button'
+import { Input } from '~/components/ui/input'
+import { Textarea } from '~/components/ui/textarea'
 import { useTranslations } from 'next-intl'
 
 export default function StandaloneCoverLetterPage() {
@@ -278,10 +281,11 @@ export default function StandaloneCoverLetterPage() {
                   </option>
                 ))}
               </select>
-              <button
+              <Button
+                variant="outline"
                 onClick={() => fileInputRef.current?.click()}
                 disabled={parsing}
-                className="flex cursor-pointer items-center justify-center gap-1 rounded-xs border border-border bg-background px-3 py-1.5 text-[11px] font-medium text-muted-foreground hover:bg-muted/30 disabled:opacity-50"
+                className="flex items-center gap-1 rounded-xs border-border text-[11px] font-medium text-muted-foreground disabled:opacity-50"
               >
                 {parsing ? (
                   <Loader2 size={12} className="animate-spin text-primary" />
@@ -290,7 +294,7 @@ export default function StandaloneCoverLetterPage() {
                     <Upload size={12} /> {t('uploadPdf')}
                   </>
                 )}
-              </button>
+              </Button>
             </div>
           </div>
 
@@ -345,44 +349,44 @@ export default function StandaloneCoverLetterPage() {
             <div className="space-y-3">
               <div>
                 <label className="label-mono mb-1 block">{t('companyName')}</label>
-                <input
+                <Input
                   type="text"
                   value={company}
                   onChange={(e) => setCompany(e.target.value)}
                   placeholder={t('placeholderCompany')}
-                  className="w-full rounded-xs border border-border bg-background px-2.5 py-1.5 text-[11px] outline-none focus:border-primary"
+                  className="w-full rounded-xs text-[11px] px-2.5 py-1.5"
                 />
               </div>
               <div>
                 <label className="label-mono mb-1 block">Job Title</label>
-                <input
+                <Input
                   type="text"
                   value={role}
                   onChange={(e) => setRole(e.target.value)}
                   placeholder="e.g. Senior Frontend Engineer"
-                  className="w-full rounded-xs border border-border bg-background px-2.5 py-1.5 text-[11px] outline-none focus:border-primary"
+                  className="w-full rounded-xs text-[11px] px-2.5 py-1.5"
                 />
               </div>
               <div>
                 <label className="label-mono mb-1 block">Focus / Highlights (Optional)</label>
-                <textarea
+                <Textarea
                   value={focus}
                   onChange={(e) => setFocus(e.target.value)}
                   placeholder="e.g. Focus on my dashboard UI leadership..."
                   rows={4}
-                  className="w-full resize-none rounded-xs border border-border bg-background px-2.5 py-1.5 text-[11px] outline-none focus:border-primary font-sans"
+                  className="w-full resize-none rounded-xs text-[11px] px-2.5 py-1.5 font-sans"
                 />
               </div>
             </div>
           ) : (
             <div className="space-y-2">
               <label className="label-mono mb-1 block">Job Description</label>
-              <textarea
+              <Textarea
                 value={jdText}
                 onChange={(e) => setJdText(e.target.value)}
                 placeholder="Paste full target job description here..."
                 rows={10}
-                className="w-full resize-none rounded-xs border border-border bg-background px-2.5 py-1.5 text-[11px] outline-none focus:border-primary font-sans"
+                className="w-full resize-none rounded-xs text-[11px] px-2.5 py-1.5 font-sans"
               />
             </div>
           )}
@@ -411,23 +415,25 @@ export default function StandaloneCoverLetterPage() {
                     {new Date(letter.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
                   </div>
                 </div>
-                <button
+                <Button
+                  variant="ghost"
+                  size="icon"
                   onClick={(e) => {
                     e.stopPropagation()
                     setDeleteTarget(letter.id)
                   }}
-                  className="shrink-0 opacity-0 group-hover:opacity-100 text-muted-foreground hover:text-destructive transition-opacity cursor-pointer"
+                  className="shrink-0 h-5 w-5 p-0 opacity-0 group-hover:opacity-100 text-muted-foreground hover:text-destructive"
                   title="Delete"
                 >
                   <Trash2 size={12} />
-                </button>
+                </Button>
               </button>
             ))}
           </div>
         )}
 
         {/* Generate Trigger */}
-        <button
+        <Button
           onClick={handleGenerate}
           disabled={
             generating ||
@@ -435,7 +441,7 @@ export default function StandaloneCoverLetterPage() {
             (mode === 'quick' && (!company || !role)) ||
             (mode === 'jd' && !jdText)
           }
-          className="w-full cursor-pointer rounded-sm bg-primary py-2 text-xs font-semibold text-primary-foreground tracking-wide uppercase transition-all hover:opacity-90 active:scale-[0.98] shadow-sm flex items-center justify-center gap-1.5 mt-6 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="w-full rounded-sm py-2 text-xs font-semibold tracking-wide uppercase active:scale-[0.98] shadow-sm mt-6"
         >
           {generating ? (
             <>
@@ -446,7 +452,7 @@ export default function StandaloneCoverLetterPage() {
               <Wand2 size={13} /> Generate Cover Letter
             </>
           )}
-        </button>
+        </Button>
       </div>
 
       {/* Document Preview Panel */}
@@ -457,27 +463,32 @@ export default function StandaloneCoverLetterPage() {
             <span className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">Document Preview</span>
           </div>
           <div className="flex gap-2">
-            <button
+            <Button
+              variant="outline"
               onClick={handleSave}
               disabled={!letterText || selectedResumeId === 'none'}
-              className="flex cursor-pointer items-center gap-1 rounded-sm border border-border bg-card px-2.5 py-1 text-[11px] hover:bg-muted disabled:opacity-50"
+              size="sm"
+              className="flex items-center gap-1 rounded-sm text-[11px]"
             >
               <Save size={11} /> Save Letter
-            </button>
-            <button
+            </Button>
+            <Button
+              variant="outline"
               onClick={handleCopy}
               disabled={!letterText}
-              className="flex cursor-pointer items-center gap-1 rounded-sm border border-border bg-card px-2.5 py-1 text-[11px] hover:bg-muted disabled:opacity-50"
+              size="sm"
+              className="flex items-center gap-1 rounded-sm text-[11px]"
             >
               <Copy size={11} /> Copy Text
-            </button>
-            <button
+            </Button>
+            <Button
               onClick={() => window.open(`/api/export/pdf?id=${selectedResumeId}&type=cover-letter`, '_blank')}
               disabled={!letterText || selectedResumeId === 'none'}
-              className="flex cursor-pointer items-center gap-1 rounded-sm bg-primary px-2.5 py-1 text-[11px] font-medium text-primary-foreground hover:opacity-90 disabled:opacity-50"
+              size="sm"
+              className="flex items-center gap-1 rounded-sm text-[11px] font-medium"
             >
               <Download size={11} /> Export PDF
-            </button>
+            </Button>
           </div>
         </div>
 
@@ -499,11 +510,11 @@ export default function StandaloneCoverLetterPage() {
               <div className="border-b border-border/50 mb-6"></div>
 
               {/* Letter Textarea */}
-              <textarea
+              <Textarea
                 value={letterText}
                 onChange={(e) => setLetterText(e.target.value)}
                 placeholder="Your cover letter text will appear here..."
-                className="w-full flex-1 min-h-[600px] bg-transparent resize-none border-0 outline-none text-foreground font-sans text-xs focus:ring-0 focus:outline-none leading-relaxed p-0"
+                className="w-full flex-1 min-h-[600px] bg-transparent resize-none border-0 outline-none text-foreground font-sans text-xs focus:ring-0 leading-relaxed p-0"
                 style={{ fontSize: '11px' }}
               />
             </div>

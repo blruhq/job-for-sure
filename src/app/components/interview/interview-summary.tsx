@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from '~/i18n/routing'
 import { CheckCircle2, TrendingUp, TrendingDown, RefreshCw, MessageSquare, AlertTriangle, Check } from 'lucide-react'
+import { Button } from '~/components/ui/button'
 
 import type { InterviewExchange } from '~/types/interview'
 
@@ -220,18 +221,19 @@ export function InterviewSummary({ exchanges, onRestart }: InterviewSummaryProps
 
         {/* Actions */}
         <div className="flex gap-2">
-          <button
+          <Button
+            variant="outline"
             onClick={onRestart}
-            className="flex-1 cursor-pointer rounded-sm border border-border bg-background hover:bg-muted/50 px-4 py-2.5 text-xs font-medium text-foreground transition-colors flex items-center justify-center gap-1.5"
+            className="flex-1 rounded-sm px-4 py-2.5 text-xs font-medium flex items-center justify-center gap-1.5"
           >
             <RefreshCw size={13} /> Practice Again
-          </button>
-          <button
+          </Button>
+          <Button
             onClick={() => router.push('/chat')}
-            className="flex-1 cursor-pointer rounded-sm bg-primary px-4 py-2.5 text-xs font-medium text-primary-foreground transition-opacity hover:opacity-90 flex items-center justify-center gap-1.5"
+            className="flex-1 rounded-sm px-4 py-2.5 text-xs font-medium flex items-center justify-center gap-1.5"
           >
             <MessageSquare size={13} /> Back to Coach Chat
-          </button>
+          </Button>
         </div>
       </div>
     </div>

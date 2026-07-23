@@ -3,6 +3,8 @@
 import { useState } from 'react'
 import { Link } from '~/i18n/routing'
 import { authClient } from '~/lib/auth-client'
+import { Button } from '~/components/ui/button'
+import { Input } from '~/components/ui/input'
 
 export default function RegisterPage() {
   const [name, setName] = useState('')
@@ -106,13 +108,13 @@ export default function RegisterPage() {
               <label className="mb-1 block font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
                 Full Name
               </label>
-              <input
+              <Input
                 type="text"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="John Doe"
                 required
-                className="w-full cursor-pointer rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground outline-none transition-colors placeholder:text-muted-foreground/50 focus:border-primary"
+                className="w-full rounded-md px-3 py-2 text-sm"
               />
             </div>
 
@@ -120,13 +122,13 @@ export default function RegisterPage() {
               <label className="mb-1 block font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
                 Email
               </label>
-              <input
+              <Input
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="you@example.com"
                 required
-                className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground outline-none transition-colors placeholder:text-muted-foreground/50 focus:border-primary"
+                className="w-full rounded-md px-3 py-2 text-sm"
               />
             </div>
 
@@ -134,24 +136,24 @@ export default function RegisterPage() {
               <label className="mb-1 block font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
                 Password
               </label>
-              <input
+              <Input
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="At least 8 characters"
                 required
                 minLength={8}
-                className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground outline-none transition-colors placeholder:text-muted-foreground/50 focus:border-primary"
+                className="w-full rounded-md px-3 py-2 text-sm"
               />
             </div>
 
-            <button
+            <Button
               type="submit"
               disabled={loading}
-              className="w-full cursor-pointer rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-opacity hover:opacity-90 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
+              className="w-full rounded-md text-sm font-medium active:scale-[0.98]"
             >
               {loading ? 'Creating account...' : 'Create Account'}
-            </button>
+            </Button>
           </form>
 
           {/* Divider */}
@@ -165,10 +167,11 @@ export default function RegisterPage() {
           </div>
 
           {/* Google */}
-          <button
+          <Button
             type="button"
+            variant="outline"
             onClick={handleGoogle}
-            className="w-full cursor-pointer rounded-md border border-border bg-background px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-muted active:scale-[0.98]"
+            className="w-full rounded-md border-border text-sm font-medium active:scale-[0.98]"
           >
             <span className="inline-flex items-center gap-2">
               <svg width="14" height="14" viewBox="0 0 24 24">
@@ -179,7 +182,7 @@ export default function RegisterPage() {
               </svg>
               Continue with Google
             </span>
-          </button>
+          </Button>
 
           <p className="mt-5 text-center text-xs text-muted-foreground">
             Already have an account?{' '}

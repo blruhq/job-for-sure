@@ -9,6 +9,7 @@ import { UploadModal } from '~/components/layout/upload-modal'
 import { notify } from '~/lib/toast'
 import { cn } from '~/lib/utils'
 import { Plus, FileText, Trash2, ExternalLink, Clock, Zap } from 'lucide-react'
+import { Button } from '~/components/ui/button'
 import type { Resume } from '~/types/resume'
 
 export default function ResumesPage() {
@@ -52,13 +53,13 @@ export default function ResumesPage() {
             <div className="label-mono mb-1" style={{ fontSize: '11px' }}>[ 02 // RESUME COLLECTION ]</div>
             <h1 className="text-lg font-semibold text-foreground">My Resumes</h1>
           </div>
-          <button
+          <Button
             onClick={() => setUploadModalOpen(true)}
-            className="flex items-center gap-2 rounded-sm bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition-all hover:opacity-90 active:scale-[0.98]"
+            className="flex items-center gap-2 rounded-sm text-sm font-semibold active:scale-[0.98]"
           >
             <Plus size={15} strokeWidth={2.5} />
             New Resume
-          </button>
+          </Button>
         </div>
       </div>
 
@@ -81,13 +82,13 @@ export default function ResumesPage() {
               <div className="label-mono mb-1" style={{ fontSize: '11px' }}>[ STATUS: EMPTY ]</div>
               <p className="text-sm text-muted-foreground">No resumes yet. Upload or create your first one.</p>
             </div>
-            <button
+            <Button
               onClick={() => setUploadModalOpen(true)}
-              className="flex items-center gap-2 rounded-sm bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition-all hover:opacity-90"
+              className="flex items-center gap-2 rounded-sm text-sm font-semibold"
             >
               <Plus size={14} strokeWidth={2.5} />
               Create Resume
-            </button>
+            </Button>
           </div>
         )}
 
@@ -138,17 +139,18 @@ export default function ResumesPage() {
                         </span>
                         <div className="mt-1 flex flex-col gap-0.5">
                           {variants.slice(0, 2).map((v) => (
-                            <button
+                            <Button
                               key={v.id}
+                              variant="ghost"
                               onClick={() => handleOpen(v.id)}
-                              className="flex items-center gap-1.5 text-left text-xs text-muted-foreground hover:text-primary transition-colors"
+                              className="flex items-center gap-1.5 text-left text-xs text-muted-foreground hover:text-primary h-auto p-0 w-full justify-start"
                             >
                               <span className="text-[9px]">└</span>
                               <span className="truncate">{v.variantLabel || v.name}</span>
                               {v.score > 0 && (
                                 <span className="ml-auto font-mono text-[10px] text-success shrink-0">{v.score}%</span>
                               )}
-                            </button>
+                            </Button>
                           ))}
                           {variants.length > 2 && (
                             <span className="text-xs text-muted-foreground pl-3">+{variants.length - 2} more</span>
@@ -168,29 +170,34 @@ export default function ResumesPage() {
 
                   {/* Card footer — actions */}
                   <div className="flex items-center justify-between border-t border-border px-3 py-2">
-                    <button
+                    <Button
                       onClick={() => handleOpen(resume.id)}
-                      className="flex items-center gap-1.5 rounded-xs bg-primary px-3 py-1.5 text-xs font-semibold text-primary-foreground transition-all hover:opacity-90 active:scale-[0.98]"
+                      size="sm"
+                      className="flex items-center gap-1.5 rounded-xs text-xs font-semibold active:scale-[0.98]"
                     >
                       <ExternalLink size={11} />
                       Open
-                    </button>
+                    </Button>
                     <div className="flex items-center gap-1">
-                      <button
+                      <Button
+                        variant="ghost"
                         onClick={() => handleOpen(resume.id)}
-                        className="flex items-center gap-1 rounded-xs px-2 py-1.5 text-xs text-muted-foreground transition-colors hover:bg-accent-soft hover:text-primary"
+                        size="sm"
+                        className="flex items-center gap-1 rounded-xs text-xs text-muted-foreground hover:bg-accent-soft hover:text-primary"
                         title="Tailor this resume"
                       >
                         <Zap size={11} />
                         Tailor
-                      </button>
-                      <button
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
                         onClick={() => setDeleteTarget({ id: resume.id, name: resume.name })}
-                        className="rounded-xs p-1.5 text-muted-foreground transition-all hover:bg-danger-soft hover:text-destructive"
+                        className="rounded-xs p-1.5 h-auto w-auto text-muted-foreground hover:bg-danger-soft hover:text-destructive"
                         title="Delete resume"
                       >
                         <Trash2 size={13} />
-                      </button>
+                      </Button>
                     </div>
                   </div>
                 </div>
@@ -198,15 +205,16 @@ export default function ResumesPage() {
             })}
 
             {/* "+ New Resume" card */}
-            <button
+            <Button
+              variant="ghost"
               onClick={() => setUploadModalOpen(true)}
-              className="flex min-h-[180px] flex-col items-center justify-center gap-3 rounded-sm border border-dashed border-border bg-card/50 text-muted-foreground transition-all hover:border-primary/50 hover:bg-accent-soft hover:text-primary"
+              className="flex min-h-[180px] w-full flex-col items-center justify-center gap-3 rounded-sm border border-dashed border-border bg-card/50 text-muted-foreground hover:border-primary/50 hover:bg-accent-soft hover:text-primary h-auto"
             >
               <div className="flex h-10 w-10 items-center justify-center rounded-sm border border-border bg-background">
                 <Plus size={18} strokeWidth={2} />
               </div>
               <span className="text-sm font-medium">New Resume</span>
-            </button>
+            </Button>
           </div>
         )}
       </div>

@@ -4,6 +4,8 @@ import { useState, Suspense } from 'react'
 import { Link, useRouter } from '~/i18n/routing'
 import { useSearchParams } from 'next/navigation'
 import { authClient } from '~/lib/auth-client'
+import { Button } from '~/components/ui/button'
+import { Input } from '~/components/ui/input'
 
 function ResetPasswordForm() {
   const router = useRouter()
@@ -120,14 +122,14 @@ function ResetPasswordForm() {
               <label className="mb-1 block font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
                 New Password
               </label>
-              <input
+              <Input
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="At least 8 characters"
                 required
                 minLength={8}
-                className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground outline-none transition-colors placeholder:text-muted-foreground/50 focus:border-primary"
+                className="w-full rounded-md px-3 py-2 text-sm"
               />
             </div>
 
@@ -135,24 +137,24 @@ function ResetPasswordForm() {
               <label className="mb-1 block font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
                 Confirm Password
               </label>
-              <input
+              <Input
                 type="password"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 placeholder="Re-enter your password"
                 required
                 minLength={8}
-                className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground outline-none transition-colors placeholder:text-muted-foreground/50 focus:border-primary"
+                className="w-full rounded-md px-3 py-2 text-sm"
               />
             </div>
 
-            <button
+            <Button
               type="submit"
               disabled={loading}
-              className="w-full cursor-pointer rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-opacity hover:opacity-90 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
+              className="w-full rounded-md text-sm font-medium active:scale-[0.98]"
             >
               {loading ? 'Resetting…' : 'Reset password'}
-            </button>
+            </Button>
           </form>
 
           <p className="mt-5 text-center text-xs text-muted-foreground">

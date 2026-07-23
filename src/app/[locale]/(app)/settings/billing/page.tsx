@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from '~/i18n/routing'
 import { Skeleton } from '~/components/ui/skeleton'
+import { Button } from '~/components/ui/button'
 
 type UsageData = {
   allowed: boolean
@@ -134,28 +135,30 @@ export default function BillingPage() {
 
         <div className="mt-4 flex items-center gap-3">
           {isPro ? (
-            <button
+            <Button
+              variant="outline"
               onClick={handlePortal}
-              className="rounded-lg border border-border px-4 py-2 text-xs font-medium text-foreground hover:bg-muted transition-colors cursor-pointer"
+              className="rounded-lg px-4 py-2 text-xs font-medium"
             >
               Manage in Stripe
-            </button>
+            </Button>
           ) : (
-            <button
+            <Button
               onClick={() => router.push('/pricing')}
-              className="rounded-lg bg-primary px-4 py-2 text-xs font-medium text-primary-foreground hover:opacity-90 transition-opacity cursor-pointer"
+              className="rounded-lg px-4 py-2 text-xs font-medium"
             >
               Upgrade to Pro
-            </button>
+            </Button>
           )}
           {isPro && !isCanceled && (
-            <button
+            <Button
+              variant="outline"
               onClick={handleCancel}
               disabled={canceling}
-              className="rounded-lg border border-border px-4 py-2 text-xs text-muted-foreground hover:text-red-500 hover:border-red-200 transition-colors disabled:opacity-50 cursor-pointer"
+              className="rounded-lg border-border px-4 py-2 text-xs text-muted-foreground hover:text-red-500 hover:border-red-200"
             >
               {canceling ? 'Canceling…' : 'Cancel subscription'}
-            </button>
+            </Button>
           )}
         </div>
       </div>

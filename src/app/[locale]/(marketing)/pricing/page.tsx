@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useRouter } from '~/i18n/routing'
 import { authClient } from '~/lib/auth-client'
 import { cn } from '~/lib/utils'
+import { Button } from '~/components/ui/button'
 
 const PLANS = [
   {
@@ -132,28 +133,30 @@ export default function PricingPage() {
               </ul>
 
               {plan.name === 'Free' ? (
-                <button
+                <Button
+                  variant="outline"
                   onClick={() => router.push('/chat')}
-                  className="mt-6 w-full rounded-lg border border-border px-4 py-2 text-sm font-medium text-foreground hover:bg-muted transition-colors cursor-pointer"
+                  className="mt-6 w-full rounded-lg px-4 py-2 text-sm font-medium"
                 >
                   {plan.cta}
-                </button>
+                </Button>
               ) : (
                 <div className="mt-4 flex flex-col gap-2">
-                  <button
+                  <Button
                     onClick={() => handleSubscribe('month')}
                     disabled={loading === 'monthly'}
-                    className="w-full rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:opacity-90 transition-opacity disabled:opacity-50 cursor-pointer"
+                    className="w-full rounded-lg px-4 py-2 text-sm font-medium"
                   >
                     {loading === 'monthly' ? 'Redirecting…' : `${plan.price}${plan.period}`}
-                  </button>
-                  <button
+                  </Button>
+                  <Button
+                    variant="outline"
                     onClick={() => handleSubscribe('year')}
                     disabled={loading === 'yearly'}
-                    className="w-full rounded-lg border border-primary/30 px-4 py-2 text-xs font-medium text-primary hover:bg-primary/5 transition-colors disabled:opacity-50 cursor-pointer"
+                    className="w-full rounded-lg border-primary/30 px-4 py-2 text-xs font-medium text-primary hover:bg-primary/5"
                   >
                     {loading === 'yearly' ? 'Redirecting…' : '$29 / year (save 70% vs $8/mo)'}
-                  </button>
+                  </Button>
                 </div>
               )}
             </div>

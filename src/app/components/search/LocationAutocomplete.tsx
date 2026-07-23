@@ -3,6 +3,8 @@
 import { useState, useEffect, useRef, useMemo } from 'react'
 import { MapPin, X, Globe } from 'lucide-react'
 import citiesData from '@/data/cities.json'
+import { Button } from '~/components/ui/button'
+import { Input } from '~/components/ui/input'
 
 interface LocationAutocompleteProps {
   value: string
@@ -187,41 +189,43 @@ export function LocationAutocomplete({
   return (
     <div ref={containerRef} className="relative w-[150px]">
       <MapPin size={13} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
-      <input
+      <Input
         type="text"
         value={value}
         onChange={(e) => {
           onChange(e.target.value)
-          onSelectCountryCode('') // Reset code on typing custom value
+          onSelectCountryCode('')
           setIsOpen(true)
           setActiveIndex(-1)
         }}
-        onFocus={() => setIsOpen(true)}
         onKeyDown={handleKeyDown}
         placeholder="Location…"
-        className="w-full rounded-sm border border-border bg-background py-1.5 pl-8 pr-6 text-[12px] outline-none focus:border-primary"
+        className="w-full rounded-sm border-border bg-background py-1.5 pl-8 pr-6 text-[12px] focus:border-primary"
       />
       {value && (
-        <button
+        <Button
+          variant="ghost"
+          size="icon"
           onClick={() => {
             onChange('')
             onSelectCountryCode('')
             setActiveIndex(-1)
           }}
-          className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+          className="absolute right-2 top-1/2 h-5 w-5 -translate-y-1/2 p-0 text-muted-foreground hover:text-foreground"
         >
           <X size={10} />
-        </button>
+        </Button>
       )}
 
       {/* Suggestions Dropdown */}
       {isOpen && suggestions.length > 0 && (
         <div className="absolute left-0 right-0 z-50 mt-1 max-h-[220px] overflow-y-auto rounded-sm border border-border bg-card shadow-lg">
           {suggestions.map((item: CitySuggestion, idx: number) => (
-            <button
+            <Button
               key={idx}
+              variant="ghost"
               onClick={() => handleSelect(item)}
-              className={`flex w-full items-center gap-2 px-3 py-1.5 text-left text-[11px] transition-colors ${
+              className={`flex w-full items-center gap-2 rounded-none px-3 py-1.5 text-left text-[11px] h-auto justify-start ${
                 idx === activeIndex
                   ? 'bg-accent text-accent-foreground'
                   : 'hover:bg-muted/50 text-foreground'
@@ -235,7 +239,7 @@ export function LocationAutocomplete({
                 </span>
               )}
               <span className="truncate">{item.label}</span>
-            </button>
+            </Button>
           ))}
         </div>
       )}

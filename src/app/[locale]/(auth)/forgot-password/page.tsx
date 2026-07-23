@@ -4,6 +4,8 @@ import { useState } from 'react'
 import { Link } from '~/i18n/routing'
 import { Mail } from 'lucide-react'
 import { authClient } from '~/lib/auth-client'
+import { Button } from '~/components/ui/button'
+import { Input } from '~/components/ui/input'
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState('')
@@ -98,23 +100,23 @@ export default function ForgotPasswordPage() {
                   <label className="mb-1 block font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
                     Email
                   </label>
-                  <input
+                  <Input
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="you@example.com"
                     required
-                    className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground outline-none transition-colors placeholder:text-muted-foreground/50 focus:border-primary"
+                    className="w-full rounded-md px-3 py-2 text-sm"
                   />
                 </div>
 
-                <button
+                <Button
                   type="submit"
                   disabled={loading}
-                  className="w-full cursor-pointer rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-opacity hover:opacity-90 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
+                  className="w-full rounded-md text-sm font-medium active:scale-[0.98]"
                 >
                   {loading ? 'Sending…' : 'Send reset link'}
-                </button>
+                </Button>
               </form>
 
               <p className="mt-5 text-center text-xs text-muted-foreground">

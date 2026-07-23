@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react'
 import Link from 'next/link'
+import { Button } from '~/components/ui/button'
 
 export default function LocaleError({
   error,
@@ -22,12 +23,12 @@ export default function LocaleError({
           An unexpected error occurred. The error has been logged.
         </p>
         <div className="mt-6 flex items-center justify-center gap-2">
-          <button
+          <Button
             onClick={reset}
-            className="cursor-pointer rounded-md bg-primary px-4 py-2 text-xs font-medium text-primary-foreground transition-opacity hover:opacity-90 active:scale-[0.98]"
+            className="rounded-md px-4 py-2 text-xs font-medium active:scale-[0.98]"
           >
             Try again
-          </button>
+          </Button>
           <Link
             href="/"
             className="cursor-pointer rounded-md border border-border bg-background px-4 py-2 text-xs font-medium text-foreground transition-colors hover:bg-muted"
