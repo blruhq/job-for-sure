@@ -2,7 +2,6 @@
 
 import { Clock, Bookmark, Send, CalendarCheck, XCircle } from 'lucide-react'
 import type { PipelineJob } from '~/types/resume'
-import { notify } from '~/lib/toast'
 
 // ═══════════════════════════════════════════════════════════════
 // Timeline — shows the lifecycle of a job application.
@@ -75,11 +74,11 @@ export function Timeline({ job, currentStatus }: { job: PipelineJob; currentStat
           <div key={i} className="flex gap-2.5">
             {/* Vertical line + dot */}
             <div className="flex flex-col items-center">
-              <div className={`flex h-4 w-4 items-center justify-center rounded-full bg-background ${event.color}`}>
+              <div className={`flex h-4 w-4 items-center justify-center rounded-full neuro-surface ${event.color}`}>
                 {event.icon}
               </div>
               {i < events.length - 1 && (
-                <div className="mt-0.5 h-full w-px bg-border" />
+                <div className="mt-0.5 h-full w-px bg-muted-foreground/20" />
               )}
             </div>
             {/* Content */}

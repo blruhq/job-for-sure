@@ -72,7 +72,7 @@ function DraggableJobCard({ job, children }: { job: PipelineJob; children: React
       {...attributes}
       {...listeners}
       className={cn(
-        'group cursor-grab rounded-sm neuro-card p-2.5 active:cursor-grabbing hover:border-primary/50',
+        'group cursor-grab rounded-sm neuro-card p-2.5 active:cursor-grabbing hover:-translate-y-0.5',
       )}
     >
       {children}
@@ -88,8 +88,8 @@ function DroppableColumn({ colId, isOver, children }: { colId: ApplicationColumn
     <div
       ref={setNodeRef}
       className={cn(
-        'flex w-72 shrink-0 flex-col rounded-sm border border-border transition-colors',
-        isOver && 'border-primary bg-accent-soft/30',
+        'flex w-72 shrink-0 flex-col rounded-sm neuro-inset',
+        isOver && 'ring-1 ring-primary/40 bg-accent-soft/30',
       )}
     >
       {children}
@@ -175,6 +175,7 @@ function InlineAddForm({ colId: _colId, onCancel, onSave, titleRef }: InlineAddF
   return (
     <div className="mt-1.5 flex flex-col gap-2 rounded-xs neuro-card p-2.5">
       <Input
+        neumorphic
         ref={titleRef}
         value={title}
         onChange={(e) => setTitle(e.target.value)}
@@ -187,6 +188,7 @@ function InlineAddForm({ colId: _colId, onCancel, onSave, titleRef }: InlineAddF
         className="w-full rounded-xs px-2 py-1.5 text-[11px] placeholder:text-muted-foreground/50"
       />
       <Input
+        neumorphic
         value={company}
         onChange={(e) => setCompany(e.target.value)}
         onKeyDown={(e) => {
@@ -197,6 +199,7 @@ function InlineAddForm({ colId: _colId, onCancel, onSave, titleRef }: InlineAddF
         className="w-full rounded-xs px-2 py-1.5 text-[11px] placeholder:text-muted-foreground/50"
       />
       <Input
+        neumorphic
         value={loc}
         onChange={(e) => setLoc(e.target.value)}
         onKeyDown={(e) => {
@@ -394,7 +397,7 @@ export function ApplicationsView() {
   return (
     <div className="flex h-full w-full flex-col neuro-surface">
       {/* ── Header ── */}
-      <div className="flex flex-col gap-2 border-b border-border px-4 py-2.5 shrink-0">
+      <div className="flex flex-col gap-2 neuro-divider px-4 py-2.5 shrink-0">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <h1 className="text-sm font-semibold text-foreground">
@@ -422,6 +425,7 @@ export function ApplicationsView() {
         {/* Paste URL input */}
         <div className="flex items-center gap-1.5">
           <Input
+            neumorphic
             value={pasteUrl}
             onChange={(e) => setPasteUrl(e.target.value)}
             onKeyDown={(e) => {
@@ -481,7 +485,7 @@ export function ApplicationsView() {
             return (
               <DroppableColumn key={col.id} colId={col.id} isOver={isOver}>
                 {/* Column Header */}
-                <div className="flex items-center justify-between border-b border-border px-3 py-2">
+                <div className="flex items-center justify-between neuro-divider px-3 py-2">
                   <div className="flex items-center gap-2">
                     <span className="h-2 w-2 rounded-full" style={{ backgroundColor: col.dot }} />
                     <span className="text-xs font-semibold text-foreground">{t(col.labelKey)}</span>

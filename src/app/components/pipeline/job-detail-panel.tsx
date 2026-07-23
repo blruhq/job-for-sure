@@ -190,7 +190,7 @@ export function JobDetailPanel({
     <Sheet open={!!job} onOpenChange={(o) => { if (!o) onClose() }}>
       <SheetContent side="right" className="w-full max-w-2xl flex flex-col p-0 gap-0">
         {/* ── Header ── */}
-        <SheetHeader className="shrink-0 border-b border-border px-5 py-4">
+        <SheetHeader className="shrink-0 neuro-divider px-5 py-4">
           <div className="flex items-start justify-between gap-3">
             <div className="min-w-0 flex-1">
               <SheetTitle className="text-base">{job.title}</SheetTitle>
@@ -220,7 +220,7 @@ export function JobDetailPanel({
               {job.score}% Match
             </span>
             {(salaryMin || job.salary) && (
-              <span className="flex items-center gap-0.5 rounded-xs border border-emerald-500/30 bg-emerald-50/50 px-2 py-0.5 text-[11px] font-semibold text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-400">
+              <span className="flex items-center gap-0.5 rounded-xs bg-success-soft px-2 py-0.5 text-[11px] font-semibold text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-400">
                 <DollarSign size={10} />
                 {salaryMin && salaryMax
                   ? `${salaryCurrency === 'USD' ? '$' : salaryCurrency === 'GBP' ? '£' : salaryCurrency === 'EUR' ? '€' : `${salaryCurrency} `}${Math.round(salaryMin / 1000)}k–${Math.round(salaryMax / 1000)}k`
@@ -228,7 +228,7 @@ export function JobDetailPanel({
               </span>
             )}
             {locationType && locationType !== 'unknown' && (
-              <span className="flex items-center gap-0.5 rounded-xs border border-border neuro-surface px-1.5 py-0.5 text-[11px] capitalize text-muted-foreground">
+              <span className="flex items-center gap-0.5 rounded-xs neuro-surface px-1.5 py-0.5 text-[11px] capitalize text-muted-foreground">
                 {locationType === 'remote' && <Globe size={9} />}
                 {locationType}
               </span>
@@ -239,13 +239,13 @@ export function JobDetailPanel({
               </span>
             )}
             {experienceYears && (
-              <span className="flex items-center gap-0.5 rounded-xs border border-border neuro-surface px-1.5 py-0.5 text-[11px] text-muted-foreground">
+              <span className="flex items-center gap-0.5 rounded-xs neuro-surface px-1.5 py-0.5 text-[11px] text-muted-foreground">
                 <Briefcase size={10} />
                 {experienceYears}
               </span>
             )}
             {postedAt && (
-              <span className="flex items-center gap-0.5 rounded-xs border border-border neuro-surface px-1.5 py-0.5 text-[11px] text-muted-foreground">
+              <span className="flex items-center gap-0.5 rounded-xs neuro-surface px-1.5 py-0.5 text-[11px] text-muted-foreground">
                 <Clock size={9} /> {formatDate(postedAt)}
               </span>
             )}
@@ -384,7 +384,7 @@ export function JobDetailPanel({
         </div>
 
         {/* ── Footer: Actions ── */}
-        <div className="shrink-0 border-t border-border neuro-surface px-5 py-4">
+        <div className="shrink-0 neuro-divider neuro-surface px-5 py-4">
           {/* AI tools grid */}
           <div className="mb-2 grid grid-cols-2 gap-2">
             <Button variant="secondary" onClick={handleTailor} className="flex items-center justify-center gap-1.5 rounded-xs px-3 py-2.5 text-sm">
