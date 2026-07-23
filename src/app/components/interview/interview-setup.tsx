@@ -4,6 +4,9 @@ import { useState, useEffect } from 'react'
 import { useRouter } from '~/i18n/routing'
 import { useSearchParams } from 'next/navigation'
 import { Brain, ArrowRight, Loader2, Clock, Trash2 } from 'lucide-react'
+import { Button } from '~/components/ui/button'
+import { Input } from '~/components/ui/input'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '~/components/ui/select'
 import { useActiveResume } from '~/hooks/use-active-resume'
 import { useApplications } from '~/hooks/use-apps'
 import { useUIStore } from '~/hooks/use-ui'
@@ -79,12 +82,13 @@ export function InterviewSetup({ onStart, history, loadingHistory, onViewSession
         <p className="mb-6 max-w-sm text-xs text-muted-foreground">
           To practice targeted mock interviews, you need to upload and parse your resume in the career coach chat first.
         </p>
-        <button
+        <Button
+          variant="default"
           onClick={() => router.push('/chat')}
-          className="flex cursor-pointer items-center gap-1.5 rounded-sm bg-primary px-4 py-2 text-xs font-medium text-primary-foreground transition-opacity hover:opacity-90 active:scale-[0.98]"
+          className="flex items-center gap-1.5 px-4 py-2 text-xs font-medium"
         >
           Go to Coach Chat <ArrowRight size={14} />
-        </button>
+        </Button>
       </div>
     )
   }
@@ -152,17 +156,21 @@ export function InterviewSetup({ onStart, history, loadingHistory, onViewSession
               {/* Resume Selection */}
               <div>
                 <label className="label-mono mb-1.5 block">{t('selectResume')}</label>
-                <select
+                <Select
                   value={selectedResumeId}
-                  onChange={(e) => handleResumeChange(e.target.value)}
-                  className="w-full cursor-pointer rounded-sm border border-border bg-background px-3 py-2 text-xs outline-none focus:border-primary"
+                  onValueChange={(val) => { if (val) handleResumeChange(val) }}
                 >
-                  {resumes.map((r) => (
-                    <option key={r.id} value={r.id}>
-                      {r.name} ({r.persona || 'No Name'})
-                    </option>
-                  ))}
-                </select>
+                  <SelectTrigger className="w-full px-3 py-2 text-xs">
+                    <SelectValue placeholder="Select a resume" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {resumes.map((r) => (
+                      <SelectItem key={r.id} value={r.id}>
+                        {r.name} ({r.persona || 'No Name'})
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
 
               {/* Target Company/Position Selection */}
@@ -170,18 +178,22 @@ export function InterviewSetup({ onStart, history, loadingHistory, onViewSession
                 <label className="label-mono mb-1.5 block">{t('targetPosition')}</label>
                 {(applications?.bookmark?.length ?? 0) > 0 ? (
                   <div className="space-y-2">
-                    <select
+                    <Select
                       value={targetSelect}
-                      onChange={(e) => setTargetSelect(e.target.value)}
-                      className="w-full cursor-pointer rounded-sm border border-border bg-background px-3 py-2 text-xs outline-none focus:border-primary"
+                      onValueChange={(val) => { if (val) setTargetSelect(val) }}
                     >
-                      {(applications?.bookmark ?? []).map((job) => (
-                        <option key={job.key} value={job.key}>
-                          {job.company} — {job.title} (Match Score: {job.score}%)
-                        </option>
-                      ))}
-                      <option value="custom">✏️ Practice for another role...</option>
-                    </select>
+                      <SelectTrigger className="w-full px-3 py-2 text-xs">
+                        <SelectValue placeholder="Select a target position" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {(applications?.bookmark ?? []).map((job) => (
+                          <SelectItem key={job.key} value={job.key}>
+                            {job.company} — {job.title} (Match Score: {job.score}%)
+                          </SelectItem>
+                        ))}
+                        <SelectItem value="custom">✏️ Practice for another role...</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
                 ) : (
                   <div className="text-[11px] text-muted-foreground bg-muted/30 border border-border/50 rounded-sm p-2 mb-2">
@@ -193,21 +205,19 @@ export function InterviewSetup({ onStart, history, loadingHistory, onViewSession
                 {targetSelect === 'custom' && (
                   <div className="mt-2.5 grid grid-cols-2 gap-2.5 animate-fade-in">
                     <div>
-                      <input
-                        type="text"
+                      <Input
                         value={customCompany}
                         onChange={(e) => setCustomCompany(e.target.value)}
                         placeholder="Company (e.g. Stripe)"
-                        className="w-full rounded-sm border border-border bg-background px-3 py-1.5 text-xs outline-none focus:border-primary"
+                        className="w-full px-3 py-1.5 text-xs"
                       />
                     </div>
                     <div>
-                      <input
-                        type="text"
+                      <Input
                         value={customRole}
                         onChange={(e) => setCustomRole(e.target.value)}
                         placeholder="Role (e.g. Frontend Engineer)"
-                        className="w-full rounded-sm border border-border bg-background px-3 py-1.5 text-xs outline-none focus:border-primary"
+                        className="w-full px-3 py-1.5 text-xs"
                       />
                     </div>
                   </div>
@@ -218,19 +228,16 @@ export function InterviewSetup({ onStart, history, loadingHistory, onViewSession
               <div>
                 <label className="label-mono mb-1.5 block">{t('interviewFocus')}</label>
                 <div className="grid grid-cols-3 gap-2">
-                  {(['behavioral', 'technical', 'mixed'] as const).map((t) => (
-                    <button
-                      key={t}
+                  {(['behavioral', 'technical', 'mixed'] as const).map((item) => (
+                    <Button
+                      key={item}
+                      variant={type === item ? 'default' : 'outline'}
                       type="button"
-                      onClick={() => setType(t)}
-                      className={`cursor-pointer rounded-sm border px-3 py-2 text-xs font-medium uppercase tracking-wide transition-all ${
-                        type === t
-                          ? 'border-primary bg-primary/5 text-primary'
-                          : 'border-border bg-background text-muted-foreground hover:bg-muted/50'
-                      }`}
+                      onClick={() => setType(item)}
+                      className="px-3 py-2 text-xs font-medium uppercase tracking-wide"
                     >
-                      {t}
-                    </button>
+                      {item}
+                    </Button>
                   ))}
                 </div>
               </div>
@@ -240,18 +247,15 @@ export function InterviewSetup({ onStart, history, loadingHistory, onViewSession
                 <label className="label-mono mb-1.5 block">{t('difficultyLevel')}</label>
                 <div className="grid grid-cols-3 gap-2">
                   {(['entry', 'mid', 'senior'] as const).map((d) => (
-                    <button
+                    <Button
                       key={d}
+                      variant={difficulty === d ? 'default' : 'outline'}
                       type="button"
                       onClick={() => setDifficulty(d)}
-                      className={`cursor-pointer rounded-sm border px-3 py-2 text-xs font-medium uppercase tracking-wide transition-all ${
-                        difficulty === d
-                          ? 'border-primary bg-primary/5 text-primary'
-                          : 'border-border bg-background text-muted-foreground hover:bg-muted/50'
-                      }`}
+                      className="px-3 py-2 text-xs font-medium uppercase tracking-wide"
                     >
                       {d}
-                    </button>
+                    </Button>
                   ))}
                 </div>
               </div>
@@ -265,18 +269,15 @@ export function InterviewSetup({ onStart, history, loadingHistory, onViewSession
                     { value: 10, label: '10 Questions' },
                     { value: 0, label: 'Until I Stop' },
                   ] as const).map((len) => (
-                    <button
+                    <Button
                       key={len.value}
+                      variant={maxQuestions === len.value ? 'default' : 'outline'}
                       type="button"
                       onClick={() => setMaxQuestions(len.value)}
-                      className={`cursor-pointer rounded-sm border px-3 py-2 text-xs font-medium transition-all ${
-                        maxQuestions === len.value
-                          ? 'border-primary bg-primary/5 text-primary'
-                          : 'border-border bg-background text-muted-foreground hover:bg-muted/50'
-                      }`}
+                      className="px-3 py-2 text-xs font-medium"
                     >
                       {len.label}
-                    </button>
+                    </Button>
                   ))}
                 </div>
               </div>
@@ -284,12 +285,14 @@ export function InterviewSetup({ onStart, history, loadingHistory, onViewSession
           </div>
 
           {/* Start Button */}
-          <button
+<Button
+            variant="default"
             onClick={handleStart}
-            className="w-full cursor-pointer rounded-sm bg-primary py-2.5 text-xs font-semibold text-primary-foreground tracking-wide uppercase transition-all hover:opacity-90 active:scale-[0.98] shadow-sm flex items-center justify-center gap-1.5 mt-6"
+            className="w-full py-2.5 text-xs font-semibold tracking-wide uppercase shadow-sm flex items-center justify-center gap-1.5 mt-6"
           >
             Start Mock Interview
-          </button>
+            <ArrowRight size={14} />
+          </Button>
         </div>
 
         {/* Right Column: Past Attempts History */}
@@ -307,10 +310,11 @@ export function InterviewSetup({ onStart, history, loadingHistory, onViewSession
                 </div>
               ) : (
                 history.map((session) => (
-                  <button
+                  <Button
                     key={session.id}
+                    variant="outline"
                     type="button"
-                    className="group flex w-full items-center justify-between border border-border/80 bg-background/50 hover:bg-muted/30 hover:border-primary/25 rounded-md p-3.5 transition-all cursor-pointer text-left"
+                    className="group flex w-full items-center justify-between p-3.5 text-left"
                     onClick={() => onViewSession(session)}
                   >
                     <div className="min-w-0 flex-1">
@@ -339,19 +343,20 @@ export function InterviewSetup({ onStart, history, loadingHistory, onViewSession
                           {session.exchanges ? `${session.exchanges.length} Qs` : ''}
                         </span>
                       </div>
-                      <button
+                      <Button
+                        variant="ghost"
                         onClick={(e) => {
                           e.stopPropagation()
                           setDeleteTarget(session.id)
                         }}
-                        className="shrink-0 opacity-0 group-hover:opacity-100 cursor-pointer rounded-xs p-1 text-muted-foreground hover:text-red-500 hover:bg-red-500/10 transition-all"
+                        className="shrink-0 opacity-0 group-hover:opacity-100 rounded-xs p-1 text-muted-foreground hover:text-red-500 hover:bg-red-500/10"
                         title="Delete session"
                       >
                         <Trash2 size={12} />
-                      </button>
+                      </Button>
                       <ArrowRight size={13} className="text-muted-foreground opacity-0 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all" />
                     </div>
-                  </button>
+                  </Button>
                 ))
               )}
             </div>

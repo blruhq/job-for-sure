@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { Link, useRouter } from '~/i18n/routing'
 import { FileText, Brain, KanbanSquare, CheckSquare, MessageSquare, Plus, ArrowRight, Mail } from 'lucide-react'
+import { Button } from '~/components/ui/button'
 import { notify } from '~/lib/toast'
 import { useResumes } from '~/hooks/use-resumes'
 import { useApplications } from '~/hooks/use-apps'
@@ -109,12 +110,13 @@ export function DashboardView() {
         <p className="mb-6 max-w-sm text-xs text-muted-foreground">
           {t('noResumesDesc')}
         </p>
-        <button
+<Button
+          variant="default"
           onClick={() => router.push('/chat')}
-          className="flex cursor-pointer items-center gap-1.5 rounded-sm bg-primary px-4 py-2 text-xs font-medium text-primary-foreground transition-opacity hover:opacity-90 active:scale-[0.98]"
+          className="flex items-center gap-1.5 px-4 py-2 text-xs font-medium"
         >
           {t('getStarted')} <ArrowRight size={13} />
-        </button>
+        </Button>
       </div>
     )
   }
@@ -131,12 +133,13 @@ export function DashboardView() {
             </h1>
             <div className="text-xs text-muted-foreground">{t('jobSearchGlance')}</div>
           </div>
-          <button
+          <Button
+            variant="default"
             onClick={() => router.push('/chat')}
-            className="flex items-center gap-1.5 rounded-sm bg-primary px-3 py-2 text-xs font-medium text-primary-foreground hover:opacity-90 transition-opacity active:scale-[0.98]"
+            className="flex items-center gap-1.5 px-3 py-2 text-xs font-medium"
           >
             <Plus size={13} /> {t('newResume')}
-          </button>
+          </Button>
         </div>
 
         {/* Section B: Stat Cards (4-column grid) */}

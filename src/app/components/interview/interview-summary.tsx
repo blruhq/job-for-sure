@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from '~/i18n/routing'
 import { CheckCircle2, TrendingUp, TrendingDown, RefreshCw, MessageSquare, AlertTriangle, Check } from 'lucide-react'
+
 import type { InterviewExchange } from '~/types/interview'
 
 interface InterviewSummaryProps {

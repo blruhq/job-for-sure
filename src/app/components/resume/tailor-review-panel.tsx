@@ -2,6 +2,7 @@
 
 import { useMemo } from 'react'
 import { Check } from 'lucide-react'
+import { Button } from '~/components/ui/button'
 import { cn } from '~/lib/utils'
 import { useUIStore } from '~/hooks/use-ui'
 import type { Resume, TailorChange } from '~/types/resume'
@@ -119,18 +120,20 @@ export function TailorReviewPanel({ onApply, onCancel }: { onApply: (variant: Re
           </p>
         </div>
         <div className="flex gap-1.5">
-          <button
+          <Button
+            variant="outline"
             onClick={handleAcceptAll}
-            className="cursor-pointer rounded-xs border border-border px-2 py-1 text-[10px] text-muted-foreground hover:text-foreground"
+            className="px-2 py-1 text-[10px]"
           >
             Accept all
-          </button>
-          <button
+          </Button>
+          <Button
+            variant="outline"
             onClick={handleRejectAll}
-            className="cursor-pointer rounded-xs border border-border px-2 py-1 text-[10px] text-muted-foreground hover:text-foreground"
+            className="px-2 py-1 text-[10px]"
           >
             Reject all
-          </button>
+          </Button>
         </div>
       </div>
 
@@ -148,17 +151,15 @@ export function TailorReviewPanel({ onApply, onCancel }: { onApply: (variant: Re
             >
               {/* Toggle row */}
               <div className="flex items-start gap-2">
-                <button
+                <Button
+                  variant={isAccepted ? 'default' : 'outline'}
                   onClick={() => toggleAcceptedChange(change.id)}
                   className={cn(
-                    'mt-0.5 flex h-4 w-4 shrink-0 cursor-pointer items-center justify-center rounded-xs border transition-colors',
-                    isAccepted
-                      ? 'border-primary bg-primary text-primary-foreground'
-                      : 'border-muted-foreground hover:border-primary',
+                    'mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-xs p-0',
                   )}
                 >
                   {isAccepted && <Check size={10} strokeWidth={3} />}
-                </button>
+                </Button>
 
                 <div className="flex-1 min-w-0">
                   {/* Label */}
@@ -207,19 +208,21 @@ export function TailorReviewPanel({ onApply, onCancel }: { onApply: (variant: Re
 
       {/* Footer with apply/cancel */}
       <div className="flex shrink-0 items-center gap-2 border-t border-border p-3">
-        <button
+        <Button
+          variant="default"
           onClick={handleApply}
           disabled={acceptedCount === 0}
-          className="flex-1 cursor-pointer rounded-sm bg-primary px-3 py-2 text-[11px] font-medium text-primary-foreground transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
+          className="flex-1 px-3 py-2 text-[11px] font-medium"
         >
           Apply {acceptedCount > 0 ? `${acceptedCount} ` : ''}change{acceptedCount === 1 ? '' : 's'}
-        </button>
-        <button
+        </Button>
+        <Button
+          variant="outline"
           onClick={onCancel}
-          className="cursor-pointer rounded-sm border border-border bg-card px-3 py-2 text-[11px] text-muted-foreground hover:text-foreground"
+          className="px-3 py-2 text-[11px]"
         >
           Cancel
-        </button>
+        </Button>
       </div>
     </div>
   )

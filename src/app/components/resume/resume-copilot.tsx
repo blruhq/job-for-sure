@@ -4,6 +4,8 @@ import { useRef, useEffect, useMemo } from 'react'
 import { useChat } from '@ai-sdk/react'
 import { DefaultChatTransport } from 'ai'
 import { useApplications } from '~/hooks/use-apps'
+import { Button } from '~/components/ui/button'
+import { Input } from '~/components/ui/input'
 import type { Resume } from '~/types/resume'
 
 export function ResumeCopilot({ resume }: { resume: Resume }) {
@@ -81,13 +83,14 @@ export function ResumeCopilot({ resume }: { resume: Resume }) {
             {/* Suggestion chips */}
             <div className="ml-9 flex flex-wrap gap-1.5">
               {suggestions.map((s) => (
-                <button
+                <Button
                   key={s.label}
+                  variant="outline"
                   onClick={() => handleSend(s.prompt)}
-                  className="cursor-pointer rounded-xs border border-border bg-card px-2.5 py-1 text-[10px] text-muted-foreground transition-all hover:border-primary hover:text-primary hover:scale-[1.02] active:scale-[0.98]"
+                  className="px-2.5 py-1 text-[10px]"
                 >
                   {s.label}
-                </button>
+                </Button>
               ))}
             </div>
           </div>
@@ -144,9 +147,9 @@ export function ResumeCopilot({ resume }: { resume: Resume }) {
 
       {/* Input */}
       <div className="flex shrink-0 items-center gap-1.5 border-t border-border/50 bg-card p-2.5">
-        <input
+        <Input
           placeholder="Ask co-pilot to rewrite…"
-          className="flex-1 rounded-xs border border-border bg-background px-2.5 py-1.5 text-[11px] outline-none focus:border-primary"
+          className="flex-1 px-2.5 py-1.5 text-[11px]"
           onKeyDown={(e) => {
             if (e.key === 'Enter' && !e.shiftKey) {
               e.preventDefault()
@@ -158,23 +161,25 @@ export function ResumeCopilot({ resume }: { resume: Resume }) {
           disabled={isStreaming}
         />
         {isStreaming ? (
-          <button
+          <Button
+            variant="outline"
             onClick={stop}
-            className="cursor-pointer rounded-xs border border-border bg-card px-2.5 py-1.5 text-[11px] font-medium text-muted-foreground hover:bg-background"
+            className="px-2.5 py-1.5 text-[11px] font-medium"
           >
             Stop
-          </button>
+          </Button>
         ) : (
-          <button
+          <Button
+            variant="default"
             onClick={(e) => {
               const input = (e.currentTarget.previousElementSibling as HTMLInputElement)
               handleSend(input.value)
               input.value = ''
             }}
-            className="cursor-pointer rounded-xs bg-primary px-2.5 py-1.5 text-[11px] font-medium text-primary-foreground transition-all hover:opacity-90 active:scale-[0.98]"
+            className="px-2.5 py-1.5 text-[11px] font-medium"
           >
             Send
-          </button>
+          </Button>
         )}
       </div>
     </div>

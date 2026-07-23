@@ -7,6 +7,8 @@ import {
   RefreshCw, Filter, X, Globe, Clock, Star, Plane,
   DollarSign, Briefcase,
 } from 'lucide-react'
+import { Button } from '~/components/ui/button'
+import { Input } from '~/components/ui/input'
 import { cn } from '~/lib/utils'
 import { compareJobs } from '~/lib/job-sources/scoring'
 import { useApplications, useCreateApplication, useDeleteApplication } from '~/hooks/use-apps'
@@ -531,30 +533,31 @@ export function JobSearchPanel({ resume }: { resume: Resume }) {
             }}
             onKeyDownEnter={() => handleSearch()}
           />
-          <button
+          <Button
+            variant="default"
             onClick={() => handleSearch()}
             disabled={loading || query.trim().length < 2}
-            className="flex cursor-pointer items-center gap-1.5 rounded-sm bg-primary px-3 py-1.5 text-[12px] font-medium text-primary-foreground transition-opacity hover:opacity-90 disabled:opacity-50"
+            className="flex items-center gap-1.5 px-3 py-1.5 text-[12px] font-medium"
           >
             {loading ? <Loader2 size={12} className="animate-spin" /> : <Search size={12} />}
             {loading ? 'Searching…' : 'Search'}
-          </button>
+          </Button>
           {searched && !loading && (
-            <button
+            <Button
+              variant="outline"
               onClick={handleRefresh}
-              className="flex cursor-pointer items-center gap-1 rounded-sm border border-border bg-card px-2 py-1.5 text-[11px] text-muted-foreground hover:text-foreground"
+              className="flex items-center gap-1 px-2 py-1.5 text-[11px]"
               title="Clear cache & fetch fresh"
             >
               <RefreshCw size={11} /> Fresh
-            </button>
+            </Button>
           )}
-          <button
+          <Button
+            variant="outline"
             onClick={() => setShowFilters(!showFilters)}
             className={cn(
-              'flex cursor-pointer items-center gap-1 rounded-sm border px-2 py-1.5 text-[11px] transition-all',
-              showFilters || activeFilterCount > 0
-                ? 'border-primary bg-accent-soft text-primary'
-                : 'border-border bg-card text-muted-foreground hover:text-foreground',
+              'flex items-center gap-1 px-2 py-1.5 text-[11px]',
+              (showFilters || activeFilterCount > 0) && 'border-primary bg-accent-soft text-primary',
             )}
           >
             <Filter size={11} /> Filters
@@ -563,7 +566,7 @@ export function JobSearchPanel({ resume }: { resume: Resume }) {
                 {activeFilterCount}
               </span>
             )}
-          </button>
+          </Button>
         </div>
 
         {/* Quick chips */}
@@ -651,23 +654,23 @@ export function JobSearchPanel({ resume }: { resume: Resume }) {
 
             {/* Skills search */}
             <FilterGroup label="Skill Search" fullWidth>
-              <input
-                type="text"
+              <Input
                 value={filters.skillSearch}
                 onChange={(e) => setFilters((f) => ({ ...f, skillSearch: e.target.value }))}
                 placeholder="Type a skill to filter…"
-                className="w-full rounded-sm border border-border bg-card px-2 py-1 text-[11px] outline-none focus:border-primary"
+                className="w-full px-2 py-1 text-[11px]"
               />
             </FilterGroup>
 
             {/* Clear */}
             {activeFilterCount > 0 && (
-              <button
+              <Button
+                variant="link"
                 onClick={clearFilters}
-                className="col-span-full flex cursor-pointer items-center gap-1 text-[10px] text-destructive hover:underline"
+                className="col-span-full flex items-center gap-1 text-[10px] text-destructive"
               >
                 <X size={10} /> Clear all filters
-              </button>
+              </Button>
             )}
           </div>
         )}
@@ -744,10 +747,11 @@ export function JobSearchPanel({ resume }: { resume: Resume }) {
               {cached && (
                 <>
                   <span>·</span>
-                  <button
+                  <Button
+                    variant="link"
                     onClick={handleRefresh}
                     disabled={backgroundRefreshing}
-                    className="flex cursor-pointer items-center gap-0.5 text-primary hover:underline disabled:opacity-50"
+                    className="flex items-center gap-0.5 text-[11px]"
                   >
                     {backgroundRefreshing ? (
                       <span className="flex items-center gap-1">
@@ -758,18 +762,19 @@ export function JobSearchPanel({ resume }: { resume: Resume }) {
                         <RefreshCw size={9} /> Cached — refresh
                       </span>
                     )}
-                  </button>
+                  </Button>
                 </>
               )}
             </div>
 
             {newJobs.length > 0 && (
-              <button
+              <Button
+                variant="outline"
                 onClick={handleShowNewJobs}
-                className="mb-3 flex w-full cursor-pointer items-center justify-center gap-1.5 rounded-sm border border-primary/30 bg-accent-soft py-2 text-[11px] font-semibold text-primary transition-all hover:bg-primary hover:text-primary-foreground animate-pulse"
+                className="mb-3 flex w-full items-center justify-center gap-1.5 border-primary/30 bg-accent-soft py-2 text-[11px] font-semibold text-primary hover:bg-primary hover:text-primary-foreground animate-pulse"
               >
                 🆕 {newJobs.length} new job{newJobs.length !== 1 ? 's' : ''} found since you searched · Show fresh results
-              </button>
+              </Button>
             )}
 
             <div className="flex flex-col gap-3">
@@ -917,16 +922,16 @@ function JobCard({ job, bookmarked, onBookmark, onAts: _onAts, onInterview: _onI
         <span className="font-mono text-[10px] text-muted-foreground/60">
           Click for details &amp; AI tools
         </span>
-        <button
+        <Button
+          variant={bookmarked ? 'default' : 'outline'}
           onClick={(e) => { e.stopPropagation(); onBookmark() }}
           className={cn(
-            'flex cursor-pointer items-center gap-1 rounded-xs border px-2 py-1 text-[11px] transition-all hover:scale-[1.02] active:scale-[0.98]',
-            bookmarked ? 'border-primary bg-primary text-primary-foreground' : 'border-border bg-card hover:border-primary hover:text-primary',
+            'flex items-center gap-1 px-2 py-1 text-[11px]',
           )}
         >
           <Bookmark size={11} fill={bookmarked ? 'currentColor' : 'none'} />
           {bookmarked ? 'Saved' : 'Save'}
-        </button>
+        </Button>
       </div>
     </div>
   )
@@ -939,18 +944,16 @@ function Chip({ active, onClick, icon, label }: {
   label: string
 }) {
   return (
-    <button
+    <Button
+      variant={active ? 'default' : 'outline'}
       onClick={onClick}
       className={cn(
-        'flex cursor-pointer items-center gap-1 rounded-xs border px-2 py-1 text-[11px] font-medium transition-all',
-        active
-          ? 'border-primary bg-primary text-primary-foreground'
-          : 'border-border bg-card text-muted-foreground hover:border-primary hover:text-foreground',
+        'flex items-center gap-1 px-2 py-1 text-[11px] font-medium',
       )}
     >
       {icon}
       {label}
-    </button>
+    </Button>
   )
 }
 

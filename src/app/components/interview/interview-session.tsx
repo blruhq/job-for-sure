@@ -3,6 +3,8 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { useLocale } from 'next-intl'
 import { Brain, User, AlertCircle, Sparkles, Check, ArrowRight, Loader2, Mic, MicOff, RotateCcw } from 'lucide-react'
+import { Button } from '~/components/ui/button'
+import { Textarea } from '~/components/ui/textarea'
 import type { InterviewConfig, InterviewQuestion, AnswerFeedback, InterviewExchange } from '~/types/interview'
 import type { Resume } from '~/types/resume'
 import { Skeleton } from '~/components/ui/skeleton'
@@ -336,13 +338,14 @@ export function InterviewSession({ config, resume, onEnd }: InterviewSessionProp
               <span>Question {exchanges.length + (currentQuestion ? 1 : 0)} (Unlimited Mode)</span>
             )}
           </div>
-          <button
+          <Button
+            variant="ghost"
             onClick={handleEnd}
             disabled={loading === 'evaluate'}
-            className="text-[10px] font-semibold text-destructive hover:opacity-80 active:scale-95 cursor-pointer disabled:opacity-50"
+            className="text-[10px] font-semibold text-destructive"
           >
             End & Summarize
-          </button>
+          </Button>
         </div>
       </div>
 
@@ -454,12 +457,13 @@ export function InterviewSession({ config, resume, onEnd }: InterviewSessionProp
               <div className="flex-1">
                 <h4 className="text-xs font-semibold text-destructive">Error</h4>
                 <p className="text-xs text-destructive/80 mt-0.5">{error}</p>
-                <button
+                <Button
+                  variant="outline"
                   onClick={currentQuestion ? submitAnswer : fetchQuestion}
-                  className="mt-3 cursor-pointer rounded bg-destructive/15 border border-destructive/20 hover:bg-destructive/20 px-3 py-1 text-[10px] font-semibold text-destructive transition-colors"
+                  className="mt-3 px-3 py-1 text-[10px] font-semibold text-destructive"
                 >
                   Retry Operation
-                </button>
+                </Button>
               </div>
             </div>
           )}
@@ -498,14 +502,14 @@ export function InterviewSession({ config, resume, onEnd }: InterviewSessionProp
                       {currentAnswer.trim().length} chars (min 20)
                     </span>
                   </div>
-                  <textarea
+                  <Textarea
                     value={currentAnswer}
                     onChange={(e) => setCurrentAnswer(e.target.value)}
                     disabled={loading === 'evaluate'}
                     rows={5}
                     placeholder="Type your response, or click the microphone to speak..."
-                    className={`w-full resize-y rounded-sm border bg-background p-3 text-xs outline-none focus:border-primary transition-colors disabled:opacity-60 ${
-                      isListening ? 'border-primary ring-2 ring-primary/20' : 'border-border'
+                    className={`w-full resize-y p-3 text-xs ${
+                      isListening ? 'border-primary ring-2 ring-primary/20' : ''
                     }`}
                   />
                   {/* Speech error message */}
@@ -520,14 +524,13 @@ export function InterviewSession({ config, resume, onEnd }: InterviewSessionProp
                     {/* Mic Button */}
                     <div className="flex items-center gap-2">
                       {speechSupported && (
-                        <button
+                        <Button
+                          variant={isListening ? 'destructive' : 'outline'}
                           type="button"
                           onClick={toggleListening}
                           disabled={loading === 'evaluate'}
-                          className={`cursor-pointer rounded-sm border px-3 py-1.5 text-[10px] font-medium transition-all flex items-center gap-1.5 disabled:opacity-50 ${
-                            isListening
-                              ? 'border-destructive/30 bg-destructive/10 text-destructive animate-pulse'
-                              : 'border-border bg-background text-muted-foreground hover:bg-muted/50'
+                          className={`px-3 py-1.5 text-[10px] font-medium flex items-center gap-1.5 ${
+                            isListening ? 'animate-pulse' : ''
                           }`}
                         >
                           {isListening ? (
@@ -539,7 +542,7 @@ export function InterviewSession({ config, resume, onEnd }: InterviewSessionProp
                               <Mic size={12} /> Speak
                             </>
                           )}
-                        </button>
+                        </Button>
                       )}
                       {isListening && (
                         <span className="text-[10px] text-muted-foreground animate-pulse">
@@ -549,10 +552,11 @@ export function InterviewSession({ config, resume, onEnd }: InterviewSessionProp
                     </div>
 
                     {/* Submit Button */}
-                    <button
+                    <Button
+                      variant="default"
                       onClick={submitAnswer}
                       disabled={currentAnswer.trim().length < 20 || loading === 'evaluate'}
-                      className="cursor-pointer rounded-sm bg-primary px-4 py-2 text-xs font-medium text-primary-foreground transition-opacity hover:opacity-90 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 flex items-center gap-1.5"
+                      className="px-4 py-2 text-xs font-medium flex items-center gap-1.5"
                     >
                       {loading === 'evaluate' ? (
                         <>
@@ -563,7 +567,7 @@ export function InterviewSession({ config, resume, onEnd }: InterviewSessionProp
                           Submit Answer <ArrowRight size={12} />
                         </>
                       )}
-                    </button>
+                    </Button>
                   </div>
                 </div>
               )}
@@ -627,15 +631,17 @@ export function InterviewSession({ config, resume, onEnd }: InterviewSessionProp
 
                   {/* Actions: Try Again + Next Question */}
                   <div className="flex justify-end gap-2 pt-2">
-                    <button
+                    <Button
+                      variant="outline"
                       onClick={handleRetry}
-                      className="cursor-pointer rounded-sm border border-border bg-background hover:bg-muted/50 px-4 py-2 text-xs font-medium text-muted-foreground transition-colors flex items-center gap-1.5"
+                      className="px-4 py-2 text-xs font-medium flex items-center gap-1.5"
                     >
                       <RotateCcw size={12} /> Try Again
-                    </button>
-                    <button
+                    </Button>
+                    <Button
+                      variant="default"
                       onClick={handleNext}
-                      className="cursor-pointer rounded-sm bg-primary px-4 py-2 text-xs font-medium text-primary-foreground transition-opacity hover:opacity-90 active:scale-[0.98] flex items-center gap-1"
+                      className="px-4 py-2 text-xs font-medium flex items-center gap-1"
                     >
                       {isLastQuestion ? (
                         <>
@@ -646,7 +652,7 @@ export function InterviewSession({ config, resume, onEnd }: InterviewSessionProp
                           Next Question <ArrowRight size={12} />
                         </>
                       )}
-                    </button>
+                    </Button>
                   </div>
                 </div>
               )}

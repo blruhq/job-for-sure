@@ -5,6 +5,7 @@ import { useRouter } from '~/i18n/routing'
 import type { UIMessage } from 'ai'
 import { Briefcase, MapPin, Check, Pencil } from 'lucide-react'
 import { Button } from '~/components/ui/button'
+import { Input } from '~/components/ui/input'
 import { UserMessage } from '@/components/agent-elements/user-message'
 import { useResumes, useUpdateResume } from '~/hooks/use-resumes'
 import { JobPreview } from '~/components/chat/job-preview'
@@ -67,36 +68,35 @@ export const UploadCardMessage = memo(function UploadCardMessage({
                 <label className="text-[10px] font-medium text-muted-foreground flex items-center gap-1">
                   <Briefcase size={10} /> Target Role
                 </label>
-                <input
-                  type="text"
+                <Input
                   value={roleInput}
                   onChange={(e) => setRoleInput(e.target.value)}
                   placeholder="e.g. Software Engineer"
-                  className="w-full text-[11px] px-2 py-1 rounded border border-border bg-background outline-none focus:border-primary"
+                  className="w-full text-[11px] px-2 py-1"
                 />
               </div>
               <div className="space-y-1.5">
                 <label className="text-[10px] font-medium text-muted-foreground flex items-center gap-1">
                   <MapPin size={10} /> Location
                 </label>
-                <input
-                  type="text"
+                <Input
                   value={locationInput}
                   onChange={(e) => setLocationInput(e.target.value)}
                   placeholder="e.g. Thailand or Remote"
-                  className="w-full text-[11px] px-2 py-1 rounded border border-border bg-background outline-none focus:border-primary"
+                  className="w-full text-[11px] px-2 py-1"
                 />
               </div>
-              <button
+              <Button
+                variant="default"
                 onClick={() => {
                   updateResume({ id: resume.id, data: { role: roleInput, location: locationInput } })
                   setIsEditing(false)
                 }}
                 disabled={roleInput.trim().length < 2}
-                className="w-full flex cursor-pointer items-center justify-center gap-1 rounded bg-primary py-1 text-[11px] font-medium text-primary-foreground transition-opacity hover:opacity-90 disabled:opacity-50"
+                className="w-full flex items-center justify-center gap-1 py-1 text-[11px] font-medium"
               >
                 <Check size={11} /> Confirm & Search Jobs
-              </button>
+              </Button>
             </div>
           ) : (
             <div className="space-y-1 text-[11px] text-muted-foreground">
@@ -132,18 +132,20 @@ export const UploadCardMessage = memo(function UploadCardMessage({
 
           {!isEditing && (
             <div className="mt-3 flex items-center gap-3">
-              <button
+              <Button
+                variant="link"
                 onClick={() => router.push(`/resume/${resume.id}`)}
-                className="cursor-pointer text-[11px] font-medium text-primary hover:underline"
+                className="text-[11px] font-medium"
               >
                 View Resume →
-              </button>
-              <button
+              </Button>
+              <Button
+                variant="ghost"
                 onClick={() => router.push(`/resume/${resume.id}?tab=editor`)}
-                className="cursor-pointer text-[11px] font-medium text-muted-foreground hover:text-foreground"
+                className="text-[11px] font-medium"
               >
                 Edit Resume →
-              </button>
+              </Button>
             </div>
           )}
         </div>

@@ -14,6 +14,7 @@ import {
   Building2,
   Lightbulb,
 } from 'lucide-react'
+import { Button } from '~/components/ui/button'
 import { cn } from '~/lib/utils'
 import type { SmartOverviewResult } from '~/types/smart-overview'
 import * as Links from '~/lib/area-links'
@@ -96,13 +97,14 @@ export function SmartOverview(props: SmartOverviewProps) {
         <p className="text-xs text-foreground mb-2">
           Couldn&apos;t generate overview. The AI may be busy.
         </p>
-        <button
+        <Button
+          variant="link"
           onClick={generate}
-          className="flex cursor-pointer items-center gap-1.5 text-xs font-medium text-primary hover:underline"
+          className="flex items-center gap-1.5 text-xs font-medium"
         >
           <RefreshCw size={12} />
           Try again
-        </button>
+        </Button>
       </div>
     )
   }
@@ -111,13 +113,14 @@ export function SmartOverview(props: SmartOverviewProps) {
   if (state === 'idle' && !overview) {
     return (
       <div className="rounded-lg border border-border bg-card p-4">
-        <button
+        <Button
+          variant="default"
           onClick={generate}
-          className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-md bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90"
+          className="flex w-full items-center justify-center gap-2 px-4 py-2.5 text-sm font-semibold"
         >
           <Sparkles size={16} />
           Generate AI Overview
-        </button>
+        </Button>
         <p className="mt-2 text-center text-xs text-muted-foreground">
           Get a personalized analysis: match, salary, commute, company
         </p>
@@ -181,12 +184,13 @@ function OverviewContent({
           <Sparkles size={14} className="text-primary" />
           AI Overview
         </div>
-        <button
+        <Button
+          variant="ghost"
           onClick={onRegenerate}
-          className="cursor-pointer text-muted-foreground hover:text-foreground"
+          className="text-muted-foreground"
         >
           <RefreshCw size={12} />
-        </button>
+        </Button>
       </div>
 
       {/* VERDICT (the headline) */}

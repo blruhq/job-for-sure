@@ -219,7 +219,8 @@ export function JobPreview({ resume, onDismiss, onLoadComplete }: { resume: Resu
 
                 {/* Actions */}
                 <div className="mt-2 flex items-center gap-1.5" onClick={(e) => e.stopPropagation()}>
-                  <button
+                  <Button
+                    variant={bm ? 'default' : 'outline'}
                     onClick={() => {
                       if (bm) {
                         toggleBookmark(key)
@@ -262,14 +263,12 @@ export function JobPreview({ resume, onDismiss, onLoadComplete }: { resume: Resu
                         notify({ message: `Bookmarked: ${job.title}`, type: 'success' })
                       }
                     }}
-                    className={cn(
-                      'flex cursor-pointer items-center gap-0.5 rounded-xs border px-1.5 py-0.5 text-[10px] transition-all',
-                      bm ? 'border-primary bg-primary text-primary-foreground' : 'border-border bg-card hover:border-primary',
-                    )}
+                    className="flex items-center gap-0.5 px-1.5 py-0.5 text-[10px]"
                   >
                     <Bookmark size={9} fill={bm ? 'currentColor' : 'none'} />
-                  </button>
-                  <button
+                  </Button>
+                  <Button
+                    variant="outline"
                     onClick={() => {
                       if (typeof window !== 'undefined') {
                         sessionStorage.setItem('jfs_pending_ats_jd', job.description)
@@ -278,24 +277,26 @@ export function JobPreview({ resume, onDismiss, onLoadComplete }: { resume: Resu
                       }
                       router.push('/ats')
                     }}
-                    className="flex cursor-pointer items-center gap-0.5 rounded-xs border border-border bg-card px-1.5 py-0.5 text-[10px] transition-colors hover:border-primary hover:text-primary"
+                    className="flex items-center gap-0.5 px-1.5 py-0.5 text-[10px]"
                   >
                     <span>🎯 ATS Fit</span>
-                  </button>
-                  <button
+                  </Button>
+                  <Button
+                    variant="outline"
                     onClick={() => {
                       router.push(`/interview?company=${encodeURIComponent(job.company)}&role=${encodeURIComponent(job.title)}`)
                     }}
-                    className="flex cursor-pointer items-center gap-0.5 rounded-xs border border-border bg-card px-1.5 py-0.5 text-[10px] transition-colors hover:border-primary hover:text-primary"
+                    className="flex items-center gap-0.5 px-1.5 py-0.5 text-[10px]"
                   >
                     <Brain size={9} /> Interview
-                  </button>
-                  <button
+                  </Button>
+                  <Button
+                    variant="default"
                     onClick={() => setPanelJob(scoredJobToPipelineJob(job, resume.skills || []))}
-                    className="ml-auto flex cursor-pointer items-center gap-0.5 rounded-xs bg-primary px-1.5 py-0.5 text-[10px] font-medium text-primary-foreground transition-all hover:opacity-90"
+                    className="ml-auto flex items-center gap-0.5 px-1.5 py-0.5 text-[10px] font-medium"
                   >
                     Details <ChevronRight size={8} />
-                  </button>
+                  </Button>
                 </div>
               </div>
             )
@@ -304,12 +305,13 @@ export function JobPreview({ resume, onDismiss, onLoadComplete }: { resume: Resu
 
         {/* View more */}
         {jobs.length > 5 && (
-          <button
+          <Button
+            variant="outline"
             onClick={() => router.push(`/resume/${resume.id}`)}
-            className="mt-2 flex w-full cursor-pointer items-center justify-center gap-1 rounded-sm border border-dashed border-border py-1.5 text-[11px] text-muted-foreground transition-colors hover:border-primary hover:text-primary"
+            className="mt-2 flex w-full items-center justify-center gap-1 border-dashed py-1.5 text-[11px]"
           >
             +{jobs.length - 5} more jobs · View all <ChevronRight size={11} />
-          </button>
+          </Button>
         )}
 
       </div>

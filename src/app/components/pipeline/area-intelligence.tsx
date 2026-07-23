@@ -1,6 +1,7 @@
 'use client'
 
 import { Button } from '~/components/ui/button'
+import { Input } from '~/components/ui/input'
 import { useState } from 'react'
 import {
   MapPin, Bus, DollarSign, Home, Hotel, Shield, Star, HeartPulse,
@@ -96,30 +97,32 @@ export function AreaIntelligence({ job, homeLocation, city, district, countryCod
             </div>
           ) : editing ? (
             <div className="space-y-2">
-              <input
+              <Input
                 value={areaInput}
                 onChange={(e) => setAreaInput(e.target.value)}
                 onKeyDown={(e) => { if (e.key === 'Enter') handleSave() }}
                 placeholder="e.g. Bang Na, Bangkok"
                 autoFocus
-                className="w-full rounded-xs border border-border bg-background px-2 py-1.5 text-[12px] outline-none focus:border-primary"
+                className="w-full px-2 py-1.5 text-[12px]"
               />
               <div className="flex items-center gap-1.5">
-                <button
+                <Button
+                  variant="default"
                   onClick={handleSave}
                   disabled={saving || !areaInput.trim()}
-                  className="flex cursor-pointer items-center gap-1 rounded-xs bg-primary px-2.5 py-1.5 text-[11px] font-medium text-primary-foreground transition-opacity hover:opacity-90 disabled:opacity-50"
+                  className="flex items-center gap-1 px-2.5 py-1.5 text-[11px] font-medium"
                 >
                   {saving ? <Loader2 size={12} className="animate-spin" /> : <Check size={12} />}
                   Save
-                </button>
+                </Button>
                 {homeLocation && (
-                  <button
+                  <Button
+                    variant="ghost"
                     onClick={() => { setEditing(false); setAreaInput(homeLocation) }}
-                    className="cursor-pointer rounded-xs px-2 py-1.5 text-[11px] text-muted-foreground hover:text-foreground"
+                    className="px-2 py-1.5 text-[11px]"
                   >
                     Cancel
-                  </button>
+                  </Button>
                 )}
               </div>
             </div>
@@ -130,21 +133,23 @@ export function AreaIntelligence({ job, homeLocation, city, district, countryCod
                 Set your area to see commute directions and travel prices.
               </p>
               <div className="flex flex-wrap gap-1.5">
-                <button
+                <Button
+                  variant="outline"
                   onClick={handleDetect}
                   disabled={detecting}
-                  className="flex cursor-pointer items-center gap-1 rounded-xs border border-border bg-background px-2.5 py-1.5 text-[11px] font-medium text-foreground transition-colors hover:bg-sidebar-hover disabled:opacity-50"
+                  className="flex items-center gap-1 px-2.5 py-1.5 text-[11px] font-medium"
                 >
                   <LocateFixed size={12} />
                   Use current location
-                </button>
-                <button
+                </Button>
+                <Button
+                  variant="outline"
                   onClick={() => setEditing(true)}
-                  className="flex cursor-pointer items-center gap-1 rounded-xs border border-border bg-background px-2.5 py-1.5 text-[11px] font-medium text-foreground transition-colors hover:bg-sidebar-hover"
+                  className="flex items-center gap-1 px-2.5 py-1.5 text-[11px] font-medium"
                 >
                   <Pencil size={12} />
                   Type area
-                </button>
+                </Button>
               </div>
             </div>
           )}
@@ -159,12 +164,13 @@ export function AreaIntelligence({ job, homeLocation, city, district, countryCod
           <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground">
             <span>from: {homeLocation}</span>
             <span>·</span>
-            <button
+            <Button
+              variant="link"
               onClick={() => { setEditing(true); setAreaInput(homeLocation) }}
-              className="cursor-pointer text-primary hover:underline"
+              className="text-[10px]"
             >
               change
-            </button>
+            </Button>
           </div>
         </>
       )}
