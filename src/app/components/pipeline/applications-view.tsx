@@ -72,7 +72,7 @@ function DraggableJobCard({ job, children }: { job: PipelineJob; children: React
       {...attributes}
       {...listeners}
       className={cn(
-        'group cursor-grab rounded-sm neuro-card p-2.5 active:cursor-grabbing hover:-translate-y-0.5',
+        'group cursor-grab rounded-sm neuro-card p-2.5 active:cursor-grabbing hover:-translate-y-0.5 min-w-0 overflow-hidden',
       )}
     >
       {children}
@@ -104,8 +104,12 @@ function JobCardContent({ job }: { job: PipelineJob }) {
     <>
       <div className="flex items-start justify-between gap-1">
         <div className="min-w-0 flex-1">
-          <div className="text-[11px] font-semibold text-foreground truncate">{job.title}</div>
-          <div className="text-[10px] text-muted-foreground truncate">{job.company}</div>
+          <div className="text-[11px] font-semibold text-foreground line-clamp-2 break-words leading-snug">
+            {job.title || 'Untitled Position'}
+          </div>
+          <div className="text-[10px] text-muted-foreground truncate mt-0.5">
+            {job.company || 'Unknown Company'}
+          </div>
         </div>
         {job.score > 0 && (
           <span className={cn(
@@ -116,11 +120,20 @@ function JobCardContent({ job }: { job: PipelineJob }) {
           </span>
         )}
       </div>
-      <div className="mt-1.5 flex items-center gap-2 text-[9px] text-muted-foreground">
-        {job.loc && <span className="truncate">{job.loc}</span>}
-      </div>
+
+      {(job.loc || job.salary) && (
+        <div className="mt-1.5 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[9px] text-muted-foreground">
+          {job.loc && <span className="break-words">{job.loc}</span>}
+          {job.salary && (
+            <>
+              {job.loc && <span className="text-muted-foreground/40">·</span>}
+              <span className="break-words">{job.salary}</span>
+            </>
+          )}
+        </div>
+      )}
       {dateText && (
-        <div className="mt-1 text-[9px] text-muted-foreground/60">
+        <div className="mt-1 text-[9px] text-muted-foreground/60 whitespace-nowrap">
           {dateText}
         </div>
       )}
@@ -408,7 +421,7 @@ export function ApplicationsView() {
                 {t('resume')}
               </span>
               <Select value={filter} onValueChange={(v) => setFilter(v || 'all')}>
-                <SelectTrigger className="rounded-xs px-2 py-1 text-[11px]">
+                <SelectTrigger className="w-full rounded-xs neuro-inset px-2 py-1 text-[11px]">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -436,10 +449,11 @@ export function ApplicationsView() {
             className="flex-1 rounded-xs px-2.5 py-1.5 text-[11px] placeholder:text-muted-foreground/50 disabled:opacity-50"
           />
           <Button
+            size="sm"
             variant="default"
             onClick={handlePasteUrl}
             disabled={scraping || !pasteUrl.trim()}
-            className="flex shrink-0 items-center gap-1 rounded-xs px-3 py-1.5 text-[11px]"
+            className="flex shrink-0 items-center gap-1 rounded-xs px-5 text-[11px]"
           >
             {scraping ? (
               <>
@@ -493,8 +507,10 @@ export function ApplicationsView() {
                   </div>
                 </div>
 
-                {/* Job Cards */}
-                <div className="flex flex-col gap-1.5 p-2 overflow-y-auto">
+                {/* Job Cards — overflow-x-hidden prevents horizontal clip/scrollbar while
+                     overflow-y-auto enables vertical scroll. px-3/pb-2 padding gives 12px
+                     room for the -6px/-8px neumorphic card shadows. */}
+                <div className="flex flex-1 min-h-0 min-w-0 flex-col gap-1.5 overflow-y-auto overflow-x-hidden px-3 pb-2 pt-3">
                   {jobs.length === 0 && !(addingToCol === col.id) && (
                     <div className="px-2 py-6 text-center">
                       <p className="text-[10px] text-muted-foreground/50">
@@ -506,10 +522,10 @@ export function ApplicationsView() {
                   <SortableContext items={jobs.map((j) => j.key)} strategy={verticalListSortingStrategy}>
                     {jobs.map((job) => (
                       <DraggableJobCard key={job.key} job={job}>
-                        <Button variant="ghost" onClick={() => setSelectedJob(job)} className="w-full text-left h-auto p-0 rounded-none">
+                        <Button variant="ghost" onClick={() => setSelectedJob(job)} className="flex w-full flex-col items-start justify-start gap-0 text-left h-auto p-0 rounded-none whitespace-normal min-w-0">
                           <JobCardContent job={job} />
                         </Button>
-                        <div className="mt-1.5 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <div className="mt-1.5 flex items-center gap-1">
                           {job.url && (
                             <a
                               href={job.url}
