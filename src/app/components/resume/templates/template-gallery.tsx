@@ -95,14 +95,17 @@ export function TemplateGallery({ value, onChange }: TemplateGalleryProps) {
   return (
     <div className="grid grid-cols-5 gap-2">
       {TEMPLATES.map(t => (
-        <button
+        <div
           key={t.id}
+          role="button"
+          tabIndex={0}
           onClick={() => onChange(t.id)}
+          onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onChange(t.id) } }}
           className={cn(
-            'group relative cursor-pointer rounded-md border p-2 text-left transition-all',
+            'group relative cursor-pointer rounded-md border p-2 text-left transition-all shadow-sm',
             value === t.id
               ? 'border-primary bg-accent-soft ring-1 ring-primary'
-              : 'border-border hover:border-primary/40',
+              : 'border-border hover:border-primary/40 hover:shadow-md',
           )}
         >
           <TemplateThumbnail templateId={t.id} selected={value === t.id} />
@@ -117,7 +120,7 @@ export function TemplateGallery({ value, onChange }: TemplateGalleryProps) {
               <Check size={8} />
             </div>
           )}
-        </button>
+        </div>
       ))}
     </div>
   )

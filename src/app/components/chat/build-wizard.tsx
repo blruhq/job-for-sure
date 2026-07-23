@@ -7,6 +7,7 @@ import { Button } from '~/components/ui/button'
 import { Input } from '~/components/ui/input'
 import { TemplateGallery } from '~/components/resume/templates/template-gallery'
 import type { ResumeTemplate } from '~/types/resume'
+import { Dialog, DialogContent } from '~/components/ui/dialog'
 
 interface WizardData {
   template: ResumeTemplate
@@ -48,11 +49,8 @@ export function BuildWizard({ open, onClose, onComplete }: BuildWizardProps) {
   ]
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 backdrop-blur-sm" onClick={handleClose}>
-      <div
-        className="w-full max-w-xl rounded-lg border border-border bg-card shadow-lg"
-        onClick={(e) => e.stopPropagation()}
-      >
+    <Dialog open={open} onOpenChange={(o) => { if (!o) handleClose() }}>
+      <DialogContent className="max-w-xl gap-0 p-0" showCloseButton={false}>
         {/* Header */}
         <div className="flex items-center justify-between border-b border-border px-5 py-3">
           <div className="flex items-center gap-2">
@@ -157,8 +155,8 @@ export function BuildWizard({ open, onClose, onComplete }: BuildWizardProps) {
             </Button>
           )}
         </div>
-      </div>
-    </div>
+      </DialogContent>
+    </Dialog>
   )
 }
 
