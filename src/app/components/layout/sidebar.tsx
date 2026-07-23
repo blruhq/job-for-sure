@@ -74,7 +74,7 @@ function NavSection({
                 isActive
                   ? 'neuro-inset text-foreground font-semibold'
                   : 'text-muted-foreground hover:bg-sidebar-hover hover:text-foreground',
-                collapsed ? 'pl-[16px] pr-[17px] py-2' : 'px-2.5 py-2',
+                collapsed ? 'pl-[16px] pr-[17px] py-2' : 'pl-[16px] pr-2.5 py-2',
               )}
             >
               <span className="relative shrink-0">
@@ -144,7 +144,7 @@ export function Sidebar() {
                   pathname === '/admin'
                     ? 'neuro-inset text-foreground font-semibold'
                     : 'text-muted-foreground hover:bg-sidebar-hover hover:text-foreground',
-                  c ? 'pl-[16px] pr-[17px] py-1.5' : 'px-2.5 py-1.5',
+                  c ? 'pl-[16px] pr-[17px] py-1.5' : 'pl-[16px] pr-2.5 py-1.5',
                 )}
               >
                 <Shield size={15} className={cn('shrink-0', pathname === '/admin' ? 'text-primary' : 'opacity-70')} />
@@ -181,7 +181,7 @@ export function Sidebar() {
                     pathname === '/resumes'
                       ? 'neuro-inset text-foreground font-semibold'
                       : 'text-muted-foreground hover:bg-sidebar-hover hover:text-foreground',
-                    c ? 'pl-[16px] pr-[17px] py-2' : 'px-2.5 py-2',
+                    c ? 'pl-[16px] pr-[17px] py-2' : 'pl-[16px] pr-2.5 py-2',
                   )}
                 >
                   <FileText size={15} className={cn('shrink-0', pathname === '/resumes' ? 'text-primary' : 'opacity-70')} />
@@ -238,7 +238,7 @@ export function Sidebar() {
                 pathname === '/settings'
                   ? 'neuro-inset text-foreground font-semibold'
                   : 'text-muted-foreground hover:bg-sidebar-hover hover:text-foreground',
-                c ? 'pl-[16px] pr-[17px] py-2' : 'px-2.5 py-2',
+                c ? 'pl-[16px] pr-[17px] py-2' : 'pl-[16px] pr-2.5 py-2',
               )}
             >
               <Settings size={15} className="shrink-0 opacity-70" />

@@ -46,30 +46,50 @@ export function Topbar() {
   const toggleSidebar = useUIStore((s) => s.toggleSidebar)
 
   return (
-    <header className="flex h-[var(--topbar-height)] shrink-0 items-center neuro-surface z-50">
-      {/* Brand area — matches sidebar width, collapses */}
+    <header className="relative flex h-[var(--topbar-height)] shrink-0 items-center neuro-surface z-50">
+      {/*
+        Logo — positioned relative to the HEADER (not the brand area).
+        The header never changes size, so left-[16px] is bulletproof.
+        z-10 ensures it sits above the spacer div below.
+      */}
+      <Link
+        href="/chat"
+        className="absolute left-[16px] top-1/2 -translate-y-1/2 z-10 flex items-center"
+      >
+        <div className="neuro-icon-well rounded-[3px] p-0.5">
+          <Image
+            src="/logo.png"
+            alt="Job For Sure"
+            width={24}
+            height={24}
+            className="shrink-0"
+            priority
+          />
+        </div>
+      </Link>
+      {/*
+        Brand text — also relative to header, fades in/out.
+        Does not affect logo position because both are absolutely positioned.
+      */}
+      {!sidebarCollapsed && (
+        <Link
+          href="/chat"
+          className="absolute left-[52px] top-1/2 -translate-y-1/2 z-10 text-sm font-semibold tracking-[-0.02em]"
+        >
+          JOB FOR SURE
+        </Link>
+      )}
+      {/*
+        Brand area spacer — empty div, NO content, NO children.
+        Only animates width (transition-[width], NOT transition-all).
+        This reserves horizontal space so the toggle button sits at the right edge.
+      */}
       <div
         className={cn(
-          'flex h-full items-center px-3 transition-all duration-200 ease-[cubic-bezier(0.2,0,0,1)] shrink-0',
-          sidebarCollapsed ? 'w-[var(--sidebar-collapsed-width)] justify-center px-0' : 'w-[var(--sidebar-width)]',
+          'h-full shrink-0 transition-[width] duration-200 ease-[cubic-bezier(0.2,0,0,1)]',
+          sidebarCollapsed ? 'w-[var(--sidebar-collapsed-width)]' : 'w-[var(--sidebar-width)]',
         )}
-      >
-        <Link href="/chat" className="flex items-center gap-2">
-          <div className="neuro-icon-well rounded-[3px] p-0.5">
-            <Image
-              src="/logo.png"
-              alt="Job For Sure"
-              width={sidebarCollapsed ? 20 : 24}
-              height={sidebarCollapsed ? 20 : 24}
-              className="shrink-0 transition-all duration-200"
-              priority
-            />
-          </div>
-          {!sidebarCollapsed && (
-            <span className="text-sm font-semibold tracking-[-0.02em]">JOB FOR SURE</span>
-          )}
-        </Link>
-      </div>
+      />
 
       {/* Sidebar toggle — visible on all sizes */}
       <Button
