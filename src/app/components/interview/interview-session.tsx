@@ -366,11 +366,11 @@ export function InterviewSession({ config, resume, onEnd }: InterviewSessionProp
                   <div className="flex h-5 w-5 items-center justify-center rounded bg-primary/10 text-primary">
                     <Brain size={12} />
                   </div>
-                  <span className="text-[9px] font-mono uppercase tracking-wider bg-muted text-muted-foreground px-1.5 py-0.5 rounded">
+                  <span className="text-[10px] font-mono uppercase tracking-wider bg-muted text-muted-foreground px-1.5 py-0.5 rounded">
                     {exchange.question.category}
                   </span>
                   {exchange.question.tags.map((tag) => (
-                    <span key={tag} className="text-[9px] bg-muted/40 text-muted-foreground px-1.5 py-0.5 rounded">
+                    <span key={tag} className="text-[10px] bg-muted/40 text-muted-foreground px-1.5 py-0.5 rounded">
                       #{tag}
                     </span>
                   ))}
@@ -481,11 +481,11 @@ export function InterviewSession({ config, resume, onEnd }: InterviewSessionProp
                   <div className="flex h-5 w-5 items-center justify-center rounded bg-primary/10 text-primary">
                     <Brain size={12} />
                   </div>
-                  <span className="text-[9px] font-mono uppercase tracking-wider bg-muted text-muted-foreground px-1.5 py-0.5 rounded">
+                  <span className="text-[10px] font-mono uppercase tracking-wider bg-muted text-muted-foreground px-1.5 py-0.5 rounded">
                     {currentQuestion.category}
                   </span>
                   {currentQuestion.tags.map((tag) => (
-                    <span key={tag} className="text-[9px] bg-muted/40 text-muted-foreground px-1.5 py-0.5 rounded">
+                    <span key={tag} className="text-[10px] bg-muted/40 text-muted-foreground px-1.5 py-0.5 rounded">
                       #{tag}
                     </span>
                   ))}

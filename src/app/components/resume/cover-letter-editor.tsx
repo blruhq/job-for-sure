@@ -202,7 +202,7 @@ export function CoverLetterEditor({ resume }: CoverLetterEditorProps) {
                 value={company}
                 onChange={(e) => setCompany(e.target.value)}
                 placeholder={t('placeholderCompany')}
-                className="w-full px-2.5 py-1.5 text-[11px]"
+                className="w-full px-2.5 py-1.5 text-xs"
                 neumorphic
               />
             </div>
@@ -212,7 +212,7 @@ export function CoverLetterEditor({ resume }: CoverLetterEditorProps) {
                 value={role}
                 onChange={(e) => setRole(e.target.value)}
                 placeholder={t('placeholderRole')}
-                className="w-full px-2.5 py-1.5 text-[11px]"
+                className="w-full px-2.5 py-1.5 text-xs"
                 neumorphic
               />
             </div>
@@ -223,7 +223,7 @@ export function CoverLetterEditor({ resume }: CoverLetterEditorProps) {
                 onChange={(e) => setFocus(e.target.value)}
                 placeholder={t('placeholderFocus')}
                 rows={4}
-                className="w-full resize-none px-2.5 py-1.5 text-[11px] font-sans"
+                className="w-full resize-none px-2.5 py-1.5 text-xs font-sans"
                 neumorphic
               />
             </div>
@@ -238,7 +238,7 @@ export function CoverLetterEditor({ resume }: CoverLetterEditorProps) {
               value={jdText}
               onChange={(e) => setJdText(e.target.value)}
               placeholder="Paste Job Description here..."
-              className="w-full h-56 px-2.5 py-1.5 text-[11px] resize-none font-sans"
+              className="w-full h-56 px-2.5 py-1.5 text-xs resize-none font-sans"
               neumorphic
             />
           </div>
@@ -260,14 +260,14 @@ export function CoverLetterEditor({ resume }: CoverLetterEditorProps) {
         {/* Actions bar */}
         <div className="flex shrink-0 items-center justify-between neuro-surface px-4 md:px-6 py-2.5">
           <div className="flex items-center gap-2">
-            <span className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">{t('generatedLetter')}</span>
+            <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">{t('generatedLetter')}</span>
           </div>
           <div className="flex gap-2">
             <Button
               variant="outline"
               onClick={handleSave}
               disabled={!letterText}
-              className="flex items-center gap-1 px-2.5 py-1 text-[11px]"
+              className="flex items-center gap-1 px-2.5 py-1 text-xs"
             >
               <Save size={11} /> {t('save')}
             </Button>
@@ -275,7 +275,7 @@ export function CoverLetterEditor({ resume }: CoverLetterEditorProps) {
               variant="outline"
               onClick={handleCopy}
               disabled={!letterText}
-              className="flex items-center gap-1 px-2.5 py-1 text-[11px]"
+              className="flex items-center gap-1 px-2.5 py-1 text-xs"
             >
               <Copy size={11} /> {t('copy')}
             </Button>
@@ -283,7 +283,7 @@ export function CoverLetterEditor({ resume }: CoverLetterEditorProps) {
               variant="outline"
               onClick={() => setShowDeleteDialog(true)}
               disabled={!letterText}
-              className="flex items-center gap-1 px-2.5 py-1 text-[11px] hover:text-red-500 hover:border-red-500/30"
+              className="flex items-center gap-1 px-2.5 py-1 text-xs hover:text-red-500 hover:border-red-500/30"
             >
               <Trash2 size={11} /> {t('delete') || 'Delete'}
             </Button>
@@ -291,7 +291,7 @@ export function CoverLetterEditor({ resume }: CoverLetterEditorProps) {
               variant="default"
               onClick={() => window.open(`/api/export/pdf?id=${resume.id}&type=cover-letter`, '_blank')}
               disabled={!letterText}
-              className="flex items-center gap-1 px-2.5 py-1 text-[11px] font-medium"
+              className="flex items-center gap-1 px-2.5 py-1 text-xs font-medium"
             >
               <Download size={11} /> {t('download') || 'Export PDF'}
             </Button>
@@ -307,7 +307,7 @@ export function CoverLetterEditor({ resume }: CoverLetterEditorProps) {
             {/* Header layout matching PDF/Resume style */}
             <div className="text-center mb-6">
               <div className="text-base font-bold tracking-tight text-foreground">{resume.persona || 'Your Name'}</div>
-              <div className="mt-1 font-mono text-[9px] text-muted-foreground">
+              <div className="mt-1 font-mono text-[10px] text-muted-foreground">
                 {[resume.email, resume.location].filter(Boolean).join(' · ')}
               </div>
             </div>

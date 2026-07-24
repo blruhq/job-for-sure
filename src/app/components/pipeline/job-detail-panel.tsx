@@ -220,7 +220,7 @@ export function JobDetailPanel({
               {job.score}% Match
             </span>
             {(salaryMin || job.salary) && (
-              <span className="flex items-center gap-0.5 rounded-xs bg-success-soft px-2 py-0.5 text-[11px] font-semibold text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-400">
+              <span className="flex items-center gap-0.5 rounded-xs bg-success-soft px-2 py-0.5 text-xs font-semibold text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-400">
                 <DollarSign size={10} />
                 {salaryMin && salaryMax
                   ? `${salaryCurrency === 'USD' ? '$' : salaryCurrency === 'GBP' ? '£' : salaryCurrency === 'EUR' ? '€' : `${salaryCurrency} `}${Math.round(salaryMin / 1000)}k–${Math.round(salaryMax / 1000)}k`
@@ -228,7 +228,7 @@ export function JobDetailPanel({
               </span>
             )}
             {locationType && locationType !== 'unknown' && (
-              <span className="flex items-center gap-0.5 rounded-xs neuro-surface px-1.5 py-0.5 text-[11px] capitalize text-muted-foreground">
+              <span className="flex items-center gap-0.5 rounded-xs neuro-surface px-1.5 py-0.5 text-xs capitalize text-muted-foreground">
                 {locationType === 'remote' && <Globe size={9} />}
                 {locationType}
               </span>
@@ -239,13 +239,13 @@ export function JobDetailPanel({
               </span>
             )}
             {experienceYears && (
-              <span className="flex items-center gap-0.5 rounded-xs neuro-surface px-1.5 py-0.5 text-[11px] text-muted-foreground">
+              <span className="flex items-center gap-0.5 rounded-xs neuro-surface px-1.5 py-0.5 text-xs text-muted-foreground">
                 <Briefcase size={10} />
                 {experienceYears}
               </span>
             )}
             {postedAt && (
-              <span className="flex items-center gap-0.5 rounded-xs neuro-surface px-1.5 py-0.5 text-[11px] text-muted-foreground">
+              <span className="flex items-center gap-0.5 rounded-xs neuro-surface px-1.5 py-0.5 text-xs text-muted-foreground">
                 <Clock size={9} /> {formatDate(postedAt)}
               </span>
             )}
@@ -259,7 +259,7 @@ export function JobDetailPanel({
             <div>
               <div className="label-mono mb-1.5">Status</div>
               <Select value={status} onValueChange={(v) => handleStatusChange(v || 'bookmarked')}>
-                <SelectTrigger className="w-full rounded-xs px-2 py-1.5 text-[12px]">
+                <SelectTrigger className="w-full rounded-xs px-2 py-1.5 text-xs">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -364,7 +364,7 @@ export function JobDetailPanel({
               <span className="group-open:hidden">&#9654; Show full job description</span>
               <span className="hidden group-open:inline">&#9660; Hide job description</span>
             </summary>
-            <div className="mt-2 whitespace-pre-wrap text-[13px] leading-relaxed text-foreground/90">
+            <div className="mt-2 whitespace-pre-wrap text-sm leading-relaxed text-foreground/90">
               {description || 'No description available.'}
             </div>
           </details>

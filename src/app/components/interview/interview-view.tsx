@@ -146,18 +146,18 @@ export function InterviewView() {
             <div className="flex-1 overflow-y-auto p-5 space-y-6">
               {(selectedPastSession.exchanges || []).map((exchange, idx: number) => (
                 <div key={idx} className="space-y-3 border-b border-border/40 pb-5 last:border-0 last:pb-0">
-                  <div className="text-[9px] font-mono uppercase text-muted-foreground tracking-wider">
+                  <div className="text-[10px] font-mono uppercase text-muted-foreground tracking-wider">
                     Question {idx + 1}
                   </div>
                   
                   {/* Question */}
                   <div className="rounded-md border border-border neuro-surface p-3.5">
                     <div className="flex items-center gap-1.5 mb-1.5">
-                      <span className="text-[9px] font-mono uppercase tracking-wider bg-muted text-muted-foreground px-1.5 py-0.5 rounded">
+                      <span className="text-[10px] font-mono uppercase tracking-wider bg-muted text-muted-foreground px-1.5 py-0.5 rounded">
                         {exchange.question?.category}
                       </span>
                       {(exchange.question?.tags || []).map((tag: string) => (
-                        <span key={tag} className="text-[9px] bg-muted/40 text-muted-foreground px-1.5 py-0.5 rounded">
+                        <span key={tag} className="text-[10px] bg-muted/40 text-muted-foreground px-1.5 py-0.5 rounded">
                           #{tag}
                         </span>
                       ))}
@@ -180,10 +180,10 @@ export function InterviewView() {
 
                     <div className="space-y-2">
                       <div>
-                        <span className="text-[9px] font-mono uppercase text-success font-semibold block mb-0.5">Strengths</span>
+                        <span className="text-[10px] font-mono uppercase text-success font-semibold block mb-0.5">Strengths</span>
                         <ul className="space-y-1">
                           {(exchange.feedback?.strengths || []).map((str: string, i: number) => (
-                            <li key={i} className="text-[11px] text-muted-foreground flex items-start gap-1">
+                            <li key={i} className="text-xs text-muted-foreground flex items-start gap-1">
                               <span className="text-success">•</span> {str}
                             </li>
                           ))}
@@ -191,10 +191,10 @@ export function InterviewView() {
                       </div>
 
                       <div>
-                        <span className="text-[9px] font-mono uppercase text-warn font-semibold block mb-0.5">Improvements</span>
+                        <span className="text-[10px] font-mono uppercase text-warn font-semibold block mb-0.5">Improvements</span>
                         <ul className="space-y-1">
                           {(exchange.feedback?.improvements || []).map((imp: string, i: number) => (
-                            <li key={i} className="text-[11px] text-muted-foreground flex items-start gap-1">
+                            <li key={i} className="text-xs text-muted-foreground flex items-start gap-1">
                               <span className="text-warn">•</span> {imp}
                             </li>
                           ))}
@@ -202,8 +202,8 @@ export function InterviewView() {
                       </div>
 
                       <div>
-                        <span className="text-[9px] font-mono uppercase text-primary font-semibold block mb-0.5">Model Answer</span>
-                        <p className="text-[11px] text-muted-foreground leading-relaxed italic bg-muted/30 p-2 rounded border border-border/40">
+                        <span className="text-[10px] font-mono uppercase text-primary font-semibold block mb-0.5">Model Answer</span>
+                        <p className="text-xs text-muted-foreground leading-relaxed italic bg-muted/30 p-2 rounded border border-border/40">
                           "{exchange.feedback?.modelAnswer}"
                         </p>
                       </div>

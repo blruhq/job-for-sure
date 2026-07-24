@@ -92,13 +92,13 @@ export function InterviewSummary({ exchanges, onRestart }: InterviewSummaryProps
           <div className="rounded-md border border-border neuro-surface p-3 text-center">
             <div className="text-[10px] font-mono uppercase text-muted-foreground mb-1">Questions</div>
             <div className="text-lg font-bold text-foreground">{totalQuestions} Qs</div>
-            <div className="text-[9px] text-muted-foreground mt-0.5">answered</div>
+            <div className="text-[10px] text-muted-foreground mt-0.5">answered</div>
           </div>
           
           <div className="rounded-md border border-border neuro-surface p-3 text-center">
             <div className="text-[10px] font-mono uppercase text-muted-foreground mb-1">Avg Score</div>
             <div className="text-lg font-bold text-foreground">{avgScore} / 10</div>
-            <div className="text-[9px] text-muted-foreground mt-0.5">{Math.round(avgScore * 10)}% match</div>
+            <div className="text-[10px] text-muted-foreground mt-0.5">{Math.round(avgScore * 10)}% match</div>
           </div>
 
           <div className="rounded-md border border-border neuro-surface p-3 text-center flex flex-col justify-between items-center">
@@ -112,7 +112,7 @@ export function InterviewSummary({ exchanges, onRestart }: InterviewSummaryProps
                 {deltaText}
               </span>
             </div>
-            <div className="text-[9px] text-muted-foreground mt-0.5">performance trajectory</div>
+            <div className="text-[10px] text-muted-foreground mt-0.5">performance trajectory</div>
           </div>
         </div>
 
@@ -170,10 +170,10 @@ export function InterviewSummary({ exchanges, onRestart }: InterviewSummaryProps
                 <div key={idx} className="rounded-md border border-border neuro-surface p-3.5 space-y-2">
                   <div className="flex items-start justify-between gap-2">
                     <div className="flex items-center gap-1.5">
-                      <span className="text-[9px] font-mono uppercase bg-muted text-muted-foreground px-1.5 py-0.5 rounded">
+                      <span className="text-[10px] font-mono uppercase bg-muted text-muted-foreground px-1.5 py-0.5 rounded">
                         Q{idx + 1}
                       </span>
-                      <span className="text-[9px] font-mono text-muted-foreground">
+                      <span className="text-[10px] font-mono text-muted-foreground">
                         {exchange.question.category}
                       </span>
                     </div>
@@ -184,11 +184,11 @@ export function InterviewSummary({ exchanges, onRestart }: InterviewSummaryProps
                       {exchange.feedback.score}/10
                     </span>
                   </div>
-                  <p className="text-[11px] text-foreground font-medium leading-relaxed">
+                  <p className="text-xs text-foreground font-medium leading-relaxed">
                     {exchange.question.question}
                   </p>
                   <div>
-                    <span className="text-[9px] font-mono uppercase text-success font-semibold">Strengths</span>
+                    <span className="text-[10px] font-mono uppercase text-success font-semibold">Strengths</span>
                     <ul className="space-y-0.5 mt-0.5">
                       {(exchange.feedback.strengths || []).map((str, i) => (
                         <li key={i} className="text-[10px] text-muted-foreground flex items-start gap-1">
@@ -198,7 +198,7 @@ export function InterviewSummary({ exchanges, onRestart }: InterviewSummaryProps
                     </ul>
                   </div>
                   <div>
-                    <span className="text-[9px] font-mono uppercase text-warn font-semibold">To Improve</span>
+                    <span className="text-[10px] font-mono uppercase text-warn font-semibold">To Improve</span>
                     <ul className="space-y-0.5 mt-0.5">
                       {(exchange.feedback.improvements || []).map((imp, i) => (
                         <li key={i} className="text-[10px] text-muted-foreground flex items-start gap-1">
@@ -208,7 +208,7 @@ export function InterviewSummary({ exchanges, onRestart }: InterviewSummaryProps
                     </ul>
                   </div>
                   <div>
-                    <span className="text-[9px] font-mono uppercase text-primary font-semibold">Model Answer</span>
+                    <span className="text-[10px] font-mono uppercase text-primary font-semibold">Model Answer</span>
                     <p className="text-[10px] text-muted-foreground italic mt-0.5 bg-muted/20 p-2 rounded border border-border/40">
                       &quot;{exchange.feedback.modelAnswer}&quot;
                     </p>

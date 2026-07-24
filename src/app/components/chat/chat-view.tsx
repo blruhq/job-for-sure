@@ -520,7 +520,7 @@ export function ChatView() {
             <div className="mx-auto flex max-w-an items-center justify-between gap-3">
               <div className="flex min-w-0 items-center gap-2">
                 <Sparkles size={12} className="shrink-0 text-primary" />
-                <span className="truncate text-[11px] text-foreground">
+                <span className="truncate text-xs text-foreground">
                   Building: <strong>{building.role}</strong>
                   {building.industry ? ` · ${building.industry}` : ''}
                 </span>
@@ -559,7 +559,7 @@ export function ChatView() {
                       done ? 'bg-success' : current ? 'bg-primary' : 'bg-border',
                     )} />
                     <span className={cn(
-                      'text-[9px] font-mono transition-colors',
+                      'text-[10px] font-mono transition-colors',
                       done ? 'text-success' : current ? 'text-primary' : 'text-muted-foreground',
                     )}>
                       {s.label}
@@ -568,7 +568,7 @@ export function ChatView() {
                 )
               })}
               {buildStepRef.current === 'complete' && (
-                <span className="text-[9px] font-mono text-success ml-1">✓ Ready to save!</span>
+                <span className="text-[10px] font-mono text-success ml-1">✓ Ready to save!</span>
               )}
             </div>
           </div>
@@ -582,7 +582,7 @@ export function ChatView() {
                 <Button
                   variant="ghost"
                   onClick={() => fileRef.current?.click()}
-                  className="neuro-pill rounded-xl inline-flex items-center gap-1 px-2 py-1 text-[11px] font-medium hover:bg-transparent hover:-translate-y-0.5"
+                  className="neuro-pill rounded-xl inline-flex items-center gap-1 px-2 py-1 text-xs font-medium hover:bg-transparent hover:-translate-y-0.5"
                 >
                   <Upload size={11} />
                   Upload Resume
@@ -590,7 +590,7 @@ export function ChatView() {
                 <Button
                   variant="ghost"
                   onClick={() => setWizardOpen(true)}
-                  className="neuro-pill rounded-xl inline-flex items-center gap-1 px-2 py-1 text-[11px] font-medium hover:bg-transparent hover:-translate-y-0.5"
+                  className="neuro-pill rounded-xl inline-flex items-center gap-1 px-2 py-1 text-xs font-medium hover:bg-transparent hover:-translate-y-0.5"
                 >
                   <FileText size={11} />
                   Build with AI
@@ -598,7 +598,7 @@ export function ChatView() {
                 <Button
                   variant="ghost"
                   onClick={() => setPasteOpen(true)}
-                  className="neuro-pill rounded-xl inline-flex items-center gap-1 px-2 py-1 text-[11px] font-medium hover:bg-transparent hover:-translate-y-0.5"
+                  className="neuro-pill rounded-xl inline-flex items-center gap-1 px-2 py-1 text-xs font-medium hover:bg-transparent hover:-translate-y-0.5"
                 >
                   <ClipboardList size={11} />
                   Paste Job
@@ -644,7 +644,7 @@ export function ChatView() {
     <div className="neuro-chat flex h-full flex-col">
       {/* Status bar — hidden during build mode */}
       {!buildData && (
-      <div className="neuro-surface flex shrink-0 flex-wrap items-center justify-between gap-2 px-4 md:px-8 py-2.5 text-[11px]">
+      <div className="neuro-surface flex shrink-0 flex-wrap items-center justify-between gap-2 px-4 md:px-8 py-2.5 text-xs">
         <div className="flex items-center gap-1.5">
           <span className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">Profile:</span>
           <Select
@@ -654,7 +654,7 @@ export function ChatView() {
             }}
             disabled={resumes.length === 0}
           >
-            <SelectTrigger className="h-auto rounded-xs neuro-inset px-1.5 py-0.5 text-[11px]">
+            <SelectTrigger className="h-auto rounded-xs neuro-inset px-1.5 py-0.5 text-xs">
               <SelectValue placeholder={resumes.length === 0 ? 'None (Upload first)' : undefined} />
             </SelectTrigger>
             <SelectContent>
@@ -675,7 +675,7 @@ export function ChatView() {
             onValueChange={(val) => { if (val) setTargetCompanyKey(val) }}
             disabled={(applications?.bookmark?.length ?? 0) === 0}
           >
-            <SelectTrigger className="h-auto rounded-xs neuro-inset px-1.5 py-0.5 text-[11px]">
+            <SelectTrigger className="h-auto rounded-xs neuro-inset px-1.5 py-0.5 text-xs">
               <SelectValue placeholder="General Career Coach" />
             </SelectTrigger>
             <SelectContent>
@@ -721,7 +721,7 @@ export function ChatView() {
                 <Upload size={18} />
               </div>
               <div className="neuro-title text-sm font-semibold">Upload Resume</div>
-              <div className="mt-0.5 text-[11px] text-muted-foreground">PDF, DOCX, or text</div>
+              <div className="mt-0.5 text-xs text-muted-foreground">PDF, DOCX, or text</div>
             </div>
 
             {/* Build from Template */}
@@ -734,7 +734,7 @@ export function ChatView() {
                 <FileText size={18} />
               </div>
               <div className="neuro-title text-sm font-semibold">Build with AI</div>
-              <div className="mt-0.5 text-[11px] text-muted-foreground">Answer questions · 5 min</div>
+              <div className="mt-0.5 text-xs text-muted-foreground">Answer questions · 5 min</div>
             </div>
 
             {/* Paste Job Posting */}
@@ -747,7 +747,7 @@ export function ChatView() {
                 <ClipboardList size={18} />
               </div>
               <div className="neuro-title text-sm font-semibold">Paste Job Posting</div>
-              <div className="mt-0.5 text-[11px] text-muted-foreground">Analyze a JD</div>
+              <div className="mt-0.5 text-xs text-muted-foreground">Analyze a JD</div>
             </div>
           </div>
         </div>
@@ -774,7 +774,7 @@ export function ChatView() {
                   <div className="neuro-card rounded-2xl p-4">
                     <div className="flex items-center gap-2 text-muted-foreground">
                       <Loader2 size={12} className="animate-spin text-primary" />
-                      <span className="font-mono text-[11px]">Parsing your resume…</span>
+                      <span className="font-mono text-xs">Parsing your resume…</span>
                     </div>
                     <div className="mt-3 space-y-2">
                       <Skeleton className="h-3 w-3/5" />

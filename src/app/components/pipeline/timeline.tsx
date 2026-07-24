@@ -83,7 +83,7 @@ export function Timeline({ job, currentStatus }: { job: PipelineJob; currentStat
             </div>
             {/* Content */}
             <div className="pb-3">
-              <div className="text-[11px] font-medium text-foreground">{event.label}</div>
+              <div className="text-xs font-medium text-foreground">{event.label}</div>
               <div className="text-[10px] text-muted-foreground">
                 {formatTimelineDate(event.date)}
               </div>

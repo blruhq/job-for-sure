@@ -88,10 +88,10 @@ export function AreaIntelligence({ job, homeLocation, city, district, countryCod
       {!homeLocation || editing ? (
         // EMPTY / EDITING STATE
         <div>
-          <div className="label-mono px-0 pt-1 pb-1.5 text-[11px]">Commute</div>
+          <div className="label-mono px-0 pt-1 pb-1.5 text-xs">Commute</div>
 
           {detecting ? (
-            <div className="flex items-center gap-2 text-[11px] text-muted-foreground py-2">
+            <div className="flex items-center gap-2 text-xs text-muted-foreground py-2">
               <Loader2 size={14} className="animate-spin text-primary" />
               Detecting your area…
             </div>
@@ -103,14 +103,14 @@ export function AreaIntelligence({ job, homeLocation, city, district, countryCod
                 onKeyDown={(e) => { if (e.key === 'Enter') handleSave() }}
                 placeholder="e.g. Bang Na, Bangkok"
                 autoFocus
-                className="w-full px-2 py-1.5 text-[12px]"
+                className="w-full px-2 py-1.5 text-xs"
               />
               <div className="flex items-center gap-1.5">
                 <Button
                   variant="default"
                   onClick={handleSave}
                   disabled={saving || !areaInput.trim()}
-                  className="flex items-center gap-1 px-2.5 py-1.5 text-[11px] font-medium"
+                  className="flex items-center gap-1 px-2.5 py-1.5 text-xs font-medium"
                 >
                   {saving ? <Loader2 size={12} className="animate-spin" /> : <Check size={12} />}
                   Save
@@ -119,7 +119,7 @@ export function AreaIntelligence({ job, homeLocation, city, district, countryCod
                   <Button
                     variant="ghost"
                     onClick={() => { setEditing(false); setAreaInput(homeLocation) }}
-                    className="px-2 py-1.5 text-[11px]"
+                    className="px-2 py-1.5 text-xs"
                   >
                     Cancel
                   </Button>
@@ -129,7 +129,7 @@ export function AreaIntelligence({ job, homeLocation, city, district, countryCod
           ) : (
             // INITIAL EMPTY STATE — never set location before
             <div className="space-y-2">
-              <p className="text-[11px] text-muted-foreground py-1">
+              <p className="text-xs text-muted-foreground py-1">
                 Set your area to see commute directions and travel prices.
               </p>
               <div className="flex flex-wrap gap-1.5">
@@ -137,7 +137,7 @@ export function AreaIntelligence({ job, homeLocation, city, district, countryCod
                   variant="outline"
                   onClick={handleDetect}
                   disabled={detecting}
-                  className="flex items-center gap-1 px-2.5 py-1.5 text-[11px] font-medium"
+                  className="flex items-center gap-1 px-2.5 py-1.5 text-xs font-medium"
                 >
                   <LocateFixed size={12} />
                   Use current location
@@ -145,7 +145,7 @@ export function AreaIntelligence({ job, homeLocation, city, district, countryCod
                 <Button
                   variant="outline"
                   onClick={() => setEditing(true)}
-                  className="flex items-center gap-1 px-2.5 py-1.5 text-[11px] font-medium"
+                  className="flex items-center gap-1 px-2.5 py-1.5 text-xs font-medium"
                 >
                   <Pencil size={12} />
                   Type area
@@ -217,7 +217,7 @@ export function AreaIntelligence({ job, homeLocation, city, district, countryCod
 function Section({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div>
-      <div className="label-mono px-0 pt-1 pb-2.5 text-[11px]">{label}</div>
+      <div className="label-mono px-0 pt-1 pb-2.5 text-xs">{label}</div>
       <div className="flex flex-wrap gap-2.5">{children}</div>
     </div>
   )
@@ -230,7 +230,7 @@ function LinkButton({ href, icon, label }: { href: string; icon: React.ReactNode
       href={href}
       target="_blank"
       rel="noopener noreferrer"
-      className="inline-flex items-center gap-1.5 rounded-xs neuro-pill px-3 py-2 text-[11px] font-medium text-foreground transition-shadow hover:bg-sidebar-hover"
+      className="inline-flex items-center gap-1.5 rounded-xs neuro-pill px-3 py-2 text-xs font-medium text-foreground transition-shadow hover:bg-sidebar-hover"
     >
       {icon}
       {label}

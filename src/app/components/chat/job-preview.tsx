@@ -101,7 +101,7 @@ export function JobPreview({ resume, onDismiss, onLoadComplete }: { resume: Resu
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2 text-muted-foreground">
             <Loader2 size={12} className="animate-spin text-primary" />
-            <span className="font-mono text-[11px]">
+            <span className="font-mono text-xs">
               Searching real jobs across 9 sources…
             </span>
           </div>
@@ -127,10 +127,10 @@ export function JobPreview({ resume, onDismiss, onLoadComplete }: { resume: Resu
         {/* Header */}
         <div className="mb-2 flex items-center justify-between">
           <div className="flex items-center gap-1.5">
-            <span className="text-[12px] font-semibold text-foreground">
+            <span className="text-xs font-semibold text-foreground">
               {total > jobs.length ? `${total} real jobs` : `${jobs.length} real job${jobs.length !== 1 ? 's' : ''}`}
             </span>
-            <span className="text-[11px] text-muted-foreground">
+            <span className="text-xs text-muted-foreground">
               for &ldquo;{resume.role}&rdquo;
             </span>
           </div>
@@ -138,7 +138,7 @@ export function JobPreview({ resume, onDismiss, onLoadComplete }: { resume: Resu
             <Button
               variant="link"
               onClick={() => router.push(`/resume/${resume.id}`)}
-              className="flex items-center gap-0.5 text-[11px]"
+              className="flex items-center gap-0.5 text-xs"
             >
               View all <ChevronRight size={12} />
             </Button>
@@ -165,14 +165,14 @@ export function JobPreview({ resume, onDismiss, onLoadComplete }: { resume: Resu
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-1.5">
                       <span
-                        className="flex h-5 w-5 shrink-0 items-center justify-center rounded-xs font-mono text-[9px] font-bold text-white"
+                        className="flex h-5 w-5 shrink-0 items-center justify-center rounded-xs font-mono text-[10px] font-bold text-white"
                         style={{ background: companyColor(job.company) }}
                       >
                         {companyLogo(job.company)}
                       </span>
-                      <span className="truncate text-[12px] font-semibold">{job.title}</span>
+                      <span className="truncate text-xs font-semibold">{job.title}</span>
                     </div>
-                    <div className="mt-0.5 truncate text-[11px] text-muted-foreground">
+                    <div className="mt-0.5 truncate text-xs text-muted-foreground">
                       {job.company} · {job.location}
                     </div>
                   </div>
@@ -188,11 +188,11 @@ export function JobPreview({ resume, onDismiss, onLoadComplete }: { resume: Resu
 
                 {/* Tags */}
                 <div className="mt-1 flex flex-wrap gap-1">
-                  <span className="rounded-xs bg-muted/50 px-1.5 py-0.5 text-[9px] text-muted-foreground">
+                  <span className="rounded-xs bg-muted/50 px-1.5 py-0.5 text-[10px] text-muted-foreground">
                     {SOURCE_SHORT[job.source] || job.source}
                   </span>
                   {(job.salaryMin || job.salary) && (
-                    <span className="flex items-center gap-0.5 rounded-xs bg-emerald-50/50 px-1.5 py-0.5 text-[9px] font-medium text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-400">
+                    <span className="flex items-center gap-0.5 rounded-xs bg-emerald-50/50 px-1.5 py-0.5 text-[10px] font-medium text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-400">
                       <DollarSign size={8} />
                       {job.salaryMin && job.salaryMax
                         ? `${job.salaryCurrency === 'USD' ? '$' : job.salaryCurrency === 'GBP' ? '£' : job.salaryCurrency === 'EUR' ? '€' : `${job.salaryCurrency ?? ''} `}${Math.round(job.salaryMin / 1000)}k–${Math.round(job.salaryMax / 1000)}k`
@@ -200,18 +200,18 @@ export function JobPreview({ resume, onDismiss, onLoadComplete }: { resume: Resu
                     </span>
                   )}
                   {job.visaSponsorship && (
-                    <span className="rounded-xs bg-accent-soft px-1.5 py-0.5 text-[9px] font-medium text-primary">
+                    <span className="rounded-xs bg-accent-soft px-1.5 py-0.5 text-[10px] font-medium text-primary">
                       <Plane size={8} className="mr-0.5 inline" />Visa
                     </span>
                   )}
                   {job.experienceYears && (
-                    <span className="flex items-center gap-0.5 rounded-xs bg-muted/50 px-1.5 py-0.5 text-[9px] text-muted-foreground">
+                    <span className="flex items-center gap-0.5 rounded-xs bg-muted/50 px-1.5 py-0.5 text-[10px] text-muted-foreground">
                       <Briefcase size={8} />
                       {job.experienceYears}
                     </span>
                   )}
                   {job.postedAt && (
-                    <span className="rounded-xs bg-muted/50 px-1.5 py-0.5 text-[9px] text-muted-foreground">
+                    <span className="rounded-xs bg-muted/50 px-1.5 py-0.5 text-[10px] text-muted-foreground">
                       {formatDate(job.postedAt)}
                     </span>
                   )}
@@ -308,7 +308,7 @@ export function JobPreview({ resume, onDismiss, onLoadComplete }: { resume: Resu
           <Button
             variant="outline"
             onClick={() => router.push(`/resume/${resume.id}`)}
-            className="mt-2 flex w-full items-center justify-center gap-1 border-dashed py-1.5 text-[11px]"
+            className="mt-2 flex w-full items-center justify-center gap-1 border-dashed py-1.5 text-xs"
           >
             +{jobs.length - 5} more jobs · View all <ChevronRight size={11} />
           </Button>

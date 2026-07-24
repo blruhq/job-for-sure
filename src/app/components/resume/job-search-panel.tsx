@@ -538,7 +538,7 @@ export function JobSearchPanel({ resume }: { resume: Resume }) {
             variant="default"
             onClick={() => handleSearch()}
             disabled={loading || query.trim().length < 2}
-            className="flex items-center gap-1.5 px-3 text-[12px] font-medium"
+            className="flex items-center gap-1.5 px-3 text-xs font-medium"
           >
             {loading ? <Loader2 size={12} className="animate-spin" /> : <Search size={12} />}
             {loading ? 'Searching…' : 'Search'}
@@ -548,7 +548,7 @@ export function JobSearchPanel({ resume }: { resume: Resume }) {
               size="sm"
               variant="outline"
               onClick={handleRefresh}
-              className="flex items-center gap-1 px-2 text-[11px]"
+              className="flex items-center gap-1 px-2 text-xs"
               title="Clear cache & fetch fresh"
             >
               <RefreshCw size={11} /> Fresh
@@ -559,13 +559,13 @@ export function JobSearchPanel({ resume }: { resume: Resume }) {
             variant="outline"
             onClick={() => setShowFilters(!showFilters)}
             className={cn(
-              'flex items-center gap-1 px-2 text-[11px]',
+              'flex items-center gap-1 px-2 text-xs',
               (showFilters || activeFilterCount > 0) && 'border-primary bg-accent-soft text-primary',
             )}
           >
             <Filter size={11} /> Filters
             {activeFilterCount > 0 && (
-              <span className="ml-0.5 rounded-full bg-primary px-1.5 py-0.5 text-[9px] font-bold text-primary-foreground">
+              <span className="ml-0.5 rounded-full bg-primary px-1.5 py-0.5 text-[10px] font-bold text-primary-foreground">
                 {activeFilterCount}
               </span>
             )}
@@ -600,7 +600,7 @@ export function JobSearchPanel({ resume }: { resume: Resume }) {
           <div className="mt-2.5 flex flex-wrap items-center gap-1.5 text-[10px] text-muted-foreground bg-muted/30 px-2 py-1 rounded-sm border border-border/50">
             <span className="font-medium text-foreground">Including Thai results for:</span>
             {thaiSynonyms.slice(0, 5).map(syn => (
-              <span key={syn} className="rounded-xs bg-muted px-1.5 py-0.5 font-mono text-[9px] text-foreground/80">
+              <span key={syn} className="rounded-xs bg-muted px-1.5 py-0.5 font-mono text-[10px] text-foreground/80">
                 {syn}
               </span>
             ))}
@@ -656,7 +656,7 @@ export function JobSearchPanel({ resume }: { resume: Resume }) {
                 value={filters.skillSearch}
                 onChange={(e) => setFilters((f) => ({ ...f, skillSearch: e.target.value }))}
                 placeholder="Type a skill to filter…"
-                className="w-full px-2 py-1 text-[11px]"
+                className="w-full px-2 py-1 text-xs"
               />
             </FilterGroup>
 
@@ -678,7 +678,7 @@ export function JobSearchPanel({ resume }: { resume: Resume }) {
       <div className="flex-1 overflow-y-auto p-4 md:p-6">
         {loading && (
           <div className="flex flex-col gap-3">
-            <div className="mb-1 font-mono text-[11px] text-muted-foreground animate-pulse">
+            <div className="mb-1 font-mono text-xs text-muted-foreground animate-pulse">
               Searching 13 sources…
             </div>
             {Array.from({ length: 8 }).map((_, i) => (
@@ -727,7 +727,7 @@ export function JobSearchPanel({ resume }: { resume: Resume }) {
 
         {!loading && filtered.length > 0 && (
           <>
-            <div className="mb-3 flex flex-wrap items-center gap-x-2 gap-y-1 text-[11px] text-muted-foreground">
+            <div className="mb-3 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-muted-foreground">
               <span>
                 {filtered.length} real job{filtered.length !== 1 ? 's' : ''}
                 {displayedJobs.length < filtered.length && ` · showing ${displayedJobs.length}`}
@@ -749,7 +749,7 @@ export function JobSearchPanel({ resume }: { resume: Resume }) {
                     variant="link"
                     onClick={handleRefresh}
                     disabled={backgroundRefreshing}
-                    className="flex items-center gap-0.5 text-[11px]"
+                    className="flex items-center gap-0.5 text-xs"
                   >
                     {backgroundRefreshing ? (
                       <span className="flex items-center gap-1">
@@ -769,7 +769,7 @@ export function JobSearchPanel({ resume }: { resume: Resume }) {
               <Button
                 variant="outline"
                 onClick={handleShowNewJobs}
-                className="mb-3 flex w-full items-center justify-center gap-1.5 border-primary/30 bg-accent-soft py-2 text-[11px] font-semibold text-primary hover:bg-primary hover:text-primary-foreground animate-pulse"
+                className="mb-3 flex w-full items-center justify-center gap-1.5 border-primary/30 bg-accent-soft py-2 text-xs font-semibold text-primary hover:bg-primary hover:text-primary-foreground animate-pulse"
               >
                 🆕 {newJobs.length} new job{newJobs.length !== 1 ? 's' : ''} found since you searched · Show fresh results
               </Button>
@@ -838,7 +838,7 @@ function JobCard({ job, bookmarked, onBookmark, onAts: _onAts, onInterview: _onI
     >
       <div className="mb-0.5 flex items-start justify-between gap-2">
         <div className="min-w-0 flex-1">
-          <span className="text-[13px] font-semibold">{job.title}</span>
+          <span className="text-sm font-semibold">{job.title}</span>
           <div className="mt-0.5 text-xs text-muted-foreground">{job.company}</div>
         </div>
         <span
@@ -854,13 +854,13 @@ function JobCard({ job, bookmarked, onBookmark, onAts: _onAts, onInterview: _onI
       {/* Tags row */}
       <div className="my-1.5 flex flex-wrap gap-1.5">
         {/* Location with flag + work policy */}
-        <span className="rounded-xs border border-border bg-background px-1.5 py-0.5 text-[11px] text-muted-foreground">
+        <span className="rounded-xs border border-border bg-background px-1.5 py-0.5 text-xs text-muted-foreground">
           {job.country && <span className="mr-0.5">{countryToFlag(job.country)}</span>}
           {job.location}
         </span>
         {job.locationType && job.locationType !== 'unknown' && (
           <span className={cn(
-            'rounded-xs border px-1.5 py-0.5 text-[11px]',
+            'rounded-xs border px-1.5 py-0.5 text-xs',
             job.locationType === 'remote'
               ? 'border-primary/30 bg-accent-soft text-primary'
               : 'border-border bg-background text-muted-foreground'
@@ -869,12 +869,12 @@ function JobCard({ job, bookmarked, onBookmark, onAts: _onAts, onInterview: _onI
             {job.locationType === 'remote' ? 'Remote' : job.locationType === 'hybrid' ? 'Hybrid' : 'On-site'}
           </span>
         )}
-        <span className="rounded-xs border border-border bg-background px-1.5 py-0.5 text-[11px] uppercase text-muted-foreground">
+        <span className="rounded-xs border border-border bg-background px-1.5 py-0.5 text-xs uppercase text-muted-foreground">
           {SOURCE_NAMES[job.source] || job.source}
         </span>
         {/* Salary — prefer structured range, fallback to free-text */}
         {(job.salaryMin || job.salary) && (
-          <span className="flex items-center gap-0.5 rounded-xs border border-emerald-500/30 bg-emerald-50/50 px-1.5 py-0.5 text-[11px] font-medium text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-400">
+          <span className="flex items-center gap-0.5 rounded-xs border border-emerald-500/30 bg-emerald-50/50 px-1.5 py-0.5 text-xs font-medium text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-400">
             <DollarSign size={9} />
             {job.salaryMin && job.salaryMax
               ? `${job.salaryCurrency === 'USD' ? '$' : job.salaryCurrency === 'GBP' ? '£' : job.salaryCurrency === 'EUR' ? '€' : `${job.salaryCurrency ?? ''} `}${Math.round(job.salaryMin / 1000)}k–${Math.round(job.salaryMax / 1000)}k`
@@ -882,17 +882,17 @@ function JobCard({ job, bookmarked, onBookmark, onAts: _onAts, onInterview: _onI
           </span>
         )}
         {job.postedAt && (
-          <span className="rounded-xs border border-border bg-background px-1.5 py-0.5 text-[11px] text-muted-foreground">
+          <span className="rounded-xs border border-border bg-background px-1.5 py-0.5 text-xs text-muted-foreground">
             {formatPostedDate(job.postedAt)}
           </span>
         )}
         {job.experienceLevel && (
-          <span className="rounded-xs border border-border bg-background px-1.5 py-0.5 text-[11px] capitalize text-muted-foreground">
+          <span className="rounded-xs border border-border bg-background px-1.5 py-0.5 text-xs capitalize text-muted-foreground">
             {job.experienceLevel}
           </span>
         )}
         {job.experienceYears && (
-          <span className="flex items-center gap-0.5 rounded-xs border border-border bg-background px-1.5 py-0.5 text-[11px] text-muted-foreground">
+          <span className="flex items-center gap-0.5 rounded-xs border border-border bg-background px-1.5 py-0.5 text-xs text-muted-foreground">
             <Briefcase size={9} />
             {job.experienceYears}
           </span>
@@ -924,7 +924,7 @@ function JobCard({ job, bookmarked, onBookmark, onAts: _onAts, onInterview: _onI
           variant={bookmarked ? 'default' : 'outline'}
           onClick={(e) => { e.stopPropagation(); onBookmark() }}
           className={cn(
-            'flex items-center gap-1 px-2 py-1 text-[11px]',
+            'flex items-center gap-1 px-2 py-1 text-xs',
           )}
         >
           <Bookmark size={11} fill={bookmarked ? 'currentColor' : 'none'} />
@@ -946,7 +946,7 @@ function Chip({ active, onClick, icon, label }: {
       variant={active ? 'default' : 'outline'}
       onClick={onClick}
       className={cn(
-        'flex items-center gap-1 px-2 py-1 text-[11px] font-medium',
+        'flex items-center gap-1 px-2 py-1 text-xs font-medium',
       )}
     >
       {icon}
@@ -974,7 +974,7 @@ function FilterCheckbox({ checked, onChange, label }: {
   label: string
 }) {
   return (
-    <label className="flex cursor-pointer items-center gap-1.5 text-[11px] text-muted-foreground hover:text-foreground">
+    <label className="flex cursor-pointer items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground">
       <input type="checkbox" checked={checked} onChange={onChange} className="h-3 w-3 accent-primary" />
       {label}
     </label>
@@ -987,7 +987,7 @@ function FilterRadio({ checked, onChange, label }: {
   label: string
 }) {
   return (
-    <label className="flex cursor-pointer items-center gap-1.5 text-[11px] text-muted-foreground hover:text-foreground">
+    <label className="flex cursor-pointer items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground">
       <input type="radio" checked={checked} onChange={onChange} className="h-3 w-3 accent-primary" />
       {label}
     </label>

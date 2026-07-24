@@ -72,7 +72,7 @@ export function JobNotes({ applicationId, initialNotes }: JobNotesProps) {
         onChange={(e) => handleChange(e.target.value)}
         placeholder="Add notes about this application…"
         rows={3}
-        className="w-full resize-none rounded-xs px-2 py-1.5 text-[11px] placeholder:text-muted-foreground/50"
+        className="w-full resize-none rounded-xs px-2 py-1.5 text-xs placeholder:text-muted-foreground/50"
       />
     </div>
   )

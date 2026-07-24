@@ -337,7 +337,7 @@ export function AtsView() {
         {/* Category breakdown (multi-dimensional audit) */}
         {analysisResult?.categories && (
           <div className="rounded-md neuro-inset p-4 flex flex-col gap-3">
-            <div className="label-mono text-[9px] uppercase tracking-wider text-muted-foreground">Scoring Categories</div>
+            <div className="label-mono text-[10px] uppercase tracking-wider text-muted-foreground">Scoring Categories</div>
             {analysisResult.categories.map((cat) => (
               <div key={cat.name} className="flex flex-col gap-1">
                 <div className="flex justify-between text-xs font-semibold">
@@ -380,7 +380,7 @@ export function AtsView() {
             <div className="label-mono mb-2">{t('keywordAnalysis')}</div>
             <div className="flex flex-col gap-3">
               <div>
-                <div className="label-mono mb-1.5 text-[8px]">
+                <div className="label-mono mb-1.5 text-[10px]">
                   {hasAnalysedJd ? 'Missing Keywords from JD (click to add)' : 'Identified Weaknesses'}
                 </div>
                 <div className="flex flex-wrap gap-1.5">
@@ -400,21 +400,21 @@ export function AtsView() {
                             }
                           }
                         }}
-                        className="rounded-full px-2 py-0.5 text-[11px]"
+                        className="rounded-full px-2 py-0.5 text-xs"
                         style={{ background: 'var(--danger-soft)', color: 'var(--destructive)', borderColor: 'rgba(220,38,38,0.2)' }}
                       >
                         + {k}
                       </Button>
                     ))
                   ) : (
-                    <span className="text-[11px] text-muted-foreground flex items-center gap-1">
+                    <span className="text-xs text-muted-foreground flex items-center gap-1">
                       <CheckCircle2 size={12} className="text-success" /> Fully matched baseline requirements!
                     </span>
                   )}
                 </div>
               </div>
               <div>
-                <div className="label-mono mb-1.5 text-[8px]">
+                <div className="label-mono mb-1.5 text-[10px]">
                   {hasAnalysedJd ? 'Matched Keywords from JD' : 'Strong Areas'}
                 </div>
                 <div className="flex flex-wrap gap-1.5">
@@ -422,14 +422,14 @@ export function AtsView() {
                     analysisResult.matched.map((k) => (
                       <span
                         key={k}
-                        className="rounded-full border px-2 py-0.5 text-[11px]"
+                        className="rounded-full border px-2 py-0.5 text-xs"
                         style={{ background: 'var(--success-soft)', color: 'var(--success)', borderColor: 'rgba(43,95,69,0.2)' }}
                       >
                         {k}
                       </span>
                     ))
                   ) : (
-                    <span className="text-[11px] text-muted-foreground">None identified yet</span>
+                    <span className="text-xs text-muted-foreground">None identified yet</span>
                   )}
                 </div>
               </div>
@@ -469,7 +469,7 @@ export function AtsView() {
       {/* Right panel — live resume preview */}
       <div className="flex w-full md:w-[55%] flex-col items-center overflow-y-auto neuro-surface p-4 md:p-6">
         <div className="mb-4 flex w-full max-w-[550px] items-center justify-between rounded-sm neuro-card p-2 px-3">
-          <span className="text-[11px] font-semibold text-muted-foreground">ATS Real-Time Sheet</span>
+          <span className="text-xs font-semibold text-muted-foreground">ATS Real-Time Sheet</span>
           <Button
             size="sm"
             onClick={() => {
@@ -480,7 +480,7 @@ export function AtsView() {
                 notify({ message: 'Select a resume first', type: 'warning' })
               }
             }}
-            className="rounded-sm px-2 py-1 text-[11px]"
+            className="rounded-sm px-2 py-1 text-xs"
           >
             Edit Resume Based on ATS
           </Button>

@@ -16,7 +16,7 @@ export function CompanyIntelligence({ company, countryCode }: CompanyIntelligenc
         Company Intelligence
       </div>
       <div className="space-y-2.5">
-        <div className="label-mono px-0 text-[11px]">Is this company good?</div>
+        <div className="label-mono px-0 text-xs">Is this company good?</div>
         <div className="flex flex-wrap gap-2.5">
           <LinkButton href={Links.cultureProfileUrl(company)} icon={<Building2 size={14} />} label="Culture Profile" />
           <LinkButton href={Links.glassdoorUrl(company)} icon={<Star size={14} />} label="Reviews" />
@@ -41,7 +41,7 @@ function LinkButton({ href, icon, label }: { href: string; icon: React.ReactNode
       href={href}
       target="_blank"
       rel="noopener noreferrer"
-      className="inline-flex items-center gap-1.5 rounded-xs neuro-pill px-3 py-2 text-[11px] font-medium text-foreground transition-shadow hover:bg-sidebar-hover"
+      className="inline-flex items-center gap-1.5 rounded-xs neuro-pill px-3 py-2 text-xs font-medium text-foreground transition-shadow hover:bg-sidebar-hover"
     >
       {icon}
       {label}

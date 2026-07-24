@@ -54,7 +54,7 @@ export const UploadCardMessage = memo(function UploadCardMessage({
         {/* Resume summary card */}
         <div className="rounded-md neuro-card p-4">
           <div className="flex items-center justify-between mb-3">
-            <span className="text-[13px] font-semibold text-foreground">{resume.persona || 'Your Name'}</span>
+            <span className="text-sm font-semibold text-foreground">{resume.persona || 'Your Name'}</span>
             {!isEditing && (
               <Button variant="ghost" size="sm" onClick={() => setIsEditing(true)} className="text-[10px] flex items-center gap-1 h-auto p-0">
                 <Pencil size={10} /> Edit Filters
@@ -72,7 +72,7 @@ export const UploadCardMessage = memo(function UploadCardMessage({
                   value={roleInput}
                   onChange={(e) => setRoleInput(e.target.value)}
                   placeholder="e.g. Software Engineer"
-                  className="w-full text-[11px] px-2 py-1"
+                  className="w-full text-xs px-2 py-1"
                 />
               </div>
               <div className="space-y-1.5">
@@ -83,7 +83,7 @@ export const UploadCardMessage = memo(function UploadCardMessage({
                   value={locationInput}
                   onChange={(e) => setLocationInput(e.target.value)}
                   placeholder="e.g. Thailand or Remote"
-                  className="w-full text-[11px] px-2 py-1"
+                  className="w-full text-xs px-2 py-1"
                 />
               </div>
               <Button
@@ -93,13 +93,13 @@ export const UploadCardMessage = memo(function UploadCardMessage({
                   setIsEditing(false)
                 }}
                 disabled={roleInput.trim().length < 2}
-                className="w-full flex items-center justify-center gap-1 py-1 text-[11px] font-medium"
+                className="w-full flex items-center justify-center gap-1 py-1 text-xs font-medium"
               >
                 <Check size={11} /> Confirm & Search Jobs
               </Button>
             </div>
           ) : (
-            <div className="space-y-1 text-[11px] text-muted-foreground">
+            <div className="space-y-1 text-xs text-muted-foreground">
               {resume.role && (
                 <div className="flex items-center gap-1.5">
                   <Briefcase size={10} className="text-primary shrink-0" />
@@ -116,16 +116,16 @@ export const UploadCardMessage = memo(function UploadCardMessage({
           )}
 
           {resume.summary && !isEditing && (
-            <p className="mt-2 text-[11px] text-muted-foreground leading-relaxed">{resume.summary}</p>
+            <p className="mt-2 text-xs text-muted-foreground leading-relaxed">{resume.summary}</p>
           )}
 
           {resume.skills.length > 0 && !isEditing && (
             <div className="mt-2 flex flex-wrap gap-1">
               {resume.skills.slice(0, 12).map((s, i) => (
-                <span key={i} className="rounded-xs bg-muted/50 px-1.5 py-0.5 text-[9px] text-muted-foreground">{s}</span>
+                <span key={i} className="rounded-xs bg-muted/50 px-1.5 py-0.5 text-[10px] text-muted-foreground">{s}</span>
               ))}
               {resume.skills.length > 12 && (
-                <span className="text-[9px] text-muted-foreground">+{resume.skills.length - 12} more</span>
+                <span className="text-[10px] text-muted-foreground">+{resume.skills.length - 12} more</span>
               )}
             </div>
           )}
@@ -135,14 +135,14 @@ export const UploadCardMessage = memo(function UploadCardMessage({
               <Button
                 variant="link"
                 onClick={() => router.push(`/resume/${resume.id}`)}
-                className="text-[11px] font-medium"
+                className="text-xs font-medium"
               >
                 View Resume →
               </Button>
               <Button
                 variant="ghost"
                 onClick={() => router.push(`/resume/${resume.id}?tab=editor`)}
-                className="text-[11px] font-medium"
+                className="text-xs font-medium"
               >
                 Edit Resume →
               </Button>

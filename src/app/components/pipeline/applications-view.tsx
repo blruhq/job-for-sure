@@ -113,7 +113,7 @@ function JobCardContent({ job }: { job: PipelineJob }) {
         </div>
         {job.score > 0 && (
           <span className={cn(
-            'shrink-0 rounded-xs px-1 py-px text-[11px] font-mono font-semibold',
+            'shrink-0 rounded-xs px-1 py-px text-xs font-mono font-semibold',
             job.score >= 85 ? 'bg-success/10 text-success' : job.score >= 70 ? 'bg-primary/10 text-primary' : 'bg-warn/10 text-warn'
           )}>
             {job.score}%
@@ -122,7 +122,7 @@ function JobCardContent({ job }: { job: PipelineJob }) {
       </div>
 
       {(job.loc || job.salary) && (
-        <div className="mt-1.5 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[11px] text-muted-foreground">
+        <div className="mt-1.5 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs text-muted-foreground">
           {job.loc && <span className="break-words">{job.loc}</span>}
           {job.salary && (
             <>
@@ -133,7 +133,7 @@ function JobCardContent({ job }: { job: PipelineJob }) {
         </div>
       )}
       {dateText && (
-        <div className="mt-1 text-[11px] text-muted-foreground/60 whitespace-nowrap">
+        <div className="mt-1 text-xs text-muted-foreground/60 whitespace-nowrap">
           {dateText}
         </div>
       )}
@@ -198,7 +198,7 @@ function InlineAddForm({ colId: _colId, onCancel, onSave, titleRef }: InlineAddF
         }}
         placeholder="Job title *"
         autoFocus
-        className="w-full rounded-xs px-2 py-1.5 text-[11px] placeholder:text-muted-foreground/50"
+        className="w-full rounded-xs px-2 py-1.5 text-xs placeholder:text-muted-foreground/50"
       />
       <Input
         neumorphic
@@ -209,7 +209,7 @@ function InlineAddForm({ colId: _colId, onCancel, onSave, titleRef }: InlineAddF
           if (e.key === 'Escape') onCancel()
         }}
         placeholder="Company *"
-        className="w-full rounded-xs px-2 py-1.5 text-[11px] placeholder:text-muted-foreground/50"
+        className="w-full rounded-xs px-2 py-1.5 text-xs placeholder:text-muted-foreground/50"
       />
       <Input
         neumorphic
@@ -220,7 +220,7 @@ function InlineAddForm({ colId: _colId, onCancel, onSave, titleRef }: InlineAddF
           if (e.key === 'Escape') onCancel()
         }}
         placeholder="Location"
-        className="w-full rounded-xs px-2 py-1.5 text-[11px] placeholder:text-muted-foreground/50"
+        className="w-full rounded-xs px-2 py-1.5 text-xs placeholder:text-muted-foreground/50"
       />
       <div className="flex items-center justify-end gap-1.5 mt-0.5">
         <Button variant="ghost" onClick={onCancel} className="rounded-xs px-2.5 py-1 text-[10px]">
@@ -421,7 +421,7 @@ export function ApplicationsView() {
                 {t('resume')}
               </span>
               <Select value={filter} onValueChange={(v) => setFilter(v || 'all')}>
-                <SelectTrigger className="w-full rounded-xs neuro-inset px-2 py-1 text-[11px]">
+                <SelectTrigger className="w-full rounded-xs neuro-inset px-2 py-1 text-xs">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -446,14 +446,14 @@ export function ApplicationsView() {
             }}
             placeholder="Paste a job URL (Indeed, Greenhouse, JobsDB...) and press Enter"
             disabled={scraping}
-            className="flex-1 rounded-xs px-2.5 py-1.5 text-[11px] placeholder:text-muted-foreground/50 disabled:opacity-50"
+            className="flex-1 rounded-xs px-2.5 py-1.5 text-xs placeholder:text-muted-foreground/50 disabled:opacity-50"
           />
           <Button
             size="sm"
             variant="default"
             onClick={handlePasteUrl}
             disabled={scraping || !pasteUrl.trim()}
-            className="flex shrink-0 items-center gap-1 rounded-xs px-5 text-[11px]"
+            className="flex shrink-0 items-center gap-1 rounded-xs px-5 text-xs"
           >
             {scraping ? (
               <>
@@ -532,7 +532,7 @@ export function ApplicationsView() {
                               target="_blank"
                               rel="noopener noreferrer"
                               onClick={(e) => e.stopPropagation()}
-                              className="flex items-center gap-0.5 rounded-xs px-1.5 py-0.5 text-[11px] text-muted-foreground hover:text-primary transition-colors"
+                              className="flex items-center gap-0.5 rounded-xs px-1.5 py-0.5 text-xs text-muted-foreground hover:text-primary transition-colors"
                             >
                               <Link2 size={10} /> Open
                             </a>
@@ -541,7 +541,7 @@ export function ApplicationsView() {
                               e.stopPropagation()
                               removeJob(job.key)
                               notify({ message: 'Removed from board', type: 'info' })
-                            }} className="flex items-center gap-0.5 rounded-xs px-1.5 py-0.5 text-[11px] text-muted-foreground hover:text-destructive h-auto">
+                            }} className="flex items-center gap-0.5 rounded-xs px-1.5 py-0.5 text-xs text-muted-foreground hover:text-destructive h-auto">
                             <Trash2 size={10} /> Remove
                           </Button>
                         </div>

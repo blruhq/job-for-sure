@@ -24,7 +24,7 @@ export function InterviewSection() {
             {/* Badge */}
             <div className="mb-4 flex w-fit items-center gap-1.5 rounded-full border border-primary/15 bg-primary/5 px-3 py-1">
               <Brain size={13} className="text-primary" />
-              <span className="text-[11px] font-semibold uppercase tracking-wider text-primary">
+              <span className="text-xs font-semibold uppercase tracking-wider text-primary">
                 {t('interviewBadge')}
               </span>
             </div>
@@ -91,10 +91,10 @@ export function InterviewSection() {
                     <div className="flex h-5 w-5 items-center justify-center rounded bg-primary/10 text-primary">
                       <Brain size={12} />
                     </div>
-                    <span className="rounded bg-muted px-1.5 py-0.5 text-[9px] font-mono uppercase tracking-wider text-muted-foreground">
+                    <span className="rounded bg-muted px-1.5 py-0.5 text-[10px] font-mono uppercase tracking-wider text-muted-foreground">
                       {t('interviewTechnical')}
                     </span>
-                    <span className="text-[9px] text-muted-foreground">{t('interviewTags')}</span>
+                    <span className="text-[10px] text-muted-foreground">{t('interviewTags')}</span>
                   </div>
                   <p className="mt-2 text-xs font-medium leading-relaxed text-foreground">
                     {t('interviewQuestion')}
@@ -136,7 +136,7 @@ export function InterviewSection() {
                       </h4>
                       <ul className="mt-1.5 space-y-1">
                         {strengths.map((s) => (
-                          <li key={s} className="flex items-start gap-1.5 text-[11px] text-muted-foreground">
+                          <li key={s} className="flex items-start gap-1.5 text-xs text-muted-foreground">
                             <span className="mt-0.5 text-success">•</span>
                             {s}
                           </li>
@@ -149,7 +149,7 @@ export function InterviewSection() {
                       </h4>
                       <ul className="mt-1.5 space-y-1">
                         {improvements.map((s) => (
-                          <li key={s} className="flex items-start gap-1.5 text-[11px] text-muted-foreground">
+                          <li key={s} className="flex items-start gap-1.5 text-xs text-muted-foreground">
                             <span className="mt-0.5 text-warn">•</span>
                             {s}
                           </li>
@@ -161,7 +161,7 @@ export function InterviewSection() {
 
                 {/* Next button area */}
                 <div className="animate-fade-up flex justify-end [animation-delay:1000ms] [animation-fill-mode:backwards]">
-                  <div className="inline-flex cursor-default items-center gap-1.5 rounded-sm bg-primary/80 px-4 py-2 text-[11px] font-medium text-primary-foreground">
+                  <div className="inline-flex cursor-default items-center gap-1.5 rounded-sm bg-primary/80 px-4 py-2 text-xs font-medium text-primary-foreground">
                     {t('interviewNextQuestion')} <ArrowRight size={12} />
                   </div>
                 </div>

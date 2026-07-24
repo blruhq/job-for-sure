@@ -196,7 +196,7 @@ export function InterviewSetup({ onStart, history, loadingHistory, onViewSession
                     </Select>
                   </div>
                 ) : (
-                  <div className="text-[11px] text-muted-foreground bg-muted/30 border border-border/50 rounded-sm p-2 mb-2">
+                  <div className="text-xs text-muted-foreground bg-muted/30 border border-border/50 rounded-sm p-2 mb-2">
                     No bookmarked jobs found. Bookmark jobs from the chat, or fill in details below.
                   </div>
                 )}
@@ -324,14 +324,14 @@ export function InterviewSetup({ onStart, history, loadingHistory, onViewSession
                         <span className="text-xs font-semibold text-foreground group-hover:text-primary transition-colors truncate">
                           {session.company}
                         </span>
-                        <span className="text-[9px] font-mono text-muted-foreground uppercase px-1 border border-border neuro-icon-well rounded-xs shrink-0">
+                        <span className="text-[10px] font-mono text-muted-foreground uppercase px-1 border border-border neuro-icon-well rounded-xs shrink-0">
                           {session.difficulty}
                         </span>
                       </div>
                       <p className="text-[10px] text-muted-foreground truncate mt-0.5">
                         {session.role} · {session.type} focus
                       </p>
-                      <span className="text-[9px] text-muted-foreground/60 font-mono block mt-1">
+                      <span className="text-[10px] text-muted-foreground/60 font-mono block mt-1">
                         {session.createdAt ? new Date(session.createdAt).toLocaleDateString() : 'Just now'}
                       </span>
                     </div>
@@ -341,7 +341,7 @@ export function InterviewSetup({ onStart, history, loadingHistory, onViewSession
                         <div className="text-xs font-bold text-foreground font-mono">
                           {session.score}/10
                         </div>
-                        <span className="text-[9px] text-muted-foreground block font-mono">
+                        <span className="text-[10px] text-muted-foreground block font-mono">
                           {session.exchanges ? `${session.exchanges.length} Qs` : ''}
                         </span>
                       </div>
