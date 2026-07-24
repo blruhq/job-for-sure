@@ -25,12 +25,12 @@ export async function sendVerificationEmail({
     subject: 'Verify your email · Job For Sure',
     html: `
       <div style="font-family: Inter, sans-serif; max-width: 480px; margin: 0 auto; padding: 32px 24px;">
-        <div style="width: 14px; height: 14px; background: #5B6ABF; border-radius: 3px; margin-bottom: 24px;" />
+        <div style="width: 14px; height: 14px; background: #8B6F47; border-radius: 3px; margin-bottom: 24px;" />
         <h1 style="font-size: 18px; font-weight: 600; margin: 0 0 8px;">Verify your email</h1>
         <p style="color: #71706A; font-size: 13px; line-height: 1.5; margin: 0 0 24px;">
           Click the button below to verify your email address and start using Job For Sure.
         </p>
-        <a href="${escapeHtml(url)}" style="display: inline-block; background: #5B6ABF; color: white; font-size: 13px; font-weight: 500; padding: 10px 24px; border-radius: 6px; text-decoration: none;">
+        <a href="${escapeHtml(url)}" style="display: inline-block; background: #8B6F47; color: white; font-size: 13px; font-weight: 500; padding: 10px 24px; border-radius: 6px; text-decoration: none;">
           Verify email
         </a>
         <p style="color: #9F9E98; font-size: 11px; margin-top: 32px;">
@@ -55,12 +55,12 @@ export async function sendPasswordResetEmail({
     subject: 'Reset your password · Job For Sure',
     html: `
       <div style="font-family: Inter, sans-serif; max-width: 480px; margin: 0 auto; padding: 32px 24px;">
-        <div style="width: 14px; height: 14px; background: #5B6ABF; border-radius: 3px; margin-bottom: 24px;" />
+        <div style="width: 14px; height: 14px; background: #8B6F47; border-radius: 3px; margin-bottom: 24px;" />
         <h1 style="font-size: 18px; font-weight: 600; margin: 0 0 8px;">Reset your password</h1>
         <p style="color: #71706A; font-size: 13px; line-height: 1.5; margin: 0 0 24px;">
           Click the button below to reset your password. This link expires in 1 hour.
         </p>
-        <a href="${escapeHtml(url)}" style="display: inline-block; background: #5B6ABF; color: white; font-size: 13px; font-weight: 500; padding: 10px 24px; border-radius: 6px; text-decoration: none;">
+        <a href="${escapeHtml(url)}" style="display: inline-block; background: #8B6F47; color: white; font-size: 13px; font-weight: 500; padding: 10px 24px; border-radius: 6px; text-decoration: none;">
           Reset password
         </a>
         <p style="color: #9F9E98; font-size: 11px; margin-top: 32px;">

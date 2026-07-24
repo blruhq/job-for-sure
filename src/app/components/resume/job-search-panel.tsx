@@ -534,29 +534,32 @@ export function JobSearchPanel({ resume }: { resume: Resume }) {
             onKeyDownEnter={() => handleSearch()}
           />
           <Button
+            size="sm"
             variant="default"
             onClick={() => handleSearch()}
             disabled={loading || query.trim().length < 2}
-            className="flex items-center gap-1.5 px-3 py-1.5 text-[12px] font-medium"
+            className="flex items-center gap-1.5 px-3 text-[12px] font-medium"
           >
             {loading ? <Loader2 size={12} className="animate-spin" /> : <Search size={12} />}
             {loading ? 'Searching…' : 'Search'}
           </Button>
           {searched && !loading && (
             <Button
+              size="sm"
               variant="outline"
               onClick={handleRefresh}
-              className="flex items-center gap-1 px-2 py-1.5 text-[11px]"
+              className="flex items-center gap-1 px-2 text-[11px]"
               title="Clear cache & fetch fresh"
             >
               <RefreshCw size={11} /> Fresh
             </Button>
           )}
           <Button
+            size="sm"
             variant="outline"
             onClick={() => setShowFilters(!showFilters)}
             className={cn(
-              'flex items-center gap-1 px-2 py-1.5 text-[11px]',
+              'flex items-center gap-1 px-2 text-[11px]',
               (showFilters || activeFilterCount > 0) && 'border-primary bg-accent-soft text-primary',
             )}
           >
@@ -589,12 +592,7 @@ export function JobSearchPanel({ resume }: { resume: Resume }) {
             icon={<Star size={11} />}
             label="75%+ Match"
           />
-          <Chip
-            active={filters.visaOnly}
-            onClick={() => setFilters((f) => ({ ...f, visaOnly: !f.visaOnly }))}
-            icon={<Plane size={11} />}
-            label="Visa Sponsor"
-          />
+
         </div>
 
         {/* Synonym pill (cross-lingual explanation) */}

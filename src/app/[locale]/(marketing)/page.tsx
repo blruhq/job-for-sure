@@ -32,7 +32,7 @@ export default function LandingPage() {
             className="pointer-events-none absolute inset-0 opacity-[0.04]"
             style={{
               backgroundImage:
-                'radial-gradient(circle at 70% 40%, rgba(91,106,191,0.4) 0%, transparent 50%), radial-gradient(circle at 30% 80%, rgba(91,106,191,0.15) 0%, transparent 40%)',
+                'radial-gradient(circle at 70% 40%, rgba(139,111,71,0.4) 0%, transparent 50%), radial-gradient(circle at 30% 80%, rgba(139,111,71,0.15) 0%, transparent 40%)',
             }}
           />
           <div className="relative mx-auto grid w-full max-w-[1120px] items-center gap-12 md:grid-cols-[1fr_1.2fr] md:gap-16">

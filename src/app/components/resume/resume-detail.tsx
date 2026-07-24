@@ -1175,8 +1175,12 @@ export function ResumeDetail({ resumeId }: { resumeId: string }) {
                     {galleryOpen ? <ChevronUp size={12} className="text-muted-foreground" /> : <ChevronDown size={12} className="text-muted-foreground" />}
                   </Button>
                   <div className="flex gap-1.5">
-                    <Button variant="ghost" onClick={() => window.open(`/api/export/pdf?id=${resume?.id}`, '_blank')} className="rounded-sm px-2 py-1 text-[11px]">Export PDF</Button>
-                    <Button variant="ghost" onClick={() => notify({ message: 'DOCX export coming soon', type: 'info' })} className="rounded-sm px-2 py-1 text-[11px]">Export DOCX</Button>
+                    <Button variant="default" size="sm" onClick={() => window.open(`/api/export/pdf?id=${resume?.id}`, '_blank')} className="flex items-center gap-1 rounded-sm px-3 py-1.5 text-[11px] font-medium">
+                      <Eye size={11} /> Export PDF
+                    </Button>
+                    <Button variant="outline" size="sm" onClick={() => notify({ message: 'DOCX export coming soon', type: 'info' })} className="flex items-center gap-1 rounded-sm px-3 py-1.5 text-[11px]">
+                      Export DOCX
+                    </Button>
                   </div>
                 </div>
                 <div className={cn(
@@ -1310,7 +1314,7 @@ export function ResumeDetail({ resumeId }: { resumeId: string }) {
                     </div>
 
                     {/* Form body */}
-                    <div className="resume-paper flex-1 rounded-xs p-6" style={{ fontFamily: 'var(--font-sans)', fontSize: '12px' }}>
+                    <div className="flex-1 rounded-sm neuro-inset p-5 overflow-y-auto">
                       {EditorFormBody()}
                     </div>
                   </div>
@@ -1344,7 +1348,7 @@ export function ResumeDetail({ resumeId }: { resumeId: string }) {
                   </div>
 
                   {/* Form body */}
-                  <div className="resume-paper rounded-xs p-4" style={{ fontFamily: 'var(--font-sans)', fontSize: '12px' }}>
+                  <div className="rounded-sm neuro-inset p-4">
                     {EditorFormBody()}
                   </div>
                 </div>

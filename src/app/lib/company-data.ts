@@ -52,7 +52,7 @@ export function createResume(data: {
 // Generate a brand color from a company name (for UI avatars)
 export function companyColor(name: string): string {
   const colors = [
-    '#5B6ABF', '#3ECF8E', '#F38020', '#635BFF',
+    '#8B6F47', '#3ECF8E', '#F38020', '#635BFF',
     '#5E6AD2', '#7B3FF2', '#E8482B', '#0EA5E9',
     '#8B5CF6', '#10B981', '#F59E0B', '#EC4899',
   ]

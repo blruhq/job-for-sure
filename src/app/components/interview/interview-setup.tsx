@@ -160,7 +160,7 @@ export function InterviewSetup({ onStart, history, loadingHistory, onViewSession
                   value={selectedResumeId}
                   onValueChange={(val) => { if (val) handleResumeChange(val) }}
                 >
-                  <SelectTrigger className="w-full px-3 py-2 text-xs">
+                  <SelectTrigger className="w-full neuro-inset rounded-sm px-3 py-2 text-xs">
                     <SelectValue placeholder="Select a resume" />
                   </SelectTrigger>
                   <SelectContent>
@@ -182,7 +182,7 @@ export function InterviewSetup({ onStart, history, loadingHistory, onViewSession
                       value={targetSelect}
                       onValueChange={(val) => { if (val) setTargetSelect(val) }}
                     >
-                      <SelectTrigger className="w-full px-3 py-2 text-xs">
+                      <SelectTrigger className="w-full neuro-inset rounded-sm px-3 py-2 text-xs">
                         <SelectValue placeholder="Select a target position" />
                       </SelectTrigger>
                       <SelectContent>

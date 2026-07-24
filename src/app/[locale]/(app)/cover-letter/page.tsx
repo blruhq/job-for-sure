@@ -349,6 +349,7 @@ export default function StandaloneCoverLetterPage() {
               <div>
                 <label className="label-mono mb-1.5 block">{t('companyName')}</label>
                 <Input
+                  neumorphic
                   type="text"
                   value={company}
                   onChange={(e) => setCompany(e.target.value)}
@@ -359,6 +360,7 @@ export default function StandaloneCoverLetterPage() {
               <div>
                 <label className="label-mono mb-1.5 block">Job Title</label>
                 <Input
+                  neumorphic
                   type="text"
                   value={role}
                   onChange={(e) => setRole(e.target.value)}
@@ -369,6 +371,7 @@ export default function StandaloneCoverLetterPage() {
               <div>
                 <label className="label-mono mb-1.5 block">Focus / Highlights (Optional)</label>
                 <Textarea
+                  neumorphic
                   value={focus}
                   onChange={(e) => setFocus(e.target.value)}
                   placeholder="e.g. Focus on my dashboard UI leadership..."

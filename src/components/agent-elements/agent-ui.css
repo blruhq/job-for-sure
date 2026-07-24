@@ -224,7 +224,7 @@
 .an-edit-diff,
 .an-edit-diff pre,
 .an-edit-diff code {
-  font-size: 12px;
+  font-size: 0.75rem;
 }
 
 .dark .an-edit-tool-card {
@@ -259,7 +259,7 @@
 .an-markdown [data-streamdown="code-block-header"] {
   padding: 0px 10px 0px 8px;
   height: auto;
-  font-size: 12px;
+  font-size: 0.75rem;
   height: 28px;
   background: transparent;
   border-bottom: 1px solid var(--color-an-tool-border-color);
@@ -300,6 +300,6 @@
 
 .an-markdown [data-streamdown="code-block"] pre,
 .an-markdown [data-streamdown="code-block"] code {
-  font-size: 12px;
+  font-size: 0.75rem;
   background: transparent;
 }

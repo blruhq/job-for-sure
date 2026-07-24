@@ -231,7 +231,7 @@ export function AtsView() {
             }}
             disabled={resumes.length === 0}
           >
-            <SelectTrigger className="w-full rounded-sm py-1.5 pl-2.5 pr-8 text-xs">
+            <SelectTrigger className="w-full rounded-sm neuro-inset py-2 pl-3 pr-8 text-xs">
               <SelectValue placeholder="None (Upload first)" />
             </SelectTrigger>
             <SelectContent>
@@ -294,16 +294,18 @@ export function AtsView() {
         {/* Company / Role context (used for tailor) */}
         <div className="flex gap-2">
           <Input
+            neumorphic
             value={company}
             onChange={(e) => setCompany(e.target.value)}
             placeholder="Company (optional)"
-            className="flex-1 rounded-sm px-2.5 py-1.5 text-xs"
+            className="flex-1 rounded-sm text-xs"
           />
           <Input
+            neumorphic
             value={role}
             onChange={(e) => setRole(e.target.value)}
             placeholder="Role (optional)"
-            className="flex-1 rounded-sm px-2.5 py-1.5 text-xs"
+            className="flex-1 rounded-sm text-xs"
           />
         </div>
 
@@ -469,7 +471,6 @@ export function AtsView() {
         <div className="mb-4 flex w-full max-w-[550px] items-center justify-between rounded-sm neuro-card p-2 px-3">
           <span className="text-[11px] font-semibold text-muted-foreground">ATS Real-Time Sheet</span>
           <Button
-            variant="outline"
             size="sm"
             onClick={() => {
               if (activeResumeId) {
