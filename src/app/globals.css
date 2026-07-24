@@ -433,16 +433,16 @@ aside a:focus-visible {
 /* Card — raised/extruded dual shadow */
 .neuro-card {
   background-color: var(--neuro-surface);
-  box-shadow: 6px 6px 12px rgba(74, 68, 56, 0.09), -6px -6px 12px rgba(253, 251, 247, 0.35);
+  box-shadow: 6px 6px 12px rgba(74, 68, 56, 0.09), -6px -6px 12px rgba(253, 251, 247, 0.22);
 }
 .neuro-card:hover {
-  box-shadow: 8px 8px 16px rgba(74, 68, 56, 0.10), -8px -8px 16px rgba(253, 251, 247, 0.4);
+  box-shadow: 8px 8px 16px rgba(74, 68, 56, 0.10), -8px -8px 16px rgba(253, 251, 247, 0.28);
 }
 
 /* Inset / pressed — recessed into surface */
 .neuro-inset {
   background-color: var(--neuro-surface);
-  box-shadow: inset 4px 4px 8px rgba(74, 68, 56, 0.08), inset -4px -4px 8px rgba(253, 251, 247, 0.35);
+  box-shadow: inset 4px 4px 8px rgba(74, 68, 56, 0.08), inset -4px -4px 8px rgba(253, 251, 247, 0.22);
 }
 
 /* Focus state — keep inset shadow only, no focus ring */
@@ -450,7 +450,7 @@ aside a:focus-visible {
 .neuro-inset:focus-within {
   box-shadow:
     inset 4px 4px 8px rgba(74, 68, 56, 0.08),
-    inset -4px -4px 8px rgba(253, 251, 247, 0.35);
+    inset -4px -4px 8px rgba(253, 251, 247, 0.22);
 }
 
 /* Container variant — no focus ring on :focus-within (use on cards, columns, panels) */
@@ -458,31 +458,31 @@ aside a:focus-visible {
 .neuro-inset-container:focus-within {
   box-shadow:
     inset 4px 4px 8px rgba(74, 68, 56, 0.08),
-    inset -4px -4px 8px rgba(253, 251, 247, 0.35);
+    inset -4px -4px 8px rgba(253, 251, 247, 0.22);
 }
 
 /* Icon well — smaller inset for icon containers */
 .neuro-icon-well {
   background-color: var(--neuro-surface);
-  box-shadow: inset 3px 3px 6px rgba(74, 68, 56, 0.08), inset -3px -3px 6px rgba(253, 251, 247, 0.35);
+  box-shadow: inset 3px 3px 6px rgba(74, 68, 56, 0.08), inset -3px -3px 6px rgba(253, 251, 247, 0.22);
 }
 
 /* Pill / raised button — extruded with active press-down */
 .neuro-pill {
   background-color: var(--neuro-surface);
-  box-shadow: 3px 3px 6px rgba(74, 68, 56, 0.09), -3px -3px 6px rgba(253, 251, 247, 0.35);
+  box-shadow: 3px 3px 6px rgba(74, 68, 56, 0.09), -3px -3px 6px rgba(253, 251, 247, 0.22);
 }
 .neuro-pill:hover {
-  box-shadow: 4px 4px 8px rgba(74, 68, 56, 0.10), -4px -4px 8px rgba(253, 251, 247, 0.4);
+  box-shadow: 4px 4px 8px rgba(74, 68, 56, 0.10), -4px -4px 8px rgba(253, 251, 247, 0.28);
 }
 .neuro-pill:active {
-  box-shadow: inset 2px 2px 4px rgba(74, 68, 56, 0.08), inset -2px -2px 4px rgba(253, 251, 247, 0.35);
+  box-shadow: inset 2px 2px 4px rgba(74, 68, 56, 0.08), inset -2px -2px 4px rgba(253, 251, 247, 0.22);
 }
 
 /* Modal surface — larger, softer shadow for dialog overlays */
 .neuro-modal {
   background-color: var(--neuro-surface);
-  box-shadow: 8px 8px 24px rgba(74, 68, 56, 0.10), -8px -8px 24px rgba(253, 251, 247, 0.35);
+  box-shadow: 8px 8px 24px rgba(74, 68, 56, 0.10), -8px -8px 24px rgba(253, 251, 247, 0.22);
 }
 
 /* Title text — softer than --foreground (#2D2A22) for neumorphic context */
@@ -506,20 +506,20 @@ aside a:focus-visible {
 /* Input bar container — pressed/recessed inset shadow */
 .neuro-chat .bg-an-input-background {
   border-color: transparent;
-  box-shadow: inset 4px 4px 8px rgba(74, 68, 56, 0.06), inset -4px -4px 8px rgba(253, 251, 247, 0.35);
+  box-shadow: inset 4px 4px 8px rgba(74, 68, 56, 0.06), inset -4px -4px 8px rgba(253, 251, 247, 0.22);
 }
 
 /* Send button — extruded raised */
 .neuro-chat .bg-an-send-button-bg {
-  box-shadow: 3px 3px 6px rgba(74, 68, 56, 0.07), -3px -3px 6px rgba(253, 251, 247, 0.35);
+  box-shadow: 3px 3px 6px rgba(74, 68, 56, 0.07), -3px -3px 6px rgba(253, 251, 247, 0.22);
 }
 
 /* Cards inside chat (upload card, job previews) — softer than global .neuro-card */
 .neuro-chat .neuro-card {
-  box-shadow: 4px 4px 10px rgba(74, 68, 56, 0.06), -4px -4px 10px rgba(253, 251, 247, 0.35);
+  box-shadow: 4px 4px 10px rgba(74, 68, 56, 0.06), -4px -4px 10px rgba(253, 251, 247, 0.22);
 }
 .neuro-chat .neuro-card:hover {
-  box-shadow: 6px 6px 14px rgba(74, 68, 56, 0.07), -6px -6px 14px rgba(253, 251, 247, 0.35);
+  box-shadow: 6px 6px 14px rgba(74, 68, 56, 0.07), -6px -6px 14px rgba(253, 251, 247, 0.22);
 }
 
 /* Suggestions bar in InputBar — match surface */
