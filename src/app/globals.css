@@ -110,6 +110,8 @@
   --neuro-surface-raised: #F0EBE2;
   /* Slightly lighter than --neuro-surface for raised/extruded cards */
   --neuro-surface-card: #EDE8DF;
+  /* Lightest tone — for cards that sit inside inset/recessed containers */
+  --neuro-surface-card-raised: #F5F1E8;
 
   /* ── Neumorphic shadow colors (Apple Vision Pro profile) ── */
   /* Dark shadow = warm clay tone, Light highlight = warm ivory glow */
@@ -546,6 +548,23 @@ aside a:focus-visible {
 /* Suggestions bar in InputBar — match surface */
 .neuro-chat .bg-an-background-secondary {
   background-color: var(--neuro-surface);
+}
+
+/* Cards nested inside inset containers (e.g. kanban columns) — lighter tone so they float above inset */
+.neuro-inset .neuro-card,
+.neuro-inset-container .neuro-card {
+  background-color: var(--neuro-surface-card-raised);
+  box-shadow:
+    0 0 14px rgba(74, 68, 56, 0.04),
+    4px 4px 10px var(--neuro-dark-card),
+    -4px -4px 10px var(--neuro-light-base);
+}
+.neuro-inset .neuro-card:hover,
+.neuro-inset-container .neuro-card:hover {
+  box-shadow:
+    0 0 18px rgba(74, 68, 56, 0.05),
+    6px 6px 14px var(--neuro-dark-card-hover),
+    -6px -6px 14px var(--neuro-light-hover);
 }
 
 /* ── Dark mode: neutralize all neumorphic effects ── */
