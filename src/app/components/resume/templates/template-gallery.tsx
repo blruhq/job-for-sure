@@ -113,7 +113,7 @@ export function TemplateGallery({ value, onChange, neumorphic = false }: Templat
                   'rounded-md border shadow-sm',
                   value === t.id
                     ? 'border-primary bg-accent-soft ring-1 ring-primary'
-                    : 'border-border hover:border-primary/40 hover:shadow-md',
+                    : 'border-border hover:border-brand/40 hover:shadow-md',
                 ),
           )}
         >

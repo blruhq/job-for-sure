@@ -63,7 +63,7 @@ export function GridPattern({
               height={height - 1}
               x={sx * width + 1}
               y={sy * height + 1}
-              fill="var(--primary)"
+              fill="var(--brand)"
               opacity="0.07"
             />
           ))}

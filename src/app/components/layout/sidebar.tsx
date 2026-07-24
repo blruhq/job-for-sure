@@ -78,14 +78,14 @@ function NavSection({
               )}
             >
               <span className="relative shrink-0">
-                <Icon size={15} className={cn(isActive ? 'text-primary' : 'opacity-70')} />
+                <Icon size={15} className={cn(isActive ? 'text-brand' : 'opacity-70')} />
                 {collapsed && 'badge' in item && item.badge && totalPipeline > 0 && (
                   <span className="absolute -top-0.5 -right-0.5 h-1.5 w-1.5 rounded-full bg-red-500 ring-1 ring-sidebar" />
                 )}
               </span>
               <span className={cn('transition-opacity duration-150', collapsed && 'opacity-0')}>{navLabel}</span>
               {'badge' in item && item.badge && totalPipeline > 0 && (
-                <span className={cn('ml-auto rounded-xs bg-accent-soft px-1.5 py-px font-mono text-[10px] font-semibold text-primary transition-opacity duration-150', collapsed && 'opacity-0')}>
+                <span className={cn('ml-auto rounded-xs bg-accent-soft px-1.5 py-px font-mono text-[10px] font-semibold text-brand transition-opacity duration-150', collapsed && 'opacity-0')}>
                   {totalPipeline}
                 </span>
               )}
@@ -147,7 +147,7 @@ export function Sidebar() {
                   c ? 'pl-[16px] pr-[17px] py-1.5' : 'pl-[16px] pr-2.5 py-1.5',
                 )}
               >
-                <Shield size={15} className={cn('shrink-0', pathname === '/admin' ? 'text-primary' : 'opacity-70')} />
+                <Shield size={15} className={cn('shrink-0', pathname === '/admin' ? 'text-brand' : 'opacity-70')} />
                 <span className={cn('transition-opacity duration-150', c && 'opacity-0')}>Admin Dashboard</span>
               </Link>
             </Tooltip>
@@ -184,7 +184,7 @@ export function Sidebar() {
                     c ? 'pl-[16px] pr-[17px] py-2' : 'pl-[16px] pr-2.5 py-2',
                   )}
                 >
-                  <FileText size={15} className={cn('shrink-0', pathname === '/resumes' ? 'text-primary' : 'opacity-70')} />
+                  <FileText size={15} className={cn('shrink-0', pathname === '/resumes' ? 'text-brand' : 'opacity-70')} />
                   <span className={cn('transition-opacity duration-150', c && 'opacity-0')}>{t('resumes')}</span>
                 </Link>
               </Tooltip>

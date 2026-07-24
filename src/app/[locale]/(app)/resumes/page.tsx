@@ -208,7 +208,7 @@ export default function ResumesPage() {
             <Button
               variant="ghost"
               onClick={() => setUploadModalOpen(true)}
-              className="flex min-h-[180px] w-full flex-col items-center justify-center gap-3 rounded-sm neuro-inset border border-dashed border-border text-muted-foreground hover:border-primary/50 hover:bg-accent-soft hover:text-primary h-auto"
+              className="flex min-h-[180px] w-full flex-col items-center justify-center gap-3 rounded-sm neuro-inset border border-dashed border-border text-muted-foreground hover:border-brand/50 hover:bg-accent-soft hover:text-primary h-auto"
             >
               <div className="flex h-10 w-10 items-center justify-center rounded-sm neuro-icon-well">
                 <Plus size={18} strokeWidth={2} />

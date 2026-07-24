@@ -29,11 +29,11 @@ export function LanguageSwitcher() {
       <DropdownMenuContent align="end" className="min-w-[120px]">
         <DropdownMenuItem onClick={() => handleLanguageChange('en')} className="flex items-center justify-between">
           <span>English</span>
-          {locale === 'en' && <span className="text-[10px] text-primary font-bold">✓</span>}
+          {locale === 'en' && <span className="text-[10px] text-brand font-bold">✓</span>}
         </DropdownMenuItem>
         <DropdownMenuItem onClick={() => handleLanguageChange('th')} className="flex items-center justify-between">
           <span>ไทย</span>
-          {locale === 'th' && <span className="text-[10px] text-primary font-bold">✓</span>}
+          {locale === 'th' && <span className="text-[10px] text-brand font-bold">✓</span>}
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

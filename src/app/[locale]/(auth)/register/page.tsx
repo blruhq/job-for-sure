@@ -57,7 +57,7 @@ export default function RegisterPage() {
         {/* Logo */}
         <div className="mb-6 text-center">
           <Link href="/" className="inline-flex cursor-pointer items-center gap-2 no-underline">
-            <div className="h-4 w-4 rounded-[3px] bg-primary" />
+            <div className="h-4 w-4 rounded-[3px] bg-brand" />
             <span className="text-sm font-semibold tracking-tight text-foreground">JOB FOR SURE</span>
           </Link>
         </div>

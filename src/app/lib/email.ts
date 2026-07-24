@@ -30,7 +30,7 @@ export async function sendVerificationEmail({
         <p style="color: #71706A; font-size: 13px; line-height: 1.5; margin: 0 0 24px;">
           Click the button below to verify your email address and start using Job For Sure.
         </p>
-        <a href="${escapeHtml(url)}" style="display: inline-block; background: #8B6F47; color: white; font-size: 13px; font-weight: 500; padding: 10px 24px; border-radius: 6px; text-decoration: none;">
+        <a href="${escapeHtml(url)}" style="display: inline-block; background: #0D9488; color: white; font-size: 13px; font-weight: 500; padding: 10px 24px; border-radius: 6px; text-decoration: none;">
           Verify email
         </a>
         <p style="color: #9F9E98; font-size: 11px; margin-top: 32px;">
@@ -60,7 +60,7 @@ export async function sendPasswordResetEmail({
         <p style="color: #71706A; font-size: 13px; line-height: 1.5; margin: 0 0 24px;">
           Click the button below to reset your password. This link expires in 1 hour.
         </p>
-        <a href="${escapeHtml(url)}" style="display: inline-block; background: #8B6F47; color: white; font-size: 13px; font-weight: 500; padding: 10px 24px; border-radius: 6px; text-decoration: none;">
+        <a href="${escapeHtml(url)}" style="display: inline-block; background: #0D9488; color: white; font-size: 13px; font-weight: 500; padding: 10px 24px; border-radius: 6px; text-decoration: none;">
           Reset password
         </a>
         <p style="color: #9F9E98; font-size: 11px; margin-top: 32px;">

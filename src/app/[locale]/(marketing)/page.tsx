@@ -152,18 +152,18 @@ export default function LandingPage() {
       <InterviewSection />
 
       {/* ── CTA ── */}
-      <section className="bg-primary">
+      <section className="bg-brand">
         <div className="mx-auto max-w-[1120px] px-6 py-20 md:py-28">
           <div className="max-w-2xl">
-            <h2 className="text-3xl font-semibold tracking-tight text-primary-foreground md:text-4xl">
+            <h2 className="text-3xl font-semibold tracking-tight text-brand-foreground md:text-4xl">
               {t('tagline')}
             </h2>
-            <p className="mt-4 text-lg leading-relaxed text-primary-foreground/80">
+            <p className="mt-4 text-lg leading-relaxed text-brand-foreground/80">
               {t('subtagline')}
             </p>
             <Link
               href="/register"
-              className="mt-8 inline-flex cursor-pointer items-center gap-1.5 rounded-lg bg-primary-foreground px-6 py-3 text-sm font-medium text-primary shadow-lg shadow-black/10 transition-all hover:bg-primary-foreground/90 hover:-translate-y-0.5 active:scale-[0.98]"
+              className="mt-8 inline-flex cursor-pointer items-center gap-1.5 rounded-lg bg-brand-foreground px-6 py-3 text-sm font-medium text-brand shadow-lg shadow-black/10 transition-all hover:bg-brand-foreground/90 hover:-translate-y-0.5 active:scale-[0.98]"
             >
               {t('getStarted')} <ArrowRight size={14} />
             </Link>
@@ -172,17 +172,17 @@ export default function LandingPage() {
       </section>
 
       {/* ── FOOTER ── */}
-      <footer className="border-t border-primary-foreground/10 bg-primary px-6 py-8">
+      <footer className="border-t border-brand-foreground/10 bg-brand px-6 py-8">
         <div className="mx-auto flex max-w-[1120px] items-center justify-between">
-          <span className="text-sm text-primary-foreground/60">{t('footerCopyright')}</span>
-          <div className="flex gap-6 text-sm text-primary-foreground/60">
-            <Link href="/pricing" className="cursor-pointer transition-colors hover:text-primary-foreground">
+          <span className="text-sm text-brand-foreground/60">{t('footerCopyright')}</span>
+          <div className="flex gap-6 text-sm text-brand-foreground/60">
+            <Link href="/pricing" className="cursor-pointer transition-colors hover:text-brand-foreground">
               Pricing
             </Link>
-            <Link href="/login" className="cursor-pointer transition-colors hover:text-primary-foreground">
+            <Link href="/login" className="cursor-pointer transition-colors hover:text-brand-foreground">
               {t('footerSignIn')}
             </Link>
-            <Link href="/register" className="cursor-pointer transition-colors hover:text-primary-foreground">
+            <Link href="/register" className="cursor-pointer transition-colors hover:text-brand-foreground">
               {t('footerGetStarted')}
             </Link>
           </div>

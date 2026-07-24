@@ -833,7 +833,7 @@ function JobCard({ job, bookmarked, onBookmark, onAts: _onAts, onInterview: _onI
   void _onInterview
   return (
     <div
-      className="cursor-pointer rounded-sm neuro-card p-4 transition-colors hover:border-primary"
+      className="cursor-pointer rounded-sm neuro-card p-4 transition-colors hover:border-brand"
       onClick={onClick}
     >
       <div className="mb-0.5 flex items-start justify-between gap-2">

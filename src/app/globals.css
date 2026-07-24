@@ -42,6 +42,9 @@
   --color-warn-soft: var(--warn-soft);
   --color-danger-soft: var(--danger-soft);
   --color-accent-soft: var(--accent-soft);
+  --color-brand: var(--brand);
+  --color-brand-foreground: var(--brand-foreground);
+  --color-primary-hover: var(--primary-hover);
 
   --radius-sm: 6px;
   --radius-md: 8px;
@@ -65,8 +68,25 @@
   --card-foreground: #2D2A22;
   --popover: #FDFBF7;
   --popover-foreground: #2D2A22;
-  --primary: #8B6F47;              /* warm bronze */
+  --primary: #0D9488;              /* teal-600 — action/CTA */
   --primary-foreground: #FFFFFF;
+  --primary-hover: #0F766E;          /* teal-700 — hover state */
+  --brand: #8B6F47;                  /* warm bronze — brand identity */
+  --brand-foreground: #FFFFFF;       /* white text on bronze */
+
+  /* ── Teal action/CTA scale (primary action color) ── */
+  --teal-50: #F0FDFA;
+  --teal-100: #CCFBF1;
+  --teal-200: #99F6E4;
+  --teal-300: #5EEAD4;
+  --teal-400: #2DD4BF;
+  --teal-500: #14B8A6;
+  --teal-600: #0D9488;   /* = --primary */
+  --teal-700: #0F766E;   /* = --primary-hover */
+  --teal-800: #115E59;
+  --teal-900: #134E4A;
+  --teal-950: #042F2E;
+
   --secondary: #EDE8E0;            /* warm beige */
   --secondary-foreground: #2D2A22;
   --muted: #EDE8E0;                /* subtle warm divider bg */
@@ -208,8 +228,10 @@ html[lang="th"] {
   --card-foreground: #E4E7EC;
   --popover: #16181D;
   --popover-foreground: #E4E7EC;
-  --primary: #B89472;
-  --primary-foreground: #FFFFFF;
+  --primary: #2DD4BF;               /* teal-400 — action/CTA in dark mode */
+  --primary-foreground: #042F2E;     /* teal-950 — dark text on bright teal */
+  --brand: #B89472;                  /* lightened bronze for dark mode */
+  --brand-foreground: #FFFFFF;
   --secondary: #1C1E24;
   --secondary-foreground: #E4E7EC;
   --muted: #1C1E24;
@@ -258,15 +280,15 @@ html[lang="th"] {
   --an-foreground-muted: #9CA3B0;
   --an-foreground-subtle: #7D7C76;
   --an-border-color: rgba(255, 255, 255, 0.07);
-  --an-primary-color: #B89472;
+  --an-primary-color: #2DD4BF;
   --an-user-message-bg: rgba(184, 148, 114, 0.12);
   --an-user-message-text: #E4E7EC;
   --an-input-background: #16181D;
   --an-input-border-color: rgba(255, 255, 255, 0.07);
   --an-input-color: #E4E7EC;
   --an-input-placeholder-color: #7D7C76;
-  --an-send-button-bg: #B89472;
-  --an-send-button-color: #0a0a0a;
+  --an-send-button-bg: #2DD4BF;
+  --an-send-button-color: #042F2E;
   --an-tool-background: #16181D;
   --an-tool-border-color: rgba(255, 255, 255, 0.07);
   --an-tool-color: #E4E7EC;

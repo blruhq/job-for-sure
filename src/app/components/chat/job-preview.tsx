@@ -158,7 +158,7 @@ export function JobPreview({ resume, onDismiss, onLoadComplete }: { resume: Resu
             return (
               <div
                 key={key}
-                className="cursor-pointer rounded-sm border border-border bg-background p-2.5 transition-colors hover:border-primary/40"
+                className="cursor-pointer rounded-sm border border-border bg-background p-2.5 transition-colors hover:border-brand/40"
                 onClick={() => setPanelJob(scoredJobToPipelineJob(job, resume.skills || []))}
               >
                 <div className="flex items-start justify-between gap-2">
