@@ -107,6 +107,21 @@
   /* ── Neumorphic surface (light mode only; dark mode neutralizes via .dark .neuro-* rules) ── */
   --neuro-surface: #E8E2D8;
 
+  /* ── Neumorphic shadow colors (Apple Vision Pro profile) ── */
+  /* Dark shadow = warm clay tone, Light highlight = warm ivory glow */
+  /* Calibrated to Apple VP: white 0.15-0.20, dark 0.15-0.25 */
+  --neuro-dark-card: rgba(74, 68, 56, 0.18);
+  --neuro-dark-card-hover: rgba(74, 68, 56, 0.22);
+  --neuro-dark-inset: rgba(74, 68, 56, 0.15);
+  --neuro-dark-pill: rgba(74, 68, 56, 0.15);
+  --neuro-dark-pill-hover: rgba(74, 68, 56, 0.18);
+  --neuro-dark-pill-active: rgba(74, 68, 56, 0.12);
+  --neuro-dark-modal: rgba(74, 68, 56, 0.20);
+  --neuro-dark-chat: rgba(74, 68, 56, 0.12);
+  --neuro-dark-chat-hover: rgba(74, 68, 56, 0.14);
+  --neuro-light-base: rgba(253, 251, 247, 0.18);
+  --neuro-light-hover: rgba(253, 251, 247, 0.22);
+
   /* ── Typography ── */
   --font-sans: var(--font-inter, 'Inter Variable'), 'Inter', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
   --font-display: 'Instrument Serif', Georgia, 'Times New Roman', serif;
@@ -433,56 +448,56 @@ aside a:focus-visible {
 /* Card — raised/extruded dual shadow */
 .neuro-card {
   background-color: var(--neuro-surface);
-  box-shadow: 6px 6px 12px rgba(74, 68, 56, 0.09), -6px -6px 12px rgba(253, 251, 247, 0.22);
+  box-shadow: 6px 6px 12px var(--neuro-dark-card), -6px -6px 12px var(--neuro-light-base);
 }
 .neuro-card:hover {
-  box-shadow: 8px 8px 16px rgba(74, 68, 56, 0.10), -8px -8px 16px rgba(253, 251, 247, 0.28);
+  box-shadow: 8px 8px 16px var(--neuro-dark-card-hover), -8px -8px 16px var(--neuro-light-hover);
 }
 
 /* Inset / pressed — recessed into surface */
 .neuro-inset {
   background-color: var(--neuro-surface);
-  box-shadow: inset 4px 4px 8px rgba(74, 68, 56, 0.08), inset -4px -4px 8px rgba(253, 251, 247, 0.22);
+  box-shadow: inset 4px 4px 8px var(--neuro-dark-inset), inset -4px -4px 8px var(--neuro-light-base);
 }
 
 /* Focus state — keep inset shadow only, no focus ring */
 .neuro-inset:focus-visible,
 .neuro-inset:focus-within {
   box-shadow:
-    inset 4px 4px 8px rgba(74, 68, 56, 0.08),
-    inset -4px -4px 8px rgba(253, 251, 247, 0.22);
+    inset 4px 4px 8px var(--neuro-dark-inset),
+    inset -4px -4px 8px var(--neuro-light-base);
 }
 
 /* Container variant — no focus ring on :focus-within (use on cards, columns, panels) */
 .neuro-inset-container:focus-visible,
 .neuro-inset-container:focus-within {
   box-shadow:
-    inset 4px 4px 8px rgba(74, 68, 56, 0.08),
-    inset -4px -4px 8px rgba(253, 251, 247, 0.22);
+    inset 4px 4px 8px var(--neuro-dark-inset),
+    inset -4px -4px 8px var(--neuro-light-base);
 }
 
 /* Icon well — smaller inset for icon containers */
 .neuro-icon-well {
   background-color: var(--neuro-surface);
-  box-shadow: inset 3px 3px 6px rgba(74, 68, 56, 0.08), inset -3px -3px 6px rgba(253, 251, 247, 0.22);
+  box-shadow: inset 3px 3px 6px var(--neuro-dark-inset), inset -3px -3px 6px var(--neuro-light-base);
 }
 
 /* Pill / raised button — extruded with active press-down */
 .neuro-pill {
   background-color: var(--neuro-surface);
-  box-shadow: 3px 3px 6px rgba(74, 68, 56, 0.09), -3px -3px 6px rgba(253, 251, 247, 0.22);
+  box-shadow: 3px 3px 6px var(--neuro-dark-pill), -3px -3px 6px var(--neuro-light-base);
 }
 .neuro-pill:hover {
-  box-shadow: 4px 4px 8px rgba(74, 68, 56, 0.10), -4px -4px 8px rgba(253, 251, 247, 0.28);
+  box-shadow: 4px 4px 8px var(--neuro-dark-pill-hover), -4px -4px 8px var(--neuro-light-hover);
 }
 .neuro-pill:active {
-  box-shadow: inset 2px 2px 4px rgba(74, 68, 56, 0.08), inset -2px -2px 4px rgba(253, 251, 247, 0.22);
+  box-shadow: inset 2px 2px 4px var(--neuro-dark-pill-active), inset -2px -2px 4px var(--neuro-light-base);
 }
 
 /* Modal surface — larger, softer shadow for dialog overlays */
 .neuro-modal {
   background-color: var(--neuro-surface);
-  box-shadow: 8px 8px 24px rgba(74, 68, 56, 0.10), -8px -8px 24px rgba(253, 251, 247, 0.22);
+  box-shadow: 8px 8px 24px var(--neuro-dark-modal), -8px -8px 24px var(--neuro-light-base);
 }
 
 /* Title text — softer than --foreground (#2D2A22) for neumorphic context */
@@ -506,20 +521,20 @@ aside a:focus-visible {
 /* Input bar container — pressed/recessed inset shadow */
 .neuro-chat .bg-an-input-background {
   border-color: transparent;
-  box-shadow: inset 4px 4px 8px rgba(74, 68, 56, 0.06), inset -4px -4px 8px rgba(253, 251, 247, 0.22);
+  box-shadow: inset 4px 4px 8px var(--neuro-dark-chat), inset -4px -4px 8px var(--neuro-light-base);
 }
 
 /* Send button — extruded raised */
 .neuro-chat .bg-an-send-button-bg {
-  box-shadow: 3px 3px 6px rgba(74, 68, 56, 0.07), -3px -3px 6px rgba(253, 251, 247, 0.22);
+  box-shadow: 3px 3px 6px var(--neuro-dark-chat), -3px -3px 6px var(--neuro-light-base);
 }
 
 /* Cards inside chat (upload card, job previews) — softer than global .neuro-card */
 .neuro-chat .neuro-card {
-  box-shadow: 4px 4px 10px rgba(74, 68, 56, 0.06), -4px -4px 10px rgba(253, 251, 247, 0.22);
+  box-shadow: 4px 4px 10px var(--neuro-dark-chat), -4px -4px 10px var(--neuro-light-base);
 }
 .neuro-chat .neuro-card:hover {
-  box-shadow: 6px 6px 14px rgba(74, 68, 56, 0.07), -6px -6px 14px rgba(253, 251, 247, 0.22);
+  box-shadow: 6px 6px 14px var(--neuro-dark-chat-hover), -6px -6px 14px var(--neuro-light-hover);
 }
 
 /* Suggestions bar in InputBar — match surface */
