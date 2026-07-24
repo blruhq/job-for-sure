@@ -272,7 +272,7 @@ export default function StandaloneCoverLetterPage() {
                   setSelectedResumeId(e.target.value)
                   if (e.target.value !== 'none') setActiveResumeId(e.target.value)
                 }}
-                className="min-w-0 flex-1 cursor-pointer rounded-xs border border-border bg-background px-2.5 py-1.5 text-[11px] outline-none focus:border-primary"
+                className="min-w-0 flex-1 cursor-pointer rounded-lg neuro-inset px-3 py-2 text-xs font-medium text-foreground outline-none focus-visible:ring-2 focus-visible:ring-primary/30"
               >
                 <option value="none">{t('selectProfilePlaceholder')}</option>
                 {resumes.map((r) => (
@@ -284,7 +284,7 @@ export default function StandaloneCoverLetterPage() {
               <Button
                 onClick={() => fileInputRef.current?.click()}
                 disabled={parsing}
-                className="flex items-center gap-1 rounded-xs text-[11px] font-medium disabled:opacity-50"
+                className="flex items-center gap-1 rounded-xs text-xs font-medium disabled:opacity-50"
               >
                 {parsing ? (
                   <Loader2 size={12} className="animate-spin text-primary" />

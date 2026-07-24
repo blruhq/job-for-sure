@@ -657,7 +657,7 @@ export function ChatView() {
             <SelectTrigger className="h-auto rounded-xs neuro-inset px-1.5 py-0.5 text-xs">
               <SelectValue placeholder={resumes.length === 0 ? 'None (Upload first)' : undefined} />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="min-w-56">
               {resumes.length === 0 ? (
                 <SelectItem value="none">None (Upload first)</SelectItem>
               ) : (
@@ -678,7 +678,7 @@ export function ChatView() {
             <SelectTrigger className="h-auto rounded-xs neuro-inset px-1.5 py-0.5 text-xs">
               <SelectValue placeholder="General Career Coach" />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="min-w-56">
               <SelectItem value="none">General Career Coach</SelectItem>
               {(applications?.bookmark ?? []).map((job) => (
                 <SelectItem key={job.key} value={job.key}>{job.company} ({job.title})</SelectItem>
