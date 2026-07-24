@@ -101,7 +101,7 @@ export function JobPreview({ resume, onDismiss, onLoadComplete }: { resume: Resu
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2 text-muted-foreground">
             <Loader2 size={12} className="animate-spin text-primary" />
-            <span className="font-mono text-xs">
+            <span className="font-mono text-sm">
               Searching real jobs across 9 sources…
             </span>
           </div>
@@ -127,10 +127,10 @@ export function JobPreview({ resume, onDismiss, onLoadComplete }: { resume: Resu
         {/* Header */}
         <div className="mb-2 flex items-center justify-between">
           <div className="flex items-center gap-1.5">
-            <span className="text-xs font-semibold text-foreground">
+            <span className="text-sm font-semibold text-foreground">
               {total > jobs.length ? `${total} real jobs` : `${jobs.length} real job${jobs.length !== 1 ? 's' : ''}`}
             </span>
-            <span className="text-xs text-muted-foreground">
+            <span className="text-sm text-muted-foreground">
               for &ldquo;{resume.role}&rdquo;
             </span>
           </div>
@@ -138,7 +138,7 @@ export function JobPreview({ resume, onDismiss, onLoadComplete }: { resume: Resu
             <Button
               variant="link"
               onClick={() => router.push(`/resume/${resume.id}`)}
-              className="flex items-center gap-0.5 text-xs"
+              className="flex items-center gap-0.5 text-sm"
             >
               View all <ChevronRight size={12} />
             </Button>
@@ -170,9 +170,9 @@ export function JobPreview({ resume, onDismiss, onLoadComplete }: { resume: Resu
                       >
                         {companyLogo(job.company)}
                       </span>
-                      <span className="truncate text-xs font-semibold">{job.title}</span>
+                      <span className="truncate text-sm font-semibold">{job.title}</span>
                     </div>
-                    <div className="mt-0.5 truncate text-xs text-muted-foreground">
+                    <div className="mt-0.5 truncate text-sm text-muted-foreground">
                       {job.company} · {job.location}
                     </div>
                   </div>
@@ -263,7 +263,7 @@ export function JobPreview({ resume, onDismiss, onLoadComplete }: { resume: Resu
                         notify({ message: `Bookmarked: ${job.title}`, type: 'success' })
                       }
                     }}
-                    className="flex items-center gap-0.5 px-1.5 py-0.5 text-[10px]"
+                    className="flex items-center gap-0.5 px-2 py-1 text-xs"
                   >
                     <Bookmark size={9} fill={bm ? 'currentColor' : 'none'} />
                   </Button>
@@ -277,7 +277,7 @@ export function JobPreview({ resume, onDismiss, onLoadComplete }: { resume: Resu
                       }
                       router.push('/ats')
                     }}
-                    className="flex items-center gap-0.5 px-1.5 py-0.5 text-[10px]"
+                    className="flex items-center gap-0.5 px-2 py-1 text-xs"
                   >
                     <span>🎯 ATS Fit</span>
                   </Button>
@@ -286,14 +286,14 @@ export function JobPreview({ resume, onDismiss, onLoadComplete }: { resume: Resu
                     onClick={() => {
                       router.push(`/interview?company=${encodeURIComponent(job.company)}&role=${encodeURIComponent(job.title)}`)
                     }}
-                    className="flex items-center gap-0.5 px-1.5 py-0.5 text-[10px]"
+                    className="flex items-center gap-0.5 px-2 py-1 text-xs"
                   >
                     <Brain size={9} /> Interview
                   </Button>
                   <Button
                     variant="default"
                     onClick={() => setPanelJob(scoredJobToPipelineJob(job, resume.skills || []))}
-                    className="ml-auto flex items-center gap-0.5 px-1.5 py-0.5 text-[10px] font-medium"
+                    className="ml-auto flex items-center gap-0.5 px-2 py-1 text-xs font-medium"
                   >
                     Details <ChevronRight size={8} />
                   </Button>
@@ -308,7 +308,7 @@ export function JobPreview({ resume, onDismiss, onLoadComplete }: { resume: Resu
           <Button
             variant="outline"
             onClick={() => router.push(`/resume/${resume.id}`)}
-            className="mt-2 flex w-full items-center justify-center gap-1 border-dashed py-1.5 text-xs"
+            className="mt-2 flex w-full items-center justify-center gap-1 border-dashed py-2 text-sm"
           >
             +{jobs.length - 5} more jobs · View all <ChevronRight size={11} />
           </Button>

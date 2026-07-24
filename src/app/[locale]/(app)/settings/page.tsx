@@ -275,7 +275,7 @@ export default function SettingsPage() {
         {/* Header */}
         <div className="mb-6">
           <h1 className="text-lg font-semibold">Settings</h1>
-          <div className="text-xs text-muted-foreground">Manage your account and preferences</div>
+          <div className="text-sm text-muted-foreground">Manage your account and preferences</div>
         </div>
 
         {/* Tabs */}
@@ -290,7 +290,7 @@ export default function SettingsPage() {
                 }
                 setTab(t)
               }}
-              className={`flex items-center gap-1.5 border-b-2 px-4 pb-2.5 text-xs font-medium transition-colors ${
+              className={`flex items-center gap-1.5 border-b-2 px-4 pb-2.5 text-sm font-medium transition-colors ${
                 tab === t
                   ? 'border-foreground text-foreground'
                   : 'border-transparent text-muted-foreground hover:text-foreground'
@@ -313,12 +313,12 @@ export default function SettingsPage() {
           <div className="space-y-5">
             {/* Name */}
             <div className="rounded-sm neuro-card p-4">
-              <div className="mb-3 text-xs font-medium">Display Name</div>
+              <div className="mb-3 text-sm font-medium">Display Name</div>
               <div className="flex gap-2">
                 <Input
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  className="flex-1 rounded-sm text-xs px-3 py-1.5"
+                  className="flex-1 rounded-sm text-sm px-3 py-2"
                   placeholder="Your name"
                   neumorphic
                 />
@@ -326,7 +326,7 @@ export default function SettingsPage() {
                   onClick={handleUpdateName}
                   disabled={savingName || name === user?.name}
                   size="sm"
-                  className="rounded-sm text-xs px-3"
+                  className="rounded-sm text-sm px-3"
                 >
                   {savingName ? <Loader2 size={13} className="animate-spin" /> : 'Save'}
                 </Button>
@@ -335,12 +335,12 @@ export default function SettingsPage() {
 
             {/* Email */}
             <div className="rounded-sm neuro-card p-4">
-              <div className="mb-3 text-xs font-medium">Email Address</div>
+              <div className="mb-3 text-sm font-medium">Email Address</div>
               <div className="flex gap-2">
                 <Input
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="flex-1 rounded-sm text-xs px-3 py-1.5"
+                  className="flex-1 rounded-sm text-sm px-3 py-2"
                   placeholder="email@example.com"
                   type="email"
                   neumorphic
@@ -349,7 +349,7 @@ export default function SettingsPage() {
                   onClick={handleUpdateEmail}
                   disabled={savingEmail || email === user?.email || !email.trim()}
                   size="sm"
-                  className="rounded-sm text-xs px-3"
+                  className="rounded-sm text-sm px-3"
                 >
                   {savingEmail ? <Loader2 size={13} className="animate-spin" /> : 'Update'}
                 </Button>
@@ -363,7 +363,7 @@ export default function SettingsPage() {
 
             {/* My Area */}
             <div className="rounded-sm neuro-card p-4">
-              <div className="mb-1 text-xs font-medium">My Area</div>
+              <div className="mb-1 text-sm font-medium">My Area</div>
               <p className="mb-3 text-[10px] text-muted-foreground">
                 District or neighborhood is enough — we use this for commute
                 directions and living cost estimates. Not your exact address.
@@ -373,7 +373,7 @@ export default function SettingsPage() {
                   value={homeLocation}
                   onChange={(e) => setHomeLocation(e.target.value)}
                   onKeyDown={(e) => { if (e.key === 'Enter') handleSaveHomeLocation() }}
-                  className="flex-1 rounded-sm text-xs px-3 py-1.5"
+                  className="flex-1 rounded-sm text-sm px-3 py-2"
                   placeholder="e.g. Bang Na, Bangkok"
                   neumorphic
                 />
@@ -381,7 +381,7 @@ export default function SettingsPage() {
                   onClick={handleSaveHomeLocation}
                   disabled={savingHomeLocation}
                   size="sm"
-                  className="shrink-0 rounded-sm text-xs px-3"
+                  className="shrink-0 rounded-sm text-sm px-3"
                 >
                   {savingHomeLocation ? <Loader2 size={13} className="animate-spin" /> : 'Save'}
                 </Button>
@@ -390,7 +390,7 @@ export default function SettingsPage() {
                 variant="link"
                 onClick={handleDetectLocation}
                 disabled={detectingLocation}
-                className="mt-2 flex items-center gap-1.5 text-xs h-auto p-0 disabled:opacity-50"
+                className="mt-2 flex items-center gap-1.5 text-sm h-auto p-0 disabled:opacity-50"
               >
                 {detectingLocation ? <Loader2 size={12} className="animate-spin" /> : <LocateFixed size={12} />}
                 {detectingLocation ? 'Detecting…' : 'Use my current location'}
@@ -399,14 +399,14 @@ export default function SettingsPage() {
 
             {/* Change Password */}
             <div className="rounded-sm neuro-card p-4">
-              <div className="mb-3 text-xs font-medium">Change Password</div>
+              <div className="mb-3 text-sm font-medium">Change Password</div>
               <div className="space-y-2.5">
                 <div className="relative">
                   <Input
                     value={currentPassword}
                     onChange={(e) => setCurrentPassword(e.target.value)}
                     type={showCurrent ? 'text' : 'password'}
-                    className="w-full rounded-sm text-xs px-3 py-1.5 pr-8"
+                    className="w-full rounded-sm text-sm px-3 py-2 pr-8"
                     placeholder="Current password"
                     neumorphic
                   />
@@ -425,7 +425,7 @@ export default function SettingsPage() {
                     value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
                     type={showNew ? 'text' : 'password'}
-                    className="w-full rounded-sm text-xs px-3 py-1.5 pr-8"
+                    className="w-full rounded-sm text-sm px-3 py-2 pr-8"
                     placeholder="New password (min 8 chars)"
                     neumorphic
                   />
@@ -443,7 +443,7 @@ export default function SettingsPage() {
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   type="password"
-                  className="w-full rounded-sm text-xs px-3 py-1.5"
+                  className="w-full rounded-sm text-sm px-3 py-2"
                   placeholder="Confirm new password"
                   neumorphic
                 />
@@ -451,7 +451,7 @@ export default function SettingsPage() {
                   onClick={handleChangePassword}
                   disabled={changingPassword}
                   size="sm"
-                  className="rounded-sm text-xs px-3"
+                  className="rounded-sm text-sm px-3"
                 >
                   {changingPassword ? <Loader2 size={13} className="animate-spin" /> : 'Change Password'}
                 </Button>
@@ -460,7 +460,7 @@ export default function SettingsPage() {
 
             {/* Account info (read-only) */}
             <div className="rounded-sm neuro-card px-4 py-3">
-              <div className="flex justify-between text-xs">
+              <div className="flex justify-between text-sm">
                 <span className="text-muted-foreground">Account ID</span>
                 <span className="font-mono text-[10px]">{user?.id}</span>
               </div>
@@ -470,14 +470,14 @@ export default function SettingsPage() {
             <div className="rounded-sm neuro-card px-4 py-3">
               <div className="flex items-center justify-between">
                 <div>
-                  <div className="text-xs font-medium">Theme</div>
-                  <div className="text-xs text-muted-foreground">Light or dark mode</div>
+                  <div className="text-sm font-medium">Theme</div>
+                  <div className="text-sm text-muted-foreground">Light or dark mode</div>
                 </div>
                 <Button
                   variant="outline"
                   onClick={toggle}
                   size="sm"
-                  className="flex items-center gap-1.5 rounded-sm text-xs"
+                  className="flex items-center gap-1.5 rounded-sm text-sm"
                 >
                   {theme === 'dark' ? <Sun size={13} /> : <Moon size={13} />}
                   Toggle
@@ -497,8 +497,8 @@ export default function SettingsPage() {
             ].map((item) => (
               <div key={item.key} className="flex items-center justify-between border-b border-border/50 px-4 py-3 last:border-b-0">
                 <div>
-                  <div className="text-xs font-medium">{item.label}</div>
-                  <div className="text-xs text-muted-foreground">{item.desc}</div>
+                  <div className="text-sm font-medium">{item.label}</div>
+                  <div className="text-sm text-muted-foreground">{item.desc}</div>
                 </div>
                 <button
                   role="switch"
@@ -522,19 +522,19 @@ export default function SettingsPage() {
         {/* ── DANGER ZONE TAB ── */}
         {tab === 'danger' && (
           <div className="rounded-sm border border-red-500/30 bg-red-500/5 p-4">
-            <div className="mb-1 flex items-center gap-1.5 text-xs font-medium text-red-600 dark:text-red-400">
+            <div className="mb-1 flex items-center gap-1.5 text-sm font-medium text-red-600 dark:text-red-400">
               <AlertTriangle size={13} />
               Danger Zone
             </div>
-            <div className="mb-4 text-xs text-muted-foreground">
+            <div className="mb-4 text-sm text-muted-foreground">
               Permanently delete your account and all associated data. This action cannot be undone.
             </div>
-            <div className="mb-3 text-xs font-medium">Type DELETE to confirm</div>
+            <div className="mb-3 text-sm font-medium">Type DELETE to confirm</div>
             <div className="flex gap-2">
               <Input
                 value={confirmDelete}
                 onChange={(e) => setConfirmDelete(e.target.value)}
-                className="flex-1 rounded-sm text-xs px-3 py-1.5 border-red-500/30 focus:border-red-500/50"
+                className="flex-1 rounded-sm text-sm px-3 py-2 border-red-500/30 focus:border-red-500/50"
                 placeholder="Type DELETE"
                 neumorphic
               />
@@ -543,7 +543,7 @@ export default function SettingsPage() {
                 onClick={handleDeleteAccount}
                 disabled={confirmDelete !== 'DELETE' || deleting}
                 size="sm"
-                className="rounded-sm text-xs px-3"
+                className="rounded-sm text-sm px-3"
               >
                 {deleting ? <Loader2 size={13} className="animate-spin" /> : 'Delete Account'}
               </Button>

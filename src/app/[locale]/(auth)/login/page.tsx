@@ -81,24 +81,24 @@ function LoginForm() {
             <h1 className="text-2xl text-foreground font-display">
               Welcome back
             </h1>
-            <p className="mt-1 text-xs text-muted-foreground">Sign in to your account</p>
+            <p className="mt-2 text-sm text-muted-foreground">Sign in to your account</p>
           </div>
 
           <form onSubmit={handleLogin} className="mt-6 space-y-3.5">
             {resetSuccess && (
-              <div className="rounded-md border border-success/30 bg-success/5 px-3 py-2 text-xs text-success">
+              <div className="rounded-md border border-success/30 bg-success/5 px-3 py-2 text-sm text-success">
                 Password reset successfully. Sign in with your new password.
               </div>
             )}
 
             {error && (
-              <div className="rounded-md border border-destructive/30 bg-destructive/5 px-3 py-2 text-xs text-destructive">
+              <div className="rounded-md border border-destructive/30 bg-destructive/5 px-3 py-2 text-sm text-destructive">
                 {error}
               </div>
             )}
 
             <div>
-              <label className="mb-1 block font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
+              <label className="mb-1.5 block font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
                 Email
               </label>
               <Input
@@ -114,12 +114,12 @@ function LoginForm() {
 
             <div>
               <div className="flex items-center justify-between">
-                <label className="mb-1 block font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
+                <label className="mb-1.5 block font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
                   Password
                 </label>
                 <Link
                   href="/forgot-password"
-                  className="mb-1 cursor-pointer text-[10px] font-medium text-primary hover:opacity-80"
+                  className="mb-1.5 cursor-pointer text-[10px] font-medium text-primary hover:opacity-80"
                 >
                   Forgot password?
                 </Link>
@@ -172,7 +172,7 @@ function LoginForm() {
             </span>
           </Button>
 
-          <p className="mt-5 text-center text-xs text-muted-foreground">
+          <p className="mt-6 text-center text-sm text-muted-foreground">
             Don&apos;t have an account?{' '}
             <Link href="/register" className="cursor-pointer font-medium text-primary hover:opacity-80">
               Sign up

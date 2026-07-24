@@ -258,8 +258,8 @@ export default function StandaloneCoverLetterPage() {
       <div className="w-full lg:w-[400px] shrink-0 border-b lg:border-b-0 lg:border-r border-border neuro-surface p-5 flex flex-col gap-4 overflow-y-auto justify-between">
         <div className="space-y-4">
           <div className="text-center pb-2 border-b border-border/50">
-            <h1 className="text-sm font-semibold tracking-tight text-foreground">{t('generatorTitle')}</h1>
-            <p className="text-xs text-muted-foreground mt-0.5">{t('generatorSubtitle')}</p>
+            <h1 className="text-base font-semibold tracking-tight text-foreground">{t('generatorTitle')}</h1>
+            <p className="text-sm text-muted-foreground mt-0.5">{t('generatorSubtitle')}</p>
           </div>
 
           {/* 1. Resume selection */}
@@ -272,7 +272,7 @@ export default function StandaloneCoverLetterPage() {
                   setSelectedResumeId(e.target.value)
                   if (e.target.value !== 'none') setActiveResumeId(e.target.value)
                 }}
-                className="min-w-0 flex-1 cursor-pointer rounded-lg neuro-inset px-3 py-2 text-xs font-medium text-foreground outline-none focus-visible:ring-2 focus-visible:ring-primary/30"
+                className="min-w-0 flex-1 cursor-pointer rounded-lg neuro-inset px-3 py-2 text-sm font-medium text-foreground outline-none focus-visible:ring-2 focus-visible:ring-primary/30"
               >
                 <option value="none">{t('selectProfilePlaceholder')}</option>
                 {resumes.map((r) => (
@@ -284,7 +284,7 @@ export default function StandaloneCoverLetterPage() {
               <Button
                 onClick={() => fileInputRef.current?.click()}
                 disabled={parsing}
-                className="flex items-center gap-1 rounded-xs text-xs font-medium disabled:opacity-50"
+                className="flex items-center gap-1 rounded-xs text-sm font-medium disabled:opacity-50"
               >
                 {parsing ? (
                   <Loader2 size={12} className="animate-spin text-primary" />
@@ -303,7 +303,7 @@ export default function StandaloneCoverLetterPage() {
             <div className="flex gap-1.5 rounded-sm neuro-inset p-0.5 shrink-0">
               <button
                 onClick={() => setMode('quick')}
-                className={`flex-1 rounded-xs py-1 text-[10px] font-semibold transition-all cursor-pointer text-center ${
+                className={`flex-1 rounded-xs py-1.5 text-xs font-semibold transition-all cursor-pointer text-center ${
                   mode === 'quick' ? 'neuro-card text-foreground font-semibold' : 'text-muted-foreground hover:text-foreground'
                 }`}
               >
@@ -311,7 +311,7 @@ export default function StandaloneCoverLetterPage() {
               </button>
               <button
                 onClick={() => setMode('jd')}
-                className={`flex-1 rounded-xs py-1 text-[10px] font-semibold transition-all cursor-pointer text-center ${
+                className={`flex-1 rounded-xs py-1.5 text-xs font-semibold transition-all cursor-pointer text-center ${
                   mode === 'jd' ? 'neuro-card text-foreground font-semibold' : 'text-muted-foreground hover:text-foreground'
                 }`}
               >
@@ -326,7 +326,7 @@ export default function StandaloneCoverLetterPage() {
             <div className="flex gap-1.5 rounded-sm neuro-inset p-0.5 shrink-0">
               <button
                 onClick={() => setOutputLanguage('en')}
-                className={`flex-1 rounded-xs py-1 text-[10px] font-semibold transition-all cursor-pointer text-center ${
+                className={`flex-1 rounded-xs py-1.5 text-xs font-semibold transition-all cursor-pointer text-center ${
                   outputLanguage === 'en' ? 'neuro-card text-foreground font-semibold' : 'text-muted-foreground hover:text-foreground'
                 }`}
               >
@@ -334,7 +334,7 @@ export default function StandaloneCoverLetterPage() {
               </button>
               <button
                 onClick={() => setOutputLanguage('th')}
-                className={`flex-1 rounded-xs py-1 text-[10px] font-semibold transition-all cursor-pointer text-center ${
+                className={`flex-1 rounded-xs py-1.5 text-xs font-semibold transition-all cursor-pointer text-center ${
                   outputLanguage === 'th' ? 'neuro-card text-foreground font-semibold' : 'text-muted-foreground hover:text-foreground'
                 }`}
               >
@@ -389,7 +389,7 @@ export default function StandaloneCoverLetterPage() {
                 onChange={(e) => setJdText(e.target.value)}
                 placeholder="Paste full target job description here..."
                 rows={10}
-                className="w-full resize-none rounded-xs text-xs px-2.5 py-1.5 font-sans"
+                className="w-full resize-none rounded-xs text-sm px-3 py-2.5 font-sans"
               />
             </div>
           )}
@@ -411,7 +411,7 @@ export default function StandaloneCoverLetterPage() {
                 onClick={() => handleLoadSaved(letter)}
               >
                 <div className="flex-1 min-w-0">
-                  <div className="text-xs font-medium text-foreground truncate">
+                  <div className="text-sm font-medium text-foreground truncate">
                     {letter.company || letter.role || 'Untitled'}
                   </div>
                   <div className="font-mono text-[10px] text-muted-foreground">
@@ -444,7 +444,7 @@ export default function StandaloneCoverLetterPage() {
             (mode === 'quick' && (!company || !role)) ||
             (mode === 'jd' && !jdText)
           }
-          className="w-full rounded-sm py-2 text-xs font-semibold tracking-wide uppercase active:scale-[0.98] shadow-sm mt-6"
+          className="w-full rounded-sm py-2.5 text-sm font-semibold tracking-wide uppercase active:scale-[0.98] shadow-sm mt-6"
         >
           {generating ? (
             <>
@@ -463,7 +463,7 @@ export default function StandaloneCoverLetterPage() {
         {/* Actions bar */}
         <div className="flex shrink-0 items-center justify-between border-b border-border neuro-surface px-4 md:px-6 py-2.5">
           <div className="flex items-center gap-2">
-            <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Document Preview</span>
+            <span className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">Document Preview</span>
           </div>
           <div className="flex gap-2">
             <Button
@@ -471,7 +471,7 @@ export default function StandaloneCoverLetterPage() {
               onClick={handleSave}
               disabled={!letterText || selectedResumeId === 'none'}
               size="sm"
-              className="flex items-center gap-1 rounded-sm text-xs"
+              className="flex items-center gap-1 rounded-sm text-sm"
             >
               <Save size={11} /> Save Letter
             </Button>
@@ -480,7 +480,7 @@ export default function StandaloneCoverLetterPage() {
               onClick={handleCopy}
               disabled={!letterText}
               size="sm"
-              className="flex items-center gap-1 rounded-sm text-xs"
+              className="flex items-center gap-1 rounded-sm text-sm"
             >
               <Copy size={11} /> Copy Text
             </Button>
@@ -488,7 +488,7 @@ export default function StandaloneCoverLetterPage() {
               onClick={() => window.open(`/api/export/pdf?id=${selectedResumeId}&type=cover-letter`, '_blank')}
               disabled={!letterText || selectedResumeId === 'none'}
               size="sm"
-              className="flex items-center gap-1 rounded-sm text-xs font-medium"
+              className="flex items-center gap-1 rounded-sm text-sm font-medium"
             >
               <Download size={11} /> Export PDF
             </Button>
@@ -516,7 +516,7 @@ export default function StandaloneCoverLetterPage() {
                 value={letterText}
                 onChange={(e) => setLetterText(e.target.value)}
                 placeholder="Your cover letter text will appear here..."
-                className="w-full flex-1 min-h-[600px] bg-transparent resize-none border-0 outline-none text-foreground font-sans text-xs focus:ring-0 leading-relaxed p-0"
+                className="w-full flex-1 min-h-[600px] bg-transparent resize-none border-0 outline-none text-foreground font-sans text-sm focus:ring-0 leading-relaxed p-0"
               />
             </div>
           ) : (
@@ -525,7 +525,7 @@ export default function StandaloneCoverLetterPage() {
                 <FileText size={24} />
               </div>
               <h3 className="mb-1 text-sm font-semibold text-foreground">No Cover Letter Generated</h3>
-              <p className="text-xs text-muted-foreground">
+              <p className="text-sm text-muted-foreground">
                 Select or upload a resume on the left, type the target company and position details, and click Generate to write your letter.
               </p>
             </div>

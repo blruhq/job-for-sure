@@ -194,7 +194,7 @@ export function JobDetailPanel({
           <div className="flex items-start justify-between gap-3">
             <div className="min-w-0 flex-1">
               <SheetTitle className="text-base">{job.title}</SheetTitle>
-              <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+              <div className="mt-1 flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
                 <span className="font-medium text-foreground">{job.company}</span>
                 <span>·</span>
                 <span className="flex items-center gap-1">
@@ -259,7 +259,7 @@ export function JobDetailPanel({
             <div>
               <div className="label-mono mb-1.5">Status</div>
               <Select value={status} onValueChange={(v) => handleStatusChange(v || 'bookmarked')}>
-                <SelectTrigger className="w-full rounded-xs px-2 py-1.5 text-xs">
+                <SelectTrigger className="w-full rounded-xs px-3 py-2 text-sm">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>

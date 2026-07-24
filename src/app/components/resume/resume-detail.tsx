@@ -90,7 +90,7 @@ function TagInput({ tags, onChange, placeholder }: { tags: string[]; onChange: (
   }, [input, tags, onChange])
 
   return (
-    <div className="flex min-h-[34px] flex-wrap items-center gap-1 rounded-xs neuro-inset px-2.5 py-1.5 text-xs">
+    <div className="flex min-h-[34px] flex-wrap items-center gap-1 rounded-xs neuro-inset px-3 py-2 text-sm">
       {tags.map((tag) => (
         <span key={tag} className="flex items-center gap-0.5 rounded-xs bg-primary/10 px-1.5 py-0.5 text-[10px] font-medium text-primary">
           {tag}
@@ -114,7 +114,7 @@ function TagInput({ tags, onChange, placeholder }: { tags: string[]; onChange: (
         }}
         onBlur={addTag}
         placeholder={tags.length === 0 ? (placeholder || 'Type and press Enter') : ''}
-        className="min-w-[80px] flex-1 border-none bg-transparent text-xs shadow-none placeholder:text-muted-foreground/50"
+        className="min-w-[80px] flex-1 border-none bg-transparent text-sm shadow-none placeholder:text-muted-foreground/50"
       />
     </div>
   )
@@ -279,7 +279,7 @@ function SectionSuggestionBanner({
   if (suggestions.length === 0) return null
   return (
     <div className="mb-3 rounded-xs border border-primary/20 bg-primary/5 p-2.5">
-      <div className="mb-1.5 flex items-center gap-1.5 text-xs font-medium text-primary">
+      <div className="mb-1.5 flex items-center gap-1.5 text-sm font-medium text-primary">
         <Lightbulb size={13} />
         Suggestions for your role
       </div>
@@ -500,37 +500,37 @@ export function ResumeDetail({ resumeId }: { resumeId: string }) {
             <div className="flex gap-3">
               <div className="flex-1">
                 <label className="label-mono mb-1 block">Resume Name</label>
-                <Input value={name} onChange={(e) => setName(e.target.value)} className="w-full rounded-xs px-2.5 py-1.5 text-xs" neumorphic />
+                <Input value={name} onChange={(e) => setName(e.target.value)} className="w-full rounded-xs px-3 py-2 text-sm" neumorphic />
               </div>
               <div className="flex-1">
                 <label className="label-mono mb-1 block">Full Name</label>
-                <Input value={persona} onChange={(e) => setPersona(e.target.value)} className="w-full rounded-xs px-2.5 py-1.5 text-xs" neumorphic />
+                <Input value={persona} onChange={(e) => setPersona(e.target.value)} className="w-full rounded-xs px-3 py-2 text-sm" neumorphic />
               </div>
             </div>
             <div className="flex gap-3 mt-3">
               <div className="flex-1">
                 <label className="label-mono mb-1 block">Email</label>
-                <Input value={email} onChange={(e) => setEmail(e.target.value)} className="w-full rounded-xs px-2.5 py-1.5 text-xs" neumorphic />
+                <Input value={email} onChange={(e) => setEmail(e.target.value)} className="w-full rounded-xs px-3 py-2 text-sm" neumorphic />
               </div>
               <div className="flex-1">
                 <label className="label-mono mb-1 block">Phone</label>
-                <Input value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="+1 555-0123" className="w-full rounded-xs px-2.5 py-1.5 text-xs" neumorphic />
+                <Input value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="+1 555-0123" className="w-full rounded-xs px-3 py-2 text-sm" neumorphic />
               </div>
             </div>
             <div className="flex gap-3 mt-3">
               <div className="flex-1">
                 <label className="label-mono mb-1 block">Location</label>
-                <Input value={location} onChange={(e) => setLocation(e.target.value)} className="w-full rounded-xs px-2.5 py-1.5 text-xs" neumorphic />
+                <Input value={location} onChange={(e) => setLocation(e.target.value)} className="w-full rounded-xs px-3 py-2 text-sm" neumorphic />
               </div>
               <div className="flex-1">
                 <label className="label-mono mb-1 block">GitHub / Portfolio</label>
-                <Input value={github} onChange={(e) => setGithub(e.target.value)} placeholder="https://github.com/..." className="w-full rounded-xs px-2.5 py-1.5 text-xs" neumorphic />
+                <Input value={github} onChange={(e) => setGithub(e.target.value)} placeholder="https://github.com/..." className="w-full rounded-xs px-3 py-2 text-sm" neumorphic />
               </div>
             </div>
             <div className="flex gap-3 mt-3">
               <div className="flex-1">
                 <label className="label-mono mb-1 block">Headline / Target Role</label>
-                <Input value={role} onChange={(e) => setRole(e.target.value)} placeholder="e.g. Software Engineer (shown under your name on PDF)" className="w-full rounded-xs px-2.5 py-1.5 text-xs" neumorphic />
+                <Input value={role} onChange={(e) => setRole(e.target.value)} placeholder="e.g. Software Engineer (shown under your name on PDF)" className="w-full rounded-xs px-3 py-2 text-sm" neumorphic />
               </div>
             </div>
           </>
@@ -539,7 +539,7 @@ export function ResumeDetail({ resumeId }: { resumeId: string }) {
         return (
           <div>
             <label className="label-mono mb-1 block">Professional Summary</label>
-            <Textarea value={summary} onChange={(e) => setSummary(e.target.value)} rows={3} className="w-full resize-y rounded-xs px-2.5 py-1.5 text-xs" neumorphic />
+            <Textarea value={summary} onChange={(e) => setSummary(e.target.value)} rows={3} className="w-full resize-y rounded-xs px-3 py-2 text-sm" neumorphic />
           </div>
         )
       case 'skills':
@@ -561,16 +561,16 @@ export function ResumeDetail({ resumeId }: { resumeId: string }) {
                 <div className="flex gap-2">
                 <div className="flex-1">
                   <label className="label-mono mb-0.5 block text-[10px]">Company</label>
-                  <Input value={exp.company} onChange={(e) => update({ ...exp, company: e.target.value })} className="w-full rounded-xs px-2 py-1 text-xs" neumorphic />
+                  <Input value={exp.company} onChange={(e) => update({ ...exp, company: e.target.value })} className="w-full rounded-xs px-3 py-2 text-sm" neumorphic />
                 </div>
                 <div className="flex-1">
                   <label className="label-mono mb-0.5 block text-[10px]">Role</label>
-                  <Input value={exp.role} onChange={(e) => update({ ...exp, role: e.target.value })} className="w-full rounded-xs px-2 py-1 text-xs" neumorphic />
+                  <Input value={exp.role} onChange={(e) => update({ ...exp, role: e.target.value })} className="w-full rounded-xs px-3 py-2 text-sm" neumorphic />
                 </div>
               </div>
               <div>
                 <label className="label-mono mb-0.5 block text-[10px]">Dates</label>
-                <Input value={exp.dates} onChange={(e) => update({ ...exp, dates: e.target.value })} placeholder="Jun 2020 — Present" className="w-full rounded-xs px-2 py-1 text-xs" neumorphic />
+                <Input value={exp.dates} onChange={(e) => update({ ...exp, dates: e.target.value })} placeholder="Jun 2020 — Present" className="w-full rounded-xs px-3 py-2 text-sm" neumorphic />
               </div>
               <div>
                 <label className="label-mono mb-0.5 block text-[10px]">Highlights (one per line)</label>
@@ -578,7 +578,7 @@ export function ResumeDetail({ resumeId }: { resumeId: string }) {
                   value={exp.bullets.join('\n')}
                   onChange={(e) => update({ ...exp, bullets: e.target.value.split('\n').filter(Boolean) })}
                   rows={3}
-                  className="w-full resize-y rounded-xs px-2 py-1 text-xs"
+                  className="w-full resize-y rounded-xs px-3 py-2 text-sm"
                   neumorphic
                 />
                 </div>
@@ -598,21 +598,21 @@ export function ResumeDetail({ resumeId }: { resumeId: string }) {
                 <div className="flex gap-2">
                   <div className="flex-1">
                   <label className="label-mono mb-0.5 block text-[10px]">Institution</label>
-                  <Input value={edu.institution} onChange={(e) => update({ ...edu, institution: e.target.value })} className="w-full rounded-xs px-2 py-1 text-xs" neumorphic />
+                  <Input value={edu.institution} onChange={(e) => update({ ...edu, institution: e.target.value })} className="w-full rounded-xs px-3 py-2 text-sm" neumorphic />
                 </div>
                 <div className="flex-1">
                   <label className="label-mono mb-0.5 block text-[10px]">Degree</label>
-                  <Input value={edu.degree} onChange={(e) => update({ ...edu, degree: e.target.value })} placeholder="BS, MBA, PhD" className="w-full rounded-xs px-2 py-1 text-xs" neumorphic />
+                  <Input value={edu.degree} onChange={(e) => update({ ...edu, degree: e.target.value })} placeholder="BS, MBA, PhD" className="w-full rounded-xs px-3 py-2 text-sm" neumorphic />
                 </div>
               </div>
               <div className="flex gap-2">
                 <div className="flex-1">
                   <label className="label-mono mb-0.5 block text-[10px]">Field of Study</label>
-                  <Input value={edu.field} onChange={(e) => update({ ...edu, field: e.target.value })} className="w-full rounded-xs px-2 py-1 text-xs" neumorphic />
+                  <Input value={edu.field} onChange={(e) => update({ ...edu, field: e.target.value })} className="w-full rounded-xs px-3 py-2 text-sm" neumorphic />
                 </div>
                 <div className="flex-1">
                   <label className="label-mono mb-0.5 block text-[10px]">Dates</label>
-                  <Input value={edu.dates} onChange={(e) => update({ ...edu, dates: e.target.value })} placeholder="2018 — 2022" className="w-full rounded-xs px-2 py-1 text-xs" neumorphic />
+                  <Input value={edu.dates} onChange={(e) => update({ ...edu, dates: e.target.value })} placeholder="2018 — 2022" className="w-full rounded-xs px-3 py-2 text-sm" neumorphic />
                 </div>
               </div>
               </div>
@@ -630,7 +630,7 @@ export function ResumeDetail({ resumeId }: { resumeId: string }) {
               <div className="flex flex-col gap-2">
                 <div>
                   <label className="label-mono mb-0.5 block text-[10px]">Project Name</label>
-                  <Input value={proj.name} onChange={(e) => update({ ...proj, name: e.target.value })} className="w-full rounded-xs px-2 py-1 text-xs" neumorphic />
+                  <Input value={proj.name} onChange={(e) => update({ ...proj, name: e.target.value })} className="w-full rounded-xs px-3 py-2 text-sm" neumorphic />
                 </div>
                 <div>
                   <label className="label-mono mb-0.5 block text-[10px]">Description</label>
@@ -638,7 +638,7 @@ export function ResumeDetail({ resumeId }: { resumeId: string }) {
                     value={proj.description}
                     onChange={(e) => update({ ...proj, description: e.target.value })}
                     rows={2}
-                    className="w-full resize-y rounded-xs px-2 py-1 text-xs" neumorphic
+                    className="w-full resize-y rounded-xs px-3 py-2 text-sm" neumorphic
                   />
                 </div>
                 <div className="flex gap-2">
@@ -652,7 +652,7 @@ export function ResumeDetail({ resumeId }: { resumeId: string }) {
                 </div>
                 <div className="flex-1">
                   <label className="label-mono mb-0.5 block text-[10px]">Link</label>
-                  <Input value={proj.link} onChange={(e) => update({ ...proj, link: e.target.value })} placeholder="https://..." className="w-full rounded-xs px-2 py-1 text-xs" neumorphic />
+                  <Input value={proj.link} onChange={(e) => update({ ...proj, link: e.target.value })} placeholder="https://..." className="w-full rounded-xs px-3 py-2 text-sm" neumorphic />
                   </div>
                 </div>
               </div>
@@ -671,16 +671,16 @@ export function ResumeDetail({ resumeId }: { resumeId: string }) {
                 <div className="flex gap-2">
                   <div className="flex-1">
                     <label className="label-mono mb-0.5 block text-[10px]">Name</label>
-                    <Input value={cert.name} onChange={(e) => update({ ...cert, name: e.target.value })} placeholder="AWS Solutions Architect" className="w-full rounded-xs px-2 py-1 text-xs" neumorphic />
+                    <Input value={cert.name} onChange={(e) => update({ ...cert, name: e.target.value })} placeholder="AWS Solutions Architect" className="w-full rounded-xs px-3 py-2 text-sm" neumorphic />
                   </div>
                   <div className="flex-1">
                     <label className="label-mono mb-0.5 block text-[10px]">Issuer</label>
-                    <Input value={cert.issuer} onChange={(e) => update({ ...cert, issuer: e.target.value })} placeholder="Amazon Web Services" className="w-full rounded-xs px-2 py-1 text-xs" neumorphic />
+                    <Input value={cert.issuer} onChange={(e) => update({ ...cert, issuer: e.target.value })} placeholder="Amazon Web Services" className="w-full rounded-xs px-3 py-2 text-sm" neumorphic />
                   </div>
                 </div>
                 <div>
                   <label className="label-mono mb-0.5 block text-[10px]">Date</label>
-                  <Input value={cert.date} onChange={(e) => update({ ...cert, date: e.target.value })} placeholder="2024" className="w-full rounded-xs px-2 py-1 text-xs" neumorphic />
+                  <Input value={cert.date} onChange={(e) => update({ ...cert, date: e.target.value })} placeholder="2024" className="w-full rounded-xs px-3 py-2 text-sm" neumorphic />
                 </div>
               </div>
             )}
@@ -697,12 +697,12 @@ export function ResumeDetail({ resumeId }: { resumeId: string }) {
                 <div className="flex gap-2">
                   <div className="flex-1">
                     <label className="label-mono mb-0.5 block text-[10px]">Language</label>
-                    <Input value={lang.name} onChange={(e) => update({ ...lang, name: e.target.value })} className="w-full rounded-xs px-2 py-1 text-xs" neumorphic />
+                    <Input value={lang.name} onChange={(e) => update({ ...lang, name: e.target.value })} className="w-full rounded-xs px-3 py-2 text-sm" neumorphic />
                   </div>
                   <div className="flex-1">
                     <label className="label-mono mb-0.5 block text-[10px]">Proficiency</label>
                     <Select value={lang.proficiency || ''} onValueChange={(v) => update({ ...lang, proficiency: v || '' })}>
-                      <SelectTrigger className="w-full rounded-xs px-2 py-1 text-xs">
+                      <SelectTrigger className="w-full rounded-xs px-3 py-2 text-sm">
                         <SelectValue placeholder="Select..." />
                       </SelectTrigger>
                       <SelectContent>
@@ -732,7 +732,7 @@ export function ResumeDetail({ resumeId }: { resumeId: string }) {
               value={sec.title}
               onChange={(e) => setCustomSections(customSections.map((s) => s.id === csId ? { ...s, title: e.target.value } : s))}
               placeholder="Section Title"
-              className="flex-1 rounded-xs px-2 py-1 text-xs font-medium"
+              className="flex-1 rounded-xs px-3 py-2 text-sm font-medium"
               neumorphic
             />
           </div>
@@ -743,7 +743,7 @@ export function ResumeDetail({ resumeId }: { resumeId: string }) {
               value={sec.bullets?.join('\n') || ''}
               onChange={(e) => setCustomSections(customSections.map((s) => s.id === csId ? { ...s, bullets: e.target.value.split('\n').filter(Boolean) } : s))}
               rows={3}
-              className="w-full resize-y rounded-xs px-2 py-1 text-xs"
+              className="w-full resize-y rounded-xs px-3 py-2 text-sm"
               neumorphic
             />
           </div>
@@ -809,7 +809,7 @@ export function ResumeDetail({ resumeId }: { resumeId: string }) {
           <Button
             variant="outline"
             onClick={() => setShowAddSectionPicker(!showAddSectionPicker)}
-            className="flex items-center gap-1 rounded-xs border-dashed px-3 py-2 text-xs w-full justify-center"
+            className="flex items-center gap-1 rounded-xs border-dashed px-3 py-2 text-sm w-full justify-center"
           >
             <PlusCircle size={13} /> Add Section
           </Button>
@@ -820,7 +820,7 @@ export function ResumeDetail({ resumeId }: { resumeId: string }) {
                   key={s}
                   variant="ghost"
                   onClick={() => { handleAddSection(s) }}
-                  className="flex w-full items-center gap-2 px-3 py-2 text-xs text-left"
+                  className="flex w-full items-center gap-2 px-3 py-2 text-sm text-left"
                 >
                   <span>{SECTION_ICONS[s]}</span>
                   <span>{SECTION_LABELS[s]}</span>
@@ -846,14 +846,14 @@ export function ResumeDetail({ resumeId }: { resumeId: string }) {
                   if (e.key === 'Escape') { setShowNewCustomInput(false); setNewCustomTitle('') }
                 }}
                 placeholder="e.g. Open Source Contributions, Volunteering, Awards"
-                className="flex-1 rounded-xs px-2.5 py-1.5 text-xs"
+                className="flex-1 rounded-xs px-3 py-2 text-sm"
                 autoFocus
                 neumorphic
               />
-              <Button variant="default" onClick={handleCreateCustomSection} className="rounded-xs px-3 py-1.5 text-xs">
+              <Button variant="default" onClick={handleCreateCustomSection} className="rounded-xs px-3 py-1.5 text-sm">
                 Add
               </Button>
-              <Button variant="outline" onClick={() => { setShowNewCustomInput(false); setNewCustomTitle('') }} className="rounded-xs px-2 py-1.5 text-xs">
+              <Button variant="outline" onClick={() => { setShowNewCustomInput(false); setNewCustomTitle('') }} className="rounded-xs px-2 py-1.5 text-sm">
                 Cancel
               </Button>
             </div>
@@ -1125,7 +1125,7 @@ export function ResumeDetail({ resumeId }: { resumeId: string }) {
       {/* Header with tabs */}
       <div className="flex shrink-0 flex-col md:flex-row md:items-center justify-between gap-2 neuro-surface px-4 md:px-6 py-3">
         <div className="flex items-center gap-2 overflow-x-auto min-w-0 max-w-full">
-          <Button variant="outline" size="sm" onClick={() => router.push('/chat')} className="flex shrink-0 items-center gap-1 rounded-sm px-2 py-1 text-xs">
+          <Button variant="outline" size="sm" onClick={() => router.push('/chat')} className="flex shrink-0 items-center gap-1 rounded-sm px-2.5 py-1.5 text-sm">
             <ArrowLeft size={12} /> Back
           </Button>
           <div className="ml-3 flex gap-1 overflow-x-auto rounded-sm neuro-inset p-0.5">
@@ -1138,7 +1138,7 @@ export function ResumeDetail({ resumeId }: { resumeId: string }) {
                   setTab(t)
                 }}
                 className={cn(
-                  'shrink-0 rounded-xs px-3 py-1 text-xs font-medium transition-all',
+                  'shrink-0 rounded-xs px-3 py-1.5 text-sm font-medium transition-all',
                   tab === t ? 'neuro-card text-foreground font-semibold' : 'text-muted-foreground',
                 )}
               >
@@ -1150,7 +1150,7 @@ export function ResumeDetail({ resumeId }: { resumeId: string }) {
         <div className="flex shrink-0 items-center gap-3">
           <h1 className="truncate text-sm font-semibold max-w-[150px] sm:max-w-xs">{resume.name}</h1>
           <span className="rounded-xs bg-success-soft px-1.5 py-0.5 font-mono text-xs font-semibold text-success">{resume.score}% Match</span>
-          <Button variant="outline" size="sm" onClick={() => setShowDeleteDialog(true)} className="flex items-center gap-1 rounded-sm px-2 py-1 text-xs text-muted-foreground hover:text-red-500 hover:border-red-500/30" title="Delete resume">
+          <Button variant="outline" size="sm" onClick={() => setShowDeleteDialog(true)} className="flex items-center gap-1 rounded-sm px-2.5 py-1.5 text-sm text-muted-foreground hover:text-red-500 hover:border-red-500/30" title="Delete resume">
             <Trash2 size={11} /> Delete
           </Button>
         </div>
@@ -1170,15 +1170,15 @@ export function ResumeDetail({ resumeId }: { resumeId: string }) {
             <div className="shrink-0 neuro-surface p-3">
               <div className="mx-auto max-w-[794px]">
                 <div className="flex items-center justify-between">
-                  <Button variant="outline" size="sm" onClick={() => setGalleryOpen(!galleryOpen)} className="flex items-center gap-1.5 rounded-sm px-2.5 py-1 text-xs font-semibold">
+                  <Button variant="outline" size="sm" onClick={() => setGalleryOpen(!galleryOpen)} className="flex items-center gap-1.5 rounded-sm px-2.5 py-1.5 text-sm font-semibold">
                     <span>Template: {getTemplateMeta(resume?.template || DEFAULT_TEMPLATE).name}</span>
                     {galleryOpen ? <ChevronUp size={12} className="text-muted-foreground" /> : <ChevronDown size={12} className="text-muted-foreground" />}
                   </Button>
                   <div className="flex gap-1.5">
-                    <Button variant="default" size="sm" onClick={() => window.open(`/api/export/pdf?id=${resume?.id}`, '_blank')} className="flex items-center gap-1 rounded-sm px-3 py-1.5 text-xs font-medium">
+                    <Button variant="default" size="sm" onClick={() => window.open(`/api/export/pdf?id=${resume?.id}`, '_blank')} className="flex items-center gap-1 rounded-sm px-3 py-2 text-sm font-medium">
                       <Eye size={11} /> Export PDF
                     </Button>
-                    <Button variant="outline" size="sm" onClick={() => notify({ message: 'DOCX export coming soon', type: 'info' })} className="flex items-center gap-1 rounded-sm px-3 py-1.5 text-xs">
+                    <Button variant="outline" size="sm" onClick={() => notify({ message: 'DOCX export coming soon', type: 'info' })} className="flex items-center gap-1 rounded-sm px-3 py-2 text-sm">
                       Export DOCX
                     </Button>
                   </div>
@@ -1226,7 +1226,7 @@ export function ResumeDetail({ resumeId }: { resumeId: string }) {
             {/* Mobile fallback */}
             <div className="lg:hidden">
               <details className="group">
-                <summary className="flex cursor-pointer items-center justify-between px-4 py-2 text-xs font-medium text-muted-foreground hover:text-foreground list-none">
+                <summary className="flex cursor-pointer items-center justify-between px-4 py-2.5 text-sm font-medium text-muted-foreground hover:text-foreground list-none">
                   <span>Preview PDF (with accepted changes)</span>
                   <ChevronDown size={14} className="transition-transform group-open:rotate-180" />
                 </summary>

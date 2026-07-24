@@ -104,7 +104,7 @@ function JobCardContent({ job }: { job: PipelineJob }) {
     <>
       <div className="flex items-start justify-between gap-1">
         <div className="min-w-0 flex-1">
-          <div className="text-xs font-semibold text-foreground line-clamp-2 break-words leading-snug">
+          <div className="text-sm font-semibold text-foreground line-clamp-2 break-words leading-snug">
             {job.title || 'Untitled Position'}
           </div>
           <div className="text-[10px] text-muted-foreground truncate mt-0.5">
@@ -122,7 +122,7 @@ function JobCardContent({ job }: { job: PipelineJob }) {
       </div>
 
       {(job.loc || job.salary) && (
-        <div className="mt-1.5 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs text-muted-foreground">
+        <div className="mt-1.5 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-sm text-muted-foreground">
           {job.loc && <span className="break-words">{job.loc}</span>}
           {job.salary && (
             <>
@@ -133,7 +133,7 @@ function JobCardContent({ job }: { job: PipelineJob }) {
         </div>
       )}
       {dateText && (
-        <div className="mt-1 text-xs text-muted-foreground/60 whitespace-nowrap">
+        <div className="mt-1 text-sm text-muted-foreground/60 whitespace-nowrap">
           {dateText}
         </div>
       )}
@@ -198,7 +198,7 @@ function InlineAddForm({ colId: _colId, onCancel, onSave, titleRef }: InlineAddF
         }}
         placeholder="Job title *"
         autoFocus
-        className="w-full rounded-xs px-2 py-1.5 text-xs placeholder:text-muted-foreground/50"
+        className="w-full rounded-xs px-3 py-2 text-sm placeholder:text-muted-foreground/50"
       />
       <Input
         neumorphic
@@ -209,7 +209,7 @@ function InlineAddForm({ colId: _colId, onCancel, onSave, titleRef }: InlineAddF
           if (e.key === 'Escape') onCancel()
         }}
         placeholder="Company *"
-        className="w-full rounded-xs px-2 py-1.5 text-xs placeholder:text-muted-foreground/50"
+        className="w-full rounded-xs px-3 py-2 text-sm placeholder:text-muted-foreground/50"
       />
       <Input
         neumorphic
@@ -220,13 +220,13 @@ function InlineAddForm({ colId: _colId, onCancel, onSave, titleRef }: InlineAddF
           if (e.key === 'Escape') onCancel()
         }}
         placeholder="Location"
-        className="w-full rounded-xs px-2 py-1.5 text-xs placeholder:text-muted-foreground/50"
+        className="w-full rounded-xs px-3 py-2 text-sm placeholder:text-muted-foreground/50"
       />
       <div className="flex items-center justify-end gap-1.5 mt-0.5">
-        <Button variant="ghost" onClick={onCancel} className="rounded-xs px-2.5 py-1 text-[10px]">
+        <Button variant="ghost" onClick={onCancel} className="rounded-xs px-2.5 py-1.5 text-xs">
           {t('cancel')}
         </Button>
-        <Button variant="default" onClick={handleSave} disabled={!title.trim() || !company.trim()} className="rounded-xs px-2.5 py-1 text-[10px]">
+        <Button variant="default" onClick={handleSave} disabled={!title.trim() || !company.trim()} className="rounded-xs px-2.5 py-1.5 text-xs">
           {t('add')}
         </Button>
       </div>
@@ -274,7 +274,7 @@ export function ApplicationsView() {
       <div className="flex h-full w-full items-center justify-center neuro-surface">
         <div className="flex flex-col items-center gap-3">
           <Loader2 size={20} className="animate-spin text-muted-foreground" />
-          <p className="text-xs text-muted-foreground">Loading applications…</p>
+          <p className="text-sm text-muted-foreground">Loading applications…</p>
         </div>
       </div>
     )
@@ -446,14 +446,14 @@ export function ApplicationsView() {
             }}
             placeholder="Paste a job URL (Indeed, Greenhouse, JobsDB...) and press Enter"
             disabled={scraping}
-            className="flex-1 rounded-xs px-2.5 py-1.5 text-xs placeholder:text-muted-foreground/50 disabled:opacity-50"
+            className="flex-1 rounded-xs px-3 py-2 text-sm placeholder:text-muted-foreground/50 disabled:opacity-50"
           />
           <Button
             size="sm"
             variant="default"
             onClick={handlePasteUrl}
             disabled={scraping || !pasteUrl.trim()}
-            className="flex shrink-0 items-center gap-1 rounded-xs px-5 text-xs"
+            className="flex shrink-0 items-center gap-1 rounded-xs px-5 text-sm"
           >
             {scraping ? (
               <>
@@ -502,7 +502,7 @@ export function ApplicationsView() {
                 <div className="flex items-center justify-between neuro-divider px-3 py-2">
                   <div className="flex items-center gap-2">
                     <span className="h-2 w-2 rounded-full" style={{ backgroundColor: col.dot }} />
-                    <span className="text-xs font-semibold text-foreground">{t(col.labelKey)}</span>
+                    <span className="text-sm font-semibold text-foreground">{t(col.labelKey)}</span>
                     <span className="text-[10px] font-mono text-muted-foreground">{jobs.length}</span>
                   </div>
                 </div>
@@ -561,7 +561,7 @@ export function ApplicationsView() {
                     <Button variant="ghost" size="sm" onClick={() => {
                         setAddingToCol(col.id)
                         setTimeout(() => addTitleRef.current?.focus(), 50)
-                      }} className="flex items-center gap-1 rounded-xs px-2 py-1.5 text-[10px]">
+                      }} className="flex items-center gap-1 rounded-xs px-2 py-2 text-xs">
                       <Plus size={12} />
                       Add Job
                     </Button>

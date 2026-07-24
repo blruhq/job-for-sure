@@ -115,7 +115,7 @@ export function TailorReviewPanel({ onApply, onCancel }: { onApply: (variant: Re
       <div className="flex shrink-0 items-center justify-between neuro-divider px-4 py-3">
         <div>
           <h2 className="text-sm font-semibold text-foreground">Review AI Changes</h2>
-          <p className="text-[10px] text-muted-foreground mt-0.5">
+          <p className="text-xs text-muted-foreground mt-0.5">
             {acceptedCount} of {totalCount} changes accepted — preview updates live
           </p>
         </div>
@@ -123,14 +123,14 @@ export function TailorReviewPanel({ onApply, onCancel }: { onApply: (variant: Re
           <Button
             variant="outline"
             onClick={handleAcceptAll}
-            className="px-2 py-1 text-[10px]"
+            className="px-2.5 py-1.5 text-xs"
           >
             Accept all
           </Button>
           <Button
             variant="outline"
             onClick={handleRejectAll}
-            className="px-2 py-1 text-[10px]"
+            className="px-2.5 py-1.5 text-xs"
           >
             Reject all
           </Button>
@@ -174,14 +174,14 @@ export function TailorReviewPanel({ onApply, onCancel }: { onApply: (variant: Re
                   <div className="space-y-1">
                     {change.before && (
                       <div className="rounded-xs bg-destructive/5 border border-destructive/10 px-2 py-1">
-                        <span className="text-[10px] text-muted-foreground line-through opacity-70">
+                        <span className="text-xs text-muted-foreground line-through opacity-70">
                           {change.before}
                         </span>
                       </div>
                     )}
                     {change.after && (
                       <div className="rounded-xs bg-success/5 border border-success/10 px-2 py-1">
-                        <span className="text-[10px] text-foreground">{change.after}</span>
+                        <span className="text-xs text-foreground">{change.after}</span>
                       </div>
                     )}
                   </div>
@@ -212,14 +212,14 @@ export function TailorReviewPanel({ onApply, onCancel }: { onApply: (variant: Re
           variant="default"
           onClick={handleApply}
           disabled={acceptedCount === 0}
-          className="flex-1 px-3 py-2 text-xs font-medium"
+          className="flex-1 px-3 py-2 text-sm font-medium"
         >
           Apply {acceptedCount > 0 ? `${acceptedCount} ` : ''}change{acceptedCount === 1 ? '' : 's'}
         </Button>
         <Button
           variant="outline"
           onClick={onCancel}
-          className="px-3 py-2 text-xs"
+          className="px-3 py-2 text-sm"
         >
           Cancel
         </Button>

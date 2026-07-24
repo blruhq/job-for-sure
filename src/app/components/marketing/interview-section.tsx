@@ -73,7 +73,7 @@ export function InterviewSection() {
                 <span className="h-2.5 w-2.5 rounded-full bg-[#FF5F57]" />
                 <span className="h-2.5 w-2.5 rounded-full bg-[#FFBD2E]" />
                 <span className="h-2.5 w-2.5 rounded-full bg-[#27C93F]" />
-                <span className="ml-2 flex items-center gap-1 text-xs font-medium text-muted-foreground">
+                <span className="ml-2 flex items-center gap-1 text-sm font-medium text-muted-foreground">
                   <Brain size={12} className="text-primary" />
                   {t('interviewMockupTitle')}
                 </span>
@@ -96,7 +96,7 @@ export function InterviewSection() {
                     </span>
                     <span className="text-[10px] text-muted-foreground">{t('interviewTags')}</span>
                   </div>
-                  <p className="mt-2 text-xs font-medium leading-relaxed text-foreground">
+                  <p className="mt-2 text-sm font-medium leading-relaxed text-foreground">
                     {t('interviewQuestion')}
                   </p>
                 </div>
@@ -104,7 +104,7 @@ export function InterviewSection() {
                 {/* User answer */}
                 <div className="animate-fade-up flex items-start gap-3 justify-end pl-10 [animation-delay:600ms] [animation-fill-mode:backwards]">
                   <div className="rounded-lg border border-primary/10 bg-primary/5 p-3">
-                    <p className="text-xs leading-relaxed text-foreground">
+                    <p className="text-sm leading-relaxed text-foreground">
                       {t('interviewUserAnswer')}
                     </p>
                   </div>
@@ -118,7 +118,7 @@ export function InterviewSection() {
                   <div className="flex items-center justify-between border-b border-border pb-3">
                     <div className="flex items-center gap-1.5">
                       <Sparkles size={14} className="text-primary" />
-                      <span className="text-xs font-semibold text-foreground">
+                      <span className="text-sm font-semibold text-foreground">
                         {t('interviewAiScoreFeedback')}
                       </span>
                     </div>
@@ -136,7 +136,7 @@ export function InterviewSection() {
                       </h4>
                       <ul className="mt-1.5 space-y-1">
                         {strengths.map((s) => (
-                          <li key={s} className="flex items-start gap-1.5 text-xs text-muted-foreground">
+                          <li key={s} className="flex items-start gap-1.5 text-sm text-muted-foreground">
                             <span className="mt-0.5 text-success">•</span>
                             {s}
                           </li>
@@ -149,7 +149,7 @@ export function InterviewSection() {
                       </h4>
                       <ul className="mt-1.5 space-y-1">
                         {improvements.map((s) => (
-                          <li key={s} className="flex items-start gap-1.5 text-xs text-muted-foreground">
+                          <li key={s} className="flex items-start gap-1.5 text-sm text-muted-foreground">
                             <span className="mt-0.5 text-warn">•</span>
                             {s}
                           </li>
@@ -161,7 +161,7 @@ export function InterviewSection() {
 
                 {/* Next button area */}
                 <div className="animate-fade-up flex justify-end [animation-delay:1000ms] [animation-fill-mode:backwards]">
-                  <div className="inline-flex cursor-default items-center gap-1.5 rounded-sm bg-primary/80 px-4 py-2 text-xs font-medium text-primary-foreground">
+                  <div className="inline-flex cursor-default items-center gap-1.5 rounded-sm bg-primary/80 px-4 py-2 text-sm font-medium text-primary-foreground">
                     {t('interviewNextQuestion')} <ArrowRight size={12} />
                   </div>
                 </div>

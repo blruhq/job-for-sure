@@ -538,7 +538,7 @@ export function JobSearchPanel({ resume }: { resume: Resume }) {
             variant="default"
             onClick={() => handleSearch()}
             disabled={loading || query.trim().length < 2}
-            className="flex items-center gap-1.5 px-3 text-xs font-medium"
+            className="flex items-center gap-1.5 px-3 text-sm font-medium"
           >
             {loading ? <Loader2 size={12} className="animate-spin" /> : <Search size={12} />}
             {loading ? 'Searching…' : 'Search'}
@@ -548,7 +548,7 @@ export function JobSearchPanel({ resume }: { resume: Resume }) {
               size="sm"
               variant="outline"
               onClick={handleRefresh}
-              className="flex items-center gap-1 px-2 text-xs"
+              className="flex items-center gap-1 px-2 text-sm"
               title="Clear cache & fetch fresh"
             >
               <RefreshCw size={11} /> Fresh
@@ -559,7 +559,7 @@ export function JobSearchPanel({ resume }: { resume: Resume }) {
             variant="outline"
             onClick={() => setShowFilters(!showFilters)}
             className={cn(
-              'flex items-center gap-1 px-2 text-xs',
+              'flex items-center gap-1 px-2 text-sm',
               (showFilters || activeFilterCount > 0) && 'border-primary bg-accent-soft text-primary',
             )}
           >
@@ -656,7 +656,7 @@ export function JobSearchPanel({ resume }: { resume: Resume }) {
                 value={filters.skillSearch}
                 onChange={(e) => setFilters((f) => ({ ...f, skillSearch: e.target.value }))}
                 placeholder="Type a skill to filter…"
-                className="w-full px-2 py-1 text-xs"
+                className="w-full px-3 py-2 text-sm"
               />
             </FilterGroup>
 
@@ -727,7 +727,7 @@ export function JobSearchPanel({ resume }: { resume: Resume }) {
 
         {!loading && filtered.length > 0 && (
           <>
-            <div className="mb-3 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-muted-foreground">
+            <div className="mb-3 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-muted-foreground">
               <span>
                 {filtered.length} real job{filtered.length !== 1 ? 's' : ''}
                 {displayedJobs.length < filtered.length && ` · showing ${displayedJobs.length}`}
@@ -749,7 +749,7 @@ export function JobSearchPanel({ resume }: { resume: Resume }) {
                     variant="link"
                     onClick={handleRefresh}
                     disabled={backgroundRefreshing}
-                    className="flex items-center gap-0.5 text-xs"
+                    className="flex items-center gap-0.5 text-sm"
                   >
                     {backgroundRefreshing ? (
                       <span className="flex items-center gap-1">
@@ -769,7 +769,7 @@ export function JobSearchPanel({ resume }: { resume: Resume }) {
               <Button
                 variant="outline"
                 onClick={handleShowNewJobs}
-                className="mb-3 flex w-full items-center justify-center gap-1.5 border-primary/30 bg-accent-soft py-2 text-xs font-semibold text-primary hover:bg-primary hover:text-primary-foreground animate-pulse"
+                className="mb-3 flex w-full items-center justify-center gap-1.5 border-primary/30 bg-accent-soft py-2 text-sm font-semibold text-primary hover:bg-primary hover:text-primary-foreground animate-pulse"
               >
                 🆕 {newJobs.length} new job{newJobs.length !== 1 ? 's' : ''} found since you searched · Show fresh results
               </Button>
@@ -924,7 +924,7 @@ function JobCard({ job, bookmarked, onBookmark, onAts: _onAts, onInterview: _onI
           variant={bookmarked ? 'default' : 'outline'}
           onClick={(e) => { e.stopPropagation(); onBookmark() }}
           className={cn(
-            'flex items-center gap-1 px-2 py-1 text-xs',
+            'flex items-center gap-1 px-2.5 py-1.5 text-sm',
           )}
         >
           <Bookmark size={11} fill={bookmarked ? 'currentColor' : 'none'} />
@@ -946,7 +946,7 @@ function Chip({ active, onClick, icon, label }: {
       variant={active ? 'default' : 'outline'}
       onClick={onClick}
       className={cn(
-        'flex items-center gap-1 px-2 py-1 text-xs font-medium',
+        'flex items-center gap-1 px-2.5 py-1.5 text-sm font-medium',
       )}
     >
       {icon}

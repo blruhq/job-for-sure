@@ -101,7 +101,7 @@ export default function BillingPage() {
     <div className="mx-auto max-w-2xl space-y-8 p-6 neuro-surface">
       <div>
         <h1 className="text-xl font-semibold tracking-tight text-foreground">Billing</h1>
-        <p className="mt-1 text-xs text-muted-foreground">Manage your subscription and usage</p>
+        <p className="mt-1 text-sm text-muted-foreground">Manage your subscription and usage</p>
       </div>
 
       {/* Current plan card */}
@@ -111,7 +111,7 @@ export default function BillingPage() {
             <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Current Plan</p>
             <p className="mt-1 text-2xl font-bold text-foreground capitalize">{data?.plan}</p>
             {isPro && data?.subscription && (
-              <p className="mt-0.5 text-xs text-muted-foreground">
+              <p className="mt-0.5 text-sm text-muted-foreground">
                 {data.subscription.interval === 'year' ? 'Yearly' : 'Monthly'} billing
               </p>
             )}
@@ -128,7 +128,7 @@ export default function BillingPage() {
         </div>
 
         {isCanceled && endDate && (
-          <p className="mt-3 rounded-md bg-warn-soft px-3 py-2 text-xs text-warn">
+          <p className="mt-3 rounded-md bg-warn-soft px-3 py-2 text-sm text-warn">
             Your Pro access ends on {endDate}. After that, you&apos;ll be downgraded to Free.
           </p>
         )}
@@ -138,14 +138,14 @@ export default function BillingPage() {
             <Button
               variant="outline"
               onClick={handlePortal}
-              className="rounded-lg px-4 py-2 text-xs font-medium"
+              className="rounded-lg px-4 py-2.5 text-sm font-medium"
             >
               Manage in Stripe
             </Button>
           ) : (
             <Button
               onClick={() => router.push('/pricing')}
-              className="rounded-lg px-4 py-2 text-xs font-medium"
+              className="rounded-lg px-4 py-2.5 text-sm font-medium"
             >
               Upgrade to Pro
             </Button>
@@ -155,7 +155,7 @@ export default function BillingPage() {
               variant="outline"
               onClick={handleCancel}
               disabled={canceling}
-              className="rounded-lg border-border px-4 py-2 text-xs text-muted-foreground hover:text-destructive hover:border-red-200"
+              className="rounded-lg border-border px-4 py-2.5 text-sm text-muted-foreground hover:text-destructive hover:border-red-200"
             >
               {canceling ? 'Canceling…' : 'Cancel subscription'}
             </Button>
@@ -166,7 +166,7 @@ export default function BillingPage() {
       {/* Usage breakdown */}
       {!isPro && data?.usage && (
         <div className="rounded-lg neuro-card p-5">
-          <h2 className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+          <h2 className="text-sm font-medium uppercase tracking-wider text-muted-foreground">
             Usage this period
           </h2>
           <div className="mt-3 space-y-3">
@@ -177,7 +177,7 @@ export default function BillingPage() {
               const pct = u.limit > 0 ? Math.round((used / u.limit) * 100) : 0
               return (
                 <div key={feature}>
-                  <div className="flex items-center justify-between text-xs">
+                  <div className="flex items-center justify-between text-sm">
                     <span className="text-foreground">{label}</span>
                     <span className="text-muted-foreground">
                       {used} / {u.limit}

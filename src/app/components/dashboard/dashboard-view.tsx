@@ -107,13 +107,13 @@ export function DashboardView() {
           <FileText size={24} />
         </div>
         <h3 className="mb-1 text-sm font-semibold text-foreground">{t('noResumesTitle')}</h3>
-        <p className="mb-6 max-w-sm text-xs text-muted-foreground">
+        <p className="mb-6 max-w-sm text-sm text-muted-foreground">
           {t('noResumesDesc')}
         </p>
 <Button
           variant="default"
           onClick={() => router.push('/chat')}
-          className="flex items-center gap-1.5 px-4 py-2 text-xs font-medium"
+          className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium"
         >
           {t('getStarted')} <ArrowRight size={13} />
         </Button>
@@ -131,12 +131,12 @@ export function DashboardView() {
             <h1 className="text-lg font-semibold text-foreground">
               {userName ? `${t('welcomeBack')}, ${userName}` : t('title')}
             </h1>
-            <div className="text-xs text-muted-foreground">{t('jobSearchGlance')}</div>
+            <div className="text-sm text-muted-foreground">{t('jobSearchGlance')}</div>
           </div>
           <Button
             variant="default"
             onClick={() => router.push('/chat')}
-            className="flex items-center gap-1.5 px-3 py-2 text-xs font-medium"
+            className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium"
           >
             <Plus size={13} /> {t('newResume')}
           </Button>
@@ -238,7 +238,7 @@ export function DashboardView() {
                       r.score >= 85 ? 'bg-success' : r.score >= 70 ? 'bg-primary' : 'bg-[var(--warn)]'
                     )}
                   />
-                  <span className="flex-1 truncate text-xs font-medium text-foreground">{r.name}</span>
+                  <span className="flex-1 truncate text-sm font-medium text-foreground">{r.name}</span>
                   <span className="font-mono text-[10px] font-semibold text-success">{r.score}%</span>
                 </Link>
               ))}
@@ -261,7 +261,7 @@ export function DashboardView() {
                   className="flex items-center gap-2.5 rounded-sm px-2 py-1.5 hover:neuro-surface transition-colors"
                 >
                   <span className={cn('h-2 w-2 shrink-0 rounded-full', stage.color)} />
-                  <span className="flex-1 text-xs font-medium text-foreground">{stage.label}</span>
+                  <span className="flex-1 text-sm font-medium text-foreground">{stage.label}</span>
                   <span className="font-mono text-[10px] font-semibold text-muted-foreground">{stage.count}</span>
                 </Link>
               ))}
@@ -276,7 +276,7 @@ export function DashboardView() {
             className="flex flex-col items-center gap-2 rounded-sm neuro-card p-4 text-center transition-colors hover:border-brand"
           >
             <MessageSquare size={18} className="text-primary" />
-            <span className="text-xs font-medium text-foreground">{t('chatWithCoach')}</span>
+            <span className="text-sm font-medium text-foreground">{t('chatWithCoach')}</span>
           </Link>
 
           <Link
@@ -284,7 +284,7 @@ export function DashboardView() {
             className="flex flex-col items-center gap-2 rounded-sm neuro-card p-4 text-center transition-colors hover:border-brand"
           >
             <Brain size={18} className="text-primary" />
-            <span className="text-xs font-medium text-foreground">{t('practiceInterview')}</span>
+            <span className="text-sm font-medium text-foreground">{t('practiceInterview')}</span>
           </Link>
 
           <Link
@@ -292,7 +292,7 @@ export function DashboardView() {
             className="flex flex-col items-center gap-2 rounded-sm neuro-card p-4 text-center transition-colors hover:border-brand"
           >
             <CheckSquare size={18} className="text-primary" />
-            <span className="text-xs font-medium text-foreground">{t('atsOptimizer')}</span>
+            <span className="text-sm font-medium text-foreground">{t('atsOptimizer')}</span>
           </Link>
 
           <Link
@@ -300,7 +300,7 @@ export function DashboardView() {
             className="flex flex-col items-center gap-2 rounded-sm neuro-card p-4 text-center transition-colors hover:border-brand"
           >
             <KanbanSquare size={18} className="text-primary" />
-            <span className="text-xs font-medium text-foreground">{t('viewApplications')}</span>
+            <span className="text-sm font-medium text-foreground">{t('viewApplications')}</span>
           </Link>
         </div>
       </div>

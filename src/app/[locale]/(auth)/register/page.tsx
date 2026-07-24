@@ -71,16 +71,16 @@ export default function RegisterPage() {
               </svg>
             </div>
             <h1 className="text-lg font-semibold text-foreground">Check your email</h1>
-            <p className="mt-2 text-xs text-muted-foreground">
+            <p className="mt-2 text-sm text-muted-foreground">
               We sent a verification link to <span className="font-medium text-foreground">{email}</span>.
               Click the link to activate your account.
             </p>
-            <p className="mt-4 text-xs text-muted-foreground/60">
+            <p className="mt-4 text-sm text-muted-foreground/60">
               Didn&apos;t get an email? Check your spam folder.
             </p>
             <Link
               href="/login"
-              className="mt-6 inline-block cursor-pointer text-xs font-medium text-primary hover:opacity-80"
+              className="mt-6 inline-block cursor-pointer text-sm font-medium text-primary hover:opacity-80"
             >
               ← Back to sign in
             </Link>
@@ -91,18 +91,18 @@ export default function RegisterPage() {
               <h1 className="text-2xl text-foreground font-display">
                 Create your account
               </h1>
-            <p className="mt-1 text-xs text-muted-foreground">Start in 30 seconds. Free forever.</p>
+            <p className="mt-2 text-sm text-muted-foreground">Start in 30 seconds. Free forever.</p>
           </div>
 
           <form onSubmit={handleRegister} className="mt-6 space-y-3.5">
             {error && (
-              <div className="rounded-md border border-destructive/30 bg-destructive/5 px-3 py-2 text-xs text-destructive">
+              <div className="rounded-md border border-destructive/30 bg-destructive/5 px-3 py-2 text-sm text-destructive">
                 {error}
               </div>
             )}
 
             <div>
-              <label className="mb-1 block font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
+              <label className="mb-1.5 block font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
                 Full Name
               </label>
               <Input
@@ -117,7 +117,7 @@ export default function RegisterPage() {
             </div>
 
             <div>
-              <label className="mb-1 block font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
+              <label className="mb-1.5 block font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
                 Email
               </label>
               <Input
@@ -132,7 +132,7 @@ export default function RegisterPage() {
             </div>
 
             <div>
-              <label className="mb-1 block font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
+              <label className="mb-1.5 block font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
                 Password
               </label>
               <Input
@@ -184,7 +184,7 @@ export default function RegisterPage() {
             </span>
           </Button>
 
-          <p className="mt-5 text-center text-xs text-muted-foreground">
+            <p className="mt-6 text-center text-sm text-muted-foreground">
             Already have an account?{' '}
             <Link href="/login" className="cursor-pointer font-medium text-primary hover:opacity-80">
               Sign in

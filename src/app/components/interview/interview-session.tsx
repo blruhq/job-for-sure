@@ -322,7 +322,7 @@ export function InterviewSession({ config, resume, onEnd }: InterviewSessionProp
             <Brain size={16} />
           </div>
           <div>
-            <div className="text-xs font-semibold text-foreground">
+            <div className="text-sm font-semibold text-foreground">
               Mock Interview: {config.targetCompany}
             </div>
             <div className="text-[10px] text-muted-foreground">
@@ -331,7 +331,7 @@ export function InterviewSession({ config, resume, onEnd }: InterviewSessionProp
           </div>
         </div>
         <div className="text-right">
-          <div className="text-xs font-semibold text-muted-foreground">
+          <div className="text-sm font-semibold text-muted-foreground">
             {config.maxQuestions > 0 ? (
               <span>Question {exchanges.length + (currentQuestion ? 1 : 0)} of {config.maxQuestions}</span>
             ) : (
@@ -375,12 +375,12 @@ export function InterviewSession({ config, resume, onEnd }: InterviewSessionProp
                     </span>
                   ))}
                 </div>
-                <p className="text-xs text-foreground font-medium leading-relaxed">{exchange.question.question}</p>
+                <p className="text-sm text-foreground font-medium leading-relaxed">{exchange.question.question}</p>
               </div>
 
               {/* Historical Answer Card */}
               <div className="flex items-start gap-3 justify-end pl-12">
-                <div className="rounded-lg bg-primary/5 border border-primary/10 p-3 text-xs text-foreground max-w-full">
+                <div className="rounded-lg bg-primary/5 border border-primary/10 p-3 text-sm text-foreground max-w-full">
                   <p className="leading-relaxed whitespace-pre-wrap">{exchange.answer}</p>
                 </div>
                 <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground text-[10px] font-semibold">
@@ -393,7 +393,7 @@ export function InterviewSession({ config, resume, onEnd }: InterviewSessionProp
                 <div className="flex items-center justify-between border-b border-border pb-3 mb-3">
                   <div className="flex items-center gap-1.5">
                     <Sparkles size={14} className="text-primary" />
-                    <span className="text-xs font-semibold text-foreground">AI Score & Feedback</span>
+                    <span className="text-sm font-semibold text-foreground">AI Score & Feedback</span>
                   </div>
                   <div className="flex items-center gap-1 rounded bg-success-soft px-2 py-0.5 border border-success/15">
                     <span className="text-[10px] font-bold text-success">Score: {exchange.feedback.score}/10</span>
@@ -405,7 +405,7 @@ export function InterviewSession({ config, resume, onEnd }: InterviewSessionProp
                     <h4 className="text-[10px] font-mono uppercase text-success font-semibold mb-1">Strengths</h4>
                     <ul className="space-y-1">
                       {exchange.feedback.strengths.map((str, i) => (
-                        <li key={i} className="text-xs text-muted-foreground flex items-start gap-1.5">
+                        <li key={i} className="text-sm text-muted-foreground flex items-start gap-1.5">
                           <span className="text-success mt-0.5">•</span> {str}
                         </li>
                       ))}
@@ -416,7 +416,7 @@ export function InterviewSession({ config, resume, onEnd }: InterviewSessionProp
                     <h4 className="text-[10px] font-mono uppercase text-warn font-semibold mb-1">Areas to Improve</h4>
                     <ul className="space-y-1">
                       {exchange.feedback.improvements.map((imp, i) => (
-                        <li key={i} className="text-xs text-muted-foreground flex items-start gap-1.5">
+                        <li key={i} className="text-sm text-muted-foreground flex items-start gap-1.5">
                           <span className="text-warn mt-0.5">•</span> {imp}
                         </li>
                       ))}
@@ -425,7 +425,7 @@ export function InterviewSession({ config, resume, onEnd }: InterviewSessionProp
 
                   <div>
                     <h4 className="text-[10px] font-mono uppercase text-primary font-semibold mb-1">Suggested Model Answer</h4>
-                    <p className="text-xs text-muted-foreground leading-relaxed italic bg-muted/30 p-2.5 rounded-sm border border-border/50">
+                    <p className="text-sm text-muted-foreground leading-relaxed italic bg-muted/30 p-3 rounded-sm border border-border/50">
                       &ldquo;{exchange.feedback.modelAnswer}&rdquo;
                     </p>
                   </div>
@@ -490,7 +490,7 @@ export function InterviewSession({ config, resume, onEnd }: InterviewSessionProp
                     </span>
                   ))}
                 </div>
-                <p className="text-xs text-foreground font-semibold leading-relaxed">{currentQuestion.question}</p>
+                <p className="text-sm text-foreground font-semibold leading-relaxed">{currentQuestion.question}</p>
               </div>
 
               {/* Answer Input Area (only if not evaluated yet) */}
@@ -508,7 +508,7 @@ export function InterviewSession({ config, resume, onEnd }: InterviewSessionProp
                     disabled={loading === 'evaluate'}
                     rows={5}
                     placeholder="Type your response, or click the microphone to speak..."
-                    className={`w-full resize-y p-3 text-xs ${
+                    className={`w-full resize-y p-3 text-sm ${
                       isListening ? 'border-primary ring-2 ring-primary/20' : ''
                     }`}
                   />
@@ -556,7 +556,7 @@ export function InterviewSession({ config, resume, onEnd }: InterviewSessionProp
                       variant="default"
                       onClick={submitAnswer}
                       disabled={currentAnswer.trim().length < 20 || loading === 'evaluate'}
-                      className="px-4 py-2 text-xs font-medium flex items-center gap-1.5"
+                      className="px-4 py-2 text-sm font-medium flex items-center gap-1.5"
                     >
                       {loading === 'evaluate' ? (
                         <>
@@ -577,7 +577,7 @@ export function InterviewSession({ config, resume, onEnd }: InterviewSessionProp
                 <div className="space-y-4">
                   {/* Your Submitted Answer */}
                   <div className="flex items-start gap-3 justify-end pl-12">
-                    <div className="rounded-lg bg-primary/5 border border-primary/10 p-3 text-xs text-foreground max-w-full">
+                    <div className="rounded-lg bg-primary/5 border border-primary/10 p-3 text-sm text-foreground max-w-full">
                       <p className="leading-relaxed whitespace-pre-wrap">{currentAnswer}</p>
                     </div>
                     <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground text-[10px] font-semibold">
@@ -590,7 +590,7 @@ export function InterviewSession({ config, resume, onEnd }: InterviewSessionProp
                     <div className="flex items-center justify-between border-b border-border pb-3 mb-3">
                       <div className="flex items-center gap-1.5">
                         <Sparkles size={14} className="text-primary" />
-                        <span className="text-xs font-semibold text-foreground">AI Score & Feedback</span>
+                        <span className="text-sm font-semibold text-foreground">AI Score & Feedback</span>
                       </div>
                       <div className="flex items-center gap-1 rounded bg-success-soft px-2 py-0.5 border border-success/15">
                         <span className="text-[10px] font-bold text-success">Score: {currentFeedback.score}/10</span>
@@ -602,7 +602,7 @@ export function InterviewSession({ config, resume, onEnd }: InterviewSessionProp
                         <h4 className="text-[10px] font-mono uppercase text-success font-semibold mb-1">Strengths</h4>
                         <ul className="space-y-1">
                           {currentFeedback.strengths.map((str, i) => (
-                            <li key={i} className="text-xs text-muted-foreground flex items-start gap-1.5">
+                            <li key={i} className="text-sm text-muted-foreground flex items-start gap-1.5">
                               <span className="text-success mt-0.5">•</span> {str}
                             </li>
                           ))}
@@ -613,7 +613,7 @@ export function InterviewSession({ config, resume, onEnd }: InterviewSessionProp
                         <h4 className="text-[10px] font-mono uppercase text-warn font-semibold mb-1">Areas to Improve</h4>
                         <ul className="space-y-1">
                           {currentFeedback.improvements.map((imp, i) => (
-                            <li key={i} className="text-xs text-muted-foreground flex items-start gap-1.5">
+                            <li key={i} className="text-sm text-muted-foreground flex items-start gap-1.5">
                               <span className="text-warn mt-0.5">•</span> {imp}
                             </li>
                           ))}
@@ -622,7 +622,7 @@ export function InterviewSession({ config, resume, onEnd }: InterviewSessionProp
 
                       <div>
                         <h4 className="text-[10px] font-mono uppercase text-primary font-semibold mb-1">Suggested Model Answer</h4>
-                        <p className="text-xs text-muted-foreground leading-relaxed italic bg-muted/30 p-2.5 rounded-sm border border-border/50">
+                        <p className="text-sm text-muted-foreground leading-relaxed italic bg-muted/30 p-3 rounded-sm border border-border/50">
                           &ldquo;{currentFeedback.modelAnswer}&rdquo;
                         </p>
                       </div>
@@ -634,14 +634,14 @@ export function InterviewSession({ config, resume, onEnd }: InterviewSessionProp
                     <Button
                       variant="outline"
                       onClick={handleRetry}
-                      className="px-4 py-2 text-xs font-medium flex items-center gap-1.5"
+                      className="px-4 py-2 text-sm font-medium flex items-center gap-1.5"
                     >
                       <RotateCcw size={12} /> Try Again
                     </Button>
                     <Button
                       variant="default"
                       onClick={handleNext}
-                      className="px-4 py-2 text-xs font-medium flex items-center gap-1"
+                      className="px-4 py-2 text-sm font-medium flex items-center gap-1"
                     >
                       {isLastQuestion ? (
                         <>

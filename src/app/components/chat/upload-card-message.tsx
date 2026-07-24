@@ -63,7 +63,7 @@ export const UploadCardMessage = memo(function UploadCardMessage({
           </div>
 
           {isEditing ? (
-            <div className="space-y-3 bg-muted/30 p-2.5 rounded-sm border border-border/50">
+            <div className="space-y-3 bg-muted/30 p-3 rounded-sm border border-border/50">
               <div className="space-y-1.5">
                 <label className="text-[10px] font-medium text-muted-foreground flex items-center gap-1">
                   <Briefcase size={10} /> Target Role
@@ -72,7 +72,7 @@ export const UploadCardMessage = memo(function UploadCardMessage({
                   value={roleInput}
                   onChange={(e) => setRoleInput(e.target.value)}
                   placeholder="e.g. Software Engineer"
-                  className="w-full text-xs px-2 py-1"
+                  className="w-full text-sm px-3 py-2"
                 />
               </div>
               <div className="space-y-1.5">
@@ -83,7 +83,7 @@ export const UploadCardMessage = memo(function UploadCardMessage({
                   value={locationInput}
                   onChange={(e) => setLocationInput(e.target.value)}
                   placeholder="e.g. Thailand or Remote"
-                  className="w-full text-xs px-2 py-1"
+                  className="w-full text-sm px-3 py-2"
                 />
               </div>
               <Button
@@ -93,13 +93,13 @@ export const UploadCardMessage = memo(function UploadCardMessage({
                   setIsEditing(false)
                 }}
                 disabled={roleInput.trim().length < 2}
-                className="w-full flex items-center justify-center gap-1 py-1 text-xs font-medium"
+                className="w-full flex items-center justify-center gap-1.5 py-2 text-sm font-medium"
               >
                 <Check size={11} /> Confirm & Search Jobs
               </Button>
             </div>
           ) : (
-            <div className="space-y-1 text-xs text-muted-foreground">
+            <div className="space-y-1 text-sm text-muted-foreground">
               {resume.role && (
                 <div className="flex items-center gap-1.5">
                   <Briefcase size={10} className="text-primary shrink-0" />
@@ -116,7 +116,7 @@ export const UploadCardMessage = memo(function UploadCardMessage({
           )}
 
           {resume.summary && !isEditing && (
-            <p className="mt-2 text-xs text-muted-foreground leading-relaxed">{resume.summary}</p>
+            <p className="mt-2 text-sm text-muted-foreground leading-relaxed">{resume.summary}</p>
           )}
 
           {resume.skills.length > 0 && !isEditing && (
@@ -135,14 +135,14 @@ export const UploadCardMessage = memo(function UploadCardMessage({
               <Button
                 variant="link"
                 onClick={() => router.push(`/resume/${resume.id}`)}
-                className="text-xs font-medium"
+                className="text-sm font-medium"
               >
                 View Resume →
               </Button>
               <Button
                 variant="ghost"
                 onClick={() => router.push(`/resume/${resume.id}?tab=editor`)}
-                className="text-xs font-medium"
+                className="text-sm font-medium"
               >
                 Edit Resume →
               </Button>

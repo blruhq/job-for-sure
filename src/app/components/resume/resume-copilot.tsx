@@ -75,7 +75,7 @@ export function ResumeCopilot({ resume }: { resume: Resume }) {
               <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-sm bg-primary text-xs font-bold text-primary-foreground">AI</div>
               <div className="flex-1 pt-0.5">
                 <div className="mb-0.5 text-xs font-semibold">Co-Pilot</div>
-                <div className="rounded-md neuro-card px-3.5 py-2.5 text-xs leading-relaxed text-muted-foreground">
+                <div className="rounded-md neuro-card px-3.5 py-2.5 text-sm leading-relaxed text-muted-foreground">
                   Hey! I'm your AI Resume Co-pilot. I can rewrite sections, add keywords, generate bullet points, or tailor your resume for specific companies.
                 </div>
               </div>
@@ -87,7 +87,7 @@ export function ResumeCopilot({ resume }: { resume: Resume }) {
                   key={s.label}
                   variant="outline"
                   onClick={() => handleSend(s.prompt)}
-                  className="px-2.5 py-1 text-[10px]"
+                  className="px-2.5 py-1.5 text-xs"
                 >
                   {s.label}
                 </Button>
@@ -103,7 +103,7 @@ export function ResumeCopilot({ resume }: { resume: Resume }) {
             )}
             {msg.role === 'user' && (
               <div className="ml-auto flex max-w-[85%] justify-end">
-                <div className="rounded-md bg-accent-soft px-3 py-2 text-xs leading-relaxed text-foreground">
+                <div className="rounded-md bg-accent-soft px-3 py-2 text-sm leading-relaxed text-foreground">
                   {msg.parts.map((part, i) => {
                     if (part.type === 'text') return <span key={i}>{part.text}</span>
                     return null
@@ -114,7 +114,7 @@ export function ResumeCopilot({ resume }: { resume: Resume }) {
             {msg.role === 'assistant' && (
               <div className="flex max-w-[85%] flex-col pt-0.5">
                 <div className="mb-0.5 text-xs font-semibold">Co-Pilot</div>
-                <div className="rounded-md neuro-card px-3.5 py-2.5 text-xs leading-relaxed prose prose-sm max-w-none">
+                <div className="rounded-md neuro-card px-3.5 py-2.5 text-sm leading-relaxed prose prose-sm max-w-none">
                   {msg.parts.map((part, i) => {
                     if (part.type === 'text') return <MarkdownLite key={i} text={part.text} />
                     return null
@@ -149,7 +149,7 @@ export function ResumeCopilot({ resume }: { resume: Resume }) {
       <div className="flex shrink-0 items-center gap-1.5 border-t border-border/50 neuro-surface p-2.5">
         <Input
           placeholder="Ask co-pilot to rewrite…"
-          className="flex-1 px-2.5 py-1.5 text-xs"
+          className="flex-1 px-3 py-2 text-sm"
           onKeyDown={(e) => {
             if (e.key === 'Enter' && !e.shiftKey) {
               e.preventDefault()
@@ -164,7 +164,7 @@ export function ResumeCopilot({ resume }: { resume: Resume }) {
           <Button
             variant="outline"
             onClick={stop}
-            className="px-2.5 py-1.5 text-xs font-medium"
+            className="px-3 py-2 text-sm font-medium"
           >
             Stop
           </Button>
@@ -176,7 +176,7 @@ export function ResumeCopilot({ resume }: { resume: Resume }) {
               handleSend(input.value)
               input.value = ''
             }}
-            className="px-2.5 py-1.5 text-xs font-medium"
+            className="px-3 py-2 text-sm font-medium"
           >
             Send
           </Button>

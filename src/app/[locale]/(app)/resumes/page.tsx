@@ -114,7 +114,7 @@ export default function ResumesPage() {
                         <span className="truncate text-sm font-semibold text-foreground">{resume.name}</span>
                       </div>
                       {resume.role && (
-                        <p className="mt-0.5 truncate text-xs text-muted-foreground">{resume.role}</p>
+                        <p className="mt-0.5 truncate text-sm text-muted-foreground">{resume.role}</p>
                       )}
                     </div>
                     {/* Score badge */}
@@ -148,7 +148,7 @@ export default function ResumesPage() {
                               key={v.id}
                               variant="ghost"
                               onClick={() => handleOpen(v.id)}
-                              className="flex items-center gap-1.5 text-left text-xs text-muted-foreground hover:text-primary h-auto p-0 w-full justify-start"
+                              className="flex items-center gap-1.5 text-left text-sm text-muted-foreground hover:text-primary h-auto p-0 w-full justify-start"
                             >
                               <span className="text-[10px]">└</span>
                               <span className="truncate">{v.variantLabel || v.name}</span>
@@ -158,7 +158,7 @@ export default function ResumesPage() {
                             </Button>
                           ))}
                           {variants.length > 2 && (
-                            <span className="text-xs text-muted-foreground pl-3">+{variants.length - 2} more</span>
+                            <span className="text-sm text-muted-foreground pl-3">+{variants.length - 2} more</span>
                           )}
                         </div>
                       </div>
@@ -166,7 +166,7 @@ export default function ResumesPage() {
 
                     {/* Updated date */}
                     {resume.updated && (
-                      <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                      <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
                         <Clock size={10} />
                         <span>Updated {formatDate(resume.updated)}</span>
                       </div>
@@ -174,11 +174,11 @@ export default function ResumesPage() {
                   </div>
 
                   {/* Card footer — actions */}
-                  <div className="flex items-center justify-between border-t border-border px-3 py-2">
+                  <div className="flex items-center justify-between border-t border-border px-4 py-2.5">
                     <Button
                       onClick={() => handleOpen(resume.id)}
                       size="sm"
-                      className="flex items-center gap-1.5 rounded-xs text-xs font-semibold active:scale-[0.98]"
+                      className="flex items-center gap-1.5 rounded-xs text-sm font-semibold active:scale-[0.98]"
                     >
                       <ExternalLink size={11} />
                       Open
@@ -188,7 +188,7 @@ export default function ResumesPage() {
                         variant="ghost"
                         onClick={() => handleTailor(resume.id)}
                         size="sm"
-                        className="flex items-center gap-1 rounded-xs text-xs text-muted-foreground hover:bg-accent-soft hover:text-primary"
+                        className="flex items-center gap-1 rounded-xs text-sm text-muted-foreground hover:bg-accent-soft hover:text-primary"
                         title="Tailor this resume"
                       >
                         <Zap size={11} />
@@ -198,7 +198,7 @@ export default function ResumesPage() {
                         variant="ghost"
                         size="icon"
                         onClick={() => setDeleteTarget({ id: resume.id, name: resume.name })}
-                        className="rounded-xs p-1.5 h-auto w-auto text-muted-foreground hover:bg-danger-soft hover:text-destructive"
+                        className="rounded-xs p-2 h-auto w-auto text-muted-foreground hover:bg-danger-soft hover:text-destructive"
                         title="Delete resume"
                       >
                         <Trash2 size={13} />

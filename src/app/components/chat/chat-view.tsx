@@ -520,7 +520,7 @@ export function ChatView() {
             <div className="mx-auto flex max-w-an items-center justify-between gap-3">
               <div className="flex min-w-0 items-center gap-2">
                 <Sparkles size={12} className="shrink-0 text-primary" />
-                <span className="truncate text-xs text-foreground">
+                <span className="truncate text-sm text-foreground">
                   Building: <strong>{building.role}</strong>
                   {building.industry ? ` · ${building.industry}` : ''}
                 </span>
@@ -654,7 +654,7 @@ export function ChatView() {
             }}
             disabled={resumes.length === 0}
           >
-            <SelectTrigger className="h-auto rounded-xs neuro-inset px-1.5 py-0.5 text-xs">
+            <SelectTrigger className="h-auto rounded-xs neuro-inset px-2 py-1 text-sm">
               <SelectValue placeholder={resumes.length === 0 ? 'None (Upload first)' : undefined} />
             </SelectTrigger>
             <SelectContent className="min-w-56">
@@ -675,7 +675,7 @@ export function ChatView() {
             onValueChange={(val) => { if (val) setTargetCompanyKey(val) }}
             disabled={(applications?.bookmark?.length ?? 0) === 0}
           >
-            <SelectTrigger className="h-auto rounded-xs neuro-inset px-1.5 py-0.5 text-xs">
+            <SelectTrigger className="h-auto rounded-xs neuro-inset px-2 py-1 text-sm">
               <SelectValue placeholder="General Career Coach" />
             </SelectTrigger>
             <SelectContent className="min-w-56">
@@ -724,7 +724,7 @@ export function ChatView() {
                 <Upload size={18} />
               </div>
               <div className="neuro-title text-sm font-semibold">Upload Resume</div>
-              <div className="mt-0.5 text-xs text-muted-foreground">PDF, DOCX, or text</div>
+              <div className="mt-0.5 text-sm text-muted-foreground">PDF, DOCX, or text</div>
             </div>
 
             {/* Build from Template */}
@@ -740,7 +740,7 @@ export function ChatView() {
                 <FileText size={18} />
               </div>
               <div className="neuro-title text-sm font-semibold">Build with AI</div>
-              <div className="mt-0.5 text-xs text-muted-foreground">Answer questions · 5 min</div>
+              <div className="mt-0.5 text-sm text-muted-foreground">Answer questions · 5 min</div>
             </div>
 
             {/* Paste Job Posting */}
@@ -756,7 +756,7 @@ export function ChatView() {
                 <ClipboardList size={18} />
               </div>
               <div className="neuro-title text-sm font-semibold">Paste Job Posting</div>
-              <div className="mt-0.5 text-xs text-muted-foreground">Analyze a JD</div>
+              <div className="mt-0.5 text-sm text-muted-foreground">Analyze a JD</div>
             </div>
           </div>
         </div>

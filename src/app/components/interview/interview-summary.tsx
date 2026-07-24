@@ -84,7 +84,7 @@ export function InterviewSummary({ exchanges, onRestart }: InterviewSummaryProps
             <CheckCircle2 size={20} />
           </div>
           <h1 className="text-xl font-semibold tracking-tight text-foreground">Interview Completed</h1>
-          <p className="text-xs text-muted-foreground mt-1">Here is a summary of your performance analysis</p>
+          <p className="text-sm text-muted-foreground mt-1">Here is a summary of your performance analysis</p>
         </div>
 
         {/* Stats Row */}
@@ -103,7 +103,7 @@ export function InterviewSummary({ exchanges, onRestart }: InterviewSummaryProps
 
           <div className="rounded-md neuro-inset p-3 text-center flex flex-col justify-between items-center">
             <div className="text-[10px] font-mono uppercase text-muted-foreground mb-1">Comparison</div>
-            <div className="flex items-center gap-1 text-xs font-semibold">
+            <div className="flex items-center gap-1 text-sm font-semibold">
               {deltaDirection === 'up' && <TrendingUp size={14} className="text-success" />}
               {deltaDirection === 'down' && <TrendingDown size={14} className="text-destructive" />}
               <span className={
@@ -125,14 +125,14 @@ export function InterviewSummary({ exchanges, onRestart }: InterviewSummaryProps
             {topStrengths.length > 0 ? (
               <ul className="space-y-1.5 bg-success-soft/20 border border-success/10 rounded-md p-3.5">
                 {topStrengths.map((str, idx) => (
-                  <li key={idx} className="text-xs text-foreground/90 flex items-start gap-2">
+                  <li key={idx} className="text-sm text-foreground/90 flex items-start gap-2">
                     <span className="text-success font-bold">•</span>
                     <span>{str}</span>
                   </li>
                 ))}
               </ul>
             ) : (
-              <div className="text-xs text-muted-foreground italic border border-dashed border-border rounded-md p-4 text-center">
+              <div className="text-sm text-muted-foreground italic border border-dashed border-border rounded-md p-4 text-center">
                 Not enough data collected to aggregate strengths.
               </div>
             )}
@@ -145,14 +145,14 @@ export function InterviewSummary({ exchanges, onRestart }: InterviewSummaryProps
             {topImprovements.length > 0 ? (
               <ul className="space-y-1.5 bg-destructive/5 border border-destructive/10 rounded-md p-3.5">
                 {topImprovements.map((imp, idx) => (
-                  <li key={idx} className="text-xs text-foreground/90 flex items-start gap-2">
+                  <li key={idx} className="text-sm text-foreground/90 flex items-start gap-2">
                     <span className="text-warn font-bold">•</span>
                     <span>{imp}</span>
                   </li>
                 ))}
               </ul>
             ) : (
-              <div className="text-xs text-muted-foreground italic border border-dashed border-border rounded-md p-4 text-center">
+              <div className="text-sm text-muted-foreground italic border border-dashed border-border rounded-md p-4 text-center">
                 Not enough data collected to aggregate improvement tips.
               </div>
             )}
@@ -184,7 +184,7 @@ export function InterviewSummary({ exchanges, onRestart }: InterviewSummaryProps
                       {exchange.feedback.score}/10
                     </span>
                   </div>
-                  <p className="text-xs text-foreground font-medium leading-relaxed">
+                  <p className="text-sm text-foreground font-medium leading-relaxed">
                     {exchange.question.question}
                   </p>
                   <div>
@@ -224,13 +224,13 @@ export function InterviewSummary({ exchanges, onRestart }: InterviewSummaryProps
           <Button
             variant="outline"
             onClick={onRestart}
-            className="flex-1 rounded-sm px-4 py-2.5 text-xs font-medium flex items-center justify-center gap-1.5"
+            className="flex-1 rounded-sm px-4 py-2.5 text-sm font-medium flex items-center justify-center gap-1.5"
           >
             <RefreshCw size={13} /> Practice Again
           </Button>
           <Button
             onClick={() => router.push('/chat')}
-            className="flex-1 rounded-sm px-4 py-2.5 text-xs font-medium flex items-center justify-center gap-1.5"
+            className="flex-1 rounded-sm px-4 py-2.5 text-sm font-medium flex items-center justify-center gap-1.5"
           >
             <MessageSquare size={13} /> Back to Coach Chat
           </Button>

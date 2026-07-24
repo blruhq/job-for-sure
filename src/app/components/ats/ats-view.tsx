@@ -209,7 +209,7 @@ export function AtsView() {
       <div className="flex w-full md:w-[45%] flex-col gap-5 overflow-y-auto border-b md:border-b-0 md:border-r neuro-surface p-4 md:p-6">
         <div>
           <h1 className="text-lg font-semibold">ATS Optimizer</h1>
-          <div className="text-xs text-muted-foreground">
+          <div className="text-sm text-muted-foreground">
             {analysisResult
               ? hasAnalysedJd
                 ? 'Real-time job matching and keyword analysis'
@@ -231,7 +231,7 @@ export function AtsView() {
             }}
             disabled={resumes.length === 0}
           >
-            <SelectTrigger className="w-full rounded-sm neuro-inset py-2 pl-3 pr-8 text-xs">
+            <SelectTrigger className="w-full rounded-sm neuro-inset py-2 pl-3 pr-8 text-sm">
               <SelectValue placeholder="None (Upload first)" />
             </SelectTrigger>
             <SelectContent>
@@ -258,14 +258,14 @@ export function AtsView() {
             onChange={(e) => setJdText(e.target.value)}
             rows={6}
             placeholder="Paste the job description you want to match against (optional)"
-            className="w-full resize-y rounded-sm p-2.5 text-xs"
+            className="w-full resize-y rounded-sm p-3 text-sm"
           />
           <div className="mt-2 flex gap-2">
             <Button
               variant="default"
               onClick={() => fetchAnalysis(jdText)}
               disabled={analysisLoading || !resume || !jdText.trim()}
-              className="flex flex-1 items-center justify-center gap-1.5 rounded-sm py-2 text-xs"
+              className="flex flex-1 items-center justify-center gap-1.5 rounded-sm py-2 text-sm"
             >
               {analysisLoading ? (
                 <RefreshCw size={13} className="animate-spin" />
@@ -278,7 +278,7 @@ export function AtsView() {
               variant="outline"
               onClick={() => fetchAnalysis('')}
               disabled={analysisLoading || !resume}
-              className="flex items-center justify-center gap-1.5 rounded-sm px-3 py-2 text-xs"
+              className="flex items-center justify-center gap-1.5 rounded-sm px-3 py-2 text-sm"
               title="Run a general resume health check without a job description"
             >
               Health Check
@@ -298,14 +298,14 @@ export function AtsView() {
             value={company}
             onChange={(e) => setCompany(e.target.value)}
             placeholder="Company (optional)"
-            className="flex-1 rounded-sm text-xs"
+            className="flex-1 rounded-sm text-sm px-3 py-2"
           />
           <Input
             neumorphic
             value={role}
             onChange={(e) => setRole(e.target.value)}
             placeholder="Role (optional)"
-            className="flex-1 rounded-sm text-xs"
+            className="flex-1 rounded-sm text-sm px-3 py-2"
           />
         </div>
 
@@ -330,7 +330,7 @@ export function AtsView() {
             <h3 className="text-sm font-semibold" style={{ color: analysisResult ? gaugeColor : 'var(--warn)' }}>
               {analysisLoading ? 'Analyzing...' : gaugeHeading}
             </h3>
-            <p className="text-xs text-muted-foreground">{analysisLoading ? 'AI is processing your resume format and context...' : gaugeDesc}</p>
+            <p className="text-sm text-muted-foreground">{analysisLoading ? 'AI is processing your resume format and context...' : gaugeDesc}</p>
           </div>
         </div>
 
@@ -340,7 +340,7 @@ export function AtsView() {
             <div className="label-mono text-[10px] uppercase tracking-wider text-muted-foreground">Scoring Categories</div>
             {analysisResult.categories.map((cat) => (
               <div key={cat.name} className="flex flex-col gap-1">
-                <div className="flex justify-between text-xs font-semibold">
+                <div className="flex justify-between text-sm font-semibold">
                   <span>{cat.name}</span>
                   <span>{cat.score}%</span>
                 </div>
@@ -365,7 +365,7 @@ export function AtsView() {
             <div className="label-mono mb-2">Recommended Improvements</div>
             <div className="flex flex-col gap-2">
               {analysisResult.suggestions.map((sug, idx) => (
-                <div key={idx} className="flex items-start gap-2 text-xs text-muted-foreground bg-accent-soft p-2.5 rounded-sm shadow-[0_1px_2px_rgba(0,0,0,0.04)]">
+                <div key={idx} className="flex items-start gap-2 text-sm text-muted-foreground bg-accent-soft p-3 rounded-sm shadow-[0_1px_2px_rgba(0,0,0,0.04)]">
                   <AlertCircle size={14} className="text-warn shrink-0 mt-0.5" />
                   <span>{sug}</span>
                 </div>
@@ -406,7 +406,7 @@ export function AtsView() {
                       </Button>
                     ))
                   ) : (
-                    <span className="text-xs text-muted-foreground flex items-center gap-1">
+                    <span className="text-sm text-muted-foreground flex items-center gap-1">
                       <CheckCircle2 size={12} className="text-success" /> Fully matched baseline requirements!
                     </span>
                   )}
@@ -421,13 +421,13 @@ export function AtsView() {
                     analysisResult.matched.map((k) => (
                       <span
                         key={k}
-                        className="rounded-full border px-2 py-0.5 text-xs bg-success-soft text-success border-success/20"
+                        className="rounded-full border px-2 py-0.5 text-sm bg-success-soft text-success border-success/20"
                       >
                         {k}
                       </span>
                     ))
                   ) : (
-                    <span className="text-xs text-muted-foreground">None identified yet</span>
+                    <span className="text-sm text-muted-foreground">None identified yet</span>
                   )}
                 </div>
               </div>
@@ -441,7 +441,7 @@ export function AtsView() {
             <div className="flex items-start gap-2.5">
               <Sparkles size={16} className="text-primary shrink-0 mt-0.5" />
               <div>
-                <h4 className="text-xs font-semibold text-foreground">Tailor Resume for this Job</h4>
+                <h4 className="text-sm font-semibold text-foreground">Tailor Resume for this Job</h4>
                 <p className="text-[10px] text-muted-foreground leading-relaxed mt-0.5">
                   AI will adapt your summary, skills order, and experience achievements to align with this job description while preserving all factual data.
                 </p>
@@ -451,7 +451,7 @@ export function AtsView() {
               variant="default"
               onClick={handleTailor}
               disabled={tailoringLoading}
-              className="flex w-full items-center justify-center gap-1.5 rounded-sm py-2 text-xs"
+              className="flex w-full items-center justify-center gap-1.5 rounded-sm py-2 text-sm"
             >
               {tailoringLoading ? (
                 <RefreshCw size={13} className="animate-spin" />
@@ -467,7 +467,7 @@ export function AtsView() {
       {/* Right panel — live resume preview */}
       <div className="flex w-full md:w-[55%] flex-col items-center overflow-y-auto neuro-surface p-4 md:p-6">
         <div className="mb-4 flex w-full max-w-[550px] items-center justify-between rounded-sm neuro-card p-2 px-3">
-          <span className="text-xs font-semibold text-muted-foreground">ATS Real-Time Sheet</span>
+          <span className="text-sm font-semibold text-muted-foreground">ATS Real-Time Sheet</span>
           <Button
             size="sm"
             onClick={() => {
@@ -478,7 +478,7 @@ export function AtsView() {
                 notify({ message: 'Select a resume first', type: 'warning' })
               }
             }}
-            className="rounded-sm px-2 py-1 text-xs"
+            className="rounded-sm px-2.5 py-1.5 text-sm"
           >
             Edit Resume Based on ATS
           </Button>
@@ -493,11 +493,11 @@ export function AtsView() {
               <FileText size={24} className="text-muted-foreground/50" />
             </div>
             <h3 className="mb-1 text-sm font-semibold text-foreground">No resume selected</h3>
-            <p className="mb-4 max-w-xs text-xs text-muted-foreground">
+            <p className="mb-4 max-w-xs text-sm text-muted-foreground">
               Select a resume from the dropdown or upload one in chat, then paste a job description to get an ATS match score.
             </p>
             <div className="flex flex-col items-start gap-2 sm:flex-row sm:items-center">
-              <Button variant="default" size="sm" onClick={() => router.push('/chat')} className="flex items-center gap-1.5 rounded-sm px-3 py-1.5 text-xs">
+              <Button variant="default" size="sm" onClick={() => router.push('/chat')} className="flex items-center gap-1.5 rounded-sm px-3 py-2 text-sm">
                 <Upload size={12} /> Upload Resume
               </Button>
               <span className="hidden items-center text-muted-foreground sm:flex">

@@ -94,7 +94,7 @@ export function SmartOverview(props: SmartOverviewProps) {
   if (state === 'error') {
     return (
       <div className="rounded-lg border border-destructive/30 bg-danger-soft p-4">
-        <p className="text-xs text-foreground mb-2">
+        <p className="text-sm text-foreground mb-2">
           Couldn&apos;t generate overview. The AI may be busy.
         </p>
         <Button
@@ -121,7 +121,7 @@ export function SmartOverview(props: SmartOverviewProps) {
           <Sparkles size={16} />
           Generate AI Overview
         </Button>
-        <p className="mt-2 text-center text-xs text-muted-foreground">
+        <p className="mt-2 text-center text-sm text-muted-foreground">
           Get a personalized analysis: match, salary, commute, company
         </p>
       </div>
@@ -211,19 +211,19 @@ function OverviewContent({
       {/* MATCH ANALYSIS */}
       <Section icon={<TrendingUp size={12} />} label="Why You Fit">
         {overview.matchAnalysis.strengths.map((s, i) => (
-          <div key={i} className="flex items-start gap-1.5 text-xs text-foreground">
+          <div key={i} className="flex items-start gap-1.5 text-sm text-foreground">
             <span className="text-success shrink-0">&#10003;</span>
             <span>{s}</span>
           </div>
         ))}
         {overview.matchAnalysis.gaps.map((g, i) => (
-          <div key={i} className="flex items-start gap-1.5 text-xs text-muted-foreground">
+          <div key={i} className="flex items-start gap-1.5 text-sm text-muted-foreground">
             <span className="text-destructive shrink-0">&#10007;</span>
             <span>{g}</span>
           </div>
         ))}
         {overview.matchAnalysis.insight && (
-          <div className="flex items-start gap-1.5 text-xs text-primary pt-1">
+          <div className="flex items-start gap-1.5 text-sm text-primary pt-1">
             <Lightbulb size={12} className="shrink-0 mt-px" />
             <span>{overview.matchAnalysis.insight}</span>
           </div>
@@ -233,7 +233,7 @@ function OverviewContent({
       {/* ROLE SUMMARY */}
       <Section icon={<Building2 size={12} />} label="The Role">
         {overview.roleSummary.map((r, i) => (
-          <div key={i} className="text-xs text-foreground">
+          <div key={i} className="text-sm text-foreground">
             &bull; {r}
           </div>
         ))}
@@ -242,11 +242,11 @@ function OverviewContent({
       {/* SALARY CHECK */}
       {overview.salaryCheck && (
         <Section icon={<DollarSign size={12} />} label="Salary Check">
-          <div className="text-xs text-foreground">
+          <div className="text-sm text-foreground">
             Listed: {overview.salaryCheck.listed || 'Not specified'}
           </div>
           {overview.salaryCheck.estimate && (
-            <div className="text-xs text-muted-foreground">
+            <div className="text-sm text-muted-foreground">
               Market: {overview.salaryCheck.estimate}
             </div>
           )}
@@ -271,9 +271,9 @@ function OverviewContent({
       {/* COMMUTE ESTIMATE */}
       {overview.commuteEstimate && (
         <Section icon={<Bus size={12} />} label="Commute">
-          <div className="text-xs text-foreground">{overview.commuteEstimate.summary}</div>
+          <div className="text-sm text-foreground">{overview.commuteEstimate.summary}</div>
           {overview.commuteEstimate.monthlyCostEstimate && (
-            <div className="text-xs text-muted-foreground">
+            <div className="text-sm text-muted-foreground">
               Est. cost: {overview.commuteEstimate.monthlyCostEstimate}
             </div>
           )}
@@ -286,9 +286,9 @@ function OverviewContent({
 
       {/* COMPANY SNAPSHOT */}
       <Section icon={<Building2 size={12} />} label="Company">
-        <div className="text-xs text-foreground">{overview.companySnapshot.description}</div>
+        <div className="text-sm text-foreground">{overview.companySnapshot.description}</div>
         {!overview.companySnapshot.known && (
-          <div className="text-xs text-muted-foreground italic">
+          <div className="text-sm text-muted-foreground italic">
             Limited info &mdash; verify with links below
           </div>
         )}
@@ -305,7 +305,7 @@ function OverviewContent({
           <Lightbulb size={12} />
           Coach Tip
         </div>
-        <div className="text-xs text-foreground">{overview.coachTip}</div>
+        <div className="text-sm text-foreground">{overview.coachTip}</div>
       </div>
 
       {/* RECOMMENDED ACTIONS */}
