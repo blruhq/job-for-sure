@@ -52,7 +52,7 @@ export default function LandingPage() {
                 </Link>
                 <Link
                   href="/register"
-                  className="inline-flex cursor-pointer items-center rounded-lg border border-border px-6 py-3 text-sm font-medium text-foreground transition-colors hover:bg-muted active:scale-[0.98]"
+                  className="inline-flex cursor-pointer items-center rounded-lg neuro-pill px-6 py-3 text-sm font-medium text-foreground transition-shadow active:scale-[0.98]"
                 >
                   {t('createAccount')}
                 </Link>

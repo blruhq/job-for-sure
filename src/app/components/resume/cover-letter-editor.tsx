@@ -145,10 +145,10 @@ export function CoverLetterEditor({ resume }: CoverLetterEditorProps) {
   }
 
   return (
-    <div className="flex w-full flex-col lg:flex-row overflow-hidden h-full">
+    <div className="flex w-full flex-col lg:flex-row overflow-hidden h-full neuro-surface">
       {/* Configuration & Input Panel */}
       <div className="w-full lg:w-[320px] shrink-0 border-b lg:border-b-0 lg:border-r neuro-surface p-5 flex flex-col gap-4 overflow-y-auto">
-        <div className="flex gap-1.5 rounded-sm bg-border/30 p-0.5 mb-1 shrink-0">
+        <div className="flex gap-1.5 rounded-sm neuro-inset p-0.5 mb-1 shrink-0">
           <Button
             variant="ghost"
             onClick={() => setMode('quick')}
@@ -172,7 +172,7 @@ export function CoverLetterEditor({ resume }: CoverLetterEditorProps) {
         {/* Language Selector */}
         <div className="space-y-1">
           <label className="label-mono mb-1 block text-[10px]">{t('outputLanguage')}</label>
-          <div className="flex gap-1.5 rounded-sm bg-border/30 p-0.5 shrink-0">
+          <div className="flex gap-1.5 rounded-sm neuro-inset p-0.5 shrink-0">
             <Button
               variant="ghost"
               onClick={() => setOutputLanguage('en')}
@@ -256,7 +256,7 @@ export function CoverLetterEditor({ resume }: CoverLetterEditorProps) {
       </div>
 
       {/* Preview / Edit Panel */}
-      <div className="flex-1 flex flex-col overflow-hidden bg-background">
+      <div className="flex-1 flex flex-col overflow-hidden neuro-surface">
         {/* Actions bar */}
         <div className="flex shrink-0 items-center justify-between neuro-surface px-4 md:px-6 py-2.5">
           <div className="flex items-center gap-2">

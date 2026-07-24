@@ -20,7 +20,7 @@ export default function NotFound() {
           </Link>
           <Link
             href="/chat"
-            className="cursor-pointer rounded-md border border-border bg-background px-4 py-2 text-xs font-medium text-foreground transition-colors hover:bg-muted"
+            className="cursor-pointer rounded-md neuro-pill px-4 py-2 text-xs font-medium text-foreground transition-shadow"
           >
             Career Coach
           </Link>

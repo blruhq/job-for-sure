@@ -1128,7 +1128,7 @@ export function ResumeDetail({ resumeId }: { resumeId: string }) {
           <Button variant="outline" size="sm" onClick={() => router.push('/chat')} className="flex shrink-0 items-center gap-1 rounded-sm px-2 py-1 text-xs">
             <ArrowLeft size={12} /> Back
           </Button>
-          <div className="ml-3 flex gap-1 overflow-x-auto rounded-sm bg-border/30 p-0.5">
+          <div className="ml-3 flex gap-1 overflow-x-auto rounded-sm neuro-inset p-0.5">
             {(['jobs', 'view', 'editor'] as const).map((t) => (
               <Button
                 key={t}
@@ -1204,7 +1204,7 @@ export function ResumeDetail({ resumeId }: { resumeId: string }) {
             {/* PDF preview — fills remaining space.
                 Uses liveResume (not raw resume) so the View tab stays in sync
                 with unsaved editor changes — same data the editor preview shows. */}
-            <div className="min-h-0 flex-1 bg-muted/30">
+            <div className="min-h-0 flex-1 neuro-surface">
               <ResumePreview resume={liveResume} />
             </div>
           </div>
@@ -1218,7 +1218,7 @@ export function ResumeDetail({ resumeId }: { resumeId: string }) {
               <TailorReviewPanel onApply={handleApplyTailor} onCancel={handleCancelTailor} />
             </div>
             {/* Live PDF with accepted changes (right) */}
-            <div className="hidden lg:flex w-[55%] min-w-[350px] flex-col bg-muted/30">
+            <div className="hidden lg:flex w-[55%] min-w-[350px] flex-col neuro-surface">
               <div className="flex-1 min-h-0">
                 <ResumePreview resume={reviewPreviewResume} />
               </div>
@@ -1324,7 +1324,7 @@ export function ResumeDetail({ resumeId }: { resumeId: string }) {
 
                 {/* Live PDF preview (right) */}
                 <ResizablePanel defaultSize="45%" minSize="20%" maxSize="70%" collapsible={true} collapsedSize="0%">
-                  <div className="h-full bg-muted/30">
+                  <div className="h-full neuro-surface">
                     <ResumePreview resume={deferredResume} />
                   </div>
                 </ResizablePanel>
@@ -1354,7 +1354,7 @@ export function ResumeDetail({ resumeId }: { resumeId: string }) {
                 </div>
               )}
               {mobileView === 'preview' && (
-                <div className="h-full bg-muted/30 min-h-[600px]">
+                <div className="h-full neuro-surface min-h-[600px]">
                   <ResumePreview resume={deferredResume} />
                 </div>
               )}

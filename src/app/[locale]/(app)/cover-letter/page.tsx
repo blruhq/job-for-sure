@@ -384,6 +384,7 @@ export default function StandaloneCoverLetterPage() {
             <div className="space-y-2">
               <label className="label-mono mb-1 block">Job Description</label>
               <Textarea
+                neumorphic
                 value={jdText}
                 onChange={(e) => setJdText(e.target.value)}
                 placeholder="Paste full target job description here..."
@@ -405,7 +406,7 @@ export default function StandaloneCoverLetterPage() {
                 className={`group flex w-full items-center gap-1.5 rounded-xs border px-2 py-1.5 cursor-pointer transition-colors text-left ${
                   activeLetterId === letter.id
                     ? 'border-primary bg-primary/5'
-                    : 'border-border hover:bg-muted/30'
+                    : 'neuro-inset hover:neuro-card'
                 }`}
                 onClick={() => handleLoadSaved(letter)}
               >

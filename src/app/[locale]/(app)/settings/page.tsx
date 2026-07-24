@@ -270,7 +270,7 @@ export default function SettingsPage() {
   }
 
   return (
-    <div className="flex-1 overflow-y-auto p-6">
+    <div className="flex-1 overflow-y-auto p-6 neuro-surface">
       <div className="mx-auto" style={{ maxWidth: '600px' }}>
         {/* Header */}
         <div className="mb-6">

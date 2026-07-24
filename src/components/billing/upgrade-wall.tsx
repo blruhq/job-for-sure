@@ -44,7 +44,7 @@ export function UpgradeWall({ feature, onContinue }: UpgradeWallProps) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm">
-      <div className="mx-4 w-full max-w-sm rounded-xl border border-border bg-card p-6 shadow-xl">
+      <div className="mx-4 w-full max-w-sm rounded-xl neuro-modal p-6">
         <div className="flex flex-col items-center text-center">
           {/* Icon */}
           <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10">
@@ -71,7 +71,7 @@ export function UpgradeWall({ feature, onContinue }: UpgradeWallProps) {
             {onContinue && (
               <button
                 onClick={onContinue}
-                className="w-full rounded-lg border border-border px-4 py-2 text-xs font-medium text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+                className="w-full rounded-lg neuro-inset px-4 py-2 text-xs font-medium text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
               >
                 Try again later
               </button>

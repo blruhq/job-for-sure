@@ -68,7 +68,7 @@ export function ResumeCopilot({ resume }: { resume: Resume }) {
       </div>
 
       {/* Messages */}
-      <div ref={scrollRef} className="flex-1 overflow-y-auto bg-background p-4">
+      <div ref={scrollRef} className="flex-1 overflow-y-auto neuro-surface p-4">
         {messages.length === 0 && (
           <div className="flex flex-col gap-3">
             <div className="flex items-start gap-2.5">

@@ -110,9 +110,9 @@ export function TailorReviewPanel({ onApply, onCancel }: { onApply: (variant: Re
   }
 
   return (
-    <div className="flex h-full flex-col bg-background">
+    <div className="flex h-full flex-col neuro-surface">
       {/* Header */}
-      <div className="flex shrink-0 items-center justify-between border-b border-border px-4 py-3">
+      <div className="flex shrink-0 items-center justify-between neuro-divider px-4 py-3">
         <div>
           <h2 className="text-sm font-semibold text-foreground">Review AI Changes</h2>
           <p className="text-[10px] text-muted-foreground mt-0.5">
@@ -146,7 +146,7 @@ export function TailorReviewPanel({ onApply, onCancel }: { onApply: (variant: Re
               key={change.id}
               className={cn(
                 'rounded-sm border p-3 transition-colors',
-                isAccepted ? 'border-primary/30 bg-primary/5' : 'border-border neuro-surface opacity-60',
+                isAccepted ? 'border-primary/30 bg-primary/5' : 'neuro-inset opacity-60',
               )}
             >
               {/* Toggle row */}
@@ -207,7 +207,7 @@ export function TailorReviewPanel({ onApply, onCancel }: { onApply: (variant: Re
       </div>
 
       {/* Footer with apply/cancel */}
-      <div className="flex shrink-0 items-center gap-2 border-t border-border p-3">
+      <div className="flex shrink-0 items-center gap-2 neuro-divider p-3">
         <Button
           variant="default"
           onClick={handleApply}

@@ -16,7 +16,7 @@ export default function LocaleError({
   }, [error])
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-background px-6 text-center">
+    <div className="flex min-h-screen flex-col items-center justify-center neuro-surface px-6 text-center">
       <div className="max-w-sm">
         <h2 className="text-lg font-semibold text-foreground">Something went wrong</h2>
         <p className="mt-2 text-xs text-muted-foreground">
@@ -31,7 +31,7 @@ export default function LocaleError({
           </Button>
           <Link
             href="/"
-            className="cursor-pointer rounded-md border border-border bg-background px-4 py-2 text-xs font-medium text-foreground transition-colors hover:bg-muted"
+            className="cursor-pointer rounded-md neuro-pill px-4 py-2 text-xs font-medium text-foreground transition-shadow"
           >
             Go home
           </Link>
