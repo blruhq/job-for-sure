@@ -78,10 +78,7 @@ function LoginForm() {
 
         <div className="rounded-lg neuro-card p-8">
           <div className="text-center">
-            <h1
-              className="text-2xl text-foreground"
-              style={{ fontFamily: 'var(--font-instrument-serif), serif' }}
-            >
+            <h1 className="text-2xl text-foreground font-display">
               Welcome back
             </h1>
             <p className="mt-1 text-xs text-muted-foreground">Sign in to your account</p>

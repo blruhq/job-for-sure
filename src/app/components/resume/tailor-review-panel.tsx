@@ -167,7 +167,7 @@ export function TailorReviewPanel({ onApply, onCancel }: { onApply: (variant: Re
                     <span className="text-[10px] font-mono font-semibold text-muted-foreground uppercase tracking-wider">
                       {change.field}
                     </span>
-                    <span className="text-[11px] font-medium text-foreground">{change.label}</span>
+                    <span className="text-xs font-medium text-foreground">{change.label}</span>
                   </div>
 
                   {/* Before → After */}
@@ -200,7 +200,7 @@ export function TailorReviewPanel({ onApply, onCancel }: { onApply: (variant: Re
 
         {changes.length === 0 && (
           <div className="flex flex-col items-center justify-center py-8 text-center">
-            <p className="text-[11px] text-muted-foreground">No changes proposed by AI.</p>
+            <p className="text-xs text-muted-foreground">No changes proposed by AI.</p>
             <p className="text-[10px] text-muted-foreground/50 mt-1">Your resume is already well-optimized.</p>
           </div>
         )}
@@ -212,14 +212,14 @@ export function TailorReviewPanel({ onApply, onCancel }: { onApply: (variant: Re
           variant="default"
           onClick={handleApply}
           disabled={acceptedCount === 0}
-          className="flex-1 px-3 py-2 text-[11px] font-medium"
+          className="flex-1 px-3 py-2 text-xs font-medium"
         >
           Apply {acceptedCount > 0 ? `${acceptedCount} ` : ''}change{acceptedCount === 1 ? '' : 's'}
         </Button>
         <Button
           variant="outline"
           onClick={onCancel}
-          className="px-3 py-2 text-[11px]"
+          className="px-3 py-2 text-xs"
         >
           Cancel
         </Button>

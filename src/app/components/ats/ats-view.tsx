@@ -400,8 +400,7 @@ export function AtsView() {
                             }
                           }
                         }}
-                        className="rounded-full px-2 py-0.5 text-xs"
-                        style={{ background: 'var(--danger-soft)', color: 'var(--destructive)', borderColor: 'rgba(220,38,38,0.2)' }}
+                        className="rounded-full px-2 py-0.5 text-xs bg-danger-soft text-destructive border border-destructive/20"
                       >
                         + {k}
                       </Button>
@@ -422,8 +421,7 @@ export function AtsView() {
                     analysisResult.matched.map((k) => (
                       <span
                         key={k}
-                        className="rounded-full border px-2 py-0.5 text-xs"
-                        style={{ background: 'var(--success-soft)', color: 'var(--success)', borderColor: 'rgba(43,95,69,0.2)' }}
+                        className="rounded-full border px-2 py-0.5 text-xs bg-success-soft text-success border-success/20"
                       >
                         {k}
                       </span>

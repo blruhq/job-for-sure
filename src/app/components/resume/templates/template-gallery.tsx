@@ -121,7 +121,7 @@ export function TemplateGallery({ value, onChange, neumorphic = false }: Templat
 
           <div className="mt-2">
             <div className="text-xs font-semibold text-foreground">{t.name}</div>
-            <div className="mt-0.5 text-[11px] leading-snug text-muted-foreground">{t.description}</div>
+            <div className="mt-0.5 text-xs leading-snug text-muted-foreground">{t.description}</div>
           </div>
 
           {value === t.id && (

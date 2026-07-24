@@ -75,7 +75,7 @@ export default function RegisterPage() {
               We sent a verification link to <span className="font-medium text-foreground">{email}</span>.
               Click the link to activate your account.
             </p>
-            <p className="mt-4 text-[11px] text-muted-foreground/60">
+            <p className="mt-4 text-xs text-muted-foreground/60">
               Didn&apos;t get an email? Check your spam folder.
             </p>
             <Link
@@ -88,12 +88,9 @@ export default function RegisterPage() {
         ) : (
         <div className="rounded-lg neuro-card p-8">
           <div className="text-center">
-            <h1
-              className="text-2xl text-foreground"
-              style={{ fontFamily: 'var(--font-instrument-serif), serif' }}
-            >
-              Create your account
-            </h1>
+              <h1 className="text-2xl text-foreground font-display">
+                Create your account
+              </h1>
             <p className="mt-1 text-xs text-muted-foreground">Start in 30 seconds. Free forever.</p>
           </div>
 

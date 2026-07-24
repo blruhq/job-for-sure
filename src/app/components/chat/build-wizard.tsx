@@ -50,11 +50,11 @@ export function BuildWizard({ open, onClose, onComplete }: BuildWizardProps) {
 
   return (
     <Dialog open={open} onOpenChange={(o) => { if (!o) handleClose() }}>
-      <DialogContent className="neuro-modal max-w-2xl gap-0 rounded-2xl p-0 ring-0" showCloseButton={false}>
+      <DialogContent className="neuro-modal max-w-2xl gap-0 rounded-lg p-0 ring-0" showCloseButton={false}>
         {/* Header */}
         <div className="flex items-center justify-between border-b border-border px-6 py-4">
           <div className="flex items-center gap-2">
-            <span className="font-mono text-[11px] font-semibold text-primary">STEP {step + 1} / 2</span>
+            <span className="font-mono text-xs font-semibold text-primary">STEP {step + 1} / 2</span>
             <span className="text-base font-semibold text-foreground">
               {['Choose Template', 'Your Target Role'][step]}
             </span>
@@ -81,7 +81,7 @@ export function BuildWizard({ open, onClose, onComplete }: BuildWizardProps) {
         <div className="p-6">
           {step === 0 && (
             <div className="space-y-4">
-              <label className="block font-mono text-[11px] uppercase tracking-wider text-muted-foreground">
+              <label className="block font-mono text-xs uppercase tracking-wider text-muted-foreground">
                 Pick a template for your resume
               </label>
               <TemplateGallery
@@ -89,7 +89,7 @@ export function BuildWizard({ open, onClose, onComplete }: BuildWizardProps) {
                 onChange={(t: ResumeTemplate) => setData({ ...data, template: t })}
                 neumorphic
               />
-              <p className="text-[11px] text-muted-foreground italic">
+              <p className="text-xs text-muted-foreground italic">
                 You can change the template anytime without losing your content.
               </p>
             </div>
@@ -98,29 +98,29 @@ export function BuildWizard({ open, onClose, onComplete }: BuildWizardProps) {
           {step === 1 && (
             <div className="space-y-4">
               <div>
-                <label className="mb-1 block font-mono text-[11px] uppercase tracking-wider text-muted-foreground">
+                <label className="mb-1 block font-mono text-xs uppercase tracking-wider text-muted-foreground">
                   What role are you applying for? *
                 </label>
                 <Input
                   value={data.role}
                   onChange={(e) => setData({ ...data, role: e.target.value })}
                   placeholder="e.g. Senior Product Designer, Registered Nurse, Marketing Manager"
-                  className="neuro-inset w-full rounded-2xl border-0 px-3 py-2 text-sm"
+                  className="neuro-inset w-full rounded-lg border-0 px-3 py-2 text-sm"
                   autoFocus
                 />
               </div>
               <div>
-                <label className="mb-1 block font-mono text-[11px] uppercase tracking-wider text-muted-foreground">
+                <label className="mb-1 block font-mono text-xs uppercase tracking-wider text-muted-foreground">
                   What industry? <span className="text-muted-foreground/50">(optional — helps tailor questions)</span>
                 </label>
                 <Input
                   value={data.industry}
                   onChange={(e) => setData({ ...data, industry: e.target.value })}
                   placeholder="e.g. Tech, Healthcare, Finance, Education"
-                  className="neuro-inset w-full rounded-2xl border-0 px-3 py-2 text-sm"
+                  className="neuro-inset w-full rounded-lg border-0 px-3 py-2 text-sm"
                 />
               </div>
-              <p className="font-mono text-[11px] text-muted-foreground">
+              <p className="font-mono text-xs text-muted-foreground">
                 After this, our AI assistant will guide you through building your resume step by step.
               </p>
             </div>

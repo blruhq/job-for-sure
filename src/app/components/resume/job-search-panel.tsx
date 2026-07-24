@@ -844,7 +844,7 @@ function JobCard({ job, bookmarked, onBookmark, onAts: _onAts, onInterview: _onI
         <span
           className={cn(
             'shrink-0 rounded-xs px-2 py-0.5 font-mono text-xs font-semibold',
-            job.score >= 75 ? 'bg-success-soft text-success' : job.score >= 50 ? 'bg-warn-soft text-[var(--warn)]' : 'bg-muted text-muted-foreground',
+            job.score >= 75 ? 'bg-success-soft text-success' : job.score >= 50 ? 'bg-warn-soft text-warn' : 'bg-muted text-muted-foreground',
           )}
         >
           {job.score}%
@@ -874,7 +874,7 @@ function JobCard({ job, bookmarked, onBookmark, onAts: _onAts, onInterview: _onI
         </span>
         {/* Salary — prefer structured range, fallback to free-text */}
         {(job.salaryMin || job.salary) && (
-          <span className="flex items-center gap-0.5 rounded-xs border border-emerald-500/30 bg-emerald-50/50 px-1.5 py-0.5 text-xs font-medium text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-400">
+          <span className="flex items-center gap-0.5 rounded-xs border border-success/30 bg-success-soft px-1.5 py-0.5 text-xs font-medium text-success dark:bg-success/10 dark:text-success">
             <DollarSign size={9} />
             {job.salaryMin && job.salaryMax
               ? `${job.salaryCurrency === 'USD' ? '$' : job.salaryCurrency === 'GBP' ? '£' : job.salaryCurrency === 'EUR' ? '€' : `${job.salaryCurrency ?? ''} `}${Math.round(job.salaryMin / 1000)}k–${Math.round(job.salaryMax / 1000)}k`

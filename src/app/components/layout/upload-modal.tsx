@@ -102,7 +102,7 @@ export function UploadModal({ open, onClose }: UploadModalProps) {
   return (
     <>
       <Dialog open={open} onOpenChange={(o) => { if (!o && !parsing) onClose() }}>
-        <DialogContent className="neuro-modal max-w-lg rounded-2xl ring-0">
+        <DialogContent className="neuro-modal max-w-lg rounded-lg ring-0">
           <DialogHeader>
             <DialogTitle>Add a Resume</DialogTitle>
           </DialogHeader>
@@ -117,7 +117,7 @@ export function UploadModal({ open, onClose }: UploadModalProps) {
               onDrop={handleDrop}
               disabled={parsing}
               className={cn(
-                'neuro-inset w-full rounded-2xl border-0 p-10 text-center',
+                'neuro-inset w-full rounded-lg border-0 p-10 text-center',
                 dragOver && 'ring-2 ring-primary',
                 parsing && 'opacity-60 cursor-not-allowed',
               )}
@@ -150,7 +150,7 @@ export function UploadModal({ open, onClose }: UploadModalProps) {
               variant="ghost"
               onClick={() => setWizardOpen(true)}
               disabled={parsing}
-              className="neuro-card w-full flex items-center gap-3 rounded-2xl border-0 p-4 text-left transition-all hover:-translate-y-0.5 disabled:opacity-60"
+              className="neuro-card w-full flex items-center gap-3 rounded-lg border-0 p-4 text-left transition-all hover:-translate-y-0.5 disabled:opacity-60"
             >
               <div className="neuro-icon-well flex h-10 w-10 items-center justify-center rounded-full text-success shrink-0">
                 <FileText size={18} />

@@ -179,7 +179,7 @@ export function JobPreview({ resume, onDismiss, onLoadComplete }: { resume: Resu
                   <span
                     className={cn(
                       'shrink-0 rounded-xs px-1.5 py-0.5 font-mono text-[10px] font-semibold',
-                      job.score >= 75 ? 'bg-success-soft text-success' : job.score >= 50 ? 'bg-warn-soft text-[var(--warn)]' : 'bg-muted text-muted-foreground',
+                      job.score >= 75 ? 'bg-success-soft text-success' : job.score >= 50 ? 'bg-warn-soft text-warn' : 'bg-muted text-muted-foreground',
                     )}
                   >
                     {job.score}%
@@ -192,7 +192,7 @@ export function JobPreview({ resume, onDismiss, onLoadComplete }: { resume: Resu
                     {SOURCE_SHORT[job.source] || job.source}
                   </span>
                   {(job.salaryMin || job.salary) && (
-                    <span className="flex items-center gap-0.5 rounded-xs bg-emerald-50/50 px-1.5 py-0.5 text-[10px] font-medium text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-400">
+                    <span className="flex items-center gap-0.5 rounded-xs bg-success-soft px-1.5 py-0.5 text-[10px] font-medium text-success dark:bg-success/10 dark:text-success">
                       <DollarSign size={8} />
                       {job.salaryMin && job.salaryMax
                         ? `${job.salaryCurrency === 'USD' ? '$' : job.salaryCurrency === 'GBP' ? '£' : job.salaryCurrency === 'EUR' ? '€' : `${job.salaryCurrency ?? ''} `}${Math.round(job.salaryMin / 1000)}k–${Math.round(job.salaryMax / 1000)}k`

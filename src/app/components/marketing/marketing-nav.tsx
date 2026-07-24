@@ -35,7 +35,7 @@ export function MarketingNav() {
               <a
                 key={link.href as string}
                 href={link.href as string}
-                className="cursor-pointer text-[13px] text-muted-foreground transition-colors hover:text-foreground"
+                className="cursor-pointer text-sm text-muted-foreground transition-colors hover:text-foreground"
               >
                 {link.label}
               </a>
@@ -43,7 +43,7 @@ export function MarketingNav() {
               <Link
                 key={link.href as string}
                 href={link.href as string}
-                className="cursor-pointer text-[13px] text-muted-foreground transition-colors hover:text-foreground"
+                className="cursor-pointer text-sm text-muted-foreground transition-colors hover:text-foreground"
               >
                 {link.label}
               </Link>
@@ -57,13 +57,13 @@ export function MarketingNav() {
           <LanguageSwitcher />
           <Link
             href="/login"
-            className="cursor-pointer rounded-md px-3 py-1.5 text-[13px] font-medium text-muted-foreground transition-colors hover:text-foreground"
+            className="cursor-pointer rounded-md px-3 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
           >
             {t('footerSignIn')}
           </Link>
           <Link
             href="/register"
-            className="cursor-pointer rounded-md bg-primary px-4 py-1.5 text-[13px] font-medium text-primary-foreground transition-opacity hover:opacity-90"
+            className="cursor-pointer rounded-md bg-primary px-4 py-1.5 text-sm font-medium text-primary-foreground transition-opacity hover:opacity-90"
           >
             {t('footerGetStarted')}
           </Link>
@@ -91,7 +91,7 @@ export function MarketingNav() {
                   key={link.href as string}
                   href={link.href as string}
                   onClick={() => setOpen(false)}
-                  className="cursor-pointer py-2 text-[13px] text-muted-foreground transition-colors hover:text-foreground"
+                  className="cursor-pointer py-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
                 >
                   {link.label}
                 </a>
@@ -100,7 +100,7 @@ export function MarketingNav() {
                   key={link.href as string}
                   href={link.href as string}
                   onClick={() => setOpen(false)}
-                  className="cursor-pointer py-2 text-[13px] text-muted-foreground transition-colors hover:text-foreground"
+                  className="cursor-pointer py-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
                 >
                   {link.label}
                 </Link>
@@ -110,14 +110,14 @@ export function MarketingNav() {
             <Link
               href="/login"
               onClick={() => setOpen(false)}
-              className="cursor-pointer py-2 text-[13px] text-muted-foreground transition-colors hover:text-foreground"
+              className="cursor-pointer py-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
             >
               {t('footerSignIn')}
             </Link>
             <Link
               href="/register"
               onClick={() => setOpen(false)}
-              className="cursor-pointer py-2 text-[13px] font-medium text-primary transition-colors hover:text-foreground"
+              className="cursor-pointer py-2 text-sm font-medium text-primary transition-colors hover:text-foreground"
             >
               {t('footerGetStarted')}
             </Link>

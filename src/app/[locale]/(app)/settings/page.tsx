@@ -271,7 +271,7 @@ export default function SettingsPage() {
 
   return (
     <div className="flex-1 overflow-y-auto p-6 neuro-surface">
-      <div className="mx-auto" style={{ maxWidth: '600px' }}>
+      <div className="mx-auto max-w-2xl">
         {/* Header */}
         <div className="mb-6">
           <h1 className="text-lg font-semibold">Settings</h1>
@@ -390,7 +390,7 @@ export default function SettingsPage() {
                 variant="link"
                 onClick={handleDetectLocation}
                 disabled={detectingLocation}
-                className="mt-2 flex items-center gap-1.5 text-[11px] h-auto p-0 disabled:opacity-50"
+                className="mt-2 flex items-center gap-1.5 text-xs h-auto p-0 disabled:opacity-50"
               >
                 {detectingLocation ? <Loader2 size={12} className="animate-spin" /> : <LocateFixed size={12} />}
                 {detectingLocation ? 'Detecting…' : 'Use my current location'}
@@ -460,7 +460,7 @@ export default function SettingsPage() {
 
             {/* Account info (read-only) */}
             <div className="rounded-sm neuro-card px-4 py-3">
-              <div className="flex justify-between text-[11px]">
+              <div className="flex justify-between text-xs">
                 <span className="text-muted-foreground">Account ID</span>
                 <span className="font-mono text-[10px]">{user?.id}</span>
               </div>
@@ -471,7 +471,7 @@ export default function SettingsPage() {
               <div className="flex items-center justify-between">
                 <div>
                   <div className="text-xs font-medium">Theme</div>
-                  <div className="text-[11px] text-muted-foreground">Light or dark mode</div>
+                  <div className="text-xs text-muted-foreground">Light or dark mode</div>
                 </div>
                 <Button
                   variant="outline"
@@ -498,9 +498,11 @@ export default function SettingsPage() {
               <div key={item.key} className="flex items-center justify-between border-b border-border/50 px-4 py-3 last:border-b-0">
                 <div>
                   <div className="text-xs font-medium">{item.label}</div>
-                  <div className="text-[11px] text-muted-foreground">{item.desc}</div>
+                  <div className="text-xs text-muted-foreground">{item.desc}</div>
                 </div>
                 <button
+                  role="switch"
+                  aria-checked={!!(prefs?.[item.key])}
                   onClick={() => handleTogglePref(item.key)}
                   className={`relative h-5 w-9 rounded-full transition-colors ${
                     prefs?.[item.key] ? 'bg-primary' : 'bg-border'
@@ -524,10 +526,10 @@ export default function SettingsPage() {
               <AlertTriangle size={13} />
               Danger Zone
             </div>
-            <div className="mb-4 text-[11px] text-muted-foreground">
+            <div className="mb-4 text-xs text-muted-foreground">
               Permanently delete your account and all associated data. This action cannot be undone.
             </div>
-            <div className="mb-3 text-[11px] font-medium">Type DELETE to confirm</div>
+            <div className="mb-3 text-xs font-medium">Type DELETE to confirm</div>
             <div className="flex gap-2">
               <Input
                 value={confirmDelete}

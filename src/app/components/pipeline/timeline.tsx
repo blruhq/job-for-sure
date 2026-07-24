@@ -31,7 +31,7 @@ export function Timeline({ job, currentStatus }: { job: PipelineJob; currentStat
       icon: <Send size={11} />,
       label: 'Applied',
       date: job.appliedAt || job.addedAt,
-      color: 'text-blue-500',
+      color: 'text-primary',
     })
   }
 
@@ -40,7 +40,7 @@ export function Timeline({ job, currentStatus }: { job: PipelineJob; currentStat
       icon: <CalendarCheck size={11} />,
       label: 'Interviewing',
       date: job.addedAt,
-      color: 'text-amber-500',
+      color: 'text-warn',
     })
   }
 
@@ -49,7 +49,7 @@ export function Timeline({ job, currentStatus }: { job: PipelineJob; currentStat
       icon: <CalendarCheck size={11} />,
       label: 'Offer received',
       date: job.addedAt,
-      color: 'text-green-500',
+      color: 'text-success',
     })
   }
 
@@ -58,7 +58,7 @@ export function Timeline({ job, currentStatus }: { job: PipelineJob; currentStat
       icon: <XCircle size={11} />,
       label: 'Rejected',
       date: job.addedAt,
-      color: 'text-red-500',
+      color: 'text-destructive',
     })
   }
 

@@ -225,7 +225,7 @@ export function LocationAutocomplete({
               key={idx}
               variant="ghost"
               onClick={() => handleSelect(item)}
-              className={`flex w-full items-center gap-2 rounded-none px-3 py-1.5 text-left text-[11px] h-auto justify-start ${
+              className={`flex w-full items-center gap-2 rounded-none px-3 py-1.5 text-left text-xs h-auto justify-start ${
                 idx === activeIndex
                   ? 'bg-accent text-accent-foreground'
                   : 'hover:bg-muted/50 text-foreground'

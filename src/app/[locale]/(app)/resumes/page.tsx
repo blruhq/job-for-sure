@@ -36,6 +36,11 @@ export default function ResumesPage() {
     router.push(`/resume/${id}`)
   }
 
+  const handleTailor = (id: string) => {
+    setActiveResumeId(id)
+    router.push('/ats')
+  }
+
   const formatDate = (iso?: string) => {
     if (!iso) return ''
     try {
@@ -50,7 +55,7 @@ export default function ResumesPage() {
       <div className="shrink-0 border-b border-border neuro-surface px-6 py-4">
         <div className="flex items-center justify-between">
           <div>
-            <div className="label-mono mb-1" style={{ fontSize: '11px' }}>[ 02 // RESUME COLLECTION ]</div>
+            <div className="label-mono mb-1 text-xs">[ 02 // RESUME COLLECTION ]</div>
             <h1 className="text-lg font-semibold text-foreground">My Resumes</h1>
           </div>
           <Button
@@ -79,7 +84,7 @@ export default function ResumesPage() {
               <FileText size={24} className="text-muted-foreground" />
             </div>
             <div>
-              <div className="label-mono mb-1" style={{ fontSize: '11px' }}>[ STATUS: EMPTY ]</div>
+              <div className="label-mono mb-1 text-xs">[ STATUS: EMPTY ]</div>
               <p className="text-sm text-muted-foreground">No resumes yet. Upload or create your first one.</p>
             </div>
             <Button
@@ -99,7 +104,7 @@ export default function ResumesPage() {
               return (
                 <div
                   key={resume.id}
-                  className="group relative flex flex-col rounded-lg neuro-card transition-all hover:shadow-none"
+                  className="group relative flex flex-col rounded-lg neuro-card transition-all hover:-translate-y-0.5"
                 >
                   {/* Card header */}
                   <div className="flex items-start justify-between gap-2 border-b border-border px-4 py-3">
@@ -120,8 +125,8 @@ export default function ResumesPage() {
                           resume.score >= 75
                             ? 'bg-success-soft text-success'
                             : resume.score >= 50
-                              ? 'bg-warn-soft text-[var(--warn)]'
-                              : 'bg-muted text-muted-foreground',
+                              ? 'bg-warn-soft text-warn'
+                              : 'bg-danger-soft text-destructive',
                         )}
                       >
                         {resume.score}%
@@ -145,7 +150,7 @@ export default function ResumesPage() {
                               onClick={() => handleOpen(v.id)}
                               className="flex items-center gap-1.5 text-left text-xs text-muted-foreground hover:text-primary h-auto p-0 w-full justify-start"
                             >
-                              <span className="text-[9px]">└</span>
+                              <span className="text-[10px]">└</span>
                               <span className="truncate">{v.variantLabel || v.name}</span>
                               {v.score > 0 && (
                                 <span className="ml-auto font-mono text-[10px] text-success shrink-0">{v.score}%</span>
@@ -181,7 +186,7 @@ export default function ResumesPage() {
                     <div className="flex items-center gap-1">
                       <Button
                         variant="ghost"
-                        onClick={() => handleOpen(resume.id)}
+                        onClick={() => handleTailor(resume.id)}
                         size="sm"
                         className="flex items-center gap-1 rounded-xs text-xs text-muted-foreground hover:bg-accent-soft hover:text-primary"
                         title="Tailor this resume"
@@ -208,7 +213,7 @@ export default function ResumesPage() {
             <Button
               variant="ghost"
               onClick={() => setUploadModalOpen(true)}
-              className="flex min-h-[180px] w-full flex-col items-center justify-center gap-3 rounded-sm neuro-inset border border-dashed border-border text-muted-foreground hover:border-brand/50 hover:bg-accent-soft hover:text-primary h-auto"
+              className="flex min-h-[180px] w-full flex-col items-center justify-center gap-3 rounded-sm neuro-inset border border-dashed border-border text-muted-foreground hover:border-primary/50 hover:bg-accent-soft hover:text-primary h-auto"
             >
               <div className="flex h-10 w-10 items-center justify-center rounded-sm neuro-icon-well">
                 <Plus size={18} strokeWidth={2} />

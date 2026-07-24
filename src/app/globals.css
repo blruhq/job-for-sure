@@ -376,6 +376,18 @@ html[lang="th"] {
   background-size: 16px 16px;
 }
 
+.hero-glow {
+  background-image:
+    radial-gradient(circle at 70% 40%, rgba(139,111,71,0.4) 0%, transparent 50%),
+    radial-gradient(circle at 30% 80%, rgba(139,111,71,0.15) 0%, transparent 40%);
+}
+
+.dark .hero-glow {
+  background-image:
+    radial-gradient(circle at 70% 40%, rgba(184,148,114,0.25) 0%, transparent 50%),
+    radial-gradient(circle at 30% 80%, rgba(184,148,114,0.10) 0%, transparent 40%);
+}
+
 /* ═══════════════════════════════════════════════════════════════
    ANIMATIONS
    ═══════════════════════════════════════════════════════════════ */

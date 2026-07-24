@@ -85,19 +85,19 @@ export function SourceHealth() {
       {loading && !data && (
         <div className="flex items-center justify-center py-8 gap-2 text-muted-foreground">
           <Loader2 size={14} className="animate-spin" />
-          <span className="text-[11px]">Testing sources…</span>
+          <span className="text-xs">Testing sources…</span>
         </div>
       )}
 
       {error && (
-        <div className="rounded-xs border border-destructive/30 bg-destructive/5 px-3 py-2 text-[11px] text-destructive">
+        <div className="rounded-xs border border-destructive/30 bg-destructive/5 px-3 py-2 text-xs text-destructive">
           {error}
         </div>
       )}
 
       {data && (
         <div className="overflow-hidden rounded-lg border border-border">
-          <table className="w-full text-[11px]">
+          <table className="w-full text-xs">
             <thead className="bg-muted/30">
               <tr>
                 <th className="px-3 py-2 text-left font-medium text-muted-foreground">Source</th>

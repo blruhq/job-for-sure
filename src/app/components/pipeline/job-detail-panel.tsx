@@ -213,14 +213,14 @@ export function JobDetailPanel({
                 job.score >= 75
                   ? 'bg-success-soft text-success'
                   : job.score >= 50
-                    ? 'bg-warn-soft text-[var(--warn)]'
+                    ? 'bg-warn-soft text-warn'
                     : 'bg-muted text-muted-foreground',
               )}
             >
               {job.score}% Match
             </span>
             {(salaryMin || job.salary) && (
-              <span className="flex items-center gap-0.5 rounded-xs bg-success-soft px-2 py-0.5 text-xs font-semibold text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-400">
+              <span className="flex items-center gap-0.5 rounded-xs bg-success-soft px-2 py-0.5 text-xs font-semibold text-success dark:bg-success/10 dark:text-success">
                 <DollarSign size={10} />
                 {salaryMin && salaryMax
                   ? `${salaryCurrency === 'USD' ? '$' : salaryCurrency === 'GBP' ? '£' : salaryCurrency === 'EUR' ? '€' : `${salaryCurrency} `}${Math.round(salaryMin / 1000)}k–${Math.round(salaryMax / 1000)}k`
@@ -349,7 +349,7 @@ export function JobDetailPanel({
                 {missingSkills.slice(0, 12).map((skill) => (
                   <span
                     key={skill}
-                    className="rounded-xs bg-warn-soft px-1.5 py-0.5 text-[10px] text-[var(--warn)]"
+                    className="rounded-xs bg-warn-soft px-1.5 py-0.5 text-[10px] text-warn"
                   >
                     {skill}
                   </span>

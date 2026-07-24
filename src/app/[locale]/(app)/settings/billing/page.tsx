@@ -128,7 +128,7 @@ export default function BillingPage() {
         </div>
 
         {isCanceled && endDate && (
-          <p className="mt-3 rounded-md bg-amber-50 px-3 py-2 text-xs text-amber-700">
+          <p className="mt-3 rounded-md bg-warn-soft px-3 py-2 text-xs text-warn">
             Your Pro access ends on {endDate}. After that, you&apos;ll be downgraded to Free.
           </p>
         )}
@@ -155,7 +155,7 @@ export default function BillingPage() {
               variant="outline"
               onClick={handleCancel}
               disabled={canceling}
-              className="rounded-lg border-border px-4 py-2 text-xs text-muted-foreground hover:text-red-500 hover:border-red-200"
+              className="rounded-lg border-border px-4 py-2 text-xs text-muted-foreground hover:text-destructive hover:border-red-200"
             >
               {canceling ? 'Canceling…' : 'Cancel subscription'}
             </Button>
@@ -186,7 +186,7 @@ export default function BillingPage() {
                   <div className="mt-1 h-1.5 w-full rounded-full bg-muted">
                     <div
                       className={`h-full rounded-full transition-all ${
-                        pct >= 90 ? 'bg-red-500' : pct >= 70 ? 'bg-amber-500' : 'bg-primary'
+                        pct >= 90 ? 'bg-destructive' : pct >= 70 ? 'bg-warn' : 'bg-primary'
                       }`}
                       style={{ width: `${pct}%` }}
                     />

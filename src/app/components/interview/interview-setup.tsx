@@ -351,7 +351,7 @@ export function InterviewSetup({ onStart, history, loadingHistory, onViewSession
                           e.stopPropagation()
                           setDeleteTarget(session.id)
                         }}
-                        className="shrink-0 opacity-0 group-hover:opacity-100 rounded-xs p-1 text-muted-foreground hover:text-red-500 hover:bg-red-500/10"
+                        className="shrink-0 opacity-0 group-hover:opacity-100 rounded-xs p-1 text-muted-foreground hover:text-destructive hover:bg-danger-soft"
                         title="Delete session"
                       >
                         <Trash2 size={12} />

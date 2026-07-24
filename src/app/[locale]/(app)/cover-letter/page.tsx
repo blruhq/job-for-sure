@@ -259,7 +259,7 @@ export default function StandaloneCoverLetterPage() {
         <div className="space-y-4">
           <div className="text-center pb-2 border-b border-border/50">
             <h1 className="text-sm font-semibold tracking-tight text-foreground">{t('generatorTitle')}</h1>
-            <p className="text-[11px] text-muted-foreground mt-0.5">{t('generatorSubtitle')}</p>
+            <p className="text-xs text-muted-foreground mt-0.5">{t('generatorSubtitle')}</p>
           </div>
 
           {/* 1. Resume selection */}
@@ -389,7 +389,7 @@ export default function StandaloneCoverLetterPage() {
                 onChange={(e) => setJdText(e.target.value)}
                 placeholder="Paste full target job description here..."
                 rows={10}
-                className="w-full resize-none rounded-xs text-[11px] px-2.5 py-1.5 font-sans"
+                className="w-full resize-none rounded-xs text-xs px-2.5 py-1.5 font-sans"
               />
             </div>
           )}
@@ -411,10 +411,10 @@ export default function StandaloneCoverLetterPage() {
                 onClick={() => handleLoadSaved(letter)}
               >
                 <div className="flex-1 min-w-0">
-                  <div className="text-[11px] font-medium text-foreground truncate">
+                  <div className="text-xs font-medium text-foreground truncate">
                     {letter.company || letter.role || 'Untitled'}
                   </div>
-                  <div className="font-mono text-[9px] text-muted-foreground">
+                  <div className="font-mono text-[10px] text-muted-foreground">
                     {new Date(letter.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
                   </div>
                 </div>
@@ -463,7 +463,7 @@ export default function StandaloneCoverLetterPage() {
         {/* Actions bar */}
         <div className="flex shrink-0 items-center justify-between border-b border-border neuro-surface px-4 md:px-6 py-2.5">
           <div className="flex items-center gap-2">
-            <span className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">Document Preview</span>
+            <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Document Preview</span>
           </div>
           <div className="flex gap-2">
             <Button
@@ -471,7 +471,7 @@ export default function StandaloneCoverLetterPage() {
               onClick={handleSave}
               disabled={!letterText || selectedResumeId === 'none'}
               size="sm"
-              className="flex items-center gap-1 rounded-sm text-[11px]"
+              className="flex items-center gap-1 rounded-sm text-xs"
             >
               <Save size={11} /> Save Letter
             </Button>
@@ -480,7 +480,7 @@ export default function StandaloneCoverLetterPage() {
               onClick={handleCopy}
               disabled={!letterText}
               size="sm"
-              className="flex items-center gap-1 rounded-sm text-[11px]"
+              className="flex items-center gap-1 rounded-sm text-xs"
             >
               <Copy size={11} /> Copy Text
             </Button>
@@ -488,7 +488,7 @@ export default function StandaloneCoverLetterPage() {
               onClick={() => window.open(`/api/export/pdf?id=${selectedResumeId}&type=cover-letter`, '_blank')}
               disabled={!letterText || selectedResumeId === 'none'}
               size="sm"
-              className="flex items-center gap-1 rounded-sm text-[11px] font-medium"
+              className="flex items-center gap-1 rounded-sm text-xs font-medium"
             >
               <Download size={11} /> Export PDF
             </Button>
@@ -499,13 +499,12 @@ export default function StandaloneCoverLetterPage() {
         <div className="flex-1 overflow-y-auto p-6 md:p-8 flex justify-center items-start">
           {letterText ? (
             <div
-              className="resume-paper w-full max-w-[650px] min-h-[800px] rounded-xs p-10 neuro-card flex flex-col animate-fade-up"
-              style={{ boxShadow: 'var(--shadow-paper)' }}
+              className="resume-paper w-full max-w-[650px] min-h-[800px] rounded-xs p-10 neuro-card flex flex-col animate-fade-up shadow-[0_0_0_1px_var(--border)]"
             >
               {/* Header layout matching PDF/Resume style */}
               <div className="text-center mb-6">
                 <div className="text-base font-bold tracking-tight text-foreground">{selectedResume?.persona || 'Your Name'}</div>
-                <div className="mt-1 font-mono text-[9px] text-muted-foreground">
+                <div className="mt-1 font-mono text-[10px] text-muted-foreground">
                   {[selectedResume?.email, selectedResume?.location].filter(Boolean).join(' · ')}
                 </div>
               </div>
@@ -518,7 +517,6 @@ export default function StandaloneCoverLetterPage() {
                 onChange={(e) => setLetterText(e.target.value)}
                 placeholder="Your cover letter text will appear here..."
                 className="w-full flex-1 min-h-[600px] bg-transparent resize-none border-0 outline-none text-foreground font-sans text-xs focus:ring-0 leading-relaxed p-0"
-                style={{ fontSize: '11px' }}
               />
             </div>
           ) : (

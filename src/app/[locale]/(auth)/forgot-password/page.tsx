@@ -54,18 +54,15 @@ export default function ForgotPasswordPage() {
               <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
                 <Mail size="24" className="text-primary" />
               </div>
-              <h1
-                className="text-2xl text-foreground"
-                style={{ fontFamily: 'var(--font-instrument-serif), serif' }}
-              >
-                Check your email
-              </h1>
+                <h1 className="text-2xl text-foreground font-display">
+                  Check your email
+                </h1>
               <p className="mt-2 text-xs text-muted-foreground">
                 We sent a password reset link to{' '}
                 <span className="font-medium text-foreground">{email}</span>.
                 Click the link to set a new password.
               </p>
-              <p className="mt-4 text-[11px] text-muted-foreground/60">
+              <p className="mt-4 text-xs text-muted-foreground/60">
                 Didn&apos;t get an email? Check your spam folder.
               </p>
               <Link
@@ -78,10 +75,7 @@ export default function ForgotPasswordPage() {
           ) : (
             <>
               <div className="text-center">
-                <h1
-                  className="text-2xl text-foreground"
-                  style={{ fontFamily: 'var(--font-instrument-serif), serif' }}
-                >
+                <h1 className="text-2xl text-foreground font-display">
                   Forgot password?
                 </h1>
                 <p className="mt-1 text-xs text-muted-foreground">

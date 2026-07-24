@@ -230,7 +230,7 @@ function LinkButton({ href, icon, label }: { href: string; icon: React.ReactNode
       href={href}
       target="_blank"
       rel="noopener noreferrer"
-      className="inline-flex items-center gap-1.5 rounded-xs neuro-pill px-3 py-2 text-xs font-medium text-foreground transition-shadow hover:bg-sidebar-hover"
+      className="inline-flex items-center gap-1.5 rounded-xs neuro-pill px-3 py-2 text-xs font-medium text-foreground transition-shadow hover:bg-accent-soft"
     >
       {icon}
       {label}

@@ -121,7 +121,7 @@ export function RoleAutocomplete({
               key={idx}
               variant="ghost"
               onClick={() => handleSelect(title)}
-              className={`block w-full rounded-none px-3 py-1.5 text-left text-[11px] h-auto justify-start ${
+              className={`block w-full rounded-none px-3 py-1.5 text-left text-xs h-auto justify-start ${
                 idx === activeIndex
                   ? 'bg-accent text-accent-foreground'
                   : 'hover:bg-muted/50 text-foreground'

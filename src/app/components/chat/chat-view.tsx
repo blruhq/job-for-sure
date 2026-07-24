@@ -582,7 +582,7 @@ export function ChatView() {
                 <Button
                   variant="ghost"
                   onClick={() => fileRef.current?.click()}
-                  className="neuro-pill rounded-xl inline-flex items-center gap-1 px-2 py-1 text-xs font-medium hover:bg-transparent hover:-translate-y-0.5"
+                  className="neuro-pill rounded-xl inline-flex items-center gap-1 px-2 py-1 text-xs font-medium hover:-translate-y-0.5"
                 >
                   <Upload size={11} />
                   Upload Resume
@@ -590,7 +590,7 @@ export function ChatView() {
                 <Button
                   variant="ghost"
                   onClick={() => setWizardOpen(true)}
-                  className="neuro-pill rounded-xl inline-flex items-center gap-1 px-2 py-1 text-xs font-medium hover:bg-transparent hover:-translate-y-0.5"
+                  className="neuro-pill rounded-xl inline-flex items-center gap-1 px-2 py-1 text-xs font-medium hover:-translate-y-0.5"
                 >
                   <FileText size={11} />
                   Build with AI
@@ -598,7 +598,7 @@ export function ChatView() {
                 <Button
                   variant="ghost"
                   onClick={() => setPasteOpen(true)}
-                  className="neuro-pill rounded-xl inline-flex items-center gap-1 px-2 py-1 text-xs font-medium hover:bg-transparent hover:-translate-y-0.5"
+                  className="neuro-pill rounded-xl inline-flex items-center gap-1 px-2 py-1 text-xs font-medium hover:-translate-y-0.5"
                 >
                   <ClipboardList size={11} />
                   Paste Job
@@ -620,7 +620,7 @@ export function ChatView() {
               className="size-7 rounded-full"
               aria-label="Attach file"
             >
-              <Paperclip size={14} className="text-neutral-400 dark:text-neutral-600" />
+              <Paperclip size={14} className="text-muted-foreground" />
             </Button>
           }
         />
@@ -714,7 +714,10 @@ export function ChatView() {
             {/* Upload */}
             <div
               onClick={() => fileRef.current?.click()}
-              className="neuro-card group flex cursor-pointer flex-col items-center rounded-2xl p-5 text-center transition-all hover:-translate-y-0.5 active:translate-y-0 animate-fade-up"
+              onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); fileRef.current?.click() } }}
+              role="button"
+              tabIndex={0}
+              className="neuro-card group flex cursor-pointer flex-col items-center rounded-2xl p-5 text-center transition-all hover:-translate-y-0.5 active:translate-y-0 animate-fade-up focus-visible:outline-2 focus-visible:outline-ring focus-visible:outline-offset-2"
               style={{ animationDelay: '100ms', animationFillMode: 'both' }}
             >
               <div className="neuro-icon-well mb-3 flex h-10 w-10 items-center justify-center rounded-full text-primary transition-transform group-hover:scale-110">
@@ -727,7 +730,10 @@ export function ChatView() {
             {/* Build from Template */}
             <div
               onClick={() => setWizardOpen(true)}
-              className="neuro-card group flex cursor-pointer flex-col items-center rounded-2xl p-5 text-center transition-all hover:-translate-y-0.5 active:translate-y-0 animate-fade-up"
+              onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setWizardOpen(true) } }}
+              role="button"
+              tabIndex={0}
+              className="neuro-card group flex cursor-pointer flex-col items-center rounded-2xl p-5 text-center transition-all hover:-translate-y-0.5 active:translate-y-0 animate-fade-up focus-visible:outline-2 focus-visible:outline-ring focus-visible:outline-offset-2"
               style={{ animationDelay: '200ms', animationFillMode: 'both' }}
             >
               <div className="neuro-icon-well mb-3 flex h-10 w-10 items-center justify-center rounded-full text-success transition-transform group-hover:scale-110">
@@ -740,10 +746,13 @@ export function ChatView() {
             {/* Paste Job Posting */}
             <div
               onClick={() => setPasteOpen(true)}
-              className="neuro-card group flex cursor-pointer flex-col items-center rounded-2xl p-5 text-center transition-all hover:-translate-y-0.5 active:translate-y-0 animate-fade-up"
+              onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setPasteOpen(true) } }}
+              role="button"
+              tabIndex={0}
+              className="neuro-card group flex cursor-pointer flex-col items-center rounded-2xl p-5 text-center transition-all hover:-translate-y-0.5 active:translate-y-0 animate-fade-up focus-visible:outline-2 focus-visible:outline-ring focus-visible:outline-offset-2"
               style={{ animationDelay: '300ms', animationFillMode: 'both' }}
             >
-              <div className="neuro-icon-well mb-3 flex h-10 w-10 items-center justify-center rounded-full text-[var(--warn)] transition-transform group-hover:scale-110">
+              <div className="neuro-icon-well mb-3 flex h-10 w-10 items-center justify-center rounded-full text-warn transition-transform group-hover:scale-110">
                 <ClipboardList size={18} />
               </div>
               <div className="neuro-title text-sm font-semibold">Paste Job Posting</div>

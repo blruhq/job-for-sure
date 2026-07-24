@@ -114,7 +114,7 @@ function TagInput({ tags, onChange, placeholder }: { tags: string[]; onChange: (
         }}
         onBlur={addTag}
         placeholder={tags.length === 0 ? (placeholder || 'Type and press Enter') : ''}
-        className="min-w-[80px] flex-1 border-none bg-transparent text-xs shadow-none focus-visible:ring-0 placeholder:text-muted-foreground/50"
+        className="min-w-[80px] flex-1 border-none bg-transparent text-xs shadow-none placeholder:text-muted-foreground/50"
       />
     </div>
   )
@@ -1278,8 +1278,8 @@ export function ResumeDetail({ resumeId }: { resumeId: string }) {
                           )}
                           {saveStatus === 'saved' && (
                             <>
-                              <div className="h-2 w-2 rounded-full bg-green-500" />
-                              <span className="text-green-600 font-medium">Saved</span>
+                              <div className="h-2 w-2 rounded-full bg-success" />
+                              <span className="text-success font-medium">Saved</span>
                             </>
                           )}
                           {saveStatus === 'idle' && (
@@ -1339,7 +1339,7 @@ export function ResumeDetail({ resumeId }: { resumeId: string }) {
                   <div className="flex items-center justify-between rounded-sm neuro-card p-2 px-3 shrink-0">
                     <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
                       {saveStatus === 'saving' && <span>Saving…</span>}
-                      {saveStatus === 'saved' && <span className="text-green-600">Saved</span>}
+                      {saveStatus === 'saved' && <span className="text-success">Saved</span>}
                       {saveStatus === 'idle' && <span>Auto-saved</span>}
                     </div>
                     <Button variant="outline" size="sm" onClick={handleOptimize} disabled={optimizing} className="flex items-center gap-1 rounded-sm px-2 py-1 text-xs disabled:opacity-50">

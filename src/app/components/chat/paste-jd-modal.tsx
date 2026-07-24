@@ -56,7 +56,7 @@ export function PasteJDModal({ open, onClose, onSubmit }: PasteJDModalProps) {
               {jdText.length} characters
             </span>
             {jdText.length > 0 && jdText.length < 50 && (
-              <span className="font-mono text-[10px] text-[var(--warn)]">
+              <span className="font-mono text-[10px] text-warn">
                 Need at least 50 characters
               </span>
             )}

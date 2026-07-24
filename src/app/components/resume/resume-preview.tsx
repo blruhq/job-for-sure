@@ -108,7 +108,7 @@ export const ResumePreview = memo(function ResumePreview({ resume }: { resume: R
   if (error && !blobUrl) {
     return (
       <div className="flex h-full min-h-[600px] items-center justify-center">
-        <div className="text-xs text-red-500">Preview unavailable</div>
+        <div className="text-xs text-destructive">Preview unavailable</div>
       </div>
     )
   }
@@ -125,7 +125,7 @@ export const ResumePreview = memo(function ResumePreview({ resume }: { resume: R
       {blobUrl && (
         <iframe
           src={blobUrl}
-          style={{ width: '100%', height: '100%', border: 'none', minHeight: '600px' }}
+          className="w-full h-full border-0 min-h-[600px]"
           title="Resume Preview"
         />
       )}

@@ -301,8 +301,7 @@ export function CoverLetterEditor({ resume }: CoverLetterEditorProps) {
         {/* Paper Container */}
         <div className="flex-1 overflow-y-auto p-6 md:p-8 flex justify-center items-start">
           <div
-            className="resume-paper w-full max-w-[650px] min-h-[800px] rounded-xs p-10 neuro-card flex flex-col"
-            style={{ boxShadow: 'var(--shadow-paper)' }}
+            className="resume-paper w-full max-w-[650px] min-h-[800px] rounded-xs p-10 neuro-card flex flex-col shadow-[0_0_0_1px_var(--border)]"
           >
             {/* Header layout matching PDF/Resume style */}
             <div className="text-center mb-6">
@@ -320,7 +319,6 @@ export function CoverLetterEditor({ resume }: CoverLetterEditorProps) {
               onChange={(e) => setLetterText(e.target.value)}
               placeholder="Your cover letter text will appear here. You can also type directly in this space to write your own letter..."
               className="w-full flex-1 min-h-[600px] bg-transparent resize-none border-0 text-foreground font-sans text-xs leading-relaxed p-0 focus:ring-0"
-              style={{ fontSize: '11px' }}
             />
           </div>
         </div>
