@@ -49,7 +49,7 @@ const collisionDetection: CollisionDetection = (args) => {
 
 const COLUMNS: { id: ApplicationColumnId; labelKey: string; dot: string; next: ApplicationColumnId | null }[] = [
   { id: 'bookmark', labelKey: 'bookmark', dot: '#9F9E98', next: 'applied' },
-  { id: 'applied', labelKey: 'applied', dot: '#5B6ABF', next: 'interviewing' },
+    { id: 'applied', labelKey: 'applied', dot: '#8B6F47', next: 'interviewing' },
   { id: 'interviewing', labelKey: 'interviewing', dot: '#D4A316', next: 'offers' },
   { id: 'offers', labelKey: 'offers', dot: '#2B5F45', next: 'rejected' },
   { id: 'rejected', labelKey: 'rejected', dot: '#B53A3A', next: null },
@@ -72,7 +72,7 @@ function DraggableJobCard({ job, children }: { job: PipelineJob; children: React
       {...attributes}
       {...listeners}
       className={cn(
-        'group cursor-grab rounded-sm neuro-card p-2.5 active:cursor-grabbing hover:-translate-y-0.5 min-w-0 overflow-hidden',
+        'group cursor-grab rounded-sm neuro-card p-4 active:cursor-grabbing hover:-translate-y-0.5 min-w-0 overflow-hidden',
       )}
     >
       {children}
@@ -88,8 +88,8 @@ function DroppableColumn({ colId, isOver, children }: { colId: ApplicationColumn
     <div
       ref={setNodeRef}
       className={cn(
-        'flex w-72 shrink-0 flex-col rounded-sm neuro-inset',
-        isOver && 'ring-1 ring-primary/40 bg-accent-soft/30',
+        'flex w-72 shrink-0 flex-col rounded-sm neuro-inset neuro-inset-container transition-all duration-150',
+        isOver && 'ring-2 ring-primary bg-primary/10 scale-[1.02]',
       )}
     >
       {children}
@@ -104,7 +104,7 @@ function JobCardContent({ job }: { job: PipelineJob }) {
     <>
       <div className="flex items-start justify-between gap-1">
         <div className="min-w-0 flex-1">
-          <div className="text-[11px] font-semibold text-foreground line-clamp-2 break-words leading-snug">
+          <div className="text-xs font-semibold text-foreground line-clamp-2 break-words leading-snug">
             {job.title || 'Untitled Position'}
           </div>
           <div className="text-[10px] text-muted-foreground truncate mt-0.5">
@@ -113,7 +113,7 @@ function JobCardContent({ job }: { job: PipelineJob }) {
         </div>
         {job.score > 0 && (
           <span className={cn(
-            'shrink-0 rounded-xs px-1 py-px text-[9px] font-mono font-semibold',
+            'shrink-0 rounded-xs px-1 py-px text-[11px] font-mono font-semibold',
             job.score >= 85 ? 'bg-success/10 text-success' : job.score >= 70 ? 'bg-primary/10 text-primary' : 'bg-warn/10 text-warn'
           )}>
             {job.score}%
@@ -122,7 +122,7 @@ function JobCardContent({ job }: { job: PipelineJob }) {
       </div>
 
       {(job.loc || job.salary) && (
-        <div className="mt-1.5 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[9px] text-muted-foreground">
+        <div className="mt-1.5 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[11px] text-muted-foreground">
           {job.loc && <span className="break-words">{job.loc}</span>}
           {job.salary && (
             <>
@@ -133,7 +133,7 @@ function JobCardContent({ job }: { job: PipelineJob }) {
         </div>
       )}
       {dateText && (
-        <div className="mt-1 text-[9px] text-muted-foreground/60 whitespace-nowrap">
+        <div className="mt-1 text-[11px] text-muted-foreground/60 whitespace-nowrap">
           {dateText}
         </div>
       )}
@@ -186,7 +186,7 @@ function InlineAddForm({ colId: _colId, onCancel, onSave, titleRef }: InlineAddF
   }
 
   return (
-    <div className="mt-1.5 flex flex-col gap-2 rounded-xs neuro-card p-2.5">
+    <div className="mt-1.5 flex flex-col gap-2 rounded-xs neuro-card p-4">
       <Input
         neumorphic
         ref={titleRef}
@@ -491,7 +491,7 @@ export function ApplicationsView() {
           }
         }}
       >
-        <div className="flex flex-1 gap-3 overflow-x-auto p-4">
+        <div className="flex flex-1 gap-5 overflow-x-auto p-4">
           {COLUMNS.map((col) => {
             const jobs = filterJobs(applications[col.id])
             const isOver = dragOverCol === col.id
@@ -508,9 +508,9 @@ export function ApplicationsView() {
                 </div>
 
                 {/* Job Cards — overflow-x-hidden prevents horizontal clip/scrollbar while
-                     overflow-y-auto enables vertical scroll. px-3/pb-2 padding gives 12px
+                     overflow-y-auto enables vertical scroll. px-4/pb-3 padding gives 16px
                      room for the -6px/-8px neumorphic card shadows. */}
-                <div className="flex flex-1 min-h-0 min-w-0 flex-col gap-1.5 overflow-y-auto overflow-x-hidden px-3 pb-2 pt-3">
+                <div className="flex flex-1 min-h-0 min-w-0 flex-col gap-3 overflow-y-auto overflow-x-hidden px-4 pb-3 pt-4">
                   {jobs.length === 0 && !(addingToCol === col.id) && (
                     <div className="px-2 py-6 text-center">
                       <p className="text-[10px] text-muted-foreground/50">
@@ -522,7 +522,7 @@ export function ApplicationsView() {
                   <SortableContext items={jobs.map((j) => j.key)} strategy={verticalListSortingStrategy}>
                     {jobs.map((job) => (
                       <DraggableJobCard key={job.key} job={job}>
-                        <Button variant="ghost" onClick={() => setSelectedJob(job)} className="flex w-full flex-col items-start justify-start gap-0 text-left h-auto p-0 rounded-none whitespace-normal min-w-0">
+                        <Button variant="ghost" onClick={() => setSelectedJob(job)} className="flex w-full flex-col items-start justify-start gap-0 text-left h-auto p-0 rounded-none whitespace-normal min-w-0 hover:bg-transparent">
                           <JobCardContent job={job} />
                         </Button>
                         <div className="mt-1.5 flex items-center gap-1">
@@ -532,7 +532,7 @@ export function ApplicationsView() {
                               target="_blank"
                               rel="noopener noreferrer"
                               onClick={(e) => e.stopPropagation()}
-                              className="flex items-center gap-0.5 rounded-xs px-1.5 py-0.5 text-[9px] text-muted-foreground hover:text-primary transition-colors"
+                              className="flex items-center gap-0.5 rounded-xs px-1.5 py-0.5 text-[11px] text-muted-foreground hover:text-primary transition-colors"
                             >
                               <Link2 size={10} /> Open
                             </a>
@@ -541,7 +541,7 @@ export function ApplicationsView() {
                               e.stopPropagation()
                               removeJob(job.key)
                               notify({ message: 'Removed from board', type: 'info' })
-                            }} className="flex items-center gap-0.5 rounded-xs px-1.5 py-0.5 text-[9px] text-muted-foreground hover:text-destructive h-auto">
+                            }} className="flex items-center gap-0.5 rounded-xs px-1.5 py-0.5 text-[11px] text-muted-foreground hover:text-destructive h-auto">
                             <Trash2 size={10} /> Remove
                           </Button>
                         </div>
@@ -575,7 +575,7 @@ export function ApplicationsView() {
         {/* ── Floating drag overlay ── */}
         <DragOverlay dropAnimation={null}>
           {activeJob ? (
-            <div className="w-72 rounded-sm neuro-card p-2.5">
+            <div className="w-72 rounded-sm neuro-card p-4">
               <JobCardContent job={activeJob} />
             </div>
           ) : null}
