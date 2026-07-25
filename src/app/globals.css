@@ -68,10 +68,10 @@
   --card-foreground: #101828;
   --popover: #FFFFFF;
   --popover-foreground: #101828;
-  --primary: #E6CD2A;              /* deep amber — AA contrast on white (4.0:1) */
-  --primary-foreground: #1A1A1A;   /* dark text on yellow */
-  --primary-hover: #D4BC1F;
-  --brand: #F5E042;                /* fresh yellow for brand fills */
+  --primary: #D97706;                 /* was #E6CD2A — now amber-600, AA contrast on white (4.5:1+) */
+  --primary-foreground: #FFFFFF;      /* white text on amber (amber-600 is dark enough) */
+  --primary-hover: #B45309;
+  --brand: #F59E0B;                /* fresh yellow for brand fills */
   --brand-foreground: #1A1A1A;
 
   /* ── Teal action/CTA scale (primary action color) ── */
@@ -91,19 +91,19 @@
   --secondary-foreground: #101828;
   --muted: #F1F3F6;                /* subtle cool divider bg */
   --muted-foreground: #667085;     /* cool gray secondary text */
-  --accent: rgba(245, 224, 66, 0.12); /* amber soft */
-  --accent-foreground: #E6CD2A;
+  --accent: rgba(245, 158, 11, 0.12); /* amber soft */
+  --accent-foreground: #D97706;
   --destructive: #D92D20;          /* slightly cooler red */
   --destructive-foreground: #FFFFFF;
   --border: #E4E7EC;               /* cool border */
   --input: #D0D5DD;
-  --ring: #E6CD2A;
+  --ring: #D97706;
   --radius: 0.5rem;                /* 8px base radius */
 
   /* ── Chart / status tokens ── */
-  --chart-1: #E6CD2A;
+  --chart-1: #D97706;
   --chart-2: #2E3856;
-  --chart-3: #F5E042;
+  --chart-3: #F59E0B;
   --chart-4: #D92D20;
   --chart-5: #93979C;
 
@@ -113,7 +113,7 @@
   --sidebar-hover: #F1F3F6;
   --sidebar-active: #ECEEF2;
   --sidebar-border: #E4E7EC;
-  --sidebar-accent: #E6CD2A;
+  --sidebar-accent: #D97706;
 
   /* ── Extended palette ── */
   --success: #067647;
@@ -121,8 +121,8 @@
   --warn: #B54708;
   --warn-soft: rgba(180, 83, 9, 0.10);
   --danger-soft: rgba(217, 45, 32, 0.10);
-  --accent-soft: rgba(245, 224, 66, 0.12);
-  --accent-blueprint: rgba(245, 224, 66, 0.08);
+  --accent-soft: rgba(245, 158, 11, 0.12);
+  --accent-blueprint: rgba(245, 158, 11, 0.08);
 
   /* ── Mascot palette: Navy + Amber + Lemon ── */
   --navy: #4E5368;                    /* suit jacket — structural */
@@ -138,11 +138,11 @@
   --cream: #F3F0E8;                   /* shirt — paper texture */
 
   /* ── Amber/Yellow accent scale ── */
-  --amber: #F5E042;                   /* fresh yellow — primary brand */
-  --amber-hover: #E6CD2A;             /* deeper for hover + AA text on white */
-  --amber-deep: #D4BC1F;              /* deepest — AA contrast for text */
-  --amber-soft: rgba(245, 224, 66, 0.14);
-  --amber-glow: rgba(245, 224, 66, 0.35);
+  --amber: #F59E0B;                   /* fresh yellow — primary brand */
+  --amber-hover: #D97706;             /* deeper for hover + AA text on white */
+  --amber-deep: #B45309;              /* deepest — AA contrast for text */
+  --amber-soft: rgba(245, 158, 11, 0.14);
+  --amber-glow: rgba(245, 158, 11, 0.35);
   --pale-glow: #FDF9D3;               /* ultra-soft yellow for AI glow panels */
   --pale-glow-soft: rgba(253, 249, 211, 0.32);
 
@@ -220,7 +220,7 @@
   --an-foreground-muted: var(--muted-foreground);
   --an-foreground-subtle: #9F9E98;
   --an-border-color: var(--border);     /* #E4E7EC cool border */
-  --an-primary-color: var(--primary);   /* #E6CD2A deep amber */
+  --an-primary-color: var(--primary);   /* #D97706 deep amber */
   --an-user-message-bg: var(--accent-soft);  /* soft amber tint */
   --an-user-message-text: var(--foreground);
   --an-input-background: var(--card);   /* white surface */
@@ -250,25 +250,25 @@ html[lang="th"] {
   --card-foreground: #F2F4F8;
   --popover: #181D27;
   --popover-foreground: #F2F4F8;
-  --primary: #F5E042;               /* fresh yellow — action/CTA in dark mode */
+  --primary: #F59E0B;               /* fresh yellow — action/CTA in dark mode */
   --primary-foreground: #0E1116;    /* dark text on yellow */
-  --brand: #F5E042;                  /* fresh yellow for dark mode */
+  --brand: #F59E0B;                  /* fresh yellow for dark mode */
   --brand-foreground: #0E1116;
   --secondary: #232936;
   --secondary-foreground: #F2F4F8;
   --muted: #232936;
   --muted-foreground: #87909F;
-  --accent: rgba(245, 224, 66, 0.14);
-  --accent-foreground: #F5E042;
+  --accent: rgba(245, 158, 11, 0.14);
+  --accent-foreground: #FBBF24;       /* amber-400 for dark mode text accents */
   --destructive: #F85149;
   --destructive-foreground: #FFFFFF;
   --border: rgba(255, 255, 255, 0.08);
   --input: rgba(255, 255, 255, 0.10);
-  --ring: #F5E042;
+  --ring: #F59E0B;
 
-  --chart-1: #F5E042;
+  --chart-1: #F59E0B;
   --chart-2: #5A6BA0;
-  --chart-3: #F8E9A0;
+  --chart-3: #FBBF24;
   --chart-4: #F85149;
   --chart-5: #87909F;
 
@@ -277,15 +277,15 @@ html[lang="th"] {
   --sidebar-hover: #232936;
   --sidebar-active: #2D3444;
   --sidebar-border: rgba(255, 255, 255, 0.08);
-  --sidebar-accent: #F5E042;
+  --sidebar-accent: #F59E0B;
 
   --success: #3FB950;
   --success-soft: rgba(63, 185, 80, 0.12);
   --warn: #F5A623;
   --warn-soft: rgba(245, 166, 35, 0.12);
   --danger-soft: rgba(248, 81, 73, 0.12);
-  --accent-soft: rgba(245, 224, 66, 0.14);
-  --accent-blueprint: rgba(245, 224, 66, 0.08);
+  --accent-soft: rgba(245, 158, 11, 0.14);
+  --accent-blueprint: rgba(245, 158, 11, 0.08);
 
   --neuro-surface: var(--background);
 
@@ -302,14 +302,14 @@ html[lang="th"] {
   --an-foreground-muted: #87909F;
   --an-foreground-subtle: #7D7C76;
   --an-border-color: rgba(255, 255, 255, 0.08);
-  --an-primary-color: #F5E042;       /* amber */
-  --an-user-message-bg: rgba(245, 224, 66, 0.14);
+  --an-primary-color: #F59E0B;       /* amber */
+  --an-user-message-bg: rgba(245, 158, 11, 0.14);
   --an-user-message-text: #F2F4F8;
   --an-input-background: #181D27;
   --an-input-border-color: rgba(255, 255, 255, 0.10);
   --an-input-color: #F2F4F8;
   --an-input-placeholder-color: #7D7C76;
-  --an-send-button-bg: #F5E042;      /* amber */
+  --an-send-button-bg: #F59E0B;      /* amber */
   --an-send-button-color: #0E1116;   /* dark text on yellow */
   --an-tool-background: #181D27;
   --an-tool-border-color: rgba(255, 255, 255, 0.08);
@@ -400,14 +400,14 @@ html[lang="th"] {
 
 .hero-glow {
   background-image:
-    radial-gradient(circle at 70% 40%, rgba(245,224,66,0.3) 0%, transparent 50%),
-    radial-gradient(circle at 30% 80%, rgba(245,224,66,0.15) 0%, transparent 40%);
+    radial-gradient(circle at 70% 40%, rgba(245,158,11,0.3) 0%, transparent 50%),
+    radial-gradient(circle at 30% 80%, rgba(245,158,11,0.15) 0%, transparent 40%);
 }
 
 .dark .hero-glow {
   background-image:
-    radial-gradient(circle at 70% 40%, rgba(245,224,66,0.2) 0%, transparent 50%),
-    radial-gradient(circle at 30% 80%, rgba(245,224,66,0.10) 0%, transparent 40%);
+    radial-gradient(circle at 70% 40%, rgba(245,158,11,0.2) 0%, transparent 50%),
+    radial-gradient(circle at 30% 80%, rgba(245,158,11,0.10) 0%, transparent 40%);
 }
 
 /* ═══════════════════════════════════════════════════════════════
