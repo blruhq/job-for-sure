@@ -57,22 +57,22 @@
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   DESIGN TOKENS — Warm ivory paper + warm bronze
-   Inspired by demo, Mercor minimalism, Path.cv polish
+   DESIGN TOKENS — Navy structure + Gold accent + Lemon AI glow
+   Mascot-true palette: suit (navy) + tie stripe (gold) + eyes (lemon)
    ═══════════════════════════════════════════════════════════════ */
 :root {
   /* ── shadcn semantic tokens ── */
-  --background: #F7F4EF;           /* warm ivory paper */
-  --foreground: #2D2A22;           /* warm charcoal */
-  --card: #FDFBF7;                 /* warm off-white surface */
-  --card-foreground: #2D2A22;
-  --popover: #FDFBF7;
-  --popover-foreground: #2D2A22;
-  --primary: #0D9488;              /* teal-600 — action/CTA */
+  --background: #F7F8FA;           /* cool off-white */
+  --foreground: #101828;           /* cool near-black */
+  --card: #FFFFFF;                 /* pure white */
+  --card-foreground: #101828;
+  --popover: #FFFFFF;
+  --popover-foreground: #101828;
+  --primary: #B8923C;              /* deep gold — AA contrast on white */
   --primary-foreground: #FFFFFF;
-  --primary-hover: #0F766E;          /* teal-700 — hover state */
-  --brand: #8B6F47;                  /* warm bronze — brand identity */
-  --brand-foreground: #FFFFFF;       /* white text on bronze */
+  --primary-hover: #A07E2E;
+  --brand: #C4A56D;                /* mascot gold — brand identity */
+  --brand-foreground: #FFFFFF;
 
   /* ── Teal action/CTA scale (primary action color) ── */
   --teal-50: #F0FDFA;
@@ -87,66 +87,79 @@
   --teal-900: #134E4A;
   --teal-950: #042F2E;
 
-  --secondary: #EDE8E0;            /* warm beige */
-  --secondary-foreground: #2D2A22;
-  --muted: #EDE8E0;                /* subtle warm divider bg */
-  --muted-foreground: #6B6557;     /* warm secondary text */
-  --accent: rgba(139, 111, 71, 0.08); /* accent soft */
-  --accent-foreground: #8B6F47;
-  --destructive: #DC2626;
+  --secondary: #F1F3F6;            /* cool gray */
+  --secondary-foreground: #101828;
+  --muted: #F1F3F6;                /* subtle cool divider bg */
+  --muted-foreground: #667085;     /* cool gray secondary text */
+  --accent: rgba(184, 146, 60, 0.10); /* gold soft */
+  --accent-foreground: #B8923C;
+  --destructive: #D92D20;          /* slightly cooler red */
   --destructive-foreground: #FFFFFF;
-  --border: #E0DAD0;               /* warm border */
-  --input: #E0DAD0;
-  --ring: #8B6F47;
+  --border: #E4E7EC;               /* cool border */
+  --input: #D0D5DD;
+  --ring: #B8923C;
   --radius: 0.5rem;                /* 8px base radius */
 
   /* ── Chart / status tokens ── */
-  --chart-1: #8B6F47;
-  --chart-2: #2B5F45;
-  --chart-3: #D4A316;
-  --chart-4: #DC2626;
-  --chart-5: #9F9E98;
+  --chart-1: #B8923C;
+  --chart-2: #2E3856;
+  --chart-3: #C4A56D;
+  --chart-4: #D92D20;
+  --chart-5: #93979C;
 
   /* ── Sidebar tokens ── */
-  --sidebar: #F2EDE5;
-  --sidebar-foreground: #2D2A22;
-  --sidebar-hover: #E8E2D8;
-  --sidebar-active: #DDD5CA;
-  --sidebar-border: #E0DAD0;
-  --sidebar-accent: #8B6F47;
+  --sidebar: #F7F8FA;
+  --sidebar-foreground: #101828;
+  --sidebar-hover: #F1F3F6;
+  --sidebar-active: #ECEEF2;
+  --sidebar-border: #E4E7EC;
+  --sidebar-accent: #B8923C;
 
   /* ── Extended palette ── */
-  --success: #1A8849;
-  --success-soft: rgba(26, 136, 73, 0.08);
-  --warn: #C68A03;
-  --warn-soft: rgba(212, 163, 22, 0.08);
-  --danger-soft: rgba(220, 38, 38, 0.08);
-  --accent-soft: rgba(139, 111, 71, 0.08);
-  --accent-blueprint: rgba(139, 111, 71, 0.05);
+  --success: #067647;
+  --success-soft: rgba(6, 118, 71, 0.10);
+  --warn: #B54708;
+  --warn-soft: rgba(180, 83, 9, 0.10);
+  --danger-soft: rgba(217, 45, 32, 0.10);
+  --accent-soft: rgba(184, 146, 60, 0.10);
+  --accent-blueprint: rgba(184, 146, 60, 0.06);
+
+  /* ── Mascot palette: Navy + Gold + Lemon ── */
+  --navy: #4E5368;                    /* suit jacket — structural */
+  --navy-deep: #2E3856;               /* tie — deep accent */
+  --navy-soft: rgba(78, 83, 104, 0.08);
+  --gold: #C4A56D;                    /* tie stripe — mascot gold */
+  --gold-hover: #D4B67E;
+  --gold-deep: #B8923C;               /* AA-contrast gold for white bg */
+  --gold-soft: rgba(196, 165, 109, 0.14);
+  --gold-glow: rgba(196, 165, 109, 0.32);
+  --lemon: #FBF7C8;                   /* mascot eyes — AI glow ONLY */
+  --lemon-glow: rgba(251, 247, 200, 0.32);
+  --cream: #F3F0E8;                   /* shirt — paper texture */
 
   /* ── Neumorphic surface (light mode only; dark mode neutralizes via .dark .neuro-* rules) ── */
-  --neuro-surface: #E8E2D8;
+  --neuro-surface: #ECEEF2;
   /* Lighter surface for inset/recessed elements (gives shadows tonal contrast) */
-  --neuro-surface-raised: #F0EBE2;
+  --neuro-surface-raised: #F5F6F8;
   /* Slightly lighter than --neuro-surface for raised/extruded cards */
-  --neuro-surface-card: #EDE8DF;
+  --neuro-surface-card: #F1F3F6;
   /* Lightest tone — for cards that sit inside inset/recessed containers */
-  --neuro-surface-card-raised: #F5F1E8;
+  --neuro-surface-card-raised: #F7F8FA;
 
   /* ── Neumorphic shadow colors (Apple Vision Pro profile) ── */
-  /* Dark shadow = warm clay tone, Light highlight = warm ivory glow */
+  /* Dark shadow = cool slate tone, Light highlight = pure white glow */
   /* Calibrated to Apple VP: white 0.15-0.20, dark 0.15-0.25 */
-  --neuro-dark-card: rgba(74, 68, 56, 0.18);
-  --neuro-dark-card-hover: rgba(74, 68, 56, 0.22);
-  --neuro-dark-inset: rgba(74, 68, 56, 0.15);
-  --neuro-dark-pill: rgba(74, 68, 56, 0.15);
-  --neuro-dark-pill-hover: rgba(74, 68, 56, 0.18);
-  --neuro-dark-pill-active: rgba(74, 68, 56, 0.12);
-  --neuro-dark-modal: rgba(74, 68, 56, 0.20);
-  --neuro-dark-chat: rgba(74, 68, 56, 0.12);
-  --neuro-dark-chat-hover: rgba(74, 68, 56, 0.14);
-  --neuro-light-base: rgba(253, 251, 247, 0.18);
-  --neuro-light-hover: rgba(253, 251, 247, 0.22);
+  --neuro-dark-card: rgba(16, 24, 40, 0.18);
+  --neuro-dark-card-hover: rgba(16, 24, 40, 0.22);
+  --neuro-dark-inset: rgba(16, 24, 40, 0.15);
+  --neuro-dark-pill: rgba(16, 24, 40, 0.15);
+  --neuro-dark-pill-hover: rgba(16, 24, 40, 0.18);
+  --neuro-dark-pill-active: rgba(16, 24, 40, 0.12);
+  --neuro-dark-modal: rgba(16, 24, 40, 0.20);
+  --neuro-dark-chat: rgba(16, 24, 40, 0.12);
+  --neuro-dark-chat-hover: rgba(16, 24, 40, 0.14);
+  --neuro-light-base: rgba(255, 255, 255, 0.18);
+  --neuro-light-hover: rgba(255, 255, 255, 0.22);
 
   /* ── Typography ── */
   --font-sans: var(--font-inter, 'Inter Variable'), 'Inter', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
@@ -184,22 +197,22 @@
   --shadow-lg: 0 2px 8px rgba(0, 0, 0, 0.06);
   --shadow-paper: 0 0 0 1px var(--border);
 
-  /* ── Agent Elements overrides (match our design system) ── */
+  /* ── Agent Elements overrides (match our gold-accent design system) ── */
   --an-border-radius: 6px;              /* enterprise, not 16px pills */
   --an-message-border-radius: 6px;
   --an-input-border-radius: 6px;
   --an-tool-border-radius: 6px;
   --an-message-radius-inner-offset: 2px;
   --an-max-width: 680px;                /* match our chat container */
-  --an-background: var(--background);   /* #F7F4EF warm ivory */
+  --an-background: var(--background);   /* #F7F8FA cool off-white */
   --an-background-secondary: var(--secondary);
   --an-background-tertiary: var(--muted);
-  --an-foreground: var(--foreground);   /* #2D2A22 warm charcoal */
+  --an-foreground: var(--foreground);   /* #101828 cool near-black */
   --an-foreground-muted: var(--muted-foreground);
   --an-foreground-subtle: #9F9E98;
-  --an-border-color: var(--border);     /* #E0DAD0 warm border */
-  --an-primary-color: var(--primary);   /* #8B6F47 warm bronze */
-  --an-user-message-bg: var(--accent-soft);  /* soft warm-bronze tint */
+  --an-border-color: var(--border);     /* #E4E7EC cool border */
+  --an-primary-color: var(--primary);   /* #B8923C deep gold */
+  --an-user-message-bg: var(--accent-soft);  /* soft gold tint */
   --an-user-message-text: var(--foreground);
   --an-input-background: var(--card);   /* white surface */
   --an-input-border-color: var(--border);
@@ -222,48 +235,48 @@ html[lang="th"] {
 
 /* ── Dark mode ── */
 .dark {
-  --background: #0D0E11;
-  --foreground: #E4E7EC;
-  --card: #16181D;
-  --card-foreground: #E4E7EC;
-  --popover: #16181D;
-  --popover-foreground: #E4E7EC;
-  --primary: #2DD4BF;               /* teal-400 — action/CTA in dark mode */
-  --primary-foreground: #042F2E;     /* teal-950 — dark text on bright teal */
-  --brand: #B89472;                  /* lightened bronze for dark mode */
-  --brand-foreground: #FFFFFF;
-  --secondary: #1C1E24;
-  --secondary-foreground: #E4E7EC;
-  --muted: #1C1E24;
-  --muted-foreground: #9CA3B0;
-  --accent: rgba(184, 148, 114, 0.12);
-  --accent-foreground: #B89472;
-  --destructive: #EF4444;
+  --background: #0E1116;
+  --foreground: #F2F4F8;
+  --card: #181D27;
+  --card-foreground: #F2F4F8;
+  --popover: #181D27;
+  --popover-foreground: #F2F4F8;
+  --primary: #C4A56D;               /* mascot gold — action/CTA in dark mode */
+  --primary-foreground: #0E1116;    /* dark text on gold */
+  --brand: #D4B67E;                  /* lightened gold for dark mode */
+  --brand-foreground: #0E1116;
+  --secondary: #232936;
+  --secondary-foreground: #F2F4F8;
+  --muted: #232936;
+  --muted-foreground: #87909F;
+  --accent: rgba(196, 165, 109, 0.14);
+  --accent-foreground: #D4B67E;
+  --destructive: #F85149;
   --destructive-foreground: #FFFFFF;
-  --border: rgba(255, 255, 255, 0.07);
-  --input: rgba(255, 255, 255, 0.07);
-  --ring: #B89472;
+  --border: rgba(255, 255, 255, 0.08);
+  --input: rgba(255, 255, 255, 0.10);
+  --ring: #C4A56D;
 
-  --chart-1: #B89472;
-  --chart-2: #4ADE80;
-  --chart-3: #EAB308;
-  --chart-4: #EF4444;
-  --chart-5: #7D7C76;
+  --chart-1: #C4A56D;
+  --chart-2: #5A6BA0;
+  --chart-3: #D4B67E;
+  --chart-4: #F85149;
+  --chart-5: #87909F;
 
-  --sidebar: #0F1014;
-  --sidebar-foreground: #E4E7EC;
-  --sidebar-hover: #1C1E24;
-  --sidebar-active: #262932;
-  --sidebar-border: rgba(255, 255, 255, 0.07);
-  --sidebar-accent: #B89472;
+  --sidebar: #131720;
+  --sidebar-foreground: #F2F4F8;
+  --sidebar-hover: #232936;
+  --sidebar-active: #2D3444;
+  --sidebar-border: rgba(255, 255, 255, 0.08);
+  --sidebar-accent: #C4A56D;
 
-  --success: #4ADE80;
-  --success-soft: rgba(74, 222, 128, 0.10);
-  --warn: #EAB308;
-  --warn-soft: rgba(234, 179, 8, 0.10);
-  --danger-soft: rgba(239, 68, 68, 0.10);
-  --accent-soft: rgba(184, 148, 114, 0.12);
-  --accent-blueprint: rgba(184, 148, 114, 0.07);
+  --success: #3FB950;
+  --success-soft: rgba(63, 185, 80, 0.12);
+  --warn: #F5A623;
+  --warn-soft: rgba(245, 166, 35, 0.12);
+  --danger-soft: rgba(248, 81, 73, 0.12);
+  --accent-soft: rgba(196, 165, 109, 0.14);
+  --accent-blueprint: rgba(196, 165, 109, 0.07);
 
   --neuro-surface: var(--background);
 
@@ -273,26 +286,26 @@ html[lang="th"] {
   --shadow-paper: 0 0 0 1px var(--border);
 
   /* ── Agent Elements dark overrides ── */
-  --an-background: #0D0E11;
-  --an-background-secondary: #1C1E24;
-  --an-background-tertiary: #16181D;
-  --an-foreground: #E4E7EC;
-  --an-foreground-muted: #9CA3B0;
+  --an-background: #0E1116;
+  --an-background-secondary: #232936;
+  --an-background-tertiary: #181D27;
+  --an-foreground: #F2F4F8;
+  --an-foreground-muted: #87909F;
   --an-foreground-subtle: #7D7C76;
-  --an-border-color: rgba(255, 255, 255, 0.07);
-  --an-primary-color: #2DD4BF;
-  --an-user-message-bg: rgba(184, 148, 114, 0.12);
-  --an-user-message-text: #E4E7EC;
-  --an-input-background: #16181D;
-  --an-input-border-color: rgba(255, 255, 255, 0.07);
-  --an-input-color: #E4E7EC;
+  --an-border-color: rgba(255, 255, 255, 0.08);
+  --an-primary-color: #C4A56D;       /* gold */
+  --an-user-message-bg: rgba(196, 165, 109, 0.14);
+  --an-user-message-text: #F2F4F8;
+  --an-input-background: #181D27;
+  --an-input-border-color: rgba(255, 255, 255, 0.10);
+  --an-input-color: #F2F4F8;
   --an-input-placeholder-color: #7D7C76;
-  --an-send-button-bg: #2DD4BF;
-  --an-send-button-color: #042F2E;
-  --an-tool-background: #16181D;
-  --an-tool-border-color: rgba(255, 255, 255, 0.07);
-  --an-tool-color: #E4E7EC;
-  --an-tool-color-muted: #9CA3B0;
+  --an-send-button-bg: #C4A56D;      /* gold */
+  --an-send-button-color: #0E1116;   /* dark text on gold */
+  --an-tool-background: #181D27;
+  --an-tool-border-color: rgba(255, 255, 255, 0.08);
+  --an-tool-color: #F2F4F8;
+  --an-tool-color-muted: #87909F;
 }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -378,14 +391,14 @@ html[lang="th"] {
 
 .hero-glow {
   background-image:
-    radial-gradient(circle at 70% 40%, rgba(139,111,71,0.4) 0%, transparent 50%),
-    radial-gradient(circle at 30% 80%, rgba(139,111,71,0.15) 0%, transparent 40%);
+    radial-gradient(circle at 70% 40%, rgba(184,146,60,0.4) 0%, transparent 50%),
+    radial-gradient(circle at 30% 80%, rgba(184,146,60,0.15) 0%, transparent 40%);
 }
 
 .dark .hero-glow {
   background-image:
-    radial-gradient(circle at 70% 40%, rgba(184,148,114,0.25) 0%, transparent 50%),
-    radial-gradient(circle at 30% 80%, rgba(184,148,114,0.10) 0%, transparent 40%);
+    radial-gradient(circle at 70% 40%, rgba(196,165,109,0.25) 0%, transparent 50%),
+    radial-gradient(circle at 30% 80%, rgba(196,165,109,0.10) 0%, transparent 40%);
 }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -469,7 +482,7 @@ aside a:focus-visible {
 /* ═══════════════════════════════════════════════════════════════
    NEUMORPHISM / SOFT UI UTILITY CLASSES
    Light-mode only. Dark mode neutralizes back to flat shadows.
-   Surface color: var(--neuro-surface) (darker than --background #F7F4EF)
+   Surface color: var(--neuro-surface) (darker than --background #F7F8FA)
    ═══════════════════════════════════════════════════════════════ */
 
 /* Surface — just the background color, no shadow */
@@ -488,10 +501,10 @@ aside a:focus-visible {
 /* Card — raised/extruded dual shadow */
 .neuro-card {
   background-color: var(--neuro-surface-card);
-  box-shadow: 0 0 16px rgba(74, 68, 56, 0.03), 6px 6px 12px var(--neuro-dark-card), -6px -6px 12px var(--neuro-light-base);
+  box-shadow: 0 0 16px rgba(16, 24, 40, 0.03), 6px 6px 12px var(--neuro-dark-card), -6px -6px 12px var(--neuro-light-base);
 }
 .neuro-card:hover {
-  box-shadow: 0 0 20px rgba(74, 68, 56, 0.04), 8px 8px 16px var(--neuro-dark-card-hover), -8px -8px 16px var(--neuro-light-hover);
+  box-shadow: 0 0 20px rgba(16, 24, 40, 0.04), 8px 8px 16px var(--neuro-dark-card-hover), -8px -8px 16px var(--neuro-light-hover);
 }
 
 /* Inset / pressed — recessed into surface */
@@ -525,7 +538,7 @@ aside a:focus-visible {
 /* Pill / raised button — extruded with active press-down */
 .neuro-pill {
   background-color: var(--neuro-surface-card);
-  box-shadow: 0 0 8px rgba(74, 68, 56, 0.03), 3px 3px 6px var(--neuro-dark-pill), -3px -3px 6px var(--neuro-light-base);
+  box-shadow: 0 0 8px rgba(16, 24, 40, 0.03), 3px 3px 6px var(--neuro-dark-pill), -3px -3px 6px var(--neuro-light-base);
 }
 .neuro-pill:hover {
   box-shadow: 4px 4px 8px var(--neuro-dark-pill-hover), -4px -4px 8px var(--neuro-light-hover);
@@ -537,12 +550,12 @@ aside a:focus-visible {
 /* Modal surface — larger, softer shadow for dialog overlays */
 .neuro-modal {
   background-color: var(--neuro-surface-card);
-  box-shadow: 0 0 24px rgba(74, 68, 56, 0.04), 8px 8px 24px var(--neuro-dark-modal), -8px -8px 24px var(--neuro-light-base);
+  box-shadow: 0 0 24px rgba(16, 24, 40, 0.04), 8px 8px 24px var(--neuro-dark-modal), -8px -8px 24px var(--neuro-light-base);
 }
 
-/* Title text — softer than --foreground (#2D2A22) for neumorphic context */
+/* Title text — softer than --foreground (#101828) for neumorphic context */
 .neuro-title {
-  color: #4A4438;
+  color: #4E5368;
 }
 
 /* ── Scoped overrides for agent-elements InputBar ── */
@@ -573,10 +586,10 @@ aside a:focus-visible {
 /* Cards inside chat (upload card, job previews) — softer than global .neuro-card */
 .neuro-chat .neuro-card {
   background-color: var(--neuro-surface-card);
-  box-shadow: 0 0 14px rgba(74, 68, 56, 0.03), 4px 4px 10px var(--neuro-dark-chat), -4px -4px 10px var(--neuro-light-base);
+  box-shadow: 0 0 14px rgba(16, 24, 40, 0.03), 4px 4px 10px var(--neuro-dark-chat), -4px -4px 10px var(--neuro-light-base);
 }
 .neuro-chat .neuro-card:hover {
-  box-shadow: 0 0 18px rgba(74, 68, 46, 0.04), 6px 6px 14px var(--neuro-dark-chat-hover), -6px -6px 14px var(--neuro-light-hover);
+  box-shadow: 0 0 18px rgba(16, 24, 40, 0.04), 6px 6px 14px var(--neuro-dark-chat-hover), -6px -6px 14px var(--neuro-light-hover);
 }
 
 /* Suggestions bar in InputBar — match surface */
@@ -589,14 +602,14 @@ aside a:focus-visible {
 .neuro-inset-container .neuro-card {
   background-color: var(--neuro-surface-card-raised);
   box-shadow:
-    0 0 14px rgba(74, 68, 56, 0.04),
+    0 0 14px rgba(16, 24, 40, 0.04),
     4px 4px 10px var(--neuro-dark-card),
     -4px -4px 10px var(--neuro-light-base);
 }
 .neuro-inset .neuro-card:hover,
 .neuro-inset-container .neuro-card:hover {
   box-shadow:
-    0 0 18px rgba(74, 68, 56, 0.05),
+    0 0 18px rgba(16, 24, 40, 0.05),
     6px 6px 14px var(--neuro-dark-card-hover),
     -6px -6px 14px var(--neuro-light-hover);
 }
