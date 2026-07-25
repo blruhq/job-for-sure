@@ -32,6 +32,7 @@ import { Input } from '~/components/ui/input'
 import { Textarea } from '~/components/ui/textarea'
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '~/components/ui/select'
 import { ConfirmDialog } from '~/components/ui/confirm-dialog'
+import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from '~/components/ui/dropdown-menu'
 import { ResumeCopilot } from '~/components/resume/resume-copilot'
 import { JobSearchPanel } from '~/components/resume/job-search-panel'
 import type { Resume, ResumeEducation, ResumeProject, ResumeExperience, ResumeCertification, ResumeLanguage, ResumeCustomSection } from '~/types/resume'
@@ -76,7 +77,7 @@ function detectSectionSuggestions(resume: { summary?: string; skills?: string[];
 
 // ── Sub-components ──
 
-function TagInput({ tags, onChange, placeholder }: { tags: string[]; onChange: (tags: string[]) => void; placeholder?: string }) {
+function TagInput({ tags, onChange, placeholder, id }: { tags: string[]; onChange: (tags: string[]) => void; placeholder?: string; id?: string }) {
   const [input, setInput] = useState('')
   const inputRef = useRef<HTMLInputElement>(null)
 
@@ -90,7 +91,7 @@ function TagInput({ tags, onChange, placeholder }: { tags: string[]; onChange: (
   }, [input, tags, onChange])
 
   return (
-    <div className="flex min-h-[34px] flex-wrap items-center gap-1 rounded-xs neuro-inset px-3 py-2 text-sm">
+    <div id={id} className="flex min-h-[34px] flex-wrap items-center gap-1 rounded-md neuro-input px-3 py-2 text-sm">
       {tags.map((tag) => (
         <span key={tag} className="flex items-center gap-0.5 rounded-xs bg-primary/10 px-1.5 py-0.5 text-[10px] font-medium text-primary">
           {tag}
@@ -545,8 +546,8 @@ export function ResumeDetail({ resumeId }: { resumeId: string }) {
       case 'skills':
         return (
           <div>
-            <label className="label-mono mb-1 block">Skills</label>
-            <TagInput tags={skills} onChange={setSkills} placeholder="Type a skill and press Enter" />
+            <label htmlFor="skills-input" className="label-mono mb-1 block">Skills</label>
+            <TagInput id="skills-input" tags={skills} onChange={setSkills} placeholder="Type a skill and press Enter" />
           </div>
         )
       case 'experience':
@@ -643,8 +644,9 @@ export function ResumeDetail({ resumeId }: { resumeId: string }) {
                 </div>
                 <div className="flex gap-2">
                   <div className="flex-1">
-                  <label className="label-mono mb-0.5 block text-[10px]">Tech Stack</label>
+                  <label htmlFor="tech-stack-input" className="label-mono mb-0.5 block text-[10px]">Tech Stack</label>
                   <TagInput
+                    id="tech-stack-input"
                     tags={proj.techStack}
                     onChange={(tags) => update({ ...proj, techStack: tags })}
                     placeholder="React, Node..."
@@ -803,31 +805,24 @@ export function ResumeDetail({ resumeId }: { resumeId: string }) {
         </SortableContext>
       </DndContext>
 
-      {/* + Add Section button */}
+      {/* + Add Section picker — uses DropdownMenu for accessible keyboard nav + ARIA */}
       {availableSections.length > 0 && !showNewCustomInput && (
         <div className="relative pt-3">
-          <Button
-            variant="outline"
-            onClick={() => setShowAddSectionPicker(!showAddSectionPicker)}
-            className="flex items-center gap-1 rounded-xs border-dashed px-3 py-2 text-sm w-full justify-center"
-          >
-            <PlusCircle size={13} /> Add Section
-          </Button>
-          {showAddSectionPicker && (
-            <div className="absolute left-0 right-0 top-full z-10 mt-1 rounded-xs neuro-card shadow-lg">
+          <DropdownMenu open={showAddSectionPicker} onOpenChange={setShowAddSectionPicker}>
+            <DropdownMenuTrigger
+              render={<Button variant="outline" className="flex w-full items-center justify-center gap-1 rounded-xs border-dashed border-[var(--input-border)] px-3 py-2 text-sm" />}
+            >
+              <PlusCircle size={13} /> Add Section
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="w-(--anchor-width)">
               {availableSections.map((s) => (
-                <Button
-                  key={s}
-                  variant="ghost"
-                  onClick={() => { handleAddSection(s) }}
-                  className="flex w-full items-center gap-2 px-3 py-2 text-sm text-left"
-                >
+                <DropdownMenuItem key={s} onClick={() => handleAddSection(s)}>
                   <span>{SECTION_ICONS[s]}</span>
                   <span>{SECTION_LABELS[s]}</span>
-                </Button>
+                </DropdownMenuItem>
               ))}
-            </div>
-          )}
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       )}
 
