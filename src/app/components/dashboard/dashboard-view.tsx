@@ -11,6 +11,7 @@ import { useCoverLetters } from '~/hooks/use-cover-letters'
 import { Skeleton } from '~/components/ui/skeleton'
 import { EMPTY_APPLICATIONS } from '~/lib/constants'
 import { cn } from '~/lib/utils'
+import { EmptyState } from '~/components/ui/empty-state'
 import { authClient } from '~/lib/auth-client'
 import { useTranslations } from 'next-intl'
 
@@ -102,22 +103,29 @@ export function DashboardView() {
   // Empty State
   if (resumeCount === 0) {
     return (
-      <div className="flex h-full w-full flex-col items-center justify-center p-6 text-center neuro-surface">
-        <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-lg bg-accent-soft text-brand">
-          <FileText size={24} />
-        </div>
-        <h3 className="mb-1 text-sm font-semibold text-foreground">{t('noResumesTitle')}</h3>
-        <p className="mb-6 max-w-sm text-sm text-muted-foreground">
-          {t('noResumesDesc')}
-        </p>
-<Button
-          variant="default"
-          onClick={() => router.push('/chat')}
-          className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium"
-        >
-          {t('getStarted')} <ArrowRight size={13} />
-        </Button>
-      </div>
+      <EmptyState
+        className="h-full w-full p-6 neuro-surface"
+        icon={
+          <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-lg bg-accent-soft text-brand">
+            <FileText size={24} />
+          </div>
+        }
+        title={<h3 className="mb-1 text-sm font-semibold text-foreground">{t('noResumesTitle')}</h3>}
+        description={
+          <p className="mb-6 max-w-sm text-sm text-muted-foreground">
+            {t('noResumesDesc')}
+          </p>
+        }
+        action={
+          <Button
+            variant="default"
+            onClick={() => router.push('/chat')}
+            className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium"
+          >
+            {t('getStarted')} <ArrowRight size={13} />
+          </Button>
+        }
+      />
     )
   }
 

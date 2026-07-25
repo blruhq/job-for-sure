@@ -5,6 +5,7 @@ import {
   Clock, Sparkles, Zap, Target, DollarSign, Briefcase,
 } from 'lucide-react'
 import { cn } from '~/lib/utils'
+import { ScoreBadge } from '~/components/ui/score-badge'
 import { useActiveResume } from '~/hooks/use-active-resume'
 import { useUpdateApplication } from '~/hooks/use-apps'
 import { notify } from '~/lib/toast'
@@ -207,18 +208,12 @@ export function JobDetailPanel({
 
           {/* Tags row */}
           <div className="mt-2 flex flex-wrap gap-1.5">
-            <span
-              className={cn(
-                'rounded-xs px-2 py-0.5 font-mono text-xs font-semibold',
-                job.score >= 75
-                  ? 'bg-success-soft text-success'
-                  : job.score >= 50
-                    ? 'bg-warn-soft text-warn'
-                    : 'bg-muted text-muted-foreground',
-              )}
+            <ScoreBadge
+              score={job.score}
+              className="px-2 py-0.5 text-xs"
             >
               {job.score}% Match
-            </span>
+            </ScoreBadge>
             {(salaryMin || job.salary) && (
               <span className="flex items-center gap-0.5 rounded-xs bg-success-soft px-2 py-0.5 text-xs font-semibold text-success dark:bg-success/10 dark:text-success">
                 <DollarSign size={10} />

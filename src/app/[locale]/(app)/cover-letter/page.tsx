@@ -12,6 +12,8 @@ import { ConfirmDialog } from '~/components/ui/confirm-dialog'
 import { Button } from '~/components/ui/button'
 import { Input } from '~/components/ui/input'
 import { Textarea } from '~/components/ui/textarea'
+import { EmptyState } from '~/components/ui/empty-state'
+import { SegmentedControl } from '~/components/ui/segmented-control'
 import { useTranslations } from 'next-intl'
 
 export default function StandaloneCoverLetterPage() {
@@ -300,47 +302,27 @@ export default function StandaloneCoverLetterPage() {
           {/* 2. Generation Mode Selector */}
           <div className="space-y-2 pt-2 border-t border-border/50">
             <label className="label-mono block">{t('detailsMode')}</label>
-            <div className="flex gap-1.5 rounded-sm neuro-inset p-0.5 shrink-0">
-              <button
-                onClick={() => setMode('quick')}
-                className={`flex-1 rounded-xs py-1.5 text-xs font-semibold transition-all cursor-pointer text-center ${
-                  mode === 'quick' ? 'neuro-card text-foreground font-semibold' : 'text-muted-foreground hover:text-foreground'
-                }`}
-              >
-                {t('quickFields')}
-              </button>
-              <button
-                onClick={() => setMode('jd')}
-                className={`flex-1 rounded-xs py-1.5 text-xs font-semibold transition-all cursor-pointer text-center ${
-                  mode === 'jd' ? 'neuro-card text-foreground font-semibold' : 'text-muted-foreground hover:text-foreground'
-                }`}
-              >
-                {t('fullJobDescription')}
-              </button>
-            </div>
+            <SegmentedControl
+              value={mode}
+              onChange={setMode}
+              options={[
+                { value: 'quick', label: t('quickFields') },
+                { value: 'jd', label: t('fullJobDescription') },
+              ]}
+            />
           </div>
 
           {/* 2.5 Language Selector */}
           <div className="space-y-2 pt-2 border-t border-border/50">
             <label className="label-mono block">{t('outputLanguage')}</label>
-            <div className="flex gap-1.5 rounded-sm neuro-inset p-0.5 shrink-0">
-              <button
-                onClick={() => setOutputLanguage('en')}
-                className={`flex-1 rounded-xs py-1.5 text-xs font-semibold transition-all cursor-pointer text-center ${
-                  outputLanguage === 'en' ? 'neuro-card text-foreground font-semibold' : 'text-muted-foreground hover:text-foreground'
-                }`}
-              >
-                English
-              </button>
-              <button
-                onClick={() => setOutputLanguage('th')}
-                className={`flex-1 rounded-xs py-1.5 text-xs font-semibold transition-all cursor-pointer text-center ${
-                  outputLanguage === 'th' ? 'neuro-card text-foreground font-semibold' : 'text-muted-foreground hover:text-foreground'
-                }`}
-              >
-                ภาษาไทย
-              </button>
-            </div>
+            <SegmentedControl
+              value={outputLanguage}
+              onChange={setOutputLanguage}
+              options={[
+                { value: 'en', label: 'English' },
+                { value: 'th', label: 'ภาษาไทย' },
+              ]}
+            />
           </div>
 
           {/* Mode Form Fields */}
@@ -520,15 +502,20 @@ export default function StandaloneCoverLetterPage() {
               />
             </div>
           ) : (
-            <div className="flex flex-col items-center justify-center py-20 text-center max-w-sm">
-              <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-xl neuro-icon-well text-muted-foreground/40">
-                <FileText size={24} />
-              </div>
-              <h3 className="mb-1 text-sm font-semibold text-foreground">No Cover Letter Generated</h3>
-              <p className="text-sm text-muted-foreground">
-                Select or upload a resume on the left, type the target company and position details, and click Generate to write your letter.
-              </p>
-            </div>
+            <EmptyState
+              className="py-20 max-w-sm"
+              icon={
+                <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-xl neuro-icon-well text-muted-foreground/40">
+                  <FileText size={24} />
+                </div>
+              }
+              title={<h3 className="mb-1 text-sm font-semibold text-foreground">No Cover Letter Generated</h3>}
+              description={
+                <p className="text-sm text-muted-foreground">
+                  Select or upload a resume on the left, type the target company and position details, and click Generate to write your letter.
+                </p>
+              }
+            />
           )}
         </div>
       </div>

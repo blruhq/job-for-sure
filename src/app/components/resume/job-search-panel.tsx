@@ -10,6 +10,8 @@ import {
 import { Button } from '~/components/ui/button'
 import { Input } from '~/components/ui/input'
 import { cn } from '~/lib/utils'
+import { ScoreBadge } from '~/components/ui/score-badge'
+import { EmptyState } from '~/components/ui/empty-state'
 import { compareJobs } from '~/lib/job-sources/scoring'
 import { useApplications, useCreateApplication, useDeleteApplication } from '~/hooks/use-apps'
 import { notify } from '~/lib/toast'
@@ -706,23 +708,29 @@ export function JobSearchPanel({ resume }: { resume: Resume }) {
         )}
 
         {!loading && !searched && (
-          <div className="flex flex-col items-center justify-center py-16 gap-2 text-center">
-            <Search size={24} className="text-muted-foreground/40" />
-            <div className="text-sm text-muted-foreground">
-              Search for real jobs matching your skills.
-            </div>
-          </div>
+          <EmptyState
+            className="py-16 gap-2"
+            icon={<Search size={24} className="text-muted-foreground/40" />}
+            description={
+              <div className="text-sm text-muted-foreground">
+                Search for real jobs matching your skills.
+              </div>
+            }
+          />
         )}
 
         {!loading && searched && filtered.length === 0 && (
-          <div className="flex flex-col items-center justify-center py-16 gap-2 text-center">
-            <AlertCircle size={20} className="text-muted-foreground/40" />
-            <div className="text-sm text-muted-foreground">
-              {results.length === 0
-                ? 'No jobs found. Try different keywords.'
-                : `No jobs match your filters. ${activeFilterCount > 0 ? 'Try clearing filters.' : ''}`}
-            </div>
-          </div>
+          <EmptyState
+            className="py-16 gap-2"
+            icon={<AlertCircle size={20} className="text-muted-foreground/40" />}
+            description={
+              <div className="text-sm text-muted-foreground">
+                {results.length === 0
+                  ? 'No jobs found. Try different keywords.'
+                  : `No jobs match your filters. ${activeFilterCount > 0 ? 'Try clearing filters.' : ''}`}
+              </div>
+            }
+          />
         )}
 
         {!loading && filtered.length > 0 && (
@@ -841,14 +849,10 @@ function JobCard({ job, bookmarked, onBookmark, onAts: _onAts, onInterview: _onI
           <span className="text-sm font-semibold">{job.title}</span>
           <div className="mt-0.5 text-xs text-muted-foreground">{job.company}</div>
         </div>
-        <span
-          className={cn(
-            'shrink-0 rounded-xs px-2 py-0.5 font-mono text-xs font-semibold',
-            job.score >= 75 ? 'bg-success-soft text-success' : job.score >= 50 ? 'bg-warn-soft text-warn' : 'bg-muted text-muted-foreground',
-          )}
-        >
-          {job.score}%
-        </span>
+        <ScoreBadge
+          score={job.score}
+          className="shrink-0 px-2 py-0.5 text-xs"
+        />
       </div>
 
       {/* Tags row */}

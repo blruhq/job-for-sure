@@ -4,6 +4,7 @@ import { useMemo } from 'react'
 import { Check } from 'lucide-react'
 import { Button } from '~/components/ui/button'
 import { cn } from '~/lib/utils'
+import { EmptyState } from '~/components/ui/empty-state'
 import { useUIStore } from '~/hooks/use-ui'
 import type { Resume, TailorChange } from '~/types/resume'
 
@@ -199,10 +200,10 @@ export function TailorReviewPanel({ onApply, onCancel }: { onApply: (variant: Re
         })}
 
         {changes.length === 0 && (
-          <div className="flex flex-col items-center justify-center py-8 text-center">
+          <EmptyState className="py-8">
             <p className="text-xs text-muted-foreground">No changes proposed by AI.</p>
             <p className="text-[10px] text-muted-foreground/50 mt-1">Your resume is already well-optimized.</p>
-          </div>
+          </EmptyState>
         )}
       </div>
 

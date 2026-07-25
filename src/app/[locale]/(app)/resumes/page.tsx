@@ -7,7 +7,8 @@ import { useUIStore } from '~/hooks/use-ui'
 import { ConfirmDialog } from '~/components/ui/confirm-dialog'
 import { UploadModal } from '~/components/layout/upload-modal'
 import { notify } from '~/lib/toast'
-import { cn } from '~/lib/utils'
+import { ScoreBadge } from '~/components/ui/score-badge'
+import { EmptyState } from '~/components/ui/empty-state'
 import { Plus, FileText, Trash2, ExternalLink, Clock, Zap } from 'lucide-react'
 import { Button } from '~/components/ui/button'
 import type { Resume } from '~/types/resume'
@@ -79,22 +80,29 @@ export default function ResumesPage() {
         )}
 
         {!isLoading && baseResumes.length === 0 && (
-          <div className="flex flex-col items-center justify-center gap-4 py-24 text-center rounded-sm neuro-inset border border-dashed border-border">
-            <div className="flex h-14 w-14 items-center justify-center rounded-sm neuro-icon-well">
-              <FileText size={24} className="text-muted-foreground" />
-            </div>
-            <div>
-              <div className="label-mono mb-1 text-xs">[ STATUS: EMPTY ]</div>
-              <p className="text-sm text-muted-foreground">No resumes yet. Upload or create your first one.</p>
-            </div>
-            <Button
-              onClick={() => setUploadModalOpen(true)}
-              className="flex items-center gap-2 rounded-sm text-sm font-semibold"
-            >
-              <Plus size={14} strokeWidth={2.5} />
-              Create Resume
-            </Button>
-          </div>
+          <EmptyState
+            className="gap-4 py-24 rounded-sm neuro-inset border border-dashed border-border"
+            icon={
+              <div className="flex h-14 w-14 items-center justify-center rounded-sm neuro-icon-well">
+                <FileText size={24} className="text-muted-foreground" />
+              </div>
+            }
+            title={
+              <div>
+                <div className="label-mono mb-1 text-xs">[ STATUS: EMPTY ]</div>
+                <p className="text-sm text-muted-foreground">No resumes yet. Upload or create your first one.</p>
+              </div>
+            }
+            action={
+              <Button
+                onClick={() => setUploadModalOpen(true)}
+                className="flex items-center gap-2 rounded-sm text-sm font-semibold"
+              >
+                <Plus size={14} strokeWidth={2.5} />
+                Create Resume
+              </Button>
+            }
+          />
         )}
 
         {!isLoading && baseResumes.length > 0 && (
@@ -119,18 +127,11 @@ export default function ResumesPage() {
                     </div>
                     {/* Score badge */}
                     {typeof resume.score === 'number' && resume.score > 0 && (
-                      <span
-                        className={cn(
-                          'shrink-0 rounded-xs px-1.5 py-0.5 font-mono text-xs font-semibold',
-                          resume.score >= 75
-                            ? 'bg-success-soft text-success'
-                            : resume.score >= 50
-                              ? 'bg-warn-soft text-warn'
-                              : 'bg-danger-soft text-destructive',
-                        )}
-                      >
-                        {resume.score}%
-                      </span>
+                      <ScoreBadge
+                        score={resume.score}
+                        lowTone="danger"
+                        className="shrink-0 px-1.5 py-0.5 text-xs"
+                      />
                     )}
                   </div>
 

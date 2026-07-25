@@ -13,6 +13,7 @@ import { Button } from '~/components/ui/button'
 import { Input } from '~/components/ui/input'
 import { Textarea } from '~/components/ui/textarea'
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '~/components/ui/select'
+import { EmptyState } from '~/components/ui/empty-state'
 import type { Resume } from '~/types/resume'
 
 // Server-side PDF preview — same renderer as the resume editor (ADR-002)
@@ -488,32 +489,39 @@ export function AtsView() {
             <ResumePreview resume={resume} />
           </div>
         ) : (
-          <div className="flex flex-col items-center justify-center py-16 text-center">
-            <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-xl neuro-icon-well">
-              <FileText size={24} className="text-muted-foreground/50" />
-            </div>
-            <h3 className="mb-1 text-sm font-semibold text-foreground">No resume selected</h3>
-            <p className="mb-4 max-w-xs text-sm text-muted-foreground">
-              Select a resume from the dropdown or upload one in chat, then paste a job description to get an ATS match score.
-            </p>
-            <div className="flex flex-col items-start gap-2 sm:flex-row sm:items-center">
-              <Button variant="default" size="sm" onClick={() => router.push('/chat')} className="flex items-center gap-1.5 rounded-sm px-3 py-2 text-sm">
-                <Upload size={12} /> Upload Resume
-              </Button>
-              <span className="hidden items-center text-muted-foreground sm:flex">
-                <ArrowRight size={14} />
-              </span>
-              <div className="flex items-center gap-1.5 rounded-sm neuro-inset px-3 py-1.5 text-xs text-muted-foreground">
-                Select Profile
+          <EmptyState
+            className="py-16"
+            icon={
+              <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-xl neuro-icon-well">
+                <FileText size={24} className="text-muted-foreground/50" />
               </div>
-              <span className="hidden items-center text-muted-foreground sm:flex">
-                <ArrowRight size={14} />
-              </span>
-              <div className="flex items-center gap-1.5 rounded-sm neuro-inset px-3 py-1.5 text-xs text-muted-foreground">
-                Paste JD
+            }
+            title={<h3 className="mb-1 text-sm font-semibold text-foreground">No resume selected</h3>}
+            description={
+              <p className="mb-4 max-w-xs text-sm text-muted-foreground">
+                Select a resume from the dropdown or upload one in chat, then paste a job description to get an ATS match score.
+              </p>
+            }
+            action={
+              <div className="flex flex-col items-start gap-2 sm:flex-row sm:items-center">
+                <Button variant="default" size="sm" onClick={() => router.push('/chat')} className="flex items-center gap-1.5 rounded-sm px-3 py-2 text-sm">
+                  <Upload size={12} /> Upload Resume
+                </Button>
+                <span className="hidden items-center text-muted-foreground sm:flex">
+                  <ArrowRight size={14} />
+                </span>
+                <div className="flex items-center gap-1.5 rounded-sm neuro-inset px-3 py-1.5 text-xs text-muted-foreground">
+                  Select Profile
+                </div>
+                <span className="hidden items-center text-muted-foreground sm:flex">
+                  <ArrowRight size={14} />
+                </span>
+                <div className="flex items-center gap-1.5 rounded-sm neuro-inset px-3 py-1.5 text-xs text-muted-foreground">
+                  Paste JD
+                </div>
               </div>
-            </div>
-          </div>
+            }
+          />
         )}
       </div>
     </div>

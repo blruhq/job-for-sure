@@ -6,7 +6,7 @@ import {
   Bookmark, Loader2, ChevronRight, Plane, X, Brain,
   DollarSign, Briefcase,
 } from 'lucide-react'
-import { cn } from '~/lib/utils'
+import { ScoreBadge } from '~/components/ui/score-badge'
 import { Button } from '~/components/ui/button'
 import { useApplications, useCreateApplication, useDeleteApplication } from '~/hooks/use-apps'
 import { notify } from '~/lib/toast'
@@ -176,14 +176,10 @@ export function JobPreview({ resume, onDismiss, onLoadComplete }: { resume: Resu
                       {job.company} · {job.location}
                     </div>
                   </div>
-                  <span
-                    className={cn(
-                      'shrink-0 rounded-xs px-1.5 py-0.5 font-mono text-[10px] font-semibold',
-                      job.score >= 75 ? 'bg-success-soft text-success' : job.score >= 50 ? 'bg-warn-soft text-warn' : 'bg-muted text-muted-foreground',
-                    )}
-                  >
-                    {job.score}%
-                  </span>
+                  <ScoreBadge
+                    score={job.score}
+                    className="shrink-0 px-1.5 py-0.5 text-[10px]"
+                  />
                 </div>
 
                 {/* Tags */}
