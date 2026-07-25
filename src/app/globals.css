@@ -522,10 +522,11 @@ aside a:focus-visible {
   background-color: var(--border);
 }
 
-/* Card — raised/extruded dual shadow */
+/* Card — raised/extruded dual shadow + subtle border for continuous edge */
 .neuro-card {
   background-color: var(--neuro-surface-card);
-  box-shadow: 0 0 16px rgba(16, 24, 40, 0.03), 6px 6px 12px var(--neuro-dark-card), -6px -6px 12px var(--neuro-light-base);
+  border: 1px solid var(--border);
+  box-shadow: 0 0 16px rgba(16, 24, 40, 0.03), 4px 4px 10px var(--neuro-dark-card), -4px -4px 10px var(--neuro-light-base);
 }
 .neuro-card:hover {
   box-shadow: 0 0 20px rgba(16, 24, 40, 0.04), 8px 8px 16px var(--neuro-dark-card-hover), -8px -8px 16px var(--neuro-light-hover);
@@ -618,6 +619,7 @@ aside a:focus-visible {
 /* Pill / raised button — extruded with active press-down */
 .neuro-pill {
   background-color: var(--neuro-surface-card);
+  border: 1px solid var(--border);
   box-shadow: 0 0 8px rgba(16, 24, 40, 0.03), 3px 3px 6px var(--neuro-dark-pill), -3px -3px 6px var(--neuro-light-base);
 }
 .neuro-pill:hover {
@@ -630,6 +632,7 @@ aside a:focus-visible {
 /* Modal surface — larger, softer shadow for dialog overlays */
 .neuro-modal {
   background-color: var(--neuro-surface-card);
+  border: 1px solid var(--border);
   box-shadow: 0 0 24px rgba(16, 24, 40, 0.04), 8px 8px 24px var(--neuro-dark-modal), -8px -8px 24px var(--neuro-light-base);
 }
 
