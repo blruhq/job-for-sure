@@ -9,20 +9,12 @@ const protectedRoutes = ['/chat', '/ats', '/applications', '/resume', '/settings
 const publicRoutes = ['/', '/login', '/register']
 
 function stripLocale(pathname: string) {
-  const parts = pathname.split('/')
-  if (parts[1] === 'en' || parts[1] === 'th') {
-    const stripped = '/' + parts.slice(2).join('/')
-    return stripped
-  }
-  return pathname
+  return pathname.replace(/^\/(?:[a-z]{2})(?=\/|$)/i, '') || '/'
 }
 
 function getLocale(pathname: string) {
-  const parts = pathname.split('/')
-  if (parts[1] === 'en' || parts[1] === 'th') {
-    return parts[1]
-  }
-  return 'en'
+  const match = pathname.match(/^\/([a-z]{2})(?=\/|$)/i)
+  return match?.[1]?.toLowerCase() ?? routing.defaultLocale
 }
 
 function isProtected(pathname: string) {
