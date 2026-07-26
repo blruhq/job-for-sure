@@ -68,17 +68,18 @@ export function Topbar() {
         </div>
       </Link>
       {/*
-        Brand text — also relative to header, fades in/out.
-        Does not affect logo position because both are absolutely positioned.
+        Brand text — also relative to header, fades in/out with opacity
+        instead of mounting/unmounting (preserves animation context).
       */}
-      {!sidebarCollapsed && (
-        <Link
-          href="/chat"
-          className="absolute left-[52px] top-1/2 -translate-y-1/2 z-10 text-sm font-semibold tracking-[-0.02em]"
-        >
-          JOB FOR SURE
-        </Link>
-      )}
+      <Link
+        href="/chat"
+        className={cn(
+          'absolute left-[52px] top-1/2 -translate-y-1/2 z-10 text-sm font-semibold tracking-[-0.02em] transition-opacity duration-200',
+          sidebarCollapsed ? 'pointer-events-none opacity-0' : 'opacity-100',
+        )}
+      >
+        JOB FOR SURE
+      </Link>
       {/*
         Brand area spacer — empty div, NO content, NO children.
         Only animates width (transition-[width], NOT transition-all).

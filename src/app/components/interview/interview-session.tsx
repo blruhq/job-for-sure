@@ -460,6 +460,7 @@ export function InterviewSession({ config, resume, onEnd }: InterviewSessionProp
                 <Button
                   variant="outline"
                   onClick={currentQuestion ? submitAnswer : fetchQuestion}
+                  disabled={loading === 'evaluate' || loading === 'question'}
                   className="mt-3 px-3 py-1 text-[10px] font-semibold text-destructive"
                 >
                   Retry Operation

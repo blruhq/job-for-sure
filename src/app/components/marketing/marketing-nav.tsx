@@ -76,6 +76,8 @@ export function MarketingNav() {
           onClick={() => setOpen(!open)}
           className="md:hidden"
           aria-label="Toggle menu"
+          aria-expanded={open}
+          aria-controls="mobile-menu"
         >
           {open ? <X size={18} /> : <Menu size={18} />}
         </Button>
@@ -83,7 +85,7 @@ export function MarketingNav() {
 
       {/* Mobile dropdown */}
       {open && (
-        <div className="border-t border-border neuro-surface md:hidden">
+        <div id="mobile-menu" className="border-t border-border neuro-surface md:hidden">
           <div className="flex flex-col gap-0 px-6 py-3">
             {links.map((link) =>
               link.scroll ? (

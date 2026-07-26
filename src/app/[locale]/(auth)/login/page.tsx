@@ -98,11 +98,13 @@ function LoginForm() {
             )}
 
             <div>
-              <label className="mb-1.5 block font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
+              <label htmlFor="login-email" className="mb-1.5 block font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
                 Email
               </label>
               <Input
-                type="text"
+                id="login-email"
+                type="email"
+                autoComplete="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="you@example.com"
@@ -114,7 +116,7 @@ function LoginForm() {
 
             <div>
               <div className="flex items-center justify-between">
-                <label className="mb-1.5 block font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
+                <label htmlFor="login-password" className="mb-1.5 block font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
                   Password
                 </label>
                 <Link
@@ -125,7 +127,9 @@ function LoginForm() {
                 </Link>
               </div>
               <Input
+                id="login-password"
                 type="password"
+                autoComplete="current-password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"

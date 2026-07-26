@@ -102,11 +102,13 @@ export default function RegisterPage() {
             )}
 
             <div>
-              <label className="mb-1.5 block font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
+              <label htmlFor="reg-name" className="mb-1.5 block font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
                 Full Name
               </label>
               <Input
+                id="reg-name"
                 type="text"
+                autoComplete="name"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="John Doe"
@@ -117,11 +119,13 @@ export default function RegisterPage() {
             </div>
 
             <div>
-              <label className="mb-1.5 block font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
+              <label htmlFor="reg-email" className="mb-1.5 block font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
                 Email
               </label>
               <Input
+                id="reg-email"
                 type="email"
+                autoComplete="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="you@example.com"
@@ -132,11 +136,13 @@ export default function RegisterPage() {
             </div>
 
             <div>
-              <label className="mb-1.5 block font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
+              <label htmlFor="reg-password" className="mb-1.5 block font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
                 Password
               </label>
               <Input
+                id="reg-password"
                 type="password"
+                autoComplete="new-password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="At least 8 characters"

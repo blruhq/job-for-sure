@@ -33,6 +33,7 @@ function SegmentedControl<T extends string>({
           key={opt.value}
           type="button"
           onClick={() => onChange(opt.value)}
+          aria-pressed={value === opt.value}
           className={cn(
             "flex-1 rounded-xs py-1.5 text-xs font-semibold transition-all cursor-pointer text-center",
             value === opt.value

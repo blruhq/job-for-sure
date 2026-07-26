@@ -416,6 +416,8 @@ export default function SettingsPage() {
                     onClick={() => setShowCurrent(!showCurrent)}
                     className="absolute right-2 top-1/2 -translate-y-1/2 h-6 w-6 p-0 text-muted-foreground hover:text-foreground"
                     type="button"
+                    aria-label={showCurrent ? 'Hide current password' : 'Show current password'}
+                    aria-pressed={showCurrent}
                   >
                     {showCurrent ? <EyeOff size={13} /> : <Eye size={13} />}
                   </Button>
@@ -435,6 +437,8 @@ export default function SettingsPage() {
                     onClick={() => setShowNew(!showNew)}
                     className="absolute right-2 top-1/2 -translate-y-1/2 h-6 w-6 p-0 text-muted-foreground hover:text-foreground"
                     type="button"
+                    aria-label={showNew ? 'Hide new password' : 'Show new password'}
+                    aria-pressed={showNew}
                   >
                     {showNew ? <EyeOff size={13} /> : <Eye size={13} />}
                   </Button>

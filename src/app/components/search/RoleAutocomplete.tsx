@@ -108,6 +108,7 @@ export function RoleAutocomplete({
             setActiveIndex(-1)
           }}
           className="absolute right-2 top-1/2 h-5 w-5 -translate-y-1/2 p-0 text-muted-foreground hover:text-foreground"
+          aria-label="Clear job title"
         >
           <X size={10} />
         </Button>
