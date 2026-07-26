@@ -144,6 +144,10 @@ export async function POST(req: Request) {
             interval: interval || 'unknown',
             status: sub.status,
           }).catch(() => {})
+          captureServerEvent(userId, 'plan_upgraded', {
+            plan: interval === 'year' ? 'yearly' : 'monthly',
+            interval,
+          }).catch(() => {})
         }
 
         break

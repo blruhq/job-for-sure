@@ -13,6 +13,12 @@ export default function LocaleError({
 }) {
   useEffect(() => {
     console.error('[LocaleError]', error)
+    // Capture error in PostHog (fail-open)
+    import('posthog-js').then(({ default: ph }) => {
+      try {
+        ph.captureException(error, { error_type: 'locale_error_boundary' })
+      } catch { /* fail-open */ }
+    }).catch(() => {})
   }, [error])
 
   return (

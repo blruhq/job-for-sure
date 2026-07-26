@@ -129,6 +129,6 @@ Target role: "${role}"${industry ? ` · Industry: ${industry}` : ''}
     maxOutputTokens: 4000,
   })
 
-  await captureServerEvent(user.id, 'resume_built_from_chat')
+  await captureServerEvent(user.id, 'resume_created', { method: 'chat' })
   return NextResponse.json(parsed)
 }, { rateLimitType: 'ai', route: '/api/resume/from-chat' })

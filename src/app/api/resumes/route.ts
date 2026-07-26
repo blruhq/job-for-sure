@@ -7,6 +7,7 @@ import { z } from 'zod'
 import { ResumeDataSchema } from '~/lib/schemas'
 import { MAX_RESUME_JSON_BYTES } from '~/lib/constants'
 import { gateFeature } from '~/lib/plan'
+import { captureServerEvent } from '~/lib/posthog-server'
 
 // GET /api/resumes — list all resumes for the current user
 export const GET = withAuth(async (req, { user }) => {
@@ -78,7 +79,8 @@ export const POST = withAuth(async (req, { user }) => {
     set: { data: resume.data, isBase: resume.isBase, updatedAt: new Date() },
   })
 
-  // FIX: Return data as a parsed object (matching GET shape),
-  // not as a raw stringified JSON.
+  // Track event
+  await captureServerEvent(user.id, 'resume_created', { method: isBase ? 'manual' : 'tailor' })
+
   return NextResponse.json({ ...resume, data })
 }, { rateLimitType: 'general', route: '/api/resumes' })

@@ -9,6 +9,7 @@ import { withAuth } from '~/lib/with-auth'
 import { eq, and, isNull, desc } from 'drizzle-orm'
 import { pdfStreamToBuffer } from '~/components/resume/templates/shared-pdf'
 import type { Resume } from '~/types/resume'
+import { captureServerEvent } from '~/lib/posthog-server'
 
 export const runtime = 'nodejs'
 
@@ -69,6 +70,9 @@ export const GET = withAuth(async (request, { user }) => {
   const filename = type === 'cover-letter'
     ? `${safeName}-cover-letter.pdf`
     : `${safeName}.pdf`
+
+  // Track event — fire-and-forget, never blocks response
+  captureServerEvent(user.id, 'resume_pdf_exported', { template: resume.template || 'modern' }).catch(() => {})
 
   return new NextResponse(new Blob([pdfBuffer as BlobPart], { type: 'application/pdf' }), {
     headers: {
