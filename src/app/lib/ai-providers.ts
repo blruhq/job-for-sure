@@ -105,6 +105,9 @@ export async function streamWithFailover(
   const modelMessages = await convertToModelMessages(messages as Parameters<typeof convertToModelMessages>[0])
 
   for (const provider of providers) {
+    let reader: ReadableStreamDefaultReader<Uint8Array> | undefined
+    let timer: ReturnType<typeof setTimeout> | undefined
+
     try {
       const result = streamText({
         model: provider.model,
@@ -119,8 +122,7 @@ export async function streamWithFailover(
       const body = response.body!
 
       // Peek at the first chunk to verify the provider is responding
-      const reader = body.getReader()
-      let timer: ReturnType<typeof setTimeout> | undefined
+      reader = body.getReader()
       const firstChunk = await Promise.race([
         reader.read(),
         new Promise<{ done: true; value: undefined }>((_, reject) => {
@@ -156,7 +158,7 @@ export async function streamWithFailover(
           // Pipe the remaining bytes
           try {
             while (true) {
-              const { value, done } = await reader.read()
+              const { value, done } = await reader!.read()
               if (done) break
               controller.enqueue(value)
             }
@@ -164,11 +166,11 @@ export async function streamWithFailover(
           } catch (err) {
             controller.error(err)
           } finally {
-            reader.releaseLock()
+            reader!.releaseLock()
           }
         },
         cancel() {
-          return reader.cancel()
+          return reader!.cancel()
         },
       })
 
@@ -181,6 +183,8 @@ export async function streamWithFailover(
         },
       })
     } catch (err) {
+      try { await reader?.cancel() } catch { /* best-effort: ignore cancel errors */ }
+      if (timer) clearTimeout(timer)
       const msg = err instanceof Error ? err.message : String(err)
       const sanitized = msg.replace(/(sk-|api[_-]?key|authorization)[^\s"']+/gi, '$1***')
       console.warn(`⚠️  [AI] ${provider.name} failed: ${sanitized}`)

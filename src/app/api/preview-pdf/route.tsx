@@ -4,7 +4,7 @@ import { ResumePDF } from '~/components/resume/resume-pdf'
 import { withAuth } from '~/lib/with-auth'
 import { ResumeDataSchema } from '~/lib/schemas'
 import type { Resume } from '~/types/resume'
-import { registerFonts } from '~/components/resume/templates/shared-pdf'
+import { registerFonts, pdfStreamToBuffer } from '~/components/resume/templates/shared-pdf'
 
 export const runtime = 'nodejs'
 export const maxDuration = 30
@@ -35,15 +35,9 @@ export const POST = withAuth(async (request, { user: _user }) => {
   try {
     const doc = <ResumePDF resume={result.data as unknown as Resume} />
     const stream = await ReactPDF.renderToStream(doc)
+    const buffer = await pdfStreamToBuffer(stream)
 
-    // Buffer the stream
-    const chunks: Uint8Array[] = []
-    for await (const chunk of stream as unknown as AsyncIterable<Uint8Array>) {
-      chunks.push(chunk)
-    }
-    const buffer = Buffer.concat(chunks)
-
-    return new NextResponse(buffer, {
+    return new NextResponse(new Blob([buffer as BlobPart], { type: 'application/pdf' }), {
       headers: {
         'Content-Type': 'application/pdf',
         'Content-Disposition': 'inline',

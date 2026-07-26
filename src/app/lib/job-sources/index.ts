@@ -258,10 +258,15 @@ export async function searchJobs(params: SearchParams): Promise<SearchResult> {
 // ── Source wrappers ──────────────────────────────────────────
 
 async function fetchRemoteOKJobs(_query: string): Promise<{ jobs: JobResult[]; error?: string }> {
+  const controller = new AbortController()
+  const timer = setTimeout(() => controller.abort(), SEARCH_TIMEOUT_MS)
+
   try {
-    const allJobs = await fetchRemoteOK()
+    const allJobs = await fetchRemoteOK({ signal: controller.signal })
+    clearTimeout(timer)
     return { jobs: allJobs }
   } catch (err) {
+    clearTimeout(timer)
     return { jobs: [], error: err instanceof Error ? err.message : 'RemoteOK failed' }
   }
 }

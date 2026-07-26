@@ -136,17 +136,7 @@ async function validateUrl(url: string): Promise<void> {
  * Strategy: try provider-specific parser first, fall back to generic.
  */
 export async function scrapeJob(url: string): Promise<ScrapeResult> {
-  // SSRF: validate URL (including DNS resolution) before any network call
-  try {
-    await validateUrl(url)
-  } catch (err) {
-    return {
-      success: false,
-      error: err instanceof Error ? err.message : 'Invalid URL',
-      source: 'manual',
-    }
-  }
-
+  // SSRF validation is handled by fetchHTML() — the single validation point.
   const domain = extractDomain(url)
 
   try {
