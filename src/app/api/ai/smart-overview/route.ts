@@ -117,7 +117,8 @@ For salary estimates: use your knowledge of typical salaries for this role in th
 For commute estimates: use your knowledge of the geography and transit systems.
 For company info: if you don't know the company, say so honestly (known: false).
 
-Keep everything concise. This is a quick-read overview, not an essay.`
+Keep everything concise. This is a quick-read overview, not an essay.
+You must respond with valid JSON matching the exact schema provided. Do not include markdown, code fences, or any text outside the JSON object.`
 
     const experienceText =
       resumeData?.experience
@@ -148,7 +149,7 @@ CANDIDATE HOME: ${homeLocation || 'Not set'}
 JOB DESCRIPTION:
 ${jdText?.substring(0, 3000) || 'Not available'}
 
-Provide your analysis as a structured overview.`
+Provide your analysis as JSON matching the schema.`
 
     // ── Call AI ──
     let result: z.infer<typeof SmartOverviewSchema>
