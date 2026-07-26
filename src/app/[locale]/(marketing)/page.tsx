@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import Image from 'next/image'
 import { Link } from '~/i18n/routing'
 import { ArrowRight } from 'lucide-react'
 import { GridPattern } from '~/components/marketing/grid-pattern'
@@ -28,6 +29,25 @@ export default function LandingPage() {
       <GridPattern>
         {/* ── HERO ── */}
         <section className="relative flex min-h-screen flex-col items-center px-6 pt-[12vh] md:pt-[15vh]">
+          {/* ── Logo / Brand Header ── */}
+          <Link
+            href="/chat"
+            className="absolute left-6 top-6 z-20 flex items-center gap-2.5"
+          >
+            <div className="neuro-icon-well rounded-[3px] p-0.5">
+              <Image
+                src="/logo.png"
+                alt="Job For Sure"
+                width={28}
+                height={28}
+                className="shrink-0"
+                priority
+              />
+            </div>
+            <span className="text-sm font-semibold tracking-[-0.02em] text-foreground">
+              Job For Sure
+            </span>
+          </Link>
           <div
             className="pointer-events-none absolute inset-0 hero-glow opacity-[0.04]"
           />
