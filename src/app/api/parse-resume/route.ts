@@ -129,11 +129,6 @@ export const POST = withAuth(async (req, { user }) => {
     text = body.data.text
   }
 
-  // Log length only in development — never log raw text (PII)
-  if (process.env.NODE_ENV === 'development') {
-    console.log('[parse-resume] Extracted text length:', text.length)
-  }
-
   // ── AI parse (strict first → lenient fallback + safety net) ──
   // Strict schema makes name + location REQUIRED, leveraging generateObject's
   // built-in retry when the model omits them. If all retries exhaust (rare),
@@ -217,9 +212,6 @@ Guidelines:
       const inferred = inferLocation(parsed)
       if (inferred) {
         parsed.location = inferred
-        if (process.env.NODE_ENV === 'development') {
-          console.log('[parse-resume] Location inferred from entries:', inferred)
-        }
       }
     }
   }
