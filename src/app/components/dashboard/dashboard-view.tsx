@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { Link, useRouter } from '~/i18n/routing'
 import { FileText, Brain, KanbanSquare, CheckSquare, MessageSquare, Plus, ArrowRight, Mail } from 'lucide-react'
+import { Button } from '~/components/ui/button'
 import { notify } from '~/lib/toast'
 import { useResumes } from '~/hooks/use-resumes'
 import { useApplications } from '~/hooks/use-apps'
@@ -10,6 +11,7 @@ import { useCoverLetters } from '~/hooks/use-cover-letters'
 import { Skeleton } from '~/components/ui/skeleton'
 import { EMPTY_APPLICATIONS } from '~/lib/constants'
 import { cn } from '~/lib/utils'
+import { EmptyState } from '~/components/ui/empty-state'
 import { authClient } from '~/lib/auth-client'
 import { useTranslations } from 'next-intl'
 
@@ -74,7 +76,7 @@ export function DashboardView() {
   // Loading State
   if (resumesLoading) {
     return (
-      <div className="flex-1 overflow-y-auto p-6 bg-background">
+      <div className="flex-1 overflow-y-auto p-6 neuro-surface">
         <div className="mx-auto max-w-[900px] space-y-6">
           <div className="flex items-center justify-between">
             <div className="space-y-2">
@@ -101,27 +103,35 @@ export function DashboardView() {
   // Empty State
   if (resumeCount === 0) {
     return (
-      <div className="flex h-full w-full flex-col items-center justify-center p-6 text-center bg-background">
-        <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-lg bg-accent-soft text-primary">
-          <FileText size={24} />
-        </div>
-        <h3 className="mb-1 text-sm font-semibold text-foreground">{t('noResumesTitle')}</h3>
-        <p className="mb-6 max-w-sm text-xs text-muted-foreground">
-          {t('noResumesDesc')}
-        </p>
-        <button
-          onClick={() => router.push('/chat')}
-          className="flex cursor-pointer items-center gap-1.5 rounded-sm bg-primary px-4 py-2 text-xs font-medium text-primary-foreground transition-opacity hover:opacity-90 active:scale-[0.98]"
-        >
-          {t('getStarted')} <ArrowRight size={13} />
-        </button>
-      </div>
+      <EmptyState
+        className="h-full w-full p-6 neuro-surface"
+        icon={
+          <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-lg bg-accent-soft text-brand">
+            <FileText size={24} />
+          </div>
+        }
+        title={<h3 className="mb-1 text-sm font-semibold text-foreground">{t('noResumesTitle')}</h3>}
+        description={
+          <p className="mb-6 max-w-sm text-sm text-muted-foreground">
+            {t('noResumesDesc')}
+          </p>
+        }
+        action={
+          <Button
+            variant="default"
+            onClick={() => router.push('/chat')}
+            className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium"
+          >
+            {t('getStarted')} <ArrowRight size={13} />
+          </Button>
+        }
+      />
     )
   }
 
   // Main Dashboard State
   return (
-    <div className="flex-1 overflow-y-auto p-6 bg-background">
+    <div className="flex-1 overflow-y-auto p-6 neuro-surface">
       <div className="mx-auto max-w-[900px]">
         {/* Section A: Header */}
         <div className="mb-6 flex items-center justify-between">
@@ -129,14 +139,15 @@ export function DashboardView() {
             <h1 className="text-lg font-semibold text-foreground">
               {userName ? `${t('welcomeBack')}, ${userName}` : t('title')}
             </h1>
-            <div className="text-xs text-muted-foreground">{t('jobSearchGlance')}</div>
+            <div className="text-sm text-muted-foreground">{t('jobSearchGlance')}</div>
           </div>
-          <button
+          <Button
+            variant="default"
             onClick={() => router.push('/chat')}
-            className="flex items-center gap-1.5 rounded-sm bg-primary px-3 py-2 text-xs font-medium text-primary-foreground hover:opacity-90 transition-opacity active:scale-[0.98]"
+            className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium"
           >
             <Plus size={13} /> {t('newResume')}
-          </button>
+          </Button>
         </div>
 
         {/* Section B: Stat Cards (4-column grid) */}
@@ -144,7 +155,7 @@ export function DashboardView() {
           {/* Card 1: Resumes */}
           <Link
             href={`/resume/${topResumes[0].id}`}
-            className="rounded-sm border border-border bg-card p-4 transition-colors hover:border-primary flex flex-col justify-between h-24"
+            className="rounded-sm neuro-card p-4 transition-colors hover:border-brand flex flex-col justify-between h-24"
           >
             <div className="flex justify-between items-start">
               <span className="text-[10px] font-mono uppercase text-muted-foreground tracking-wider">{t('resumes')}</span>
@@ -161,7 +172,7 @@ export function DashboardView() {
           {/* Card 2: Applications */}
           <Link
             href="/applications"
-            className="rounded-sm border border-border bg-card p-4 transition-colors hover:border-primary flex flex-col justify-between h-24"
+            className="rounded-sm neuro-card p-4 transition-colors hover:border-brand flex flex-col justify-between h-24"
           >
             <div className="flex justify-between items-start">
               <span className="text-[10px] font-mono uppercase text-muted-foreground tracking-wider">{t('applications')}</span>
@@ -178,7 +189,7 @@ export function DashboardView() {
           {/* Card 3: Interview */}
           <Link
             href="/interview"
-            className="rounded-sm border border-border bg-card p-4 transition-colors hover:border-primary flex flex-col justify-between h-24"
+            className="rounded-sm neuro-card p-4 transition-colors hover:border-brand flex flex-col justify-between h-24"
           >
             <div className="flex justify-between items-start">
               <span className="text-[10px] font-mono uppercase text-muted-foreground tracking-wider">{t('interview')}</span>
@@ -202,7 +213,7 @@ export function DashboardView() {
           {/* Card 4: Cover Letters */}
           <Link
             href={coverLetters.length > 0 ? `/cover-letter` : '/chat'}
-            className="rounded-sm border border-border bg-card p-4 transition-colors hover:border-primary flex flex-col justify-between h-24"
+            className="rounded-sm neuro-card p-4 transition-colors hover:border-brand flex flex-col justify-between h-24"
           >
             <div className="flex justify-between items-start">
               <span className="text-[10px] font-mono uppercase text-muted-foreground tracking-wider">{t('letters')}</span>
@@ -220,14 +231,14 @@ export function DashboardView() {
         {/* Section C: Two-column Panel (Top Resumes + Pipeline Snapshot) */}
         <div className="mb-5 grid grid-cols-1 lg:grid-cols-2 gap-4">
           {/* Left card: Top Resumes */}
-          <div className="rounded-sm border border-border bg-card p-4">
+          <div className="rounded-sm neuro-card p-4">
             <div className="label-mono mb-3 text-foreground font-semibold">{t('topResumes')}</div>
             <div className="space-y-2">
               {topResumes.map((r) => (
                 <Link
                   key={r.id}
                   href={`/resume/${r.id}`}
-                  className="flex items-center gap-2.5 rounded-sm px-2 py-1.5 hover:bg-background transition-colors"
+                  className="flex items-center gap-2.5 rounded-sm px-2 py-1.5 hover:neuro-surface transition-colors"
                 >
                   <span
                     className={cn(
@@ -235,7 +246,7 @@ export function DashboardView() {
                       r.score >= 85 ? 'bg-success' : r.score >= 70 ? 'bg-primary' : 'bg-[var(--warn)]'
                     )}
                   />
-                  <span className="flex-1 truncate text-xs font-medium text-foreground">{r.name}</span>
+                  <span className="flex-1 truncate text-sm font-medium text-foreground">{r.name}</span>
                   <span className="font-mono text-[10px] font-semibold text-success">{r.score}%</span>
                 </Link>
               ))}
@@ -243,7 +254,7 @@ export function DashboardView() {
           </div>
 
           {/* Right card: Applications Snapshot */}
-          <div className="rounded-sm border border-border bg-card p-4">
+          <div className="rounded-sm neuro-card p-4">
             <div className="label-mono mb-3 text-foreground font-semibold">{t('applications')}</div>
             <div className="space-y-2">
               {[
@@ -255,10 +266,10 @@ export function DashboardView() {
                 <Link
                   key={stage.label}
                   href="/applications"
-                  className="flex items-center gap-2.5 rounded-sm px-2 py-1.5 hover:bg-background transition-colors"
+                  className="flex items-center gap-2.5 rounded-sm px-2 py-1.5 hover:neuro-surface transition-colors"
                 >
                   <span className={cn('h-2 w-2 shrink-0 rounded-full', stage.color)} />
-                  <span className="flex-1 text-xs font-medium text-foreground">{stage.label}</span>
+                  <span className="flex-1 text-sm font-medium text-foreground">{stage.label}</span>
                   <span className="font-mono text-[10px] font-semibold text-muted-foreground">{stage.count}</span>
                 </Link>
               ))}
@@ -270,34 +281,34 @@ export function DashboardView() {
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
           <Link
             href="/chat"
-            className="flex flex-col items-center gap-2 rounded-sm border border-border bg-card p-4 text-center transition-colors hover:border-primary"
+            className="flex flex-col items-center gap-2 rounded-sm neuro-card p-4 text-center transition-colors hover:border-brand"
           >
             <MessageSquare size={18} className="text-primary" />
-            <span className="text-xs font-medium text-foreground">{t('chatWithCoach')}</span>
+            <span className="text-sm font-medium text-foreground">{t('chatWithCoach')}</span>
           </Link>
 
           <Link
             href="/interview"
-            className="flex flex-col items-center gap-2 rounded-sm border border-border bg-card p-4 text-center transition-colors hover:border-primary"
+            className="flex flex-col items-center gap-2 rounded-sm neuro-card p-4 text-center transition-colors hover:border-brand"
           >
             <Brain size={18} className="text-primary" />
-            <span className="text-xs font-medium text-foreground">{t('practiceInterview')}</span>
+            <span className="text-sm font-medium text-foreground">{t('practiceInterview')}</span>
           </Link>
 
           <Link
             href="/ats"
-            className="flex flex-col items-center gap-2 rounded-sm border border-border bg-card p-4 text-center transition-colors hover:border-primary"
+            className="flex flex-col items-center gap-2 rounded-sm neuro-card p-4 text-center transition-colors hover:border-brand"
           >
             <CheckSquare size={18} className="text-primary" />
-            <span className="text-xs font-medium text-foreground">{t('atsOptimizer')}</span>
+            <span className="text-sm font-medium text-foreground">{t('atsOptimizer')}</span>
           </Link>
 
           <Link
             href="/applications"
-            className="flex flex-col items-center gap-2 rounded-sm border border-border bg-card p-4 text-center transition-colors hover:border-primary"
+            className="flex flex-col items-center gap-2 rounded-sm neuro-card p-4 text-center transition-colors hover:border-brand"
           >
             <KanbanSquare size={18} className="text-primary" />
-            <span className="text-xs font-medium text-foreground">{t('viewApplications')}</span>
+            <span className="text-sm font-medium text-foreground">{t('viewApplications')}</span>
           </Link>
         </div>
       </div>

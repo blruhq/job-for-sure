@@ -3,6 +3,8 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from '~/i18n/routing'
 import { CheckCircle2, TrendingUp, TrendingDown, RefreshCw, MessageSquare, AlertTriangle, Check } from 'lucide-react'
+import { Button } from '~/components/ui/button'
+
 import type { InterviewExchange } from '~/types/interview'
 
 interface InterviewSummaryProps {
@@ -75,33 +77,33 @@ export function InterviewSummary({ exchanges, onRestart }: InterviewSummaryProps
   }
 
   return (
-    <div className="flex h-full w-full items-center justify-center overflow-y-auto p-4 md:p-8 bg-background">
-      <div className="w-full max-w-[620px] rounded-lg border border-border bg-card p-6 shadow-sm">
+    <div className="flex h-full w-full items-center justify-center overflow-y-auto p-4 md:p-8 neuro-surface">
+      <div className="w-full max-w-[620px] rounded-lg neuro-card p-6">
         <div className="mb-6 text-center">
           <div className="mx-auto mb-3 flex h-10 w-10 items-center justify-center rounded-lg bg-success-soft text-success border border-success/10">
             <CheckCircle2 size={20} />
           </div>
           <h1 className="text-xl font-semibold tracking-tight text-foreground">Interview Completed</h1>
-          <p className="text-xs text-muted-foreground mt-1">Here is a summary of your performance analysis</p>
+          <p className="text-sm text-muted-foreground mt-1">Here is a summary of your performance analysis</p>
         </div>
 
         {/* Stats Row */}
         <div className="grid grid-cols-3 gap-3 mb-6">
-          <div className="rounded-md border border-border bg-background p-3 text-center">
+          <div className="rounded-md neuro-inset p-3 text-center">
             <div className="text-[10px] font-mono uppercase text-muted-foreground mb-1">Questions</div>
             <div className="text-lg font-bold text-foreground">{totalQuestions} Qs</div>
-            <div className="text-[9px] text-muted-foreground mt-0.5">answered</div>
+            <div className="text-[10px] text-muted-foreground mt-0.5">answered</div>
           </div>
           
-          <div className="rounded-md border border-border bg-background p-3 text-center">
+          <div className="rounded-md neuro-inset p-3 text-center">
             <div className="text-[10px] font-mono uppercase text-muted-foreground mb-1">Avg Score</div>
             <div className="text-lg font-bold text-foreground">{avgScore} / 10</div>
-            <div className="text-[9px] text-muted-foreground mt-0.5">{Math.round(avgScore * 10)}% match</div>
+            <div className="text-[10px] text-muted-foreground mt-0.5">{Math.round(avgScore * 10)}% match</div>
           </div>
 
-          <div className="rounded-md border border-border bg-background p-3 text-center flex flex-col justify-between items-center">
+          <div className="rounded-md neuro-inset p-3 text-center flex flex-col justify-between items-center">
             <div className="text-[10px] font-mono uppercase text-muted-foreground mb-1">Comparison</div>
-            <div className="flex items-center gap-1 text-xs font-semibold">
+            <div className="flex items-center gap-1 text-sm font-semibold">
               {deltaDirection === 'up' && <TrendingUp size={14} className="text-success" />}
               {deltaDirection === 'down' && <TrendingDown size={14} className="text-destructive" />}
               <span className={
@@ -110,7 +112,7 @@ export function InterviewSummary({ exchanges, onRestart }: InterviewSummaryProps
                 {deltaText}
               </span>
             </div>
-            <div className="text-[9px] text-muted-foreground mt-0.5">performance trajectory</div>
+            <div className="text-[10px] text-muted-foreground mt-0.5">performance trajectory</div>
           </div>
         </div>
 
@@ -123,14 +125,14 @@ export function InterviewSummary({ exchanges, onRestart }: InterviewSummaryProps
             {topStrengths.length > 0 ? (
               <ul className="space-y-1.5 bg-success-soft/20 border border-success/10 rounded-md p-3.5">
                 {topStrengths.map((str, idx) => (
-                  <li key={idx} className="text-xs text-foreground/90 flex items-start gap-2">
+                  <li key={idx} className="text-sm text-foreground/90 flex items-start gap-2">
                     <span className="text-success font-bold">•</span>
                     <span>{str}</span>
                   </li>
                 ))}
               </ul>
             ) : (
-              <div className="text-xs text-muted-foreground italic border border-dashed border-border rounded-md p-4 text-center">
+              <div className="text-sm text-muted-foreground italic border border-dashed border-border rounded-md p-4 text-center">
                 Not enough data collected to aggregate strengths.
               </div>
             )}
@@ -143,14 +145,14 @@ export function InterviewSummary({ exchanges, onRestart }: InterviewSummaryProps
             {topImprovements.length > 0 ? (
               <ul className="space-y-1.5 bg-destructive/5 border border-destructive/10 rounded-md p-3.5">
                 {topImprovements.map((imp, idx) => (
-                  <li key={idx} className="text-xs text-foreground/90 flex items-start gap-2">
+                  <li key={idx} className="text-sm text-foreground/90 flex items-start gap-2">
                     <span className="text-warn font-bold">•</span>
                     <span>{imp}</span>
                   </li>
                 ))}
               </ul>
             ) : (
-              <div className="text-xs text-muted-foreground italic border border-dashed border-border rounded-md p-4 text-center">
+              <div className="text-sm text-muted-foreground italic border border-dashed border-border rounded-md p-4 text-center">
                 Not enough data collected to aggregate improvement tips.
               </div>
             )}
@@ -165,13 +167,13 @@ export function InterviewSummary({ exchanges, onRestart }: InterviewSummaryProps
             </h3>
             <div className="space-y-3">
               {exchanges.map((exchange, idx) => (
-                <div key={idx} className="rounded-md border border-border bg-background p-3.5 space-y-2">
+                <div key={idx} className="rounded-md neuro-inset p-3.5 space-y-2">
                   <div className="flex items-start justify-between gap-2">
                     <div className="flex items-center gap-1.5">
-                      <span className="text-[9px] font-mono uppercase bg-muted text-muted-foreground px-1.5 py-0.5 rounded">
+                      <span className="text-[10px] font-mono uppercase bg-muted text-muted-foreground px-1.5 py-0.5 rounded">
                         Q{idx + 1}
                       </span>
-                      <span className="text-[9px] font-mono text-muted-foreground">
+                      <span className="text-[10px] font-mono text-muted-foreground">
                         {exchange.question.category}
                       </span>
                     </div>
@@ -182,11 +184,11 @@ export function InterviewSummary({ exchanges, onRestart }: InterviewSummaryProps
                       {exchange.feedback.score}/10
                     </span>
                   </div>
-                  <p className="text-[11px] text-foreground font-medium leading-relaxed">
+                  <p className="text-sm text-foreground font-medium leading-relaxed">
                     {exchange.question.question}
                   </p>
                   <div>
-                    <span className="text-[9px] font-mono uppercase text-success font-semibold">Strengths</span>
+                    <span className="text-[10px] font-mono uppercase text-success font-semibold">Strengths</span>
                     <ul className="space-y-0.5 mt-0.5">
                       {(exchange.feedback.strengths || []).map((str, i) => (
                         <li key={i} className="text-[10px] text-muted-foreground flex items-start gap-1">
@@ -196,7 +198,7 @@ export function InterviewSummary({ exchanges, onRestart }: InterviewSummaryProps
                     </ul>
                   </div>
                   <div>
-                    <span className="text-[9px] font-mono uppercase text-warn font-semibold">To Improve</span>
+                    <span className="text-[10px] font-mono uppercase text-warn font-semibold">To Improve</span>
                     <ul className="space-y-0.5 mt-0.5">
                       {(exchange.feedback.improvements || []).map((imp, i) => (
                         <li key={i} className="text-[10px] text-muted-foreground flex items-start gap-1">
@@ -206,7 +208,7 @@ export function InterviewSummary({ exchanges, onRestart }: InterviewSummaryProps
                     </ul>
                   </div>
                   <div>
-                    <span className="text-[9px] font-mono uppercase text-primary font-semibold">Model Answer</span>
+                    <span className="text-[10px] font-mono uppercase text-primary font-semibold">Model Answer</span>
                     <p className="text-[10px] text-muted-foreground italic mt-0.5 bg-muted/20 p-2 rounded border border-border/40">
                       &quot;{exchange.feedback.modelAnswer}&quot;
                     </p>
@@ -219,18 +221,19 @@ export function InterviewSummary({ exchanges, onRestart }: InterviewSummaryProps
 
         {/* Actions */}
         <div className="flex gap-2">
-          <button
+          <Button
+            variant="outline"
             onClick={onRestart}
-            className="flex-1 cursor-pointer rounded-sm border border-border bg-background hover:bg-muted/50 px-4 py-2.5 text-xs font-medium text-foreground transition-colors flex items-center justify-center gap-1.5"
+            className="flex-1 rounded-sm px-4 py-2.5 text-sm font-medium flex items-center justify-center gap-1.5"
           >
             <RefreshCw size={13} /> Practice Again
-          </button>
-          <button
+          </Button>
+          <Button
             onClick={() => router.push('/chat')}
-            className="flex-1 cursor-pointer rounded-sm bg-primary px-4 py-2.5 text-xs font-medium text-primary-foreground transition-opacity hover:opacity-90 flex items-center justify-center gap-1.5"
+            className="flex-1 rounded-sm px-4 py-2.5 text-sm font-medium flex items-center justify-center gap-1.5"
           >
             <MessageSquare size={13} /> Back to Coach Chat
-          </button>
+          </Button>
         </div>
       </div>
     </div>

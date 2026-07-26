@@ -2,6 +2,9 @@
 
 import { useState, useRef } from 'react'
 import { Trash2, Link2, RefreshCw, Plus, Loader2, AlertCircle } from 'lucide-react'
+import { Button } from '~/components/ui/button'
+import { Input } from '~/components/ui/input'
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '~/components/ui/select'
 import { cn } from '~/lib/utils'
 import { useApplications, useMoveApplication, useDeleteApplication, useCreateApplication } from '~/hooks/use-apps'
 import { JobDetailPanel } from '~/components/pipeline/job-detail-panel'
@@ -46,7 +49,7 @@ const collisionDetection: CollisionDetection = (args) => {
 
 const COLUMNS: { id: ApplicationColumnId; labelKey: string; dot: string; next: ApplicationColumnId | null }[] = [
   { id: 'bookmark', labelKey: 'bookmark', dot: '#9F9E98', next: 'applied' },
-  { id: 'applied', labelKey: 'applied', dot: '#5B6ABF', next: 'interviewing' },
+    { id: 'applied', labelKey: 'applied', dot: '#8B6F47', next: 'interviewing' },
   { id: 'interviewing', labelKey: 'interviewing', dot: '#D4A316', next: 'offers' },
   { id: 'offers', labelKey: 'offers', dot: '#2B5F45', next: 'rejected' },
   { id: 'rejected', labelKey: 'rejected', dot: '#B53A3A', next: null },
@@ -69,7 +72,7 @@ function DraggableJobCard({ job, children }: { job: PipelineJob; children: React
       {...attributes}
       {...listeners}
       className={cn(
-        'group cursor-grab rounded-sm border border-border/60 bg-card p-2.5 active:cursor-grabbing hover:border-primary/50',
+        'group cursor-grab rounded-sm neuro-card p-4 active:cursor-grabbing hover:-translate-y-0.5 min-w-0 overflow-hidden',
       )}
     >
       {children}
@@ -85,8 +88,8 @@ function DroppableColumn({ colId, isOver, children }: { colId: ApplicationColumn
     <div
       ref={setNodeRef}
       className={cn(
-        'flex w-72 shrink-0 flex-col rounded-sm border border-border transition-colors',
-        isOver && 'border-primary bg-accent-soft/30',
+        'flex w-72 shrink-0 flex-col rounded-sm neuro-inset neuro-inset-container transition-all duration-150',
+        isOver && 'ring-2 ring-primary bg-primary/10 scale-[1.02]',
       )}
     >
       {children}
@@ -101,23 +104,36 @@ function JobCardContent({ job }: { job: PipelineJob }) {
     <>
       <div className="flex items-start justify-between gap-1">
         <div className="min-w-0 flex-1">
-          <div className="text-[11px] font-semibold text-foreground truncate">{job.title}</div>
-          <div className="text-[10px] text-muted-foreground truncate">{job.company}</div>
+          <div className="text-sm font-semibold text-foreground line-clamp-2 break-words leading-snug">
+            {job.title || 'Untitled Position'}
+          </div>
+          <div className="text-[10px] text-muted-foreground truncate mt-0.5">
+            {job.company || 'Unknown Company'}
+          </div>
         </div>
         {job.score > 0 && (
           <span className={cn(
-            'shrink-0 rounded-xs px-1 py-px text-[9px] font-mono font-semibold',
+            'shrink-0 rounded-xs px-1 py-px text-xs font-mono font-semibold',
             job.score >= 85 ? 'bg-success/10 text-success' : job.score >= 70 ? 'bg-primary/10 text-primary' : 'bg-warn/10 text-warn'
           )}>
             {job.score}%
           </span>
         )}
       </div>
-      <div className="mt-1.5 flex items-center gap-2 text-[9px] text-muted-foreground">
-        {job.loc && <span className="truncate">{job.loc}</span>}
-      </div>
+
+      {(job.loc || job.salary) && (
+        <div className="mt-1.5 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-sm text-muted-foreground">
+          {job.loc && <span className="break-words">{job.loc}</span>}
+          {job.salary && (
+            <>
+              {job.loc && <span className="text-muted-foreground/40">·</span>}
+              <span className="break-words">{job.salary}</span>
+            </>
+          )}
+        </div>
+      )}
       {dateText && (
-        <div className="mt-1 text-[9px] text-muted-foreground/60">
+        <div className="mt-1 text-sm text-muted-foreground/60 whitespace-nowrap">
           {dateText}
         </div>
       )}
@@ -170,10 +186,10 @@ function InlineAddForm({ colId: _colId, onCancel, onSave, titleRef }: InlineAddF
   }
 
   return (
-    <div className="mt-1.5 flex flex-col gap-2 rounded-xs border border-border bg-card p-2.5">
-      <input
+    <div className="mt-1.5 flex flex-col gap-2 rounded-xs neuro-card p-4">
+      <Input
+        neumorphic
         ref={titleRef}
-        type="text"
         value={title}
         onChange={(e) => setTitle(e.target.value)}
         onKeyDown={(e) => {
@@ -182,10 +198,10 @@ function InlineAddForm({ colId: _colId, onCancel, onSave, titleRef }: InlineAddF
         }}
         placeholder="Job title *"
         autoFocus
-        className="w-full rounded-xs border border-border bg-background px-2 py-1.5 text-[11px] outline-none focus:border-primary placeholder:text-muted-foreground/50"
+        className="w-full rounded-xs px-3 py-2 text-sm placeholder:text-muted-foreground/50"
       />
-      <input
-        type="text"
+      <Input
+        neumorphic
         value={company}
         onChange={(e) => setCompany(e.target.value)}
         onKeyDown={(e) => {
@@ -193,10 +209,10 @@ function InlineAddForm({ colId: _colId, onCancel, onSave, titleRef }: InlineAddF
           if (e.key === 'Escape') onCancel()
         }}
         placeholder="Company *"
-        className="w-full rounded-xs border border-border bg-background px-2 py-1.5 text-[11px] outline-none focus:border-primary placeholder:text-muted-foreground/50"
+        className="w-full rounded-xs px-3 py-2 text-sm placeholder:text-muted-foreground/50"
       />
-      <input
-        type="text"
+      <Input
+        neumorphic
         value={loc}
         onChange={(e) => setLoc(e.target.value)}
         onKeyDown={(e) => {
@@ -204,22 +220,15 @@ function InlineAddForm({ colId: _colId, onCancel, onSave, titleRef }: InlineAddF
           if (e.key === 'Escape') onCancel()
         }}
         placeholder="Location"
-        className="w-full rounded-xs border border-border bg-background px-2 py-1.5 text-[11px] outline-none focus:border-primary placeholder:text-muted-foreground/50"
+        className="w-full rounded-xs px-3 py-2 text-sm placeholder:text-muted-foreground/50"
       />
       <div className="flex items-center justify-end gap-1.5 mt-0.5">
-        <button
-          onClick={onCancel}
-          className="rounded-xs px-2.5 py-1 text-[10px] text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
-        >
+        <Button variant="ghost" onClick={onCancel} className="rounded-xs px-2.5 py-1.5 text-xs">
           {t('cancel')}
-        </button>
-        <button
-          onClick={handleSave}
-          disabled={!title.trim() || !company.trim()}
-          className="rounded-xs bg-primary px-2.5 py-1 text-[10px] font-medium text-primary-foreground transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer"
-        >
+        </Button>
+        <Button variant="default" onClick={handleSave} disabled={!title.trim() || !company.trim()} className="rounded-xs px-2.5 py-1.5 text-xs">
           {t('add')}
-        </button>
+        </Button>
       </div>
     </div>
   )
@@ -262,10 +271,10 @@ export function ApplicationsView() {
   // ── Loading state ──
   if (isLoading) {
     return (
-      <div className="flex h-full w-full items-center justify-center bg-background">
+      <div className="flex h-full w-full items-center justify-center neuro-surface">
         <div className="flex flex-col items-center gap-3">
           <Loader2 size={20} className="animate-spin text-muted-foreground" />
-          <p className="text-xs text-muted-foreground">Loading applications…</p>
+          <p className="text-sm text-muted-foreground">Loading applications…</p>
         </div>
       </div>
     )
@@ -274,7 +283,7 @@ export function ApplicationsView() {
   // ── Error state ──
   if (isError) {
     return (
-      <div className="flex h-full w-full flex-col items-center justify-center bg-background gap-3 px-6 text-center">
+      <div className="flex h-full w-full flex-col items-center justify-center neuro-surface gap-3 px-6 text-center">
         <AlertCircle size={24} className="text-destructive/60" />
         <div className="max-w-xs">
           <p className="text-sm font-medium text-foreground">Failed to load applications</p>
@@ -282,12 +291,9 @@ export function ApplicationsView() {
             {error instanceof Error ? error.message : 'An unexpected error occurred. Please try again.'}
           </p>
         </div>
-        <button
-          onClick={() => window.location.reload()}
-          className="cursor-pointer rounded-sm bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground hover:opacity-90"
-        >
+        <Button variant="default" onClick={() => window.location.reload()} className="rounded-sm px-3 py-1.5 text-xs">
           Reload page
-        </button>
+        </Button>
       </div>
     )
   }
@@ -402,9 +408,9 @@ export function ApplicationsView() {
   }
 
   return (
-    <div className="flex h-full w-full flex-col bg-background">
+    <div className="flex h-full w-full flex-col neuro-surface">
       {/* ── Header ── */}
-      <div className="flex flex-col gap-2 border-b border-border px-4 py-2.5 shrink-0">
+      <div className="flex flex-col gap-2 neuro-divider px-4 py-2.5 shrink-0">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <h1 className="text-sm font-semibold text-foreground">
@@ -414,24 +420,25 @@ export function ApplicationsView() {
               <span className="text-[10px] text-muted-foreground font-mono">
                 {t('resume')}
               </span>
-              <select
-                value={filter}
-                onChange={(e) => setFilter(e.target.value)}
-                className="cursor-pointer rounded-xs border border-border bg-background px-2 py-1 text-[11px] outline-none focus:border-primary"
-              >
-                {resumeIds.map((id) => (
-                  <option key={id} value={id}>
-                    {id === 'all' ? t('all') : resumes.find((r) => r.id === id)?.name || id}
-                  </option>
-                ))}
-              </select>
+              <Select value={filter} onValueChange={(v) => setFilter(v || 'all')}>
+                <SelectTrigger className="w-full rounded-xs neuro-inset px-2 py-1 text-xs">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {resumeIds.map((id) => (
+                    <SelectItem key={id} value={id}>
+                      {id === 'all' ? t('all') : resumes.find((r) => r.id === id)?.name || id}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
           </div>
         </div>
         {/* Paste URL input */}
         <div className="flex items-center gap-1.5">
-          <input
-            type="url"
+          <Input
+            neumorphic
             value={pasteUrl}
             onChange={(e) => setPasteUrl(e.target.value)}
             onKeyDown={(e) => {
@@ -439,12 +446,14 @@ export function ApplicationsView() {
             }}
             placeholder="Paste a job URL (Indeed, Greenhouse, JobsDB...) and press Enter"
             disabled={scraping}
-            className="flex-1 rounded-xs border border-border bg-background px-2.5 py-1.5 text-[11px] outline-none focus:border-primary placeholder:text-muted-foreground/50 disabled:opacity-50"
+            className="flex-1 rounded-xs px-3 py-2 text-sm placeholder:text-muted-foreground/50 disabled:opacity-50"
           />
-          <button
+          <Button
+            size="sm"
+            variant="default"
             onClick={handlePasteUrl}
             disabled={scraping || !pasteUrl.trim()}
-            className="flex shrink-0 cursor-pointer items-center gap-1 rounded-xs bg-primary px-3 py-1.5 text-[11px] font-medium text-primary-foreground transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
+            className="flex shrink-0 items-center gap-1 rounded-xs px-5 text-sm"
           >
             {scraping ? (
               <>
@@ -457,7 +466,7 @@ export function ApplicationsView() {
                 Add
               </>
             )}
-          </button>
+          </Button>
         </div>
       </div>
 
@@ -482,7 +491,7 @@ export function ApplicationsView() {
           }
         }}
       >
-        <div className="flex flex-1 gap-3 overflow-x-auto p-4">
+        <div className="flex flex-1 gap-5 overflow-x-auto p-4">
           {COLUMNS.map((col) => {
             const jobs = filterJobs(applications[col.id])
             const isOver = dragOverCol === col.id
@@ -490,16 +499,18 @@ export function ApplicationsView() {
             return (
               <DroppableColumn key={col.id} colId={col.id} isOver={isOver}>
                 {/* Column Header */}
-                <div className="flex items-center justify-between border-b border-border px-3 py-2">
+                <div className="flex items-center justify-between neuro-divider px-3 py-2">
                   <div className="flex items-center gap-2">
                     <span className="h-2 w-2 rounded-full" style={{ backgroundColor: col.dot }} />
-                    <span className="text-xs font-semibold text-foreground">{t(col.labelKey)}</span>
+                    <span className="text-sm font-semibold text-foreground">{t(col.labelKey)}</span>
                     <span className="text-[10px] font-mono text-muted-foreground">{jobs.length}</span>
                   </div>
                 </div>
 
-                {/* Job Cards */}
-                <div className="flex flex-col gap-1.5 p-2 overflow-y-auto">
+                {/* Job Cards — overflow-x-hidden prevents horizontal clip/scrollbar while
+                     overflow-y-auto enables vertical scroll. px-4/pb-3 padding gives 16px
+                     room for the -6px/-8px neumorphic card shadows. */}
+                <div className="flex flex-1 min-h-0 min-w-0 flex-col gap-3 overflow-y-auto overflow-x-hidden px-4 pb-3 pt-4">
                   {jobs.length === 0 && !(addingToCol === col.id) && (
                     <div className="px-2 py-6 text-center">
                       <p className="text-[10px] text-muted-foreground/50">
@@ -511,31 +522,28 @@ export function ApplicationsView() {
                   <SortableContext items={jobs.map((j) => j.key)} strategy={verticalListSortingStrategy}>
                     {jobs.map((job) => (
                       <DraggableJobCard key={job.key} job={job}>
-                        <button type="button" onClick={() => setSelectedJob(job)} className="w-full text-left cursor-pointer">
+                        <Button variant="ghost" onClick={() => setSelectedJob(job)} className="flex w-full flex-col items-start justify-start gap-0 text-left h-auto p-0 rounded-none whitespace-normal min-w-0 hover:bg-transparent">
                           <JobCardContent job={job} />
-                        </button>
-                        <div className="mt-1.5 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                        </Button>
+                        <div className="mt-1.5 flex items-center gap-1">
                           {job.url && (
                             <a
                               href={job.url}
                               target="_blank"
                               rel="noopener noreferrer"
                               onClick={(e) => e.stopPropagation()}
-                              className="flex items-center gap-0.5 rounded-xs px-1.5 py-0.5 text-[9px] text-muted-foreground hover:text-primary transition-colors"
+                              className="flex items-center gap-0.5 rounded-xs px-1.5 py-0.5 text-xs text-muted-foreground hover:text-primary transition-colors"
                             >
                               <Link2 size={10} /> Open
                             </a>
                           )}
-                          <button
-                            onClick={(e) => {
+                          <Button variant="ghost" size="sm" onClick={(e) => {
                               e.stopPropagation()
                               removeJob(job.key)
                               notify({ message: 'Removed from board', type: 'info' })
-                            }}
-                            className="flex items-center gap-0.5 rounded-xs px-1.5 py-0.5 text-[9px] text-muted-foreground hover:text-destructive transition-colors cursor-pointer"
-                          >
+                            }} className="flex items-center gap-0.5 rounded-xs px-1.5 py-0.5 text-xs text-muted-foreground hover:text-destructive h-auto">
                             <Trash2 size={10} /> Remove
-                          </button>
+                          </Button>
                         </div>
                       </DraggableJobCard>
                     ))}
@@ -550,16 +558,13 @@ export function ApplicationsView() {
                       onSave={(payload) => bookmarkJob(payload)}
                     />
                   ) : (
-                    <button
-                      onClick={() => {
+                    <Button variant="ghost" size="sm" onClick={() => {
                         setAddingToCol(col.id)
                         setTimeout(() => addTitleRef.current?.focus(), 50)
-                      }}
-                      className="flex cursor-pointer items-center gap-1 rounded-xs px-2 py-1.5 text-[10px] text-muted-foreground hover:text-foreground hover:bg-accent/50 transition-colors"
-                    >
+                      }} className="flex items-center gap-1 rounded-xs px-2 py-2 text-xs">
                       <Plus size={12} />
                       Add Job
-                    </button>
+                    </Button>
                   )}
                 </div>
               </DroppableColumn>
@@ -570,7 +575,7 @@ export function ApplicationsView() {
         {/* ── Floating drag overlay ── */}
         <DragOverlay dropAnimation={null}>
           {activeJob ? (
-            <div className="w-72 rounded-sm border border-border/60 bg-card p-2.5 shadow-[0_8px_30px_rgba(0,0,0,0.12)]">
+            <div className="w-72 rounded-sm neuro-card p-4">
               <JobCardContent job={activeJob} />
             </div>
           ) : null}

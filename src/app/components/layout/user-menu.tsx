@@ -1,11 +1,9 @@
-'use client'
-
 import { useState, useEffect } from 'react'
 import { useRouter } from '~/i18n/routing'
-import { Menu } from '@base-ui/react/menu'
 import { Settings, LogOut } from 'lucide-react'
 import { authClient } from '~/lib/auth-client'
 import { notify } from '~/lib/toast'
+import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator } from '~/components/ui/dropdown-menu'
 
 export function UserMenu() {
   const router = useRouter()
@@ -51,37 +49,27 @@ export function UserMenu() {
   }
 
   return (
-    <Menu.Root>
-      <Menu.Trigger className="flex h-[30px] w-[30px] cursor-pointer items-center justify-center rounded-full bg-primary text-[10px] font-semibold text-primary-foreground transition-all duration-150 hover:opacity-80 active:scale-95 data-[popup-open]:ring-2 data-[popup-open]:ring-ring">
+    <DropdownMenu>
+      <DropdownMenuTrigger className="flex h-[30px] w-[30px] cursor-pointer items-center justify-center rounded-full bg-primary text-[10px] font-semibold text-primary-foreground transition-all duration-150 hover:opacity-80 active:scale-95">
         {initials}
-      </Menu.Trigger>
-      <Menu.Portal>
-        <Menu.Positioner side="bottom" align="end" className="z-50">
-          <Menu.Popup className="min-w-[180px] rounded-md border border-border bg-popover p-1 shadow-lg">
-            <div className="px-2.5 py-2">
-              {userName && <div className="text-xs font-semibold text-foreground">{userName}</div>}
-              {userEmail && (
-                <div className="truncate text-[10px] text-muted-foreground">{userEmail}</div>
-              )}
-            </div>
-            <div className="mx-2 h-px bg-border" />
-            <Menu.Item
-              className="flex cursor-pointer items-center gap-2 rounded-sm px-2.5 py-1.5 text-xs text-muted-foreground transition-colors hover:bg-accent hover:text-foreground data-[highlighted]:bg-accent data-[highlighted]:text-foreground"
-              onClick={() => router.push('/settings')}
-            >
-              <Settings size={14} />
-              Settings
-            </Menu.Item>
-            <Menu.Item
-              className="flex cursor-pointer items-center gap-2 rounded-sm px-2.5 py-1.5 text-xs text-muted-foreground transition-colors hover:bg-accent hover:text-foreground data-[highlighted]:bg-accent data-[highlighted]:text-foreground"
-              onClick={handleSignOut}
-            >
-              <LogOut size={14} />
-              Sign out
-            </Menu.Item>
-          </Menu.Popup>
-        </Menu.Positioner>
-      </Menu.Portal>
-    </Menu.Root>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end" className="min-w-[180px]">
+        <div className="px-2.5 py-2">
+          {userName && <div className="text-xs font-semibold text-foreground">{userName}</div>}
+          {userEmail && (
+            <div className="truncate text-[10px] text-muted-foreground">{userEmail}</div>
+          )}
+        </div>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem onClick={() => router.push('/settings')} className="flex items-center gap-2">
+          <Settings size={14} />
+          Settings
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={handleSignOut} className="flex items-center gap-2">
+          <LogOut size={14} />
+          Sign out
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
   )
 }

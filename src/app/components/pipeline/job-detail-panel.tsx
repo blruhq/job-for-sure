@@ -1,12 +1,11 @@
-'use client'
-
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from '~/i18n/routing'
 import {
-  X, FileText, Brain, ExternalLink, Bookmark, Globe, Plane,
-  Clock, Sparkles, ChevronDown, Zap, Target, DollarSign, Briefcase,
+  FileText, Brain, ExternalLink, Bookmark, Globe, Plane,
+  Clock, Sparkles, Zap, Target, DollarSign, Briefcase,
 } from 'lucide-react'
 import { cn } from '~/lib/utils'
+import { ScoreBadge } from '~/components/ui/score-badge'
 import { useActiveResume } from '~/hooks/use-active-resume'
 import { useUpdateApplication } from '~/hooks/use-apps'
 import { notify } from '~/lib/toast'
@@ -18,6 +17,9 @@ import { SmartOverview } from './smart-overview'
 import { AreaIntelligence } from './area-intelligence'
 import { CompanyIntelligence } from './company-intelligence'
 import { extractCity, extractDistrict, detectCountry } from '~/lib/area-links'
+import { Button } from '~/components/ui/button'
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '~/components/ui/select'
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from '~/components/ui/sheet'
 
 // ═══════════════════════════════════════════════════════════════
 // JobDetailPanel — slide-over panel showing everything about a job.
@@ -82,25 +84,6 @@ export function JobDetailPanel({
     setDescription(desc)
   }, [job])
 
-  // ── Key handlers ──
-  const handleKeyDown = useCallback(
-    (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose()
-    },
-    [onClose],
-  )
-
-  useEffect(() => {
-    if (job) {
-      document.addEventListener('keydown', handleKeyDown)
-      document.body.style.overflow = 'hidden'
-      return () => {
-        document.removeEventListener('keydown', handleKeyDown)
-        document.body.style.overflow = ''
-      }
-    }
-  }, [job, handleKeyDown])
-
   if (!job) return null
 
   // ── Derived data ──
@@ -129,9 +112,6 @@ export function JobDetailPanel({
   const salaryCurrency = (job.jobData?.salaryCurrency as string) || 'USD'
 
   // ── Structured location ──
-  // extractCity is smarter than jobData.city (which comes from parseLocation
-  // and grabs the first comma part — often a district like "Ratchathewi"
-  // instead of the actual city "Bangkok"). Use it first, structured as fallback.
   const city = extractCity(job.loc) || (job.jobData?.city as string) || ''
   const district = job.district || (job.jobData?.district as string) || extractDistrict(job.loc)
   const countryCode = detectCountry(job.loc) || (job.jobData?.country as string) || ''
@@ -208,27 +188,14 @@ export function JobDetailPanel({
   }
 
   return (
-    <>
-      {/* Backdrop */}
-      <div
-        className="fixed inset-0 z-[100] bg-black/40 backdrop-blur-sm"
-        onClick={onClose}
-      />
-
-      {/* Slide-over panel */}
-      <div
-        className="fixed right-0 top-0 z-[101] flex h-full w-full max-w-lg flex-col border-l border-border bg-card shadow-xl animate-in slide-in-from-right"
-        onClick={(e) => e.stopPropagation()}
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="job-detail-title"
-      >
+    <Sheet open={!!job} onOpenChange={(o) => { if (!o) onClose() }}>
+      <SheetContent side="right" className="w-full max-w-2xl flex flex-col p-0 gap-0">
         {/* ── Header ── */}
-        <div className="shrink-0 border-b border-border px-5 py-4">
+        <SheetHeader className="shrink-0 neuro-divider px-5 py-4">
           <div className="flex items-start justify-between gap-3">
             <div className="min-w-0 flex-1">
-              <h2 id="job-detail-title" className="text-base font-semibold text-foreground">{job.title}</h2>
-              <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+              <SheetTitle className="text-base">{job.title}</SheetTitle>
+              <div className="mt-1 flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
                 <span className="font-medium text-foreground">{job.company}</span>
                 <span>·</span>
                 <span className="flex items-center gap-1">
@@ -237,31 +204,18 @@ export function JobDetailPanel({
                 </span>
               </div>
             </div>
-            <button
-              onClick={onClose}
-              aria-label="Close"
-              className="cursor-pointer rounded-sm p-1 text-muted-foreground hover:bg-muted hover:text-foreground"
-            >
-              <X size={16} />
-            </button>
           </div>
 
           {/* Tags row */}
           <div className="mt-2 flex flex-wrap gap-1.5">
-            <span
-              className={cn(
-                'rounded-xs px-2 py-0.5 font-mono text-xs font-semibold',
-                job.score >= 75
-                  ? 'bg-success-soft text-success'
-                  : job.score >= 50
-                    ? 'bg-warn-soft text-[var(--warn)]'
-                    : 'bg-muted text-muted-foreground',
-              )}
+            <ScoreBadge
+              score={job.score}
+              className="px-2 py-0.5 text-xs"
             >
               {job.score}% Match
-            </span>
+            </ScoreBadge>
             {(salaryMin || job.salary) && (
-              <span className="flex items-center gap-0.5 rounded-xs border border-emerald-500/30 bg-emerald-50/50 px-2 py-0.5 text-[11px] font-semibold text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-400">
+              <span className="flex items-center gap-0.5 rounded-xs bg-success-soft px-2 py-0.5 text-xs font-semibold text-success dark:bg-success/10 dark:text-success">
                 <DollarSign size={10} />
                 {salaryMin && salaryMax
                   ? `${salaryCurrency === 'USD' ? '$' : salaryCurrency === 'GBP' ? '£' : salaryCurrency === 'EUR' ? '€' : `${salaryCurrency} `}${Math.round(salaryMin / 1000)}k–${Math.round(salaryMax / 1000)}k`
@@ -269,7 +223,7 @@ export function JobDetailPanel({
               </span>
             )}
             {locationType && locationType !== 'unknown' && (
-              <span className="flex items-center gap-0.5 rounded-xs border border-border bg-background px-1.5 py-0.5 text-[11px] capitalize text-muted-foreground">
+              <span className="flex items-center gap-0.5 rounded-xs neuro-surface px-1.5 py-0.5 text-xs capitalize text-muted-foreground">
                 {locationType === 'remote' && <Globe size={9} />}
                 {locationType}
               </span>
@@ -280,42 +234,37 @@ export function JobDetailPanel({
               </span>
             )}
             {experienceYears && (
-              <span className="flex items-center gap-0.5 rounded-xs border border-border bg-background px-1.5 py-0.5 text-[11px] text-muted-foreground">
+              <span className="flex items-center gap-0.5 rounded-xs neuro-surface px-1.5 py-0.5 text-xs text-muted-foreground">
                 <Briefcase size={10} />
                 {experienceYears}
               </span>
             )}
             {postedAt && (
-              <span className="flex items-center gap-0.5 rounded-xs border border-border bg-background px-1.5 py-0.5 text-[11px] text-muted-foreground">
+              <span className="flex items-center gap-0.5 rounded-xs neuro-surface px-1.5 py-0.5 text-xs text-muted-foreground">
                 <Clock size={9} /> {formatDate(postedAt)}
               </span>
             )}
           </div>
-        </div>
+        </SheetHeader>
 
         {/* ── Scrollable body ── */}
         <div className="flex-1 overflow-y-auto px-5 py-4 space-y-4">
-          {/* Tracker mode: Status dropdown */}
+          {/* Tracker mode: Status select */}
           {mode === 'tracker' && job.applicationId && (
             <div>
               <div className="label-mono mb-1.5">Status</div>
-              <div className="relative">
-                <select
-                  value={status}
-                  onChange={(e) => handleStatusChange(e.target.value)}
-                  className="w-full cursor-pointer appearance-none rounded-xs border border-border bg-background px-2 py-1.5 text-[12px] outline-none focus:border-primary"
-                >
+              <Select value={status} onValueChange={(v) => handleStatusChange(v || 'bookmarked')}>
+                <SelectTrigger className="w-full rounded-xs px-3 py-2 text-sm">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
                   {STATUS_OPTIONS.map((opt) => (
-                    <option key={opt.value} value={opt.value}>
+                    <SelectItem key={opt.value} value={opt.value}>
                       {opt.label}
-                    </option>
+                    </SelectItem>
                   ))}
-                </select>
-                <ChevronDown
-                  size={12}
-                  className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground"
-                />
-              </div>
+                </SelectContent>
+              </Select>
             </div>
           )}
 
@@ -395,7 +344,7 @@ export function JobDetailPanel({
                 {missingSkills.slice(0, 12).map((skill) => (
                   <span
                     key={skill}
-                    className="rounded-xs bg-warn-soft px-1.5 py-0.5 text-[10px] text-[var(--warn)]"
+                    className="rounded-xs bg-warn-soft px-1.5 py-0.5 text-[10px] text-warn"
                   >
                     {skill}
                   </span>
@@ -410,7 +359,7 @@ export function JobDetailPanel({
               <span className="group-open:hidden">&#9654; Show full job description</span>
               <span className="hidden group-open:inline">&#9660; Hide job description</span>
             </summary>
-            <div className="mt-2 whitespace-pre-wrap text-[13px] leading-relaxed text-foreground/90">
+            <div className="mt-2 whitespace-pre-wrap text-sm leading-relaxed text-foreground/90">
               {description || 'No description available.'}
             </div>
           </details>
@@ -430,65 +379,48 @@ export function JobDetailPanel({
         </div>
 
         {/* ── Footer: Actions ── */}
-        <div className="shrink-0 border-t border-border bg-background/50 px-5 py-3">
+        <div className="shrink-0 neuro-divider neuro-surface px-5 py-4">
           {/* AI tools grid */}
           <div className="mb-2 grid grid-cols-2 gap-2">
-            <button
-              onClick={handleTailor}
-              className="flex cursor-pointer items-center justify-center gap-1.5 rounded-xs bg-primary px-3 py-2 text-[12px] font-semibold text-primary-foreground transition-all hover:opacity-90 active:scale-[0.98]"
-            >
+            <Button variant="secondary" onClick={handleTailor} className="flex items-center justify-center gap-1.5 rounded-xs px-3 py-2.5 text-sm">
               <Zap size={13} /> Tailor Resume
-            </button>
-            <button
-              onClick={handleCoverLetter}
-              className="flex cursor-pointer items-center justify-center gap-1.5 rounded-xs bg-primary px-3 py-2 text-[12px] font-semibold text-primary-foreground transition-all hover:opacity-90 active:scale-[0.98]"
-            >
+            </Button>
+            <Button variant="secondary" onClick={handleCoverLetter} className="flex items-center justify-center gap-1.5 rounded-xs px-3 py-2.5 text-sm">
               <FileText size={13} /> Cover Letter
-            </button>
-            <button
-              onClick={handleAts}
-              className="flex cursor-pointer items-center justify-center gap-1.5 rounded-xs bg-primary px-3 py-2 text-[12px] font-semibold text-primary-foreground transition-all hover:opacity-90 active:scale-[0.98]"
-            >
+            </Button>
+            <Button variant="secondary" onClick={handleAts} className="flex items-center justify-center gap-1.5 rounded-xs px-3 py-2.5 text-sm">
               <Target size={13} /> ATS Match
-            </button>
-            <button
-              onClick={handleInterview}
-              className="flex cursor-pointer items-center justify-center gap-1.5 rounded-xs bg-primary px-3 py-2 text-[12px] font-semibold text-primary-foreground transition-all hover:opacity-90 active:scale-[0.98]"
-            >
+            </Button>
+            <Button variant="secondary" onClick={handleInterview} className="flex items-center justify-center gap-1.5 rounded-xs px-3 py-2.5 text-sm">
               <Brain size={13} /> Interview
-            </button>
+            </Button>
           </div>
 
-          {/* Bottom row */}
-          <div className="flex items-center justify-between gap-2">
-            <div className="flex items-center gap-2">
-              {mode === 'search' && (
-                <button
-                  onClick={onSaveToTracker}
-                  className={cn(
-                    'flex cursor-pointer items-center gap-1 rounded-xs border px-2.5 py-1.5 text-[11px] transition-all',
-                    isSaved
-                      ? 'border-primary bg-primary text-primary-foreground'
-                      : 'border-border bg-card hover:border-primary hover:text-primary',
-                  )}
-                >
-                  <Bookmark size={11} fill={isSaved ? 'currentColor' : 'none'} />
-                  {isSaved ? 'Saved' : 'Save to Tracker'}
-                </button>
-              )}
-            </div>
-            {job.url && (
-              <button
-                onClick={handleApply}
-                className="flex cursor-pointer items-center gap-1 rounded-xs border border-border bg-card px-2.5 py-1.5 text-[11px] font-medium text-muted-foreground transition-colors hover:border-primary hover:text-primary"
+          {/* Bottom row — primary actions */}
+          <div className="flex items-center gap-3 mt-3">
+            {mode === 'search' && (
+              <Button
+                variant={isSaved ? 'default' : 'outline'}
+                onClick={onSaveToTracker}
+                className={cn('flex flex-1 items-center justify-center gap-2 rounded-xs h-11 text-sm font-semibold')}
               >
-                Apply <ExternalLink size={10} />
-              </button>
+                <Bookmark size={14} fill={isSaved ? 'currentColor' : 'none'} />
+                {isSaved ? 'Saved to Tracker' : 'Save to Tracker'}
+              </Button>
+            )}
+            {job.url && (
+              <Button
+                variant="default"
+                onClick={handleApply}
+                className="flex flex-1 items-center justify-center gap-2 rounded-xs h-11 text-sm font-semibold"
+              >
+                Apply <ExternalLink size={14} />
+              </Button>
             )}
           </div>
         </div>
-      </div>
-    </>
+      </SheetContent>
+    </Sheet>
   )
 }
 

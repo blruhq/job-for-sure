@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react'
 import { FileText, Loader2 } from 'lucide-react'
 import { useUpdateApplication } from '~/hooks/use-apps'
 import { notify } from '~/lib/toast'
+import { Textarea } from '~/components/ui/textarea'
 
 // ═══════════════════════════════════════════════════════════════
 // JobNotes — auto-saving textarea for application notes.
@@ -65,12 +66,13 @@ export function JobNotes({ applicationId, initialNotes }: JobNotesProps) {
           </span>
         )}
       </div>
-      <textarea
+      <Textarea
+        neumorphic
         value={notes}
         onChange={(e) => handleChange(e.target.value)}
         placeholder="Add notes about this application…"
         rows={3}
-        className="w-full resize-none rounded-xs border border-border bg-background px-2 py-1.5 text-[11px] outline-none focus:border-primary placeholder:text-muted-foreground/50"
+        className="w-full resize-none rounded-xs px-2 py-1.5 text-xs placeholder:text-muted-foreground/50"
       />
     </div>
   )

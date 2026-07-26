@@ -2,6 +2,9 @@
 
 import { useState, useEffect } from 'react'
 import { Wand2, Download, Copy, Save, Trash2 } from 'lucide-react'
+import { Button } from '~/components/ui/button'
+import { Input } from '~/components/ui/input'
+import { Textarea } from '~/components/ui/textarea'
 import { notify } from '~/lib/toast'
 import { ConfirmDialog } from '~/components/ui/confirm-dialog'
 import { useCoverLetters, useUpdateCoverLetter } from '~/hooks/use-cover-letters'
@@ -142,48 +145,52 @@ export function CoverLetterEditor({ resume }: CoverLetterEditorProps) {
   }
 
   return (
-    <div className="flex w-full flex-col lg:flex-row overflow-hidden h-full">
+    <div className="flex w-full flex-col lg:flex-row overflow-hidden h-full neuro-surface">
       {/* Configuration & Input Panel */}
-      <div className="w-full lg:w-[320px] shrink-0 border-b lg:border-b-0 lg:border-r border-border bg-card p-5 flex flex-col gap-4 overflow-y-auto">
-        <div className="flex gap-1.5 rounded-sm bg-border/30 p-0.5 mb-1 shrink-0">
-          <button
+      <div className="w-full lg:w-[320px] shrink-0 border-b lg:border-b-0 lg:border-r neuro-surface p-5 flex flex-col gap-4 overflow-y-auto">
+        <div className="flex gap-1.5 rounded-sm neuro-inset p-0.5 mb-1 shrink-0">
+          <Button
+            variant="ghost"
             onClick={() => setMode('quick')}
-            className={`flex-1 rounded-xs py-1 text-[10px] font-semibold transition-all cursor-pointer text-center ${
-              mode === 'quick' ? 'bg-card text-foreground shadow-sm font-semibold' : 'text-muted-foreground hover:text-foreground'
+            className={`flex-1 rounded-xs py-1 text-[10px] font-semibold text-center ${
+              mode === 'quick' ? 'neuro-card text-foreground' : 'text-muted-foreground'
             }`}
           >
             {t('quickFill')}
-          </button>
-          <button
+          </Button>
+          <Button
+            variant="ghost"
             onClick={() => setMode('jd')}
-            className={`flex-1 rounded-xs py-1 text-[10px] font-semibold transition-all cursor-pointer text-center ${
-              mode === 'jd' ? 'bg-card text-foreground shadow-sm font-semibold' : 'text-muted-foreground hover:text-foreground'
+            className={`flex-1 rounded-xs py-1 text-[10px] font-semibold text-center ${
+              mode === 'jd' ? 'neuro-card text-foreground' : 'text-muted-foreground'
             }`}
           >
             {t('jobDescription')}
-          </button>
+          </Button>
         </div>
 
         {/* Language Selector */}
         <div className="space-y-1">
           <label className="label-mono mb-1 block text-[10px]">{t('outputLanguage')}</label>
-          <div className="flex gap-1.5 rounded-sm bg-border/30 p-0.5 shrink-0">
-            <button
+          <div className="flex gap-1.5 rounded-sm neuro-inset p-0.5 shrink-0">
+            <Button
+              variant="ghost"
               onClick={() => setOutputLanguage('en')}
-              className={`flex-1 rounded-xs py-1 text-[10px] font-semibold transition-all cursor-pointer text-center ${
-                outputLanguage === 'en' ? 'bg-card text-foreground shadow-sm font-semibold' : 'text-muted-foreground hover:text-foreground'
+              className={`flex-1 rounded-xs py-1 text-[10px] font-semibold text-center ${
+                outputLanguage === 'en' ? 'neuro-card text-foreground' : 'text-muted-foreground'
               }`}
             >
               English
-            </button>
-            <button
+            </Button>
+            <Button
+              variant="ghost"
               onClick={() => setOutputLanguage('th')}
-              className={`flex-1 rounded-xs py-1 text-[10px] font-semibold transition-all cursor-pointer text-center ${
-                outputLanguage === 'th' ? 'bg-card text-foreground shadow-sm font-semibold' : 'text-muted-foreground hover:text-foreground'
+              className={`flex-1 rounded-xs py-1 text-[10px] font-semibold text-center ${
+                outputLanguage === 'th' ? 'neuro-card text-foreground' : 'text-muted-foreground'
               }`}
             >
               ภาษาไทย
-            </button>
+            </Button>
           </div>
         </div>
 
@@ -191,122 +198,127 @@ export function CoverLetterEditor({ resume }: CoverLetterEditorProps) {
           <div className="space-y-3">
             <div>
               <label className="label-mono mb-1 block">{t('companyName')}</label>
-              <input
-                type="text"
+              <Input
                 value={company}
                 onChange={(e) => setCompany(e.target.value)}
                 placeholder={t('placeholderCompany')}
-                className="w-full rounded-xs border border-border bg-background px-2.5 py-1.5 text-[11px] outline-none focus:border-primary"
+                className="w-full px-3 py-2 text-sm"
+                neumorphic
               />
             </div>
             <div>
               <label className="label-mono mb-1 block">{t('roleTitle')}</label>
-              <input
-                type="text"
+              <Input
                 value={role}
                 onChange={(e) => setRole(e.target.value)}
                 placeholder={t('placeholderRole')}
-                className="w-full rounded-xs border border-border bg-background px-2.5 py-1.5 text-[11px] outline-none focus:border-primary"
+                className="w-full px-3 py-2 text-sm"
+                neumorphic
               />
             </div>
             <div>
               <label className="label-mono mb-1 block">{t('wordingFocus')}</label>
-              <textarea
+              <Textarea
                 value={focus}
                 onChange={(e) => setFocus(e.target.value)}
                 placeholder={t('placeholderFocus')}
                 rows={4}
-                className="w-full resize-none rounded-xs border border-border bg-background px-2.5 py-1.5 text-[11px] outline-none focus:border-primary font-sans"
+                className="w-full resize-none px-3 py-2.5 text-sm font-sans"
+                neumorphic
               />
             </div>
           </div>
         ) : (
           <div>
-            <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-1">{t('jobDescription')}</h3>
+            <h3 className="text-sm font-bold uppercase tracking-wider text-muted-foreground mb-1">{t('jobDescription')}</h3>
             <p className="text-[10px] text-muted-foreground mb-3 leading-relaxed">
               Paste the job description below to customize your cover letter.
             </p>
-            <textarea
+            <Textarea
               value={jdText}
               onChange={(e) => setJdText(e.target.value)}
               placeholder="Paste Job Description here..."
-              className="w-full h-56 rounded-xs border border-border bg-background px-2.5 py-1.5 text-[11px] outline-none focus:border-primary resize-none font-sans"
+              className="w-full h-56 px-3 py-2.5 text-sm resize-none font-sans"
+              neumorphic
             />
           </div>
         )}
 
-        <button
+        <Button
+          variant="default"
           onClick={handleGenerate}
           disabled={generating || (mode === 'quick' && (!company || !role)) || (mode === 'jd' && !jdText)}
-          className="flex cursor-pointer items-center justify-center gap-1.5 rounded-sm bg-primary py-2 text-xs font-semibold text-primary-foreground transition-opacity hover:opacity-90 disabled:opacity-50"
+          className="flex items-center justify-center gap-1.5 py-2 text-sm font-semibold"
         >
           <Wand2 size={13} className={generating ? "animate-pulse" : ""} />
           {generating ? `${t('generate')}...` : t('generate')}
-        </button>
+        </Button>
       </div>
 
       {/* Preview / Edit Panel */}
-      <div className="flex-1 flex flex-col overflow-hidden bg-background">
+      <div className="flex-1 flex flex-col overflow-hidden neuro-surface">
         {/* Actions bar */}
-        <div className="flex shrink-0 items-center justify-between border-b border-border bg-card px-4 md:px-6 py-2.5">
+        <div className="flex shrink-0 items-center justify-between neuro-surface px-4 md:px-6 py-2.5">
           <div className="flex items-center gap-2">
-            <span className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">{t('generatedLetter')}</span>
+            <span className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">{t('generatedLetter')}</span>
           </div>
           <div className="flex gap-2">
-            <button
+            <Button
+              variant="outline"
               onClick={handleSave}
               disabled={!letterText}
-              className="flex cursor-pointer items-center gap-1 rounded-sm border border-border bg-card px-2.5 py-1 text-[11px] hover:bg-muted disabled:opacity-50"
+              className="flex items-center gap-1 px-3 py-1.5 text-sm"
             >
               <Save size={11} /> {t('save')}
-            </button>
-            <button
+            </Button>
+            <Button
+              variant="outline"
               onClick={handleCopy}
               disabled={!letterText}
-              className="flex cursor-pointer items-center gap-1 rounded-sm border border-border bg-card px-2.5 py-1 text-[11px] hover:bg-muted disabled:opacity-50"
+              className="flex items-center gap-1 px-3 py-1.5 text-sm"
             >
               <Copy size={11} /> {t('copy')}
-            </button>
-            <button
+            </Button>
+            <Button
+              variant="outline"
               onClick={() => setShowDeleteDialog(true)}
               disabled={!letterText}
-              className="flex cursor-pointer items-center gap-1 rounded-sm border border-border bg-card px-2.5 py-1 text-[11px] hover:text-red-500 hover:border-red-500/30 disabled:opacity-50 transition-all"
+              className="flex items-center gap-1 px-3 py-1.5 text-sm hover:text-red-500 hover:border-red-500/30"
             >
               <Trash2 size={11} /> {t('delete') || 'Delete'}
-            </button>
-            <button
+            </Button>
+            <Button
+              variant="default"
               onClick={() => window.open(`/api/export/pdf?id=${resume.id}&type=cover-letter`, '_blank')}
               disabled={!letterText}
-              className="flex cursor-pointer items-center gap-1 rounded-sm bg-primary px-2.5 py-1 text-[11px] font-medium text-primary-foreground hover:opacity-90 disabled:opacity-50"
+              className="flex items-center gap-1 px-3 py-1.5 text-sm font-medium"
             >
               <Download size={11} /> {t('download') || 'Export PDF'}
-            </button>
+            </Button>
           </div>
         </div>
 
         {/* Paper Container */}
         <div className="flex-1 overflow-y-auto p-6 md:p-8 flex justify-center items-start">
           <div
-            className="resume-paper w-full max-w-[650px] min-h-[800px] rounded-xs p-10 bg-card border border-border flex flex-col shadow-sm"
-            style={{ boxShadow: 'var(--shadow-paper)' }}
+            className="resume-paper w-full max-w-[650px] min-h-[800px] rounded-xs p-10 neuro-card flex flex-col shadow-[0_0_0_1px_var(--border)]"
           >
             {/* Header layout matching PDF/Resume style */}
             <div className="text-center mb-6">
               <div className="text-base font-bold tracking-tight text-foreground">{resume.persona || 'Your Name'}</div>
-              <div className="mt-1 font-mono text-[9px] text-muted-foreground">
+              <div className="mt-1 font-mono text-[10px] text-muted-foreground">
                 {[resume.email, resume.location].filter(Boolean).join(' · ')}
               </div>
             </div>
 
-            <div className="border-b border-border/50 mb-6"></div>
+            <div className="mb-6"></div>
 
             {/* Letter Textarea */}
-            <textarea
+            <Textarea
               value={letterText}
               onChange={(e) => setLetterText(e.target.value)}
               placeholder="Your cover letter text will appear here. You can also type directly in this space to write your own letter..."
-              className="w-full flex-1 min-h-[600px] bg-transparent resize-none border-0 outline-none text-foreground font-sans text-xs focus:ring-0 focus:outline-none leading-relaxed p-0"
-              style={{ fontSize: '11px' }}
+              className="w-full flex-1 min-h-[600px] bg-transparent resize-none border-0 text-foreground font-sans text-sm leading-relaxed p-0 focus:ring-0"
             />
           </div>
         </div>

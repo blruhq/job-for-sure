@@ -3,6 +3,8 @@
 import { useState } from 'react'
 import { Link } from '~/i18n/routing'
 import { authClient } from '~/lib/auth-client'
+import { Button } from '~/components/ui/button'
+import { Input } from '~/components/ui/input'
 
 export default function RegisterPage() {
   const [name, setName] = useState('')
@@ -50,18 +52,18 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background px-6">
+    <div className="flex min-h-screen items-center justify-center neuro-surface px-6">
       <div className="w-full max-w-sm">
         {/* Logo */}
         <div className="mb-6 text-center">
           <Link href="/" className="inline-flex cursor-pointer items-center gap-2 no-underline">
-            <div className="h-4 w-4 rounded-[3px] bg-primary" />
+            <div className="h-4 w-4 rounded-[3px] bg-brand" />
             <span className="text-sm font-semibold tracking-tight text-foreground">JOB FOR SURE</span>
           </Link>
         </div>
 
-        {emailSent ? (
-          <div className="rounded-lg border border-border bg-card p-8 shadow-sm text-center">
+    {emailSent ? (
+              <div className="rounded-lg neuro-card p-8 text-center">
             <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-primary">
                 <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
@@ -69,89 +71,89 @@ export default function RegisterPage() {
               </svg>
             </div>
             <h1 className="text-lg font-semibold text-foreground">Check your email</h1>
-            <p className="mt-2 text-xs text-muted-foreground">
+            <p className="mt-2 text-sm text-muted-foreground">
               We sent a verification link to <span className="font-medium text-foreground">{email}</span>.
               Click the link to activate your account.
             </p>
-            <p className="mt-4 text-[11px] text-muted-foreground/60">
+            <p className="mt-4 text-sm text-muted-foreground/60">
               Didn&apos;t get an email? Check your spam folder.
             </p>
             <Link
               href="/login"
-              className="mt-6 inline-block cursor-pointer text-xs font-medium text-primary hover:opacity-80"
+              className="mt-6 inline-block cursor-pointer text-sm font-medium text-primary hover:opacity-80"
             >
               ← Back to sign in
             </Link>
           </div>
         ) : (
-        <div className="rounded-lg border border-border bg-card p-8 shadow-sm">
+        <div className="rounded-lg neuro-card p-8">
           <div className="text-center">
-            <h1
-              className="text-2xl text-foreground"
-              style={{ fontFamily: 'var(--font-instrument-serif), serif' }}
-            >
-              Create your account
-            </h1>
-            <p className="mt-1 text-xs text-muted-foreground">Start in 30 seconds. Free forever.</p>
+              <h1 className="text-2xl text-foreground font-display">
+                Create your account
+              </h1>
+            <p className="mt-2 text-sm text-muted-foreground">Start in 30 seconds. Free forever.</p>
           </div>
 
           <form onSubmit={handleRegister} className="mt-6 space-y-3.5">
             {error && (
-              <div className="rounded-md border border-destructive/30 bg-destructive/5 px-3 py-2 text-xs text-destructive">
+              <div className="rounded-md border border-destructive/30 bg-destructive/5 px-3 py-2 text-sm text-destructive">
                 {error}
               </div>
             )}
 
             <div>
-              <label className="mb-1 block font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
+              <label className="mb-1.5 block font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
                 Full Name
               </label>
-              <input
+              <Input
                 type="text"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="John Doe"
                 required
-                className="w-full cursor-pointer rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground outline-none transition-colors placeholder:text-muted-foreground/50 focus:border-primary"
+                className="w-full rounded-md px-3 py-2 text-sm"
+                neumorphic
               />
             </div>
 
             <div>
-              <label className="mb-1 block font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
+              <label className="mb-1.5 block font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
                 Email
               </label>
-              <input
+              <Input
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="you@example.com"
                 required
-                className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground outline-none transition-colors placeholder:text-muted-foreground/50 focus:border-primary"
+                className="w-full rounded-md px-3 py-2 text-sm"
+                neumorphic
               />
             </div>
 
             <div>
-              <label className="mb-1 block font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
+              <label className="mb-1.5 block font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
                 Password
               </label>
-              <input
+              <Input
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="At least 8 characters"
                 required
                 minLength={8}
-                className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground outline-none transition-colors placeholder:text-muted-foreground/50 focus:border-primary"
+                className="w-full rounded-md px-3 py-2 text-sm"
+                neumorphic
               />
             </div>
 
-            <button
+            <Button
               type="submit"
               disabled={loading}
-              className="w-full cursor-pointer rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-opacity hover:opacity-90 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
+              className="w-full rounded-md text-sm font-medium active:scale-[0.98]"
             >
               {loading ? 'Creating account...' : 'Create Account'}
-            </button>
+            </Button>
           </form>
 
           {/* Divider */}
@@ -160,15 +162,16 @@ export default function RegisterPage() {
               <div className="w-full border-t border-border" />
             </div>
             <div className="relative flex justify-center">
-              <span className="bg-card px-2 text-[10px] text-muted-foreground">or</span>
+              <span className="neuro-surface px-2 text-[10px] text-muted-foreground">or</span>
             </div>
           </div>
 
           {/* Google */}
-          <button
+          <Button
             type="button"
+            variant="outline"
             onClick={handleGoogle}
-            className="w-full cursor-pointer rounded-md border border-border bg-background px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-muted active:scale-[0.98]"
+            className="w-full rounded-md border-border text-sm font-medium active:scale-[0.98]"
           >
             <span className="inline-flex items-center gap-2">
               <svg width="14" height="14" viewBox="0 0 24 24">
@@ -179,9 +182,9 @@ export default function RegisterPage() {
               </svg>
               Continue with Google
             </span>
-          </button>
+          </Button>
 
-          <p className="mt-5 text-center text-xs text-muted-foreground">
+            <p className="mt-6 text-center text-sm text-muted-foreground">
             Already have an account?{' '}
             <Link href="/login" className="cursor-pointer font-medium text-primary hover:opacity-80">
               Sign in

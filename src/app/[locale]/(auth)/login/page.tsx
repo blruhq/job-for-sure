@@ -4,6 +4,8 @@ import { useState, Suspense, useEffect } from 'react'
 import { Link, useRouter } from '~/i18n/routing'
 import { useSearchParams } from 'next/navigation'
 import { authClient } from '~/lib/auth-client'
+import { Button } from '~/components/ui/button'
+import { Input } from '~/components/ui/input'
 
 function LoginForm() {
   const router = useRouter()
@@ -64,83 +66,82 @@ function LoginForm() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background px-6">
+    <div className="flex min-h-screen items-center justify-center neuro-surface px-6">
       <div className="w-full max-w-sm">
         {/* Logo */}
         <div className="mb-6 text-center">
           <Link href="/" className="inline-flex cursor-pointer items-center gap-2 no-underline">
-            <div className="h-4 w-4 rounded-[3px] bg-primary" />
+            <div className="h-4 w-4 rounded-[3px] bg-brand" />
             <span className="text-sm font-semibold tracking-tight text-foreground">JOB FOR SURE</span>
           </Link>
         </div>
 
-        <div className="rounded-lg border border-border bg-card p-8 shadow-sm">
+        <div className="rounded-lg neuro-card p-8">
           <div className="text-center">
-            <h1
-              className="text-2xl text-foreground"
-              style={{ fontFamily: 'var(--font-instrument-serif), serif' }}
-            >
+            <h1 className="text-2xl text-foreground font-display">
               Welcome back
             </h1>
-            <p className="mt-1 text-xs text-muted-foreground">Sign in to your account</p>
+            <p className="mt-2 text-sm text-muted-foreground">Sign in to your account</p>
           </div>
 
           <form onSubmit={handleLogin} className="mt-6 space-y-3.5">
             {resetSuccess && (
-              <div className="rounded-md border border-success/30 bg-success/5 px-3 py-2 text-xs text-success">
+              <div className="rounded-md border border-success/30 bg-success/5 px-3 py-2 text-sm text-success">
                 Password reset successfully. Sign in with your new password.
               </div>
             )}
 
             {error && (
-              <div className="rounded-md border border-destructive/30 bg-destructive/5 px-3 py-2 text-xs text-destructive">
+              <div className="rounded-md border border-destructive/30 bg-destructive/5 px-3 py-2 text-sm text-destructive">
                 {error}
               </div>
             )}
 
             <div>
-              <label className="mb-1 block font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
+              <label className="mb-1.5 block font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
                 Email
               </label>
-              <input
+              <Input
                 type="text"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="you@example.com"
                 required
-                className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground outline-none transition-colors placeholder:text-muted-foreground/50 focus:border-primary"
+                className="w-full rounded-md px-3 py-2 text-sm"
+                neumorphic
               />
             </div>
 
             <div>
               <div className="flex items-center justify-between">
-                <label className="mb-1 block font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
+                <label className="mb-1.5 block font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
                   Password
                 </label>
                 <Link
                   href="/forgot-password"
-                  className="mb-1 cursor-pointer text-[10px] font-medium text-primary hover:opacity-80"
+                  className="mb-1.5 cursor-pointer text-[10px] font-medium text-primary hover:opacity-80"
                 >
                   Forgot password?
                 </Link>
               </div>
-              <input
+              <Input
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
                 required
-                className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground outline-none transition-colors placeholder:text-muted-foreground/50 focus:border-primary"
+                className="w-full rounded-md px-3 py-2 text-sm"
+                neumorphic
               />
             </div>
 
-            <button
+            <Button
               type="submit"
               disabled={loading}
-              className="w-full cursor-pointer rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-opacity hover:opacity-90 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
+              className="w-full rounded-md text-sm font-medium active:scale-[0.98]"
             >
               {loading ? 'Signing in...' : 'Sign In'}
-            </button>
+            </Button>
           </form>
 
           {/* Divider */}
@@ -149,15 +150,16 @@ function LoginForm() {
               <div className="w-full border-t border-border" />
             </div>
             <div className="relative flex justify-center">
-              <span className="bg-card px-2 text-[10px] text-muted-foreground">or</span>
+              <span className="neuro-surface px-2 text-[10px] text-muted-foreground">or</span>
             </div>
           </div>
 
           {/* Google */}
-          <button
+          <Button
             type="button"
+            variant="outline"
             onClick={handleGoogle}
-            className="w-full cursor-pointer rounded-md border border-border bg-background px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-muted active:scale-[0.98]"
+            className="w-full rounded-md border-border text-sm font-medium active:scale-[0.98]"
           >
             <span className="inline-flex items-center gap-2">
               <svg width="14" height="14" viewBox="0 0 24 24">
@@ -168,9 +170,9 @@ function LoginForm() {
               </svg>
               Continue with Google
             </span>
-          </button>
+          </Button>
 
-          <p className="mt-5 text-center text-xs text-muted-foreground">
+          <p className="mt-6 text-center text-sm text-muted-foreground">
             Don&apos;t have an account?{' '}
             <Link href="/register" className="cursor-pointer font-medium text-primary hover:opacity-80">
               Sign up
@@ -189,7 +191,7 @@ function LoginForm() {
 export default function LoginPage() {
   return (
     <Suspense fallback={
-      <div className="flex min-h-screen items-center justify-center bg-background">
+      <div className="flex min-h-screen items-center justify-center neuro-surface">
         <div className="h-1.5 w-1.5 animate-pulse rounded-full bg-primary" />
       </div>
     }>

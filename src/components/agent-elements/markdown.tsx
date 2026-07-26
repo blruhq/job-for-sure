@@ -4,6 +4,19 @@ import { Streamdown, type Components } from "streamdown";
 import { createCodePlugin } from "@streamdown/code";
 import { cn } from "./utils/cn";
 
+// ── XSS Safety ───────────────────────────────────────────────────────────
+// Streamdown applies rehype-sanitize by default with a strict GitHub-style
+// allowlist schema (see hast-util-sanitize's defaultSchema). This means:
+//   - Only ~40 safe tag names are allowed (no <script>, <iframe>, <object>)
+//   - No event-handler attributes are permitted (onerror, onclick, etc.)
+//   - URL protocols are restricted (no javascript:)
+//   - id/name attributes get a clobberPrefix to prevent DOM clobbering
+//
+// No additional DOMPurify pass is required — rehype-sanitize runs as a
+// unified plugin in the default pipeline. If you override rehypePlugins
+// below, ensure sanitization is still included.
+// ──────────────────────────────────────────────────────────────────────────
+
 function fixNumberedListBreaks(text: string): string {
   return text.replace(/^(\d+)\.\s*\n+\s*\n*/gm, "$1. ");
 }

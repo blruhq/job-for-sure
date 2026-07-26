@@ -2,7 +2,9 @@
 
 import { useMemo } from 'react'
 import { Check } from 'lucide-react'
+import { Button } from '~/components/ui/button'
 import { cn } from '~/lib/utils'
+import { EmptyState } from '~/components/ui/empty-state'
 import { useUIStore } from '~/hooks/use-ui'
 import type { Resume, TailorChange } from '~/types/resume'
 
@@ -109,28 +111,30 @@ export function TailorReviewPanel({ onApply, onCancel }: { onApply: (variant: Re
   }
 
   return (
-    <div className="flex h-full flex-col bg-background">
+    <div className="flex h-full flex-col neuro-surface">
       {/* Header */}
-      <div className="flex shrink-0 items-center justify-between border-b border-border px-4 py-3">
+      <div className="flex shrink-0 items-center justify-between neuro-divider px-4 py-3">
         <div>
           <h2 className="text-sm font-semibold text-foreground">Review AI Changes</h2>
-          <p className="text-[10px] text-muted-foreground mt-0.5">
+          <p className="text-xs text-muted-foreground mt-0.5">
             {acceptedCount} of {totalCount} changes accepted — preview updates live
           </p>
         </div>
         <div className="flex gap-1.5">
-          <button
+          <Button
+            variant="outline"
             onClick={handleAcceptAll}
-            className="cursor-pointer rounded-xs border border-border px-2 py-1 text-[10px] text-muted-foreground hover:text-foreground"
+            className="px-2.5 py-1.5 text-xs"
           >
             Accept all
-          </button>
-          <button
+          </Button>
+          <Button
+            variant="outline"
             onClick={handleRejectAll}
-            className="cursor-pointer rounded-xs border border-border px-2 py-1 text-[10px] text-muted-foreground hover:text-foreground"
+            className="px-2.5 py-1.5 text-xs"
           >
             Reject all
-          </button>
+          </Button>
         </div>
       </div>
 
@@ -143,22 +147,20 @@ export function TailorReviewPanel({ onApply, onCancel }: { onApply: (variant: Re
               key={change.id}
               className={cn(
                 'rounded-sm border p-3 transition-colors',
-                isAccepted ? 'border-primary/30 bg-primary/5' : 'border-border bg-card opacity-60',
+                isAccepted ? 'border-primary/30 bg-primary/5' : 'neuro-inset opacity-60',
               )}
             >
               {/* Toggle row */}
               <div className="flex items-start gap-2">
-                <button
+                <Button
+                  variant={isAccepted ? 'default' : 'outline'}
                   onClick={() => toggleAcceptedChange(change.id)}
                   className={cn(
-                    'mt-0.5 flex h-4 w-4 shrink-0 cursor-pointer items-center justify-center rounded-xs border transition-colors',
-                    isAccepted
-                      ? 'border-primary bg-primary text-primary-foreground'
-                      : 'border-muted-foreground hover:border-primary',
+                    'mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-xs p-0',
                   )}
                 >
                   {isAccepted && <Check size={10} strokeWidth={3} />}
-                </button>
+                </Button>
 
                 <div className="flex-1 min-w-0">
                   {/* Label */}
@@ -166,21 +168,21 @@ export function TailorReviewPanel({ onApply, onCancel }: { onApply: (variant: Re
                     <span className="text-[10px] font-mono font-semibold text-muted-foreground uppercase tracking-wider">
                       {change.field}
                     </span>
-                    <span className="text-[11px] font-medium text-foreground">{change.label}</span>
+                    <span className="text-xs font-medium text-foreground">{change.label}</span>
                   </div>
 
                   {/* Before → After */}
                   <div className="space-y-1">
                     {change.before && (
                       <div className="rounded-xs bg-destructive/5 border border-destructive/10 px-2 py-1">
-                        <span className="text-[10px] text-muted-foreground line-through opacity-70">
+                        <span className="text-xs text-muted-foreground line-through opacity-70">
                           {change.before}
                         </span>
                       </div>
                     )}
                     {change.after && (
                       <div className="rounded-xs bg-success/5 border border-success/10 px-2 py-1">
-                        <span className="text-[10px] text-foreground">{change.after}</span>
+                        <span className="text-xs text-foreground">{change.after}</span>
                       </div>
                     )}
                   </div>
@@ -198,28 +200,30 @@ export function TailorReviewPanel({ onApply, onCancel }: { onApply: (variant: Re
         })}
 
         {changes.length === 0 && (
-          <div className="flex flex-col items-center justify-center py-8 text-center">
-            <p className="text-[11px] text-muted-foreground">No changes proposed by AI.</p>
+          <EmptyState className="py-8">
+            <p className="text-xs text-muted-foreground">No changes proposed by AI.</p>
             <p className="text-[10px] text-muted-foreground/50 mt-1">Your resume is already well-optimized.</p>
-          </div>
+          </EmptyState>
         )}
       </div>
 
       {/* Footer with apply/cancel */}
-      <div className="flex shrink-0 items-center gap-2 border-t border-border p-3">
-        <button
+      <div className="flex shrink-0 items-center gap-2 neuro-divider p-3">
+        <Button
+          variant="default"
           onClick={handleApply}
           disabled={acceptedCount === 0}
-          className="flex-1 cursor-pointer rounded-sm bg-primary px-3 py-2 text-[11px] font-medium text-primary-foreground transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
+          className="flex-1 px-3 py-2 text-sm font-medium"
         >
           Apply {acceptedCount > 0 ? `${acceptedCount} ` : ''}change{acceptedCount === 1 ? '' : 's'}
-        </button>
-        <button
+        </Button>
+        <Button
+          variant="outline"
           onClick={onCancel}
-          className="cursor-pointer rounded-sm border border-border bg-card px-3 py-2 text-[11px] text-muted-foreground hover:text-foreground"
+          className="px-3 py-2 text-sm"
         >
           Cancel
-        </button>
+        </Button>
       </div>
     </div>
   )

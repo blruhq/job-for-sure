@@ -9,6 +9,11 @@ import { normalizeParsed, type ParsedResumeFields } from '~/lib/resume-normalize
 import { notify } from '~/lib/toast'
 import { Wand2, Download, Copy, Save, Upload, FileText, Loader2, Trash2 } from 'lucide-react'
 import { ConfirmDialog } from '~/components/ui/confirm-dialog'
+import { Button } from '~/components/ui/button'
+import { Input } from '~/components/ui/input'
+import { Textarea } from '~/components/ui/textarea'
+import { EmptyState } from '~/components/ui/empty-state'
+import { SegmentedControl } from '~/components/ui/segmented-control'
 import { useTranslations } from 'next-intl'
 
 export default function StandaloneCoverLetterPage() {
@@ -241,7 +246,7 @@ export default function StandaloneCoverLetterPage() {
   }
 
   return (
-    <div className="flex h-full w-full flex-col lg:flex-row overflow-hidden bg-background">
+    <div className="flex h-full w-full flex-col lg:flex-row overflow-hidden neuro-surface">
       {/* Hidden file input */}
       <input
         ref={fileInputRef}
@@ -252,11 +257,11 @@ export default function StandaloneCoverLetterPage() {
       />
 
       {/* Configuration Column */}
-      <div className="w-full lg:w-[350px] shrink-0 border-b lg:border-b-0 lg:border-r border-border bg-card p-5 flex flex-col gap-4 overflow-y-auto justify-between">
+      <div className="w-full lg:w-[400px] shrink-0 border-b lg:border-b-0 lg:border-r border-border neuro-surface p-5 flex flex-col gap-4 overflow-y-auto justify-between">
         <div className="space-y-4">
           <div className="text-center pb-2 border-b border-border/50">
-            <h1 className="text-sm font-semibold tracking-tight text-foreground">{t('generatorTitle')}</h1>
-            <p className="text-[11px] text-muted-foreground mt-0.5">{t('generatorSubtitle')}</p>
+            <h1 className="text-base font-semibold tracking-tight text-foreground">{t('generatorTitle')}</h1>
+            <p className="text-sm text-muted-foreground mt-0.5">{t('generatorSubtitle')}</p>
           </div>
 
           {/* 1. Resume selection */}
@@ -269,7 +274,7 @@ export default function StandaloneCoverLetterPage() {
                   setSelectedResumeId(e.target.value)
                   if (e.target.value !== 'none') setActiveResumeId(e.target.value)
                 }}
-                className="min-w-0 flex-1 cursor-pointer rounded-xs border border-border bg-background px-2.5 py-1.5 text-[11px] outline-none focus:border-primary"
+                className="min-w-0 flex-1 cursor-pointer rounded-lg neuro-inset px-3 py-2 text-sm font-medium text-foreground outline-none focus-visible:ring-2 focus-visible:ring-primary/30"
               >
                 <option value="none">{t('selectProfilePlaceholder')}</option>
                 {resumes.map((r) => (
@@ -278,10 +283,10 @@ export default function StandaloneCoverLetterPage() {
                   </option>
                 ))}
               </select>
-              <button
+              <Button
                 onClick={() => fileInputRef.current?.click()}
                 disabled={parsing}
-                className="flex cursor-pointer items-center justify-center gap-1 rounded-xs border border-border bg-background px-3 py-1.5 text-[11px] font-medium text-muted-foreground hover:bg-muted/30 disabled:opacity-50"
+                className="flex items-center gap-1 rounded-xs text-sm font-medium disabled:opacity-50"
               >
                 {parsing ? (
                   <Loader2 size={12} className="animate-spin text-primary" />
@@ -290,99 +295,83 @@ export default function StandaloneCoverLetterPage() {
                     <Upload size={12} /> {t('uploadPdf')}
                   </>
                 )}
-              </button>
+              </Button>
             </div>
           </div>
 
           {/* 2. Generation Mode Selector */}
           <div className="space-y-2 pt-2 border-t border-border/50">
             <label className="label-mono block">{t('detailsMode')}</label>
-            <div className="flex gap-1.5 rounded-sm bg-border/30 p-0.5 shrink-0">
-              <button
-                onClick={() => setMode('quick')}
-                className={`flex-1 rounded-xs py-1 text-[10px] font-semibold transition-all cursor-pointer text-center ${
-                  mode === 'quick' ? 'bg-card text-foreground shadow-sm font-semibold' : 'text-muted-foreground hover:text-foreground'
-                }`}
-              >
-                {t('quickFields')}
-              </button>
-              <button
-                onClick={() => setMode('jd')}
-                className={`flex-1 rounded-xs py-1 text-[10px] font-semibold transition-all cursor-pointer text-center ${
-                  mode === 'jd' ? 'bg-card text-foreground shadow-sm font-semibold' : 'text-muted-foreground hover:text-foreground'
-                }`}
-              >
-                {t('fullJobDescription')}
-              </button>
-            </div>
+            <SegmentedControl
+              value={mode}
+              onChange={setMode}
+              options={[
+                { value: 'quick', label: t('quickFields') },
+                { value: 'jd', label: t('fullJobDescription') },
+              ]}
+            />
           </div>
 
           {/* 2.5 Language Selector */}
           <div className="space-y-2 pt-2 border-t border-border/50">
             <label className="label-mono block">{t('outputLanguage')}</label>
-            <div className="flex gap-1.5 rounded-sm bg-border/30 p-0.5 shrink-0">
-              <button
-                onClick={() => setOutputLanguage('en')}
-                className={`flex-1 rounded-xs py-1 text-[10px] font-semibold transition-all cursor-pointer text-center ${
-                  outputLanguage === 'en' ? 'bg-card text-foreground shadow-sm font-semibold' : 'text-muted-foreground hover:text-foreground'
-                }`}
-              >
-                English
-              </button>
-              <button
-                onClick={() => setOutputLanguage('th')}
-                className={`flex-1 rounded-xs py-1 text-[10px] font-semibold transition-all cursor-pointer text-center ${
-                  outputLanguage === 'th' ? 'bg-card text-foreground shadow-sm font-semibold' : 'text-muted-foreground hover:text-foreground'
-                }`}
-              >
-                ภาษาไทย
-              </button>
-            </div>
+            <SegmentedControl
+              value={outputLanguage}
+              onChange={setOutputLanguage}
+              options={[
+                { value: 'en', label: 'English' },
+                { value: 'th', label: 'ภาษาไทย' },
+              ]}
+            />
           </div>
 
           {/* Mode Form Fields */}
           {mode === 'quick' ? (
             <div className="space-y-3">
               <div>
-                <label className="label-mono mb-1 block">{t('companyName')}</label>
-                <input
+                <label className="label-mono mb-1.5 block">{t('companyName')}</label>
+                <Input
+                  neumorphic
                   type="text"
                   value={company}
                   onChange={(e) => setCompany(e.target.value)}
                   placeholder={t('placeholderCompany')}
-                  className="w-full rounded-xs border border-border bg-background px-2.5 py-1.5 text-[11px] outline-none focus:border-primary"
+                  className="w-full rounded-xs text-sm px-3 py-2.5"
                 />
               </div>
               <div>
-                <label className="label-mono mb-1 block">Job Title</label>
-                <input
+                <label className="label-mono mb-1.5 block">Job Title</label>
+                <Input
+                  neumorphic
                   type="text"
                   value={role}
                   onChange={(e) => setRole(e.target.value)}
                   placeholder="e.g. Senior Frontend Engineer"
-                  className="w-full rounded-xs border border-border bg-background px-2.5 py-1.5 text-[11px] outline-none focus:border-primary"
+                  className="w-full rounded-xs text-sm px-3 py-2.5"
                 />
               </div>
               <div>
-                <label className="label-mono mb-1 block">Focus / Highlights (Optional)</label>
-                <textarea
+                <label className="label-mono mb-1.5 block">Focus / Highlights (Optional)</label>
+                <Textarea
+                  neumorphic
                   value={focus}
                   onChange={(e) => setFocus(e.target.value)}
                   placeholder="e.g. Focus on my dashboard UI leadership..."
                   rows={4}
-                  className="w-full resize-none rounded-xs border border-border bg-background px-2.5 py-1.5 text-[11px] outline-none focus:border-primary font-sans"
+                  className="w-full resize-none rounded-xs text-sm px-3 py-2.5 font-sans"
                 />
               </div>
             </div>
           ) : (
             <div className="space-y-2">
               <label className="label-mono mb-1 block">Job Description</label>
-              <textarea
+              <Textarea
+                neumorphic
                 value={jdText}
                 onChange={(e) => setJdText(e.target.value)}
                 placeholder="Paste full target job description here..."
                 rows={10}
-                className="w-full resize-none rounded-xs border border-border bg-background px-2.5 py-1.5 text-[11px] outline-none focus:border-primary font-sans"
+                className="w-full resize-none rounded-xs text-sm px-3 py-2.5 font-sans"
               />
             </div>
           )}
@@ -399,35 +388,37 @@ export default function StandaloneCoverLetterPage() {
                 className={`group flex w-full items-center gap-1.5 rounded-xs border px-2 py-1.5 cursor-pointer transition-colors text-left ${
                   activeLetterId === letter.id
                     ? 'border-primary bg-primary/5'
-                    : 'border-border hover:bg-muted/30'
+                    : 'neuro-inset hover:neuro-card'
                 }`}
                 onClick={() => handleLoadSaved(letter)}
               >
                 <div className="flex-1 min-w-0">
-                  <div className="text-[11px] font-medium text-foreground truncate">
+                  <div className="text-sm font-medium text-foreground truncate">
                     {letter.company || letter.role || 'Untitled'}
                   </div>
-                  <div className="font-mono text-[9px] text-muted-foreground">
+                  <div className="font-mono text-[10px] text-muted-foreground">
                     {new Date(letter.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
                   </div>
                 </div>
-                <button
+                <Button
+                  variant="ghost"
+                  size="icon"
                   onClick={(e) => {
                     e.stopPropagation()
                     setDeleteTarget(letter.id)
                   }}
-                  className="shrink-0 opacity-0 group-hover:opacity-100 text-muted-foreground hover:text-destructive transition-opacity cursor-pointer"
+                  className="shrink-0 h-5 w-5 p-0 opacity-0 group-hover:opacity-100 text-muted-foreground hover:text-destructive"
                   title="Delete"
                 >
                   <Trash2 size={12} />
-                </button>
+                </Button>
               </button>
             ))}
           </div>
         )}
 
         {/* Generate Trigger */}
-        <button
+        <Button
           onClick={handleGenerate}
           disabled={
             generating ||
@@ -435,7 +426,7 @@ export default function StandaloneCoverLetterPage() {
             (mode === 'quick' && (!company || !role)) ||
             (mode === 'jd' && !jdText)
           }
-          className="w-full cursor-pointer rounded-sm bg-primary py-2 text-xs font-semibold text-primary-foreground tracking-wide uppercase transition-all hover:opacity-90 active:scale-[0.98] shadow-sm flex items-center justify-center gap-1.5 mt-6 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="w-full rounded-sm py-2.5 text-sm font-semibold tracking-wide uppercase active:scale-[0.98] shadow-sm mt-6"
         >
           {generating ? (
             <>
@@ -446,38 +437,43 @@ export default function StandaloneCoverLetterPage() {
               <Wand2 size={13} /> Generate Cover Letter
             </>
           )}
-        </button>
+        </Button>
       </div>
 
       {/* Document Preview Panel */}
-      <div className="flex-1 flex flex-col overflow-hidden bg-background">
+      <div className="flex-1 flex flex-col overflow-hidden neuro-surface">
         {/* Actions bar */}
-        <div className="flex shrink-0 items-center justify-between border-b border-border bg-card px-4 md:px-6 py-2.5">
+        <div className="flex shrink-0 items-center justify-between border-b border-border neuro-surface px-4 md:px-6 py-2.5">
           <div className="flex items-center gap-2">
-            <span className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">Document Preview</span>
+            <span className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">Document Preview</span>
           </div>
           <div className="flex gap-2">
-            <button
+            <Button
+              variant="outline"
               onClick={handleSave}
               disabled={!letterText || selectedResumeId === 'none'}
-              className="flex cursor-pointer items-center gap-1 rounded-sm border border-border bg-card px-2.5 py-1 text-[11px] hover:bg-muted disabled:opacity-50"
+              size="sm"
+              className="flex items-center gap-1 rounded-sm text-sm"
             >
               <Save size={11} /> Save Letter
-            </button>
-            <button
+            </Button>
+            <Button
+              variant="outline"
               onClick={handleCopy}
               disabled={!letterText}
-              className="flex cursor-pointer items-center gap-1 rounded-sm border border-border bg-card px-2.5 py-1 text-[11px] hover:bg-muted disabled:opacity-50"
+              size="sm"
+              className="flex items-center gap-1 rounded-sm text-sm"
             >
               <Copy size={11} /> Copy Text
-            </button>
-            <button
+            </Button>
+            <Button
               onClick={() => window.open(`/api/export/pdf?id=${selectedResumeId}&type=cover-letter`, '_blank')}
               disabled={!letterText || selectedResumeId === 'none'}
-              className="flex cursor-pointer items-center gap-1 rounded-sm bg-primary px-2.5 py-1 text-[11px] font-medium text-primary-foreground hover:opacity-90 disabled:opacity-50"
+              size="sm"
+              className="flex items-center gap-1 rounded-sm text-sm font-medium"
             >
               <Download size={11} /> Export PDF
-            </button>
+            </Button>
           </div>
         </div>
 
@@ -485,13 +481,12 @@ export default function StandaloneCoverLetterPage() {
         <div className="flex-1 overflow-y-auto p-6 md:p-8 flex justify-center items-start">
           {letterText ? (
             <div
-              className="resume-paper w-full max-w-[650px] min-h-[800px] rounded-xs p-10 bg-card border border-border flex flex-col shadow-sm animate-fade-up"
-              style={{ boxShadow: 'var(--shadow-paper)' }}
+              className="resume-paper w-full max-w-[650px] min-h-[800px] rounded-xs p-10 neuro-card flex flex-col animate-fade-up shadow-[0_0_0_1px_var(--border)]"
             >
               {/* Header layout matching PDF/Resume style */}
               <div className="text-center mb-6">
                 <div className="text-base font-bold tracking-tight text-foreground">{selectedResume?.persona || 'Your Name'}</div>
-                <div className="mt-1 font-mono text-[9px] text-muted-foreground">
+                <div className="mt-1 font-mono text-[10px] text-muted-foreground">
                   {[selectedResume?.email, selectedResume?.location].filter(Boolean).join(' · ')}
                 </div>
               </div>
@@ -499,24 +494,28 @@ export default function StandaloneCoverLetterPage() {
               <div className="border-b border-border/50 mb-6"></div>
 
               {/* Letter Textarea */}
-              <textarea
+              <Textarea
                 value={letterText}
                 onChange={(e) => setLetterText(e.target.value)}
                 placeholder="Your cover letter text will appear here..."
-                className="w-full flex-1 min-h-[600px] bg-transparent resize-none border-0 outline-none text-foreground font-sans text-xs focus:ring-0 focus:outline-none leading-relaxed p-0"
-                style={{ fontSize: '11px' }}
+                className="w-full flex-1 min-h-[600px] bg-transparent resize-none border-0 outline-none text-foreground font-sans text-sm focus:ring-0 leading-relaxed p-0"
               />
             </div>
           ) : (
-            <div className="flex flex-col items-center justify-center py-20 text-center max-w-sm">
-              <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-xl border border-border bg-card text-muted-foreground/40">
-                <FileText size={24} />
-              </div>
-              <h3 className="mb-1 text-sm font-semibold text-foreground">No Cover Letter Generated</h3>
-              <p className="text-xs text-muted-foreground">
-                Select or upload a resume on the left, type the target company and position details, and click Generate to write your letter.
-              </p>
-            </div>
+            <EmptyState
+              className="py-20 max-w-sm"
+              icon={
+                <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-xl neuro-icon-well text-muted-foreground/40">
+                  <FileText size={24} />
+                </div>
+              }
+              title={<h3 className="mb-1 text-sm font-semibold text-foreground">No Cover Letter Generated</h3>}
+              description={
+                <p className="text-sm text-muted-foreground">
+                  Select or upload a resume on the left, type the target company and position details, and click Generate to write your letter.
+                </p>
+              }
+            />
           )}
         </div>
       </div>

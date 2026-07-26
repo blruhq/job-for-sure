@@ -21,7 +21,7 @@ export function Skeleton({ className, ...props }: React.HTMLAttributes<HTMLDivEl
  */
 export function SkeletonCard({ lines = 2 }: { lines?: number }) {
   return (
-    <div className="rounded-sm border border-border bg-card p-4">
+    <div className="rounded-sm neuro-card p-4">
       <div className="mb-3 flex items-center gap-2">
         <Skeleton className="h-8 w-8 rounded-sm" />
         <div className="flex-1 space-y-1.5">
@@ -42,7 +42,7 @@ export function SkeletonCard({ lines = 2 }: { lines?: number }) {
  */
 export function SkeletonGauge() {
   return (
-    <div className="flex items-center gap-4 rounded-md border border-border bg-card p-4">
+    <div className="flex items-center gap-4 rounded-md neuro-card p-4">
       <Skeleton className="h-20 w-20 shrink-0 rounded-full" />
       <div className="space-y-2">
         <Skeleton className="h-4 w-28" />
@@ -57,7 +57,7 @@ export function SkeletonGauge() {
  */
 export function SkeletonColumn() {
   return (
-    <div className="min-h-[200px] rounded-sm border border-border bg-card p-2.5">
+    <div className="min-h-[200px] rounded-sm neuro-inset p-2.5">
       <div className="mb-2 flex items-center justify-between border-b border-border/50 pb-2">
         <Skeleton className="h-3 w-20" />
         <Skeleton className="h-3 w-6 rounded-xs" />

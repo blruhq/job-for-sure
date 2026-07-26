@@ -74,7 +74,7 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
 
   if (!checked) {
     return (
-      <div className="flex h-screen flex-col items-center justify-center gap-4 bg-background">
+      <div className="flex h-screen flex-col items-center justify-center gap-4 neuro-surface">
         <div className="flex items-center gap-2">
           <Skeleton className="h-5 w-5 rounded-[3px]" />
           <Skeleton className="h-4 w-32" />
@@ -116,7 +116,7 @@ function AppShell({ children }: { children: React.ReactNode }) {
   }, [sidebarOpen])
 
   return (
-    <div className="flex h-screen flex-col">
+    <div className="flex h-screen flex-col neuro-surface">
       <Topbar />
       <div className="relative flex flex-1 overflow-hidden">
         {/* Desktop sidebar — in flow, toggles between 220px and 56px */}

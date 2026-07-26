@@ -2,9 +2,9 @@ import Link from 'next/link'
 
 export default function NotFound() {
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-background px-6 text-center">
+    <div className="flex min-h-screen flex-col items-center justify-center neuro-surface px-6 text-center">
       <div className="max-w-sm">
-        <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-xl border border-border bg-card">
+        <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-xl neuro-icon-well">
           <span className="text-2xl font-bold text-muted-foreground/40">404</span>
         </div>
         <h1 className="text-lg font-semibold text-foreground">Page not found</h1>
@@ -20,7 +20,7 @@ export default function NotFound() {
           </Link>
           <Link
             href="/chat"
-            className="cursor-pointer rounded-md border border-border bg-background px-4 py-2 text-xs font-medium text-foreground transition-colors hover:bg-muted"
+            className="cursor-pointer rounded-md neuro-pill px-4 py-2 text-xs font-medium text-foreground transition-shadow"
           >
             Career Coach
           </Link>

@@ -67,7 +67,7 @@ export default async function AdminPage() {
     .where(sql`${user.createdAt} >= ${oneWeekAgo}`)
 
   return (
-    <div className="h-full overflow-y-auto bg-background">
+    <div className="h-full overflow-y-auto neuro-surface">
       <div className="mx-auto max-w-4xl px-6 py-8">
         {/* ── Header ── */}
         <div className="mb-8">
@@ -92,9 +92,9 @@ export default async function AdminPage() {
           <h2 className="mb-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
             Recent Signups
           </h2>
-          <div className="overflow-hidden rounded-lg border border-border">
+          <div className="overflow-hidden rounded-lg neuro-card">
             <table className="w-full text-xs">
-              <thead className="bg-muted/30">
+              <thead className="neuro-inset">
                 <tr>
                   <th className="px-3 py-2 text-left font-medium text-muted-foreground">Name</th>
                   <th className="px-3 py-2 text-left font-medium text-muted-foreground">Email</th>
@@ -133,9 +133,9 @@ export default async function AdminPage() {
           <h2 className="mb-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
             Recent Interviews
           </h2>
-          <div className="overflow-hidden rounded-lg border border-border">
+          <div className="overflow-hidden rounded-lg neuro-card">
             <table className="w-full text-xs">
-              <thead className="bg-muted/30">
+              <thead className="neuro-inset">
                 <tr>
                   <th className="px-3 py-2 text-left font-medium text-muted-foreground">Company</th>
                   <th className="px-3 py-2 text-left font-medium text-muted-foreground">Role</th>
@@ -182,7 +182,7 @@ export default async function AdminPage() {
 // ── Helper component ──
 function StatCard({ label, value }: { label: string; value: number }) {
   return (
-    <div className="rounded-lg border border-border bg-card p-4">
+    <div className="rounded-lg neuro-card p-4">
       <div className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
         {label}
       </div>

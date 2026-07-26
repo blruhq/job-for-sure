@@ -4,6 +4,8 @@ import { useState, Suspense } from 'react'
 import { Link, useRouter } from '~/i18n/routing'
 import { useSearchParams } from 'next/navigation'
 import { authClient } from '~/lib/auth-client'
+import { Button } from '~/components/ui/button'
+import { Input } from '~/components/ui/input'
 
 function ResetPasswordForm() {
   const router = useRouter()
@@ -19,15 +21,15 @@ function ResetPasswordForm() {
   // Token invalid or expired — show error state
   if (hasError || !token) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-background px-6">
+      <div className="flex min-h-screen items-center justify-center neuro-surface px-6">
         <div className="w-full max-w-sm">
           <div className="mb-6 text-center">
             <Link href="/" className="inline-flex cursor-pointer items-center gap-2 no-underline">
-              <div className="h-4 w-4 rounded-[3px] bg-primary" />
+              <div className="h-4 w-4 rounded-[3px] bg-brand" />
               <span className="text-sm font-semibold tracking-tight text-foreground">JOB FOR SURE</span>
             </Link>
           </div>
-          <div className="rounded-lg border border-border bg-card p-8 shadow-sm text-center">
+            <div className="rounded-lg neuro-card p-8 text-center">
             <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-destructive/10">
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-destructive">
                 <circle cx="12" cy="12" r="10" />
@@ -86,24 +88,21 @@ function ResetPasswordForm() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background px-6">
+    <div className="flex min-h-screen items-center justify-center neuro-surface px-6">
       <div className="w-full max-w-sm">
         {/* Logo */}
         <div className="mb-6 text-center">
           <Link href="/" className="inline-flex cursor-pointer items-center gap-2 no-underline">
-            <div className="h-4 w-4 rounded-[3px] bg-primary" />
+            <div className="h-4 w-4 rounded-[3px] bg-brand" />
             <span className="text-sm font-semibold tracking-tight text-foreground">JOB FOR SURE</span>
           </Link>
         </div>
 
-        <div className="rounded-lg border border-border bg-card p-8 shadow-sm">
+        <div className="rounded-lg neuro-card p-8">
           <div className="text-center">
-            <h1
-              className="text-2xl text-foreground"
-              style={{ fontFamily: 'var(--font-instrument-serif), serif' }}
-            >
-              Set new password
-            </h1>
+              <h1 className="text-2xl text-foreground font-display">
+                Set new password
+              </h1>
             <p className="mt-1 text-xs text-muted-foreground">
               Enter your new password below.
             </p>
@@ -120,14 +119,15 @@ function ResetPasswordForm() {
               <label className="mb-1 block font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
                 New Password
               </label>
-              <input
+              <Input
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="At least 8 characters"
                 required
                 minLength={8}
-                className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground outline-none transition-colors placeholder:text-muted-foreground/50 focus:border-primary"
+                className="w-full rounded-md px-3 py-2 text-sm"
+                neumorphic
               />
             </div>
 
@@ -135,24 +135,25 @@ function ResetPasswordForm() {
               <label className="mb-1 block font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
                 Confirm Password
               </label>
-              <input
+              <Input
                 type="password"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 placeholder="Re-enter your password"
                 required
                 minLength={8}
-                className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground outline-none transition-colors placeholder:text-muted-foreground/50 focus:border-primary"
+                className="w-full rounded-md px-3 py-2 text-sm"
+                neumorphic
               />
             </div>
 
-            <button
+            <Button
               type="submit"
               disabled={loading}
-              className="w-full cursor-pointer rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-opacity hover:opacity-90 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
+              className="w-full rounded-md text-sm font-medium active:scale-[0.98]"
             >
               {loading ? 'Resetting…' : 'Reset password'}
-            </button>
+            </Button>
           </form>
 
           <p className="mt-5 text-center text-xs text-muted-foreground">
@@ -170,7 +171,7 @@ function ResetPasswordForm() {
 export default function ResetPasswordPage() {
   return (
     <Suspense fallback={
-      <div className="flex min-h-screen items-center justify-center bg-background">
+      <div className="flex min-h-screen items-center justify-center neuro-surface">
         <div className="h-1.5 w-1.5 animate-pulse rounded-full bg-primary" />
       </div>
     }>

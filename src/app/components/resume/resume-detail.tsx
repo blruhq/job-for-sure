@@ -27,7 +27,12 @@ import { cn } from '~/lib/utils'
 import { useResumes, useCreateResume, useUpdateResume, useDeleteResume } from '~/hooks/use-resumes'
 import { useUIStore } from '~/hooks/use-ui'
 import { notify } from '~/lib/toast'
+import { Button } from '~/components/ui/button'
+import { Input } from '~/components/ui/input'
+import { Textarea } from '~/components/ui/textarea'
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '~/components/ui/select'
 import { ConfirmDialog } from '~/components/ui/confirm-dialog'
+import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from '~/components/ui/dropdown-menu'
 import { ResumeCopilot } from '~/components/resume/resume-copilot'
 import { JobSearchPanel } from '~/components/resume/job-search-panel'
 import type { Resume, ResumeEducation, ResumeProject, ResumeExperience, ResumeCertification, ResumeLanguage, ResumeCustomSection } from '~/types/resume'
@@ -72,7 +77,7 @@ function detectSectionSuggestions(resume: { summary?: string; skills?: string[];
 
 // ── Sub-components ──
 
-function TagInput({ tags, onChange, placeholder }: { tags: string[]; onChange: (tags: string[]) => void; placeholder?: string }) {
+function TagInput({ tags, onChange, placeholder, id }: { tags: string[]; onChange: (tags: string[]) => void; placeholder?: string; id?: string }) {
   const [input, setInput] = useState('')
   const inputRef = useRef<HTMLInputElement>(null)
 
@@ -86,16 +91,16 @@ function TagInput({ tags, onChange, placeholder }: { tags: string[]; onChange: (
   }, [input, tags, onChange])
 
   return (
-    <div className="flex min-h-[34px] flex-wrap items-center gap-1 rounded-xs border border-border bg-background px-2.5 py-1.5 text-[11px] focus-within:border-primary">
+    <div id={id} className="flex min-h-[34px] flex-wrap items-center gap-1 rounded-md neuro-input px-3 py-2 text-sm">
       {tags.map((tag) => (
         <span key={tag} className="flex items-center gap-0.5 rounded-xs bg-primary/10 px-1.5 py-0.5 text-[10px] font-medium text-primary">
           {tag}
-          <button type="button" onClick={() => onChange(tags.filter((t) => t !== tag))} className="ml-0.5 cursor-pointer rounded-full hover:bg-primary/20">
+          <Button variant="ghost" size="icon" onClick={() => onChange(tags.filter((t) => t !== tag))} className="ml-0.5 h-4 w-4 rounded-full p-0 hover:bg-primary/20">
             <X size={10} />
-          </button>
+          </Button>
         </span>
       ))}
-      <input
+      <Input
         ref={inputRef}
         value={input}
         onChange={(e) => setInput(e.target.value)}
@@ -110,7 +115,7 @@ function TagInput({ tags, onChange, placeholder }: { tags: string[]; onChange: (
         }}
         onBlur={addTag}
         placeholder={tags.length === 0 ? (placeholder || 'Type and press Enter') : ''}
-        className="min-w-[80px] flex-1 border-none bg-transparent text-[11px] outline-none placeholder:text-muted-foreground/50"
+        className="min-w-[80px] flex-1 border-none bg-transparent text-sm shadow-none placeholder:text-muted-foreground/50"
       />
     </div>
   )
@@ -135,18 +140,19 @@ function SortableItem({ id, children }: { id: string; children: React.ReactNode 
         opacity: isDragging ? 0.5 : 1,
         zIndex: isDragging ? 50 : 'auto',
       }}
-      className="relative rounded-xs border border-border bg-background p-3"
+      className="relative rounded-xs neuro-inset p-3"
     >
       {children}
-      <button
-        type="button"
+      <Button
+        variant="ghost"
+        size="icon"
         {...attributes}
         {...listeners}
-        className="absolute left-1.5 top-1/2 -translate-y-1/2 cursor-grab text-muted-foreground/60 hover:text-muted-foreground active:cursor-grabbing"
+        className="absolute left-1.5 top-1/2 h-auto w-auto -translate-y-1/2 cursor-grab text-muted-foreground/60 hover:text-muted-foreground active:cursor-grabbing"
         title="Drag to reorder"
       >
         <GripVertical size={14} />
-      </button>
+      </Button>
     </div>
   )
 }
@@ -205,16 +211,12 @@ function EditableList<T>({
   }
 
   return (
-    <div className="border-t border-border/50 pt-3">
+    <div className="pt-3">
       <div className="mb-2 flex items-center justify-between">
         <span className="label-mono text-[10px]">{label}</span>
-        <button
-          type="button"
-          onClick={addItem}
-          className="flex cursor-pointer items-center gap-0.5 rounded-xs border border-border bg-card px-1.5 py-0.5 text-[10px] text-muted-foreground hover:bg-background hover:text-foreground"
-        >
+        <Button variant="outline" size="sm" onClick={addItem} className="flex items-center gap-0.5 rounded-xs px-1.5 py-0.5 text-[10px]">
           <Plus size={10} /> Add
-        </button>
+        </Button>
       </div>
       {items.length === 0 && (
         <p className="py-2 text-center text-[10px] text-muted-foreground/50 italic">No entries yet. Click "Add" to create one.</p>
@@ -232,9 +234,9 @@ function EditableList<T>({
                 {/* Add left padding for the drag handle */}
                 <div className="pl-5">
                   <div className="absolute right-2 top-2">
-                    <button type="button" onClick={() => removeItem(i)} className="cursor-pointer rounded-xs p-0.5 text-muted-foreground hover:text-red-500">
+                    <Button variant="ghost" size="icon" onClick={() => removeItem(i)} className="h-5 w-5 rounded-xs p-0.5 text-muted-foreground hover:text-red-500">
                       <X size={12} />
-                    </button>
+                    </Button>
                   </div>
                   {renderItem(item, i, (updated) => {
                     const copy = [...items]
@@ -249,8 +251,8 @@ function EditableList<T>({
 
         {/* ── Floating drag overlay ── */}
         <DragOverlay dropAnimation={null}>
-          {activeId ? (
-            <div className="rounded-xs border border-border bg-background p-3 shadow-[0_4px_16px_rgba(0,0,0,0.1)]">
+      {activeId ? (
+              <div className="rounded-xs neuro-card p-3 shadow-[0_4px_16px_rgba(0,0,0,0.1)]">
               <div className="pl-5">
                 {renderItem(
                   items[itemIds.indexOf(activeId)],
@@ -278,28 +280,29 @@ function SectionSuggestionBanner({
   if (suggestions.length === 0) return null
   return (
     <div className="mb-3 rounded-xs border border-primary/20 bg-primary/5 p-2.5">
-      <div className="mb-1.5 flex items-center gap-1.5 text-[11px] font-medium text-primary">
+      <div className="mb-1.5 flex items-center gap-1.5 text-sm font-medium text-primary">
         <Lightbulb size={13} />
         Suggestions for your role
       </div>
       <div className="flex flex-wrap gap-1.5">
         {suggestions.map((s) => (
-          <button
+          <Button
             key={s}
-            type="button"
+            variant="outline"
+            size="sm"
             onClick={() => { onAdd(s); onDismiss() }}
-            className="flex cursor-pointer items-center gap-1 rounded-xs border border-primary/20 bg-card px-2 py-1 text-[10px] text-foreground hover:bg-primary/10"
+            className="flex items-center gap-1 rounded-xs px-2 py-1 text-[10px]"
           >
             <PlusCircle size={11} /> Add {SECTION_LABELS[s]} {SECTION_ICONS[s]}
-          </button>
+          </Button>
         ))}
-        <button
-          type="button"
+        <Button
+          variant="ghost"
           onClick={onDismiss}
-          className="cursor-pointer rounded-xs px-2 py-1 text-[10px] text-muted-foreground hover:text-foreground"
+          className="rounded-xs px-2 py-1 text-[10px]"
         >
           Dismiss
-        </button>
+        </Button>
       </div>
     </div>
   )
@@ -333,27 +336,29 @@ function SortableSection({
       className="relative group/section"
     >
       <div className="flex gap-1">
-        <button
-          type="button"
+        <Button
+          variant="ghost"
+          size="icon"
           {...attributes}
           {...listeners}
-          className="mt-1.5 shrink-0 cursor-grab text-muted-foreground/50 opacity-80 group-hover/section:opacity-100 transition-all hover:text-foreground/80 active:cursor-grabbing hover:scale-110"
+          className="mt-1.5 h-auto w-auto shrink-0 cursor-grab text-muted-foreground/50 opacity-80 group-hover/section:opacity-100 transition-all hover:text-foreground/80 active:cursor-grabbing hover:scale-110"
           title="Drag to reorder section"
         >
           <GripVertical size={14} />
-        </button>
+        </Button>
         <div className={cn('flex-1 min-w-0 transition-opacity', !isVisible && 'opacity-40')}>
           {children}
         </div>
         {onToggleVisible && id !== 'basic' && (
-          <button
-            type="button"
+          <Button
+            variant="ghost"
+            size="icon"
             onClick={onToggleVisible}
-            className="mt-1.5 shrink-0 cursor-pointer text-muted-foreground/50 opacity-0 group-hover/section:opacity-100 transition-all hover:text-foreground"
+            className="mt-1.5 h-auto w-auto shrink-0 text-muted-foreground/50 opacity-0 group-hover/section:opacity-100 transition-all hover:text-foreground"
             title={isVisible ? 'Hide from PDF' : 'Show in PDF'}
           >
             {isVisible ? <Eye size={13} /> : <EyeOff size={13} />}
-          </button>
+          </Button>
         )}
       </div>
     </div>
@@ -496,37 +501,37 @@ export function ResumeDetail({ resumeId }: { resumeId: string }) {
             <div className="flex gap-3">
               <div className="flex-1">
                 <label className="label-mono mb-1 block">Resume Name</label>
-                <input value={name} onChange={(e) => setName(e.target.value)} className="w-full rounded-xs border border-border bg-background px-2.5 py-1.5 text-[11px] outline-none focus:border-primary" />
+                <Input value={name} onChange={(e) => setName(e.target.value)} className="w-full rounded-xs px-3 py-2 text-sm" neumorphic />
               </div>
               <div className="flex-1">
                 <label className="label-mono mb-1 block">Full Name</label>
-                <input value={persona} onChange={(e) => setPersona(e.target.value)} className="w-full rounded-xs border border-border bg-background px-2.5 py-1.5 text-[11px] outline-none focus:border-primary" />
+                <Input value={persona} onChange={(e) => setPersona(e.target.value)} className="w-full rounded-xs px-3 py-2 text-sm" neumorphic />
               </div>
             </div>
             <div className="flex gap-3 mt-3">
               <div className="flex-1">
                 <label className="label-mono mb-1 block">Email</label>
-                <input value={email} onChange={(e) => setEmail(e.target.value)} className="w-full rounded-xs border border-border bg-background px-2.5 py-1.5 text-[11px] outline-none focus:border-primary" />
+                <Input value={email} onChange={(e) => setEmail(e.target.value)} className="w-full rounded-xs px-3 py-2 text-sm" neumorphic />
               </div>
               <div className="flex-1">
                 <label className="label-mono mb-1 block">Phone</label>
-                <input value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="+1 555-0123" className="w-full rounded-xs border border-border bg-background px-2.5 py-1.5 text-[11px] outline-none focus:border-primary" />
+                <Input value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="+1 555-0123" className="w-full rounded-xs px-3 py-2 text-sm" neumorphic />
               </div>
             </div>
             <div className="flex gap-3 mt-3">
               <div className="flex-1">
                 <label className="label-mono mb-1 block">Location</label>
-                <input value={location} onChange={(e) => setLocation(e.target.value)} className="w-full rounded-xs border border-border bg-background px-2.5 py-1.5 text-[11px] outline-none focus:border-primary" />
+                <Input value={location} onChange={(e) => setLocation(e.target.value)} className="w-full rounded-xs px-3 py-2 text-sm" neumorphic />
               </div>
               <div className="flex-1">
                 <label className="label-mono mb-1 block">GitHub / Portfolio</label>
-                <input value={github} onChange={(e) => setGithub(e.target.value)} placeholder="https://github.com/..." className="w-full rounded-xs border border-border bg-background px-2.5 py-1.5 text-[11px] outline-none focus:border-primary" />
+                <Input value={github} onChange={(e) => setGithub(e.target.value)} placeholder="https://github.com/..." className="w-full rounded-xs px-3 py-2 text-sm" neumorphic />
               </div>
             </div>
             <div className="flex gap-3 mt-3">
               <div className="flex-1">
                 <label className="label-mono mb-1 block">Headline / Target Role</label>
-                <input value={role} onChange={(e) => setRole(e.target.value)} placeholder="e.g. Software Engineer (shown under your name on PDF)" className="w-full rounded-xs border border-border bg-background px-2.5 py-1.5 text-[11px] outline-none focus:border-primary" />
+                <Input value={role} onChange={(e) => setRole(e.target.value)} placeholder="e.g. Software Engineer (shown under your name on PDF)" className="w-full rounded-xs px-3 py-2 text-sm" neumorphic />
               </div>
             </div>
           </>
@@ -535,14 +540,14 @@ export function ResumeDetail({ resumeId }: { resumeId: string }) {
         return (
           <div>
             <label className="label-mono mb-1 block">Professional Summary</label>
-            <textarea value={summary} onChange={(e) => setSummary(e.target.value)} rows={3} className="w-full resize-y rounded-xs border border-border bg-background px-2.5 py-1.5 text-[11px] outline-none focus:border-primary" />
+            <Textarea value={summary} onChange={(e) => setSummary(e.target.value)} rows={3} className="w-full resize-y rounded-xs px-3 py-2 text-sm" neumorphic />
           </div>
         )
       case 'skills':
         return (
           <div>
-            <label className="label-mono mb-1 block">Skills</label>
-            <TagInput tags={skills} onChange={setSkills} placeholder="Type a skill and press Enter" />
+            <label htmlFor="skills-input" className="label-mono mb-1 block">Skills</label>
+            <TagInput id="skills-input" tags={skills} onChange={setSkills} placeholder="Type a skill and press Enter" />
           </div>
         )
       case 'experience':
@@ -555,27 +560,28 @@ export function ResumeDetail({ resumeId }: { resumeId: string }) {
             renderItem={(exp, _i, update) => (
               <div className="flex flex-col gap-2">
                 <div className="flex gap-2">
-                  <div className="flex-1">
-                    <label className="label-mono mb-0.5 block text-[9px]">Company</label>
-                    <input value={exp.company} onChange={(e) => update({ ...exp, company: e.target.value })} className="w-full rounded-xs border border-border bg-background px-2 py-1 text-[11px] outline-none focus:border-primary" />
-                  </div>
-                  <div className="flex-1">
-                    <label className="label-mono mb-0.5 block text-[9px]">Role</label>
-                    <input value={exp.role} onChange={(e) => update({ ...exp, role: e.target.value })} className="w-full rounded-xs border border-border bg-background px-2 py-1 text-[11px] outline-none focus:border-primary" />
-                  </div>
+                <div className="flex-1">
+                  <label className="label-mono mb-0.5 block text-[10px]">Company</label>
+                  <Input value={exp.company} onChange={(e) => update({ ...exp, company: e.target.value })} className="w-full rounded-xs px-3 py-2 text-sm" neumorphic />
                 </div>
-                <div>
-                  <label className="label-mono mb-0.5 block text-[9px]">Dates</label>
-                  <input value={exp.dates} onChange={(e) => update({ ...exp, dates: e.target.value })} placeholder="Jun 2020 — Present" className="w-full rounded-xs border border-border bg-background px-2 py-1 text-[11px] outline-none focus:border-primary" />
+                <div className="flex-1">
+                  <label className="label-mono mb-0.5 block text-[10px]">Role</label>
+                  <Input value={exp.role} onChange={(e) => update({ ...exp, role: e.target.value })} className="w-full rounded-xs px-3 py-2 text-sm" neumorphic />
                 </div>
-                <div>
-                  <label className="label-mono mb-0.5 block text-[9px]">Highlights (one per line)</label>
-                  <textarea
-                    value={exp.bullets.join('\n')}
-                    onChange={(e) => update({ ...exp, bullets: e.target.value.split('\n').filter(Boolean) })}
-                    rows={3}
-                    className="w-full resize-y rounded-xs border border-border bg-background px-2 py-1 text-[11px] outline-none focus:border-primary"
-                  />
+              </div>
+              <div>
+                <label className="label-mono mb-0.5 block text-[10px]">Dates</label>
+                <Input value={exp.dates} onChange={(e) => update({ ...exp, dates: e.target.value })} placeholder="Jun 2020 — Present" className="w-full rounded-xs px-3 py-2 text-sm" neumorphic />
+              </div>
+              <div>
+                <label className="label-mono mb-0.5 block text-[10px]">Highlights (one per line)</label>
+                <Textarea
+                  value={exp.bullets.join('\n')}
+                  onChange={(e) => update({ ...exp, bullets: e.target.value.split('\n').filter(Boolean) })}
+                  rows={3}
+                  className="w-full resize-y rounded-xs px-3 py-2 text-sm"
+                  neumorphic
+                />
                 </div>
               </div>
             )}
@@ -592,24 +598,24 @@ export function ResumeDetail({ resumeId }: { resumeId: string }) {
               <div className="flex flex-col gap-2">
                 <div className="flex gap-2">
                   <div className="flex-1">
-                    <label className="label-mono mb-0.5 block text-[9px]">Institution</label>
-                    <input value={edu.institution} onChange={(e) => update({ ...edu, institution: e.target.value })} className="w-full rounded-xs border border-border bg-background px-2 py-1 text-[11px] outline-none focus:border-primary" />
-                  </div>
-                  <div className="flex-1">
-                    <label className="label-mono mb-0.5 block text-[9px]">Degree</label>
-                    <input value={edu.degree} onChange={(e) => update({ ...edu, degree: e.target.value })} placeholder="BS, MBA, PhD" className="w-full rounded-xs border border-border bg-background px-2 py-1 text-[11px] outline-none focus:border-primary" />
-                  </div>
+                  <label className="label-mono mb-0.5 block text-[10px]">Institution</label>
+                  <Input value={edu.institution} onChange={(e) => update({ ...edu, institution: e.target.value })} className="w-full rounded-xs px-3 py-2 text-sm" neumorphic />
                 </div>
-                <div className="flex gap-2">
-                  <div className="flex-1">
-                    <label className="label-mono mb-0.5 block text-[9px]">Field of Study</label>
-                    <input value={edu.field} onChange={(e) => update({ ...edu, field: e.target.value })} className="w-full rounded-xs border border-border bg-background px-2 py-1 text-[11px] outline-none focus:border-primary" />
-                  </div>
-                  <div className="flex-1">
-                    <label className="label-mono mb-0.5 block text-[9px]">Dates</label>
-                    <input value={edu.dates} onChange={(e) => update({ ...edu, dates: e.target.value })} placeholder="2018 — 2022" className="w-full rounded-xs border border-border bg-background px-2 py-1 text-[11px] outline-none focus:border-primary" />
-                  </div>
+                <div className="flex-1">
+                  <label className="label-mono mb-0.5 block text-[10px]">Degree</label>
+                  <Input value={edu.degree} onChange={(e) => update({ ...edu, degree: e.target.value })} placeholder="BS, MBA, PhD" className="w-full rounded-xs px-3 py-2 text-sm" neumorphic />
                 </div>
+              </div>
+              <div className="flex gap-2">
+                <div className="flex-1">
+                  <label className="label-mono mb-0.5 block text-[10px]">Field of Study</label>
+                  <Input value={edu.field} onChange={(e) => update({ ...edu, field: e.target.value })} className="w-full rounded-xs px-3 py-2 text-sm" neumorphic />
+                </div>
+                <div className="flex-1">
+                  <label className="label-mono mb-0.5 block text-[10px]">Dates</label>
+                  <Input value={edu.dates} onChange={(e) => update({ ...edu, dates: e.target.value })} placeholder="2018 — 2022" className="w-full rounded-xs px-3 py-2 text-sm" neumorphic />
+                </div>
+              </div>
               </div>
             )}
           />
@@ -624,30 +630,31 @@ export function ResumeDetail({ resumeId }: { resumeId: string }) {
             renderItem={(proj, _i, update) => (
               <div className="flex flex-col gap-2">
                 <div>
-                  <label className="label-mono mb-0.5 block text-[9px]">Project Name</label>
-                  <input value={proj.name} onChange={(e) => update({ ...proj, name: e.target.value })} className="w-full rounded-xs border border-border bg-background px-2 py-1 text-[11px] outline-none focus:border-primary" />
+                  <label className="label-mono mb-0.5 block text-[10px]">Project Name</label>
+                  <Input value={proj.name} onChange={(e) => update({ ...proj, name: e.target.value })} className="w-full rounded-xs px-3 py-2 text-sm" neumorphic />
                 </div>
                 <div>
-                  <label className="label-mono mb-0.5 block text-[9px]">Description</label>
-                  <textarea
+                  <label className="label-mono mb-0.5 block text-[10px]">Description</label>
+                  <Textarea
                     value={proj.description}
                     onChange={(e) => update({ ...proj, description: e.target.value })}
                     rows={2}
-                    className="w-full resize-y rounded-xs border border-border bg-background px-2 py-1 text-[11px] outline-none focus:border-primary"
+                    className="w-full resize-y rounded-xs px-3 py-2 text-sm" neumorphic
                   />
                 </div>
                 <div className="flex gap-2">
                   <div className="flex-1">
-                    <label className="label-mono mb-0.5 block text-[9px]">Tech Stack</label>
-                    <TagInput
-                      tags={proj.techStack}
-                      onChange={(tags) => update({ ...proj, techStack: tags })}
-                      placeholder="React, Node..."
-                    />
-                  </div>
-                  <div className="flex-1">
-                    <label className="label-mono mb-0.5 block text-[9px]">Link</label>
-                    <input value={proj.link} onChange={(e) => update({ ...proj, link: e.target.value })} placeholder="https://..." className="w-full rounded-xs border border-border bg-background px-2 py-1 text-[11px] outline-none focus:border-primary" />
+                  <label htmlFor="tech-stack-input" className="label-mono mb-0.5 block text-[10px]">Tech Stack</label>
+                  <TagInput
+                    id="tech-stack-input"
+                    tags={proj.techStack}
+                    onChange={(tags) => update({ ...proj, techStack: tags })}
+                    placeholder="React, Node..."
+                  />
+                </div>
+                <div className="flex-1">
+                  <label className="label-mono mb-0.5 block text-[10px]">Link</label>
+                  <Input value={proj.link} onChange={(e) => update({ ...proj, link: e.target.value })} placeholder="https://..." className="w-full rounded-xs px-3 py-2 text-sm" neumorphic />
                   </div>
                 </div>
               </div>
@@ -665,17 +672,17 @@ export function ResumeDetail({ resumeId }: { resumeId: string }) {
               <div className="flex flex-col gap-2">
                 <div className="flex gap-2">
                   <div className="flex-1">
-                    <label className="label-mono mb-0.5 block text-[9px]">Name</label>
-                    <input value={cert.name} onChange={(e) => update({ ...cert, name: e.target.value })} placeholder="AWS Solutions Architect" className="w-full rounded-xs border border-border bg-background px-2 py-1 text-[11px] outline-none focus:border-primary" />
+                    <label className="label-mono mb-0.5 block text-[10px]">Name</label>
+                    <Input value={cert.name} onChange={(e) => update({ ...cert, name: e.target.value })} placeholder="AWS Solutions Architect" className="w-full rounded-xs px-3 py-2 text-sm" neumorphic />
                   </div>
                   <div className="flex-1">
-                    <label className="label-mono mb-0.5 block text-[9px]">Issuer</label>
-                    <input value={cert.issuer} onChange={(e) => update({ ...cert, issuer: e.target.value })} placeholder="Amazon Web Services" className="w-full rounded-xs border border-border bg-background px-2 py-1 text-[11px] outline-none focus:border-primary" />
+                    <label className="label-mono mb-0.5 block text-[10px]">Issuer</label>
+                    <Input value={cert.issuer} onChange={(e) => update({ ...cert, issuer: e.target.value })} placeholder="Amazon Web Services" className="w-full rounded-xs px-3 py-2 text-sm" neumorphic />
                   </div>
                 </div>
                 <div>
-                  <label className="label-mono mb-0.5 block text-[9px]">Date</label>
-                  <input value={cert.date} onChange={(e) => update({ ...cert, date: e.target.value })} placeholder="2024" className="w-full rounded-xs border border-border bg-background px-2 py-1 text-[11px] outline-none focus:border-primary" />
+                  <label className="label-mono mb-0.5 block text-[10px]">Date</label>
+                  <Input value={cert.date} onChange={(e) => update({ ...cert, date: e.target.value })} placeholder="2024" className="w-full rounded-xs px-3 py-2 text-sm" neumorphic />
                 </div>
               </div>
             )}
@@ -689,27 +696,27 @@ export function ResumeDetail({ resumeId }: { resumeId: string }) {
             label="Languages"
             createNew={() => ({ name: '', proficiency: '' })}
             renderItem={(lang, _i, update) => (
-              <div className="flex gap-2">
-                <div className="flex-1">
-                  <label className="label-mono mb-0.5 block text-[9px]">Language</label>
-                  <input value={lang.name} onChange={(e) => update({ ...lang, name: e.target.value })} className="w-full rounded-xs border border-border bg-background px-2 py-1 text-[11px] outline-none focus:border-primary" />
+                <div className="flex gap-2">
+                  <div className="flex-1">
+                    <label className="label-mono mb-0.5 block text-[10px]">Language</label>
+                    <Input value={lang.name} onChange={(e) => update({ ...lang, name: e.target.value })} className="w-full rounded-xs px-3 py-2 text-sm" neumorphic />
+                  </div>
+                  <div className="flex-1">
+                    <label className="label-mono mb-0.5 block text-[10px]">Proficiency</label>
+                    <Select value={lang.proficiency || ''} onValueChange={(v) => update({ ...lang, proficiency: v || '' })}>
+                      <SelectTrigger className="w-full rounded-xs px-3 py-2 text-sm">
+                        <SelectValue placeholder="Select..." />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="Basic">Basic</SelectItem>
+                        <SelectItem value="Conversational">Conversational</SelectItem>
+                        <SelectItem value="Professional">Professional</SelectItem>
+                        <SelectItem value="Fluent">Fluent</SelectItem>
+                        <SelectItem value="Native">Native</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
                 </div>
-                <div className="flex-1">
-                  <label className="label-mono mb-0.5 block text-[9px]">Proficiency</label>
-                  <select
-                     value={lang.proficiency}
-                     onChange={(e) => update({ ...lang, proficiency: e.target.value })}
-                     className="w-full rounded-xs border border-border bg-background px-2 py-1 text-[11px] outline-none focus:border-primary"
-                  >
-                     <option value="">Select...</option>
-                     <option value="Basic">Basic</option>
-                     <option value="Conversational">Conversational</option>
-                     <option value="Professional">Professional</option>
-                     <option value="Fluent">Fluent</option>
-                     <option value="Native">Native</option>
-                  </select>
-                </div>
-              </div>
             )}
           />
         )
@@ -722,36 +729,39 @@ export function ResumeDetail({ resumeId }: { resumeId: string }) {
       return (
         <div className="relative flex flex-col gap-2">
           <div className="flex items-center justify-between gap-2">
-            <input
+            <Input
               data-cs-id={csId}
               value={sec.title}
               onChange={(e) => setCustomSections(customSections.map((s) => s.id === csId ? { ...s, title: e.target.value } : s))}
               placeholder="Section Title"
-              className="flex-1 rounded-xs border border-border bg-background px-2 py-1 text-[11px] font-medium outline-none focus:border-primary"
+              className="flex-1 rounded-xs px-3 py-2 text-sm font-medium"
+              neumorphic
             />
           </div>
           <div>
-            <label className="label-mono mb-0.5 block text-[9px]">Highlights (one per line)</label>
-            <textarea
+            <label className="label-mono mb-0.5 block text-[10px]">Highlights (one per line)</label>
+            <Textarea
               placeholder="Enter each bullet point on a new line"
               value={sec.bullets?.join('\n') || ''}
               onChange={(e) => setCustomSections(customSections.map((s) => s.id === csId ? { ...s, bullets: e.target.value.split('\n').filter(Boolean) } : s))}
               rows={3}
-              className="w-full resize-y rounded-xs border border-border bg-background px-2 py-1 text-[11px] outline-none focus:border-primary"
+              className="w-full resize-y rounded-xs px-3 py-2 text-sm"
+              neumorphic
             />
           </div>
           {/* Delete button */}
-          <button
-            type="button"
+          <Button
+            variant="ghost"
+            size="icon"
             onClick={() => {
               setCustomSections(customSections.filter((s) => s.id !== csId))
               setSectionOrder(sectionOrder.filter((oid) => oid !== id))
             }}
-            className="absolute right-0 top-0 cursor-pointer rounded-xs p-0.5 text-muted-foreground/50 hover:text-red-500 transition-colors"
+            className="absolute right-0 top-0 h-5 w-5 rounded-xs p-0.5 text-muted-foreground/50 hover:text-red-500 transition-colors"
             title="Remove section"
           >
             <X size={12} />
-          </button>
+          </Button>
         </div>
       )
     }
@@ -795,41 +805,34 @@ export function ResumeDetail({ resumeId }: { resumeId: string }) {
         </SortableContext>
       </DndContext>
 
-      {/* + Add Section button */}
+      {/* + Add Section picker — uses DropdownMenu for accessible keyboard nav + ARIA */}
       {availableSections.length > 0 && !showNewCustomInput && (
-        <div className="relative border-t border-border/50 pt-3">
-          <button
-            type="button"
-            onClick={() => setShowAddSectionPicker(!showAddSectionPicker)}
-            className="flex cursor-pointer items-center gap-1 rounded-xs border border-dashed border-border bg-transparent px-3 py-2 text-[11px] text-muted-foreground hover:border-primary hover:text-primary transition-all w-full justify-center"
-          >
-            <PlusCircle size={13} /> Add Section
-          </button>
-          {showAddSectionPicker && (
-            <div className="absolute left-0 right-0 top-full z-10 mt-1 rounded-xs border border-border bg-card shadow-lg">
+        <div className="relative pt-3">
+          <DropdownMenu open={showAddSectionPicker} onOpenChange={setShowAddSectionPicker}>
+            <DropdownMenuTrigger
+              render={<Button variant="outline" className="flex w-full items-center justify-center gap-1 rounded-xs border-dashed border-[var(--input-border)] px-3 py-2 text-sm" />}
+            >
+              <PlusCircle size={13} /> Add Section
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="w-(--anchor-width)">
               {availableSections.map((s) => (
-                <button
-                  key={s}
-                  type="button"
-                  onClick={() => { handleAddSection(s) }}
-                  className="flex w-full cursor-pointer items-center gap-2 px-3 py-2 text-[11px] text-left text-foreground hover:bg-muted"
-                >
+                <DropdownMenuItem key={s} onClick={() => handleAddSection(s)}>
                   <span>{SECTION_ICONS[s]}</span>
                   <span>{SECTION_LABELS[s]}</span>
-                </button>
+                </DropdownMenuItem>
               ))}
-            </div>
-          )}
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       )}
 
       {/* Inline title input when adding a new custom section */}
       {showNewCustomInput && (
-        <div className="border-t border-border/50 pt-3">
-          <div className="flex flex-col gap-2 rounded-xs border border-border bg-background p-3">
-            <label className="label-mono block text-[9px]">Section Title</label>
+        <div className="pt-3">
+          <div className="flex flex-col gap-2 rounded-xs neuro-inset p-3">
+            <label className="label-mono block text-[10px]">Section Title</label>
             <div className="flex gap-2">
-              <input
+              <Input
                 ref={newCustomInputRef}
                 value={newCustomTitle}
                 onChange={(e) => setNewCustomTitle(e.target.value)}
@@ -838,23 +841,16 @@ export function ResumeDetail({ resumeId }: { resumeId: string }) {
                   if (e.key === 'Escape') { setShowNewCustomInput(false); setNewCustomTitle('') }
                 }}
                 placeholder="e.g. Open Source Contributions, Volunteering, Awards"
-                className="flex-1 rounded-xs border border-border bg-background px-2.5 py-1.5 text-[11px] outline-none focus:border-primary"
+                className="flex-1 rounded-xs px-3 py-2 text-sm"
                 autoFocus
+                neumorphic
               />
-              <button
-                type="button"
-                onClick={handleCreateCustomSection}
-                className="cursor-pointer rounded-xs bg-primary px-3 py-1.5 text-[11px] font-medium text-primary-foreground hover:bg-primary/90"
-              >
+              <Button variant="default" onClick={handleCreateCustomSection} className="rounded-xs px-3 py-1.5 text-sm">
                 Add
-              </button>
-              <button
-                type="button"
-                onClick={() => { setShowNewCustomInput(false); setNewCustomTitle('') }}
-                className="cursor-pointer rounded-xs border border-border bg-card px-2 py-1.5 text-[11px] text-muted-foreground hover:bg-background"
-              >
+              </Button>
+              <Button variant="outline" onClick={() => { setShowNewCustomInput(false); setNewCustomTitle('') }} className="rounded-xs px-2 py-1.5 text-sm">
                 Cancel
-              </button>
+              </Button>
             </div>
           </div>
         </div>
@@ -1080,7 +1076,7 @@ export function ResumeDetail({ resumeId }: { resumeId: string }) {
   if (!resume) {
     return (
       <div className="flex flex-1 items-center justify-center text-sm text-muted-foreground">
-        Resume not found. <button onClick={() => router.push('/chat')} className="ml-2 text-primary">Back to Chat</button>
+        Resume not found. <Button variant="link" onClick={() => router.push('/chat')} className="ml-2">Back to Chat</Button>
       </div>
     )
   }
@@ -1122,42 +1118,36 @@ export function ResumeDetail({ resumeId }: { resumeId: string }) {
   return (
     <div className="flex h-full flex-col">
       {/* Header with tabs */}
-      <div className="flex shrink-0 flex-col md:flex-row md:items-center justify-between gap-2 border-b border-border bg-card px-4 md:px-6 py-3">
+      <div className="flex shrink-0 flex-col md:flex-row md:items-center justify-between gap-2 neuro-surface px-4 md:px-6 py-3">
         <div className="flex items-center gap-2 overflow-x-auto min-w-0 max-w-full">
-          <button
-            onClick={() => router.push('/chat')}
-            className="flex shrink-0 items-center gap-1 rounded-sm border border-border bg-card px-2 py-1 text-[11px] text-muted-foreground hover:bg-background"
-          >
+          <Button variant="outline" size="sm" onClick={() => router.push('/chat')} className="flex shrink-0 items-center gap-1 rounded-sm px-2.5 py-1.5 text-sm">
             <ArrowLeft size={12} /> Back
-          </button>
-          <div className="ml-3 flex gap-1 overflow-x-auto rounded-sm bg-border/30 p-0.5">
+          </Button>
+          <div className="ml-3 flex gap-1 overflow-x-auto rounded-sm neuro-inset p-0.5">
             {(['jobs', 'view', 'editor'] as const).map((t) => (
-              <button
+              <Button
                 key={t}
+                variant="ghost"
                 onClick={() => {
                   if (t !== 'editor') suggestionAnalysed.current = false // reset for next open
                   setTab(t)
                 }}
                 className={cn(
-                  'shrink-0 rounded-xs px-3 py-1 text-[11px] font-medium transition-all',
-                  tab === t ? 'bg-card text-foreground shadow-sm font-semibold' : 'text-muted-foreground hover:text-foreground',
+                  'shrink-0 rounded-xs px-3 py-1.5 text-sm font-medium transition-all',
+                  tab === t ? 'neuro-card text-foreground font-semibold' : 'text-muted-foreground',
                 )}
               >
                 {t === 'jobs' ? 'Find Jobs' : t === 'view' ? 'View Resume' : 'Resume Editor'}
-              </button>
+              </Button>
             ))}
           </div>
         </div>
         <div className="flex shrink-0 items-center gap-3">
           <h1 className="truncate text-sm font-semibold max-w-[150px] sm:max-w-xs">{resume.name}</h1>
-          <span className="rounded-xs bg-success-soft px-1.5 py-0.5 font-mono text-[11px] font-semibold text-success">{resume.score}% Match</span>
-          <button
-            onClick={() => setShowDeleteDialog(true)}
-            className="flex cursor-pointer items-center gap-1 rounded-sm border border-border bg-card px-2 py-1 text-[11px] text-muted-foreground hover:text-red-500 hover:border-red-500/30 transition-all"
-            title="Delete resume"
-          >
+          <span className="rounded-xs bg-success-soft px-1.5 py-0.5 font-mono text-xs font-semibold text-success">{resume.score}% Match</span>
+          <Button variant="outline" size="sm" onClick={() => setShowDeleteDialog(true)} className="flex items-center gap-1 rounded-sm px-2.5 py-1.5 text-sm text-muted-foreground hover:text-red-500 hover:border-red-500/30" title="Delete resume">
             <Trash2 size={11} /> Delete
-          </button>
+          </Button>
         </div>
       </div>
 
@@ -1172,19 +1162,20 @@ export function ResumeDetail({ resumeId }: { resumeId: string }) {
         {tab === 'view' && (
           <div className="flex w-full flex-col overflow-hidden">
             {/* Template gallery bar */}
-            <div className="shrink-0 border-b border-border bg-card p-3">
+            <div className="shrink-0 neuro-surface p-3">
               <div className="mx-auto max-w-[794px]">
                 <div className="flex items-center justify-between">
-                  <button
-                    onClick={() => setGalleryOpen(!galleryOpen)}
-                    className="flex cursor-pointer items-center gap-1.5 rounded-sm border border-border bg-background px-2.5 py-1 text-[11px] font-semibold text-foreground hover:bg-muted transition-colors"
-                  >
+                  <Button variant="outline" size="sm" onClick={() => setGalleryOpen(!galleryOpen)} className="flex items-center gap-1.5 rounded-sm px-2.5 py-1.5 text-sm font-semibold">
                     <span>Template: {getTemplateMeta(resume?.template || DEFAULT_TEMPLATE).name}</span>
                     {galleryOpen ? <ChevronUp size={12} className="text-muted-foreground" /> : <ChevronDown size={12} className="text-muted-foreground" />}
-                  </button>
+                  </Button>
                   <div className="flex gap-1.5">
-                    <button onClick={() => window.open(`/api/export/pdf?id=${resume?.id}`, '_blank')} className="rounded-sm px-2 py-1 text-[11px] text-muted-foreground hover:bg-background hover:text-foreground">Export PDF</button>
-                    <button onClick={() => notify({ message: 'DOCX export coming soon', type: 'info' })} className="rounded-sm px-2 py-1 text-[11px] text-muted-foreground hover:bg-background hover:text-foreground">Export DOCX</button>
+                    <Button variant="default" size="sm" onClick={() => window.open(`/api/export/pdf?id=${resume?.id}`, '_blank')} className="flex items-center gap-1 rounded-sm px-3 py-2 text-sm font-medium">
+                      <Eye size={11} /> Export PDF
+                    </Button>
+                    <Button variant="outline" size="sm" onClick={() => notify({ message: 'DOCX export coming soon', type: 'info' })} className="flex items-center gap-1 rounded-sm px-3 py-2 text-sm">
+                      Export DOCX
+                    </Button>
                   </div>
                 </div>
                 <div className={cn(
@@ -1208,7 +1199,7 @@ export function ResumeDetail({ resumeId }: { resumeId: string }) {
             {/* PDF preview — fills remaining space.
                 Uses liveResume (not raw resume) so the View tab stays in sync
                 with unsaved editor changes — same data the editor preview shows. */}
-            <div className="min-h-0 flex-1 bg-muted/30">
+            <div className="min-h-0 flex-1 neuro-surface">
               <ResumePreview resume={liveResume} />
             </div>
           </div>
@@ -1218,23 +1209,23 @@ export function ResumeDetail({ resumeId }: { resumeId: string }) {
         {tab === 'editor' && isReviewMode && (
           <div className="flex w-full flex-col lg:flex-row">
             {/* Change list panel (left) */}
-            <div className="w-full lg:w-[45%] overflow-y-auto border-r border-border">
+            <div className="w-full lg:w-[45%] overflow-y-auto shadow-[1px_0_2px_rgba(0,0,0,0.04)]">
               <TailorReviewPanel onApply={handleApplyTailor} onCancel={handleCancelTailor} />
             </div>
             {/* Live PDF with accepted changes (right) */}
-            <div className="hidden lg:flex w-[55%] min-w-[350px] flex-col bg-muted/30">
+            <div className="hidden lg:flex w-[55%] min-w-[350px] flex-col neuro-surface">
               <div className="flex-1 min-h-0">
                 <ResumePreview resume={reviewPreviewResume} />
               </div>
             </div>
             {/* Mobile fallback */}
-            <div className="lg:hidden border-t border-border">
+            <div className="lg:hidden">
               <details className="group">
-                <summary className="flex cursor-pointer items-center justify-between px-4 py-2 text-[11px] font-medium text-muted-foreground hover:text-foreground list-none">
+                <summary className="flex cursor-pointer items-center justify-between px-4 py-2.5 text-sm font-medium text-muted-foreground hover:text-foreground list-none">
                   <span>Preview PDF (with accepted changes)</span>
                   <ChevronDown size={14} className="transition-transform group-open:rotate-180" />
                 </summary>
-                <div className="h-[500px] border-t border-border">
+                <div className="h-[500px]">
                   <ResumePreview resume={reviewPreviewResume} />
                 </div>
               </details>
@@ -1246,19 +1237,21 @@ export function ResumeDetail({ resumeId }: { resumeId: string }) {
         {tab === 'editor' && !isReviewMode && (
           <>
             {/* Mobile tab toggle */}
-            <div className="flex shrink-0 border-b border-border bg-card lg:hidden">
-              <button
+            <div className="flex shrink-0 neuro-surface lg:hidden">
+              <Button
+                variant="ghost"
                 onClick={() => setMobileView('edit')}
-                className={cn('flex-1 py-2 text-[11px] font-medium transition-all', mobileView === 'edit' ? 'border-b-2 border-primary text-foreground font-semibold' : 'text-muted-foreground')}
+                className={cn('flex-1 rounded-none py-2 text-xs font-medium', mobileView === 'edit' ? 'border-b-2 border-primary text-foreground font-semibold' : 'text-muted-foreground')}
               >
                 ✏️ Edit
-              </button>
-              <button
+              </Button>
+              <Button
+                variant="ghost"
                 onClick={() => setMobileView('preview')}
-                className={cn('flex-1 py-2 text-[11px] font-medium transition-all', mobileView === 'preview' ? 'border-b-2 border-primary text-foreground font-semibold' : 'text-muted-foreground')}
+                className={cn('flex-1 rounded-none py-2 text-xs font-medium', mobileView === 'preview' ? 'border-b-2 border-primary text-foreground font-semibold' : 'text-muted-foreground')}
               >
                 📄 Preview
-              </button>
+              </Button>
             </div>
 
             {/* Desktop: resizable panels */}
@@ -1268,10 +1261,10 @@ export function ResumeDetail({ resumeId }: { resumeId: string }) {
                 <ResizablePanel defaultSize="55%" minSize="30%" maxSize="80%">
                   <div className="flex h-full flex-col gap-3 overflow-y-auto p-4 md:p-6">
                     {/* Toolbar */}
-                    <div className="flex items-center justify-between rounded-sm border border-border bg-card p-2 px-3 shrink-0">
+                    <div className="flex items-center justify-between rounded-sm neuro-card p-2 px-3 shrink-0">
                       <div className="flex gap-2">
                         {/* Save status indicator */}
-                        <div className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
+                        <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
                           {saveStatus === 'saving' && (
                             <>
                               <div className="h-2.5 w-2.5 animate-spin rounded-full border border-border border-t-primary" />
@@ -1280,8 +1273,8 @@ export function ResumeDetail({ resumeId }: { resumeId: string }) {
                           )}
                           {saveStatus === 'saved' && (
                             <>
-                              <div className="h-2 w-2 rounded-full bg-green-500" />
-                              <span className="text-green-600 font-medium">Saved</span>
+                              <div className="h-2 w-2 rounded-full bg-success" />
+                              <span className="text-success font-medium">Saved</span>
                             </>
                           )}
                           {saveStatus === 'idle' && (
@@ -1293,28 +1286,30 @@ export function ResumeDetail({ resumeId }: { resumeId: string }) {
                         </div>
                       </div>
                       <div className="flex gap-2">
-                        <button onClick={() => {
+                        <Button variant="outline" size="sm" onClick={() => {
                           const copy = { ...resume, id: crypto.randomUUID(), name: `${resume.name} (Copy)`, updated: 'just now' }
                           addResume({ id: copy.id, data: copy })
                           setActiveResumeId(copy.id)
                           notify({ message: 'Resume cloned', type: 'success' })
-                        }} className="flex cursor-pointer items-center gap-1 rounded-sm border border-border bg-card px-2.5 py-1 text-[11px] hover:bg-muted">
+                        }} className="flex items-center gap-1 rounded-sm px-2.5 py-1 text-xs">
                           Save as New
-                        </button>
-                        <button onClick={handleOptimize} disabled={optimizing} className="flex cursor-pointer items-center gap-1 rounded-sm border border-border bg-card px-2.5 py-1 text-[11px] hover:bg-muted disabled:opacity-50">
+                        </Button>
+                        <Button variant="outline" size="sm" onClick={handleOptimize} disabled={optimizing} className="flex items-center gap-1 rounded-sm px-2.5 py-1 text-xs disabled:opacity-50">
                           <Wand2 size={11} /> {optimizing ? 'Optimizing…' : 'AI Optimize'}
-                        </button>
-                        <button
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
                           onClick={() => setCopilotOpen(true)}
-                          className={cn('flex cursor-pointer items-center gap-1 rounded-sm border border-border bg-card px-2.5 py-1 text-[11px] hover:bg-muted', copilotOpen && 'opacity-50')}
+                          className={cn('flex items-center gap-1 rounded-sm px-2.5 py-1 text-xs', copilotOpen && 'opacity-50')}
                         >
                           <Sparkles size={11} /> Co-Pilot
-                        </button>
+                        </Button>
                       </div>
                     </div>
 
                     {/* Form body */}
-                    <div className="resume-paper flex-1 rounded-xs p-6" style={{ fontFamily: 'var(--font-sans)', fontSize: '12px' }}>
+                    <div className="flex-1 rounded-sm neuro-inset p-5 overflow-y-auto">
                       {EditorFormBody()}
                     </div>
                   </div>
@@ -1324,7 +1319,7 @@ export function ResumeDetail({ resumeId }: { resumeId: string }) {
 
                 {/* Live PDF preview (right) */}
                 <ResizablePanel defaultSize="45%" minSize="20%" maxSize="70%" collapsible={true} collapsedSize="0%">
-                  <div className="h-full bg-muted/30">
+                  <div className="h-full neuro-surface">
                     <ResumePreview resume={deferredResume} />
                   </div>
                 </ResizablePanel>
@@ -1336,25 +1331,25 @@ export function ResumeDetail({ resumeId }: { resumeId: string }) {
               {mobileView === 'edit' && (
                 <div className="flex flex-col gap-3 p-4">
                   {/* Toolbar — simplified for mobile */}
-                  <div className="flex items-center justify-between rounded-sm border border-border bg-card p-2 px-3 shrink-0">
-                    <div className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
+                  <div className="flex items-center justify-between rounded-sm neuro-card p-2 px-3 shrink-0">
+                    <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
                       {saveStatus === 'saving' && <span>Saving…</span>}
-                      {saveStatus === 'saved' && <span className="text-green-600">Saved</span>}
+                      {saveStatus === 'saved' && <span className="text-success">Saved</span>}
                       {saveStatus === 'idle' && <span>Auto-saved</span>}
                     </div>
-                    <button onClick={handleOptimize} disabled={optimizing} className="flex cursor-pointer items-center gap-1 rounded-sm border border-border bg-card px-2 py-1 text-[11px] hover:bg-muted disabled:opacity-50">
+                    <Button variant="outline" size="sm" onClick={handleOptimize} disabled={optimizing} className="flex items-center gap-1 rounded-sm px-2 py-1 text-xs disabled:opacity-50">
                       <Wand2 size={11} /> {optimizing ? '…' : 'AI'}
-                    </button>
+                    </Button>
                   </div>
 
                   {/* Form body */}
-                  <div className="resume-paper rounded-xs p-4" style={{ fontFamily: 'var(--font-sans)', fontSize: '12px' }}>
+                  <div className="rounded-sm neuro-inset p-4">
                     {EditorFormBody()}
                   </div>
                 </div>
               )}
               {mobileView === 'preview' && (
-                <div className="h-full bg-muted/30 min-h-[600px]">
+                <div className="h-full neuro-surface min-h-[600px]">
                   <ResumePreview resume={deferredResume} />
                 </div>
               )}
@@ -1372,19 +1367,16 @@ export function ResumeDetail({ resumeId }: { resumeId: string }) {
             />
             {/* Drawer */}
             <div className="fixed right-0 top-0 z-50 h-full w-full max-w-[380px] shadow-2xl animate-in slide-in-from-right duration-200">
-              <div className="relative flex h-full flex-col bg-card">
+              <div className="relative flex h-full flex-col neuro-surface">
                 {/* Drawer header with close */}
-                <div className="flex shrink-0 items-center justify-between border-b border-border bg-card px-4 py-2.5">
+                <div className="flex shrink-0 items-center justify-between neuro-surface px-4 py-2.5">
                   <div className="flex items-center gap-2">
                     <div className="flex h-6 w-6 items-center justify-center rounded-sm bg-primary text-[10px] font-bold text-primary-foreground">AI</div>
                     <span className="text-xs font-semibold">AI Co-Pilot</span>
                   </div>
-                  <button
-                    onClick={() => setCopilotOpen(false)}
-                    className="cursor-pointer rounded-xs p-1 text-muted-foreground hover:bg-muted hover:text-foreground"
-                  >
+                  <Button variant="ghost" size="icon" onClick={() => setCopilotOpen(false)} className="h-6 w-6 rounded-xs p-1 text-muted-foreground hover:bg-muted hover:text-foreground">
                     <X size={14} />
-                  </button>
+                  </Button>
                 </div>
                 {/* Co-Pilot content — reuse the component but without its own outer wrapper */}
                 <ResumeCopilot resume={resume as Resume} />

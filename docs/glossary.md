@@ -29,7 +29,7 @@
 
 ## 1. Entities (Database Tables)
 
-All defined in `app/lib/schema.ts`. Migration files in `drizzle/` (never edit manually).
+All defined in `src/app/lib/schema.ts`. Migration files in `drizzle/` (never edit manually).
 
 | Term | Table | Meaning | Used By |
 |------|-------|---------|---------|
@@ -41,7 +41,7 @@ All defined in `app/lib/schema.ts`. Migration files in `drizzle/` (never edit ma
 | **Tailored Resume** | `tailored_resumes` | A resume variant optimized for a specific job. Links to `baseResumeId`, stores `jobUrl` + `jobData` (scraped JD). | "AI Optimize" button, "Tailor for this job" flow. |
 | **Application** | `applications` | A tracked job in the pipeline. Fields: company, jobTitle, status (`bookmarked` → `applied` → `interviewing` → `offers`), tailoredResumeId, notes, appliedAt. | Job Tracker board. |
 | **User Preferences** | `user_preferences` | Notification settings. Fields: emailNotifications, weeklyDigest, marketingEmails. | Settings page. |
-| **Applications Data** | `applications_data` | JSONB backup of the full Kanban board state (for board persistence). | `useAppStore()` hydration. |
+| **Applications Data** | `applications_data` | JSONB backup of the full Kanban board state (for board persistence). | Zustand store hydration. |
 | **Interview Session** | `interview_sessions` | A completed mock interview. Fields: company, role, type (`behavioral`/`technical`/`mixed`), difficulty (`entry`/`mid`/`senior`), score, exchanges (JSON array of Q&A pairs). | Interview Practice page. |
 | **Cover Letter** | `cover_letters` | Generated cover letter. Fields: resumeId, company, role, content (text), jdText (job description used). Soft-deleted via `deletedAt`. | Cover Letter tab + standalone page. |
 
@@ -66,7 +66,7 @@ User ──1:N──► Resumes
 
 ## 2. Pages & Routes
 
-All app pages live under `app/[locale]/(app)/`. Locale prefix: `/en` or `/th`.
+All app pages live under `src/app/[locale]/(app)/`. Locale prefix: `/en` or `/th`.
 
 | Page | Route | What It Does | Sidebar Label | Component / Layout |
 |------|-------|--------------|---------------|--------------------|
@@ -84,7 +84,7 @@ All app pages live under `app/[locale]/(app)/`. Locale prefix: `/en` or `/th`.
 
 ## 3. Sidebar Navigation
 
-Defined in `app/components/layout/sidebar.tsx`. Sections:
+Defined in `src/app/components/layout/sidebar.tsx`. Sections:
 
 ```
 ┌─ HOME ──────────────────────────────┐
@@ -113,16 +113,16 @@ Defined in `app/components/layout/sidebar.tsx`. Sections:
 
 | Element | Action | Store / Component |
 |---------|--------|-------------------|
-| **Resume list item** | Click → sets `activeResumeId` + navigates to `/resume/[id]`. Shows score badge. Trash icon (hover) → delete confirm. | `useAppStore().setActiveResumeId`, `deleteResume` |
+| **Resume list item** | Click → sets `activeResumeId` + navigates to `/resume/[id]`. Shows score badge. Trash icon (hover) → delete confirm. | `useUIStore().setActiveResumeId`, `deleteResume` |
 | **+ New Resume** | Opens **UploadModal** (file upload or Build with AI). | `UploadModal` |
 | **Job Tracker badge** | Shows total count across all 4 pipeline columns. Red dot when collapsed. | `applications.bookmark + applied + interviewing + offers` length |
-| **Collapse toggle** | Collapses sidebar to icon-only. Auto-collapses on mobile (<768px). | `useAppStore().toggleSidebar` |
+| **Collapse toggle** | Collapses sidebar to icon-only. Auto-collapses on mobile (<768px). | `useUIStore().toggleSidebar` |
 
 ---
 
 ## 4. Resume Detail — Tabs & Buttons
 
-Component: `app/components/resume/resume-detail.tsx`
+Component: `src/app/components/resume/resume-detail.tsx`
 
 ### 4.1 Tab Bar
 
@@ -162,7 +162,7 @@ Component: `app/components/resume/resume-detail.tsx`
 
 ### 4.5 Resume Sections (Form Fields)
 
-Defined in `app/types/resume.ts` → `Resume` interface:
+Defined in `src/app/types/resume.ts` → `Resume` interface:
 
 | Section | Fields | Type |
 |---------|--------|------|
@@ -178,7 +178,7 @@ Defined in `app/types/resume.ts` → `Resume` interface:
 
 ### 4.6 AI Co-Pilot (Editor Sidebar)
 
-Component: `app/components/resume/resume-copilot.tsx`
+Component: `src/app/components/resume/resume-copilot.tsx`
 
 | Feature | What It Does |
 |---------|-------------|
@@ -205,7 +205,7 @@ API: `POST /api/chat` (streaming via `streamWithFailover`)
 
 ### 5.2 Chat Message Types
 
-Defined in `app/types/resume.ts` → `ChatMessage`:
+Defined in `src/app/types/resume.ts` → `ChatMessage`:
 
 | Kind | Description |
 |------|-------------|
@@ -217,7 +217,7 @@ Defined in `app/types/resume.ts` → `ChatMessage`:
 
 ### 5.3 Build Wizard
 
-Component: `app/components/chat/build-wizard.tsx`
+Component: `src/app/components/chat/build-wizard.tsx`
 
 Pre-chat configuration modal:
 1. **Template selection** (Minimalist default)
@@ -229,7 +229,7 @@ Pre-chat configuration modal:
 
 ## 6. Job Search Panel
 
-Component: `app/components/resume/job-search-panel.tsx` (inside Resume Detail → "Find Jobs" tab)
+Component: `src/app/components/resume/job-search-panel.tsx` (inside Resume Detail → "Find Jobs" tab)
 API: `POST /api/jobs/search`
 
 ### 6.1 Search Controls
@@ -256,7 +256,7 @@ API: `POST /api/jobs/search`
 
 ### 6.3 Job Source Tiers
 
-Defined in `app/lib/job-sources/types.ts` and ADR-004:
+Defined in `src/app/lib/job-sources/types.ts` and ADR-004:
 
 | Tier | Sources | Speed | Cost |
 |------|---------|-------|------|
@@ -395,7 +395,7 @@ Related flow spec: `docs/flow/cover-letter.md`
 ## 10. Job Tracker (Applications)
 
 Page: `/applications`
-Store: `useAppStore().applications` (type: `ApplicationBoard`)
+Store: Zustand `useUIStore` (type: `ApplicationBoard`)
 API: `GET/POST /api/applications`
 
 ### Kanban Board
@@ -453,7 +453,7 @@ interface PipelineJob {
 
 ## 11. Upload & Resume Creation
 
-Component: `app/components/layout/upload-modal.tsx`
+Component: `src/app/components/layout/upload-modal.tsx`
 
 ### Upload Modal (opened from "+ New Resume")
 
@@ -503,7 +503,7 @@ Related flow spec: `docs/flow/resume-builder.md`
 
 ## 12. Templates
 
-Defined in `app/components/resume/templates/registry.ts`. Used for both preview and PDF export.
+Defined in `src/app/components/resume/templates/registry.ts`. Used for both preview and PDF export.
 
 | Template | ID | Font | Layout | Best For |
 |----------|----|------|--------|----------|
@@ -518,14 +518,14 @@ Default: `minimalist`
 PDF rendering: `@react-pdf/renderer` (server-side only, no headless browser).
 Fonts loaded via `Font.register()` with environment-aware paths (URL for browser, filesystem for server).
 
-PDF components: `app/components/resume/templates/{template-id}-pdf.tsx`
-Preview component: `app/components/resume/resume-preview.tsx` (uses `<PDFViewer>` in iframe)
+PDF components: `src/app/components/resume/templates/{template-id}-pdf.tsx`
+Preview component: `src/app/components/resume/resume-preview.tsx` (uses `<PDFViewer>` in iframe)
 
 ---
 
 ## 13. API Routes
 
-All under `app/api/`. All AI routes use `withAuth` + failover wrappers.
+All under `src/app/api/`. All AI routes use `withAuth` + failover wrappers.
 
 ### Resume Routes
 
@@ -611,7 +611,7 @@ All under `app/api/`. All AI routes use `withAuth` + failover wrappers.
 | **Pipeline** | The application tracking board with 4 stages: Bookmark → Applied → Interviewing → Offers. | Job Tracker |
 | **Exchange** | A single Q&A pair in a mock interview session. Contains question, user answer, AI score, model answer, strengths, improvements. | `interview_sessions.exchanges` |
 | **Section Suggestion** | AI-driven recommendation to add a resume section (e.g., "You're in finance — add Certifications?"). Based on detected role. | Resume Editor banner |
-| **SSRF Guard** | Server-Side Request Forgery protection. Blocks scraping requests to private IPs, loopback, cloud metadata endpoints. Prevents the scraper from being used as a proxy to internal services. | `app/lib/scraper.ts` |
+| **SSRF Guard** | Server-Side Request Forgery protection. Blocks scraping requests to private IPs, loopback, cloud metadata endpoints. Prevents the scraper from being used as a proxy to internal services. | `src/app/lib/scraper.ts` |
 | **Template** | Visual layout theme for resume PDF rendering. 5 options: Minimalist, Modern, Classic, Executive, Photo. | Template Gallery, PDF export |
 
 ---
@@ -620,14 +620,14 @@ All under `app/api/`. All AI routes use `withAuth` + failover wrappers.
 
 | Term | Definition | File / Config |
 |------|-----------|---------------|
-| **AI Failover** | Two-provider retry chain. Primary (DeepSeek Official) fails → automatically retries on Fallback (DeepInfra). Same model (DeepSeek V4 Flash) on both. | `app/lib/ai-providers.ts`, ADR-003 |
+| **AI Failover** | Two-provider retry chain. Primary (DeepSeek Official) fails → automatically retries on Fallback (DeepInfra). Same model (DeepSeek V4 Flash) on both. | `src/app/lib/ai-providers.ts`, ADR-003 |
 | **No-Thinking Provider** | Wrapper that disables DeepSeek's chain-of-thought (`thinking: { type: 'disabled' }`) for structured JSON responses. Prevents wasted tokens. Also converts `json_schema` → `json_object` for DeepSeek compatibility. | `createNoThinkingProvider()` in `ai-providers.ts` |
 | **Fail-Open Policy** | External services (PostHog, Upstash Redis, Rate Limiter) must NEVER block core features. All calls wrapped in try/catch that silently returns null on failure. | `posthog-server.ts`, `ratelimit.ts` |
-| **proxy.ts** | Next.js 16 middleware (renamed from `middleware.ts`). Handles locale redirect + public/protected route detection. Function name: `proxy`. | Root `proxy.ts` |
-| **AuthGuard** | Client-side session guard in `(app)/layout.tsx`. Calls `authClient.getSession()`. Redirects to `/login` if no session. | `app/[locale]/(app)/layout.tsx` |
-| **Optimistic Update** | UI state updates immediately, then API call persists. On failure, state rolls back and shows error toast. Pattern used throughout `useAppStore`. | `app/lib/store.tsx` |
-| **withAuth** | Server-side auth wrapper for API routes. Reads session cookie via headers, returns 401 if invalid. | `app/lib/with-auth.ts` |
-| **Upstash Cache** | Redis cache for job search results. Key: `query::location`. TTL: 6 hours. Re-scored per user on cache hit (since scores are user-specific). | `app/lib/job-sources/index.ts` |
+| **proxy.ts** | Next.js 16 middleware (renamed from `middleware.ts`). Handles locale redirect + public/protected route detection. Function name: `proxy`. | `src/proxy.ts` |
+| **AuthGuard** | Client-side session guard in `(app)/layout.tsx`. Calls `authClient.getSession()`. Redirects to `/login` if no session. | `src/app/[locale]/(app)/layout.tsx` |
+| **Optimistic Update** | UI state updates immediately, then API call persists. On failure, state rolls back and shows error toast. Pattern used throughout Zustand stores. | Zustand stores (useUIStore, useResumeStore) |
+| **withAuth** | Server-side auth wrapper for API routes. Reads session cookie via headers, returns 401 if invalid. | `src/app/lib/with-auth.ts` |
+| **Upstash Cache** | Redis cache for job search results. Key: `query::location`. TTL: 6 hours. Re-scored per user on cache hit (since scores are user-specific). | `src/app/lib/job-sources/index.ts` |
 
 ---
 
@@ -637,7 +637,7 @@ This section maps out key layout and card components. Each subsection outlines t
 
 ### 16.1 Job Card (`JobCard`)
 
-Component: `app/components/resume/job-search-panel.tsx` → `JobCard`
+Component: `src/app/components/resume/job-search-panel.tsx` → `JobCard`
 Rendered: Inside Job Search Panel and as preview cards in chat matches.
 
 #### Visual Wireframe
@@ -683,7 +683,7 @@ Rendered: Inside Job Search Panel and as preview cards in chat matches.
 
 ### 16.2 Sidebar (`Sidebar`)
 
-Component: `app/components/layout/sidebar.tsx`
+Component: `src/app/components/layout/sidebar.tsx`
 
 #### Visual Wireframe (Expanded State)
 ```
@@ -729,7 +729,7 @@ Component: `app/components/layout/sidebar.tsx`
 
 ### 16.3 User Menu (`UserMenu`)
 
-Component: `app/components/layout/user-menu.tsx`
+Component: `src/app/components/layout/user-menu.tsx`
 Location: Renders in layout topbar.
 
 #### Visual Wireframe
@@ -759,7 +759,7 @@ Location: Renders in layout topbar.
 
 ### 16.4 Onboarding Upload Modal & Wizard (`UploadModal`)
 
-Components: `app/components/layout/upload-modal.tsx`, `app/components/chat/build-wizard.tsx`
+Components: `src/app/components/layout/upload-modal.tsx`, `src/app/components/chat/build-wizard.tsx`
 Triggered by: "+ New Resume" sidebar clicks, or clicking "Build Your Resume First" buttons.
 
 #### Visual Wireframe

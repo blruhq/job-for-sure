@@ -173,7 +173,7 @@ export function EditToolDiffCard({
           )}
         </div>
         {step.diffStats && !isPending && (
-          <span className="text-[11px] font-mono text-an-tool-color-muted inline-flex gap-2">
+          <span className="text-xs font-mono text-an-tool-color-muted inline-flex gap-2">
             {step.diffStats.split(" ").map((token) => (
               <span
                 key={token}

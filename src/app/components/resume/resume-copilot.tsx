@@ -4,6 +4,8 @@ import { useRef, useEffect, useMemo } from 'react'
 import { useChat } from '@ai-sdk/react'
 import { DefaultChatTransport } from 'ai'
 import { useApplications } from '~/hooks/use-apps'
+import { Button } from '~/components/ui/button'
+import { Input } from '~/components/ui/input'
 import type { Resume } from '~/types/resume'
 
 export function ResumeCopilot({ resume }: { resume: Resume }) {
@@ -60,20 +62,20 @@ export function ResumeCopilot({ resume }: { resume: Resume }) {
     <div className="flex flex-1 flex-col overflow-hidden">
       {/* Status indicator (header is in the drawer wrapper) */}
       <div className="flex shrink-0 items-center justify-end gap-2 px-4 pt-2">
-        <span className="rounded-xs bg-success-soft px-1.5 py-px font-mono text-[9px] font-semibold text-success">
+        <span className="rounded-xs bg-success-soft px-1.5 py-px font-mono text-[10px] font-semibold text-success">
           {isStreaming ? 'Thinking…' : 'Active'}
         </span>
       </div>
 
       {/* Messages */}
-      <div ref={scrollRef} className="flex-1 overflow-y-auto bg-background p-4">
+      <div ref={scrollRef} className="flex-1 overflow-y-auto neuro-surface p-4">
         {messages.length === 0 && (
           <div className="flex flex-col gap-3">
             <div className="flex items-start gap-2.5">
-              <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-sm bg-primary text-[11px] font-bold text-primary-foreground">AI</div>
+              <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-sm bg-primary text-xs font-bold text-primary-foreground">AI</div>
               <div className="flex-1 pt-0.5">
                 <div className="mb-0.5 text-xs font-semibold">Co-Pilot</div>
-                <div className="rounded-md border border-border bg-card px-3.5 py-2.5 text-xs leading-relaxed text-muted-foreground">
+                <div className="rounded-md neuro-card px-3.5 py-2.5 text-sm leading-relaxed text-muted-foreground">
                   Hey! I'm your AI Resume Co-pilot. I can rewrite sections, add keywords, generate bullet points, or tailor your resume for specific companies.
                 </div>
               </div>
@@ -81,13 +83,14 @@ export function ResumeCopilot({ resume }: { resume: Resume }) {
             {/* Suggestion chips */}
             <div className="ml-9 flex flex-wrap gap-1.5">
               {suggestions.map((s) => (
-                <button
+                <Button
                   key={s.label}
+                  variant="outline"
                   onClick={() => handleSend(s.prompt)}
-                  className="cursor-pointer rounded-xs border border-border bg-card px-2.5 py-1 text-[10px] text-muted-foreground transition-all hover:border-primary hover:text-primary hover:scale-[1.02] active:scale-[0.98]"
+                  className="px-2.5 py-1.5 text-xs"
                 >
                   {s.label}
-                </button>
+                </Button>
               ))}
             </div>
           </div>
@@ -96,11 +99,11 @@ export function ResumeCopilot({ resume }: { resume: Resume }) {
         {messages.map((msg, idx) => (
           <div key={msg.id} className="mb-3 flex items-start gap-2.5 animate-fade-up" style={{ animationDelay: `${idx * 80}ms`, animationFillMode: 'both' }}>
             {msg.role === 'assistant' && (
-              <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-sm bg-primary text-[11px] font-bold text-primary-foreground">AI</div>
+              <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-sm bg-primary text-xs font-bold text-primary-foreground">AI</div>
             )}
             {msg.role === 'user' && (
               <div className="ml-auto flex max-w-[85%] justify-end">
-                <div className="rounded-md bg-accent-soft px-3 py-2 text-xs leading-relaxed text-foreground">
+                <div className="rounded-md bg-accent-soft px-3 py-2 text-sm leading-relaxed text-foreground">
                   {msg.parts.map((part, i) => {
                     if (part.type === 'text') return <span key={i}>{part.text}</span>
                     return null
@@ -111,7 +114,7 @@ export function ResumeCopilot({ resume }: { resume: Resume }) {
             {msg.role === 'assistant' && (
               <div className="flex max-w-[85%] flex-col pt-0.5">
                 <div className="mb-0.5 text-xs font-semibold">Co-Pilot</div>
-                <div className="rounded-md border border-border bg-card px-3.5 py-2.5 text-xs leading-relaxed prose prose-sm max-w-none">
+                <div className="rounded-md neuro-card px-3.5 py-2.5 text-sm leading-relaxed prose prose-sm max-w-none">
                   {msg.parts.map((part, i) => {
                     if (part.type === 'text') return <MarkdownLite key={i} text={part.text} />
                     return null
@@ -125,7 +128,7 @@ export function ResumeCopilot({ resume }: { resume: Resume }) {
         {/* Streaming indicator */}
         {isStreaming && messages[messages.length - 1]?.role === 'user' && (
           <div className="mb-3 flex items-start gap-2.5">
-            <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-sm bg-primary text-[11px] font-bold text-primary-foreground">AI</div>
+            <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-sm bg-primary text-xs font-bold text-primary-foreground">AI</div>
             <div className="flex items-center gap-1 pt-2">
               <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-muted-foreground/60" style={{ animationDelay: '0ms' }} />
               <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-muted-foreground/60" style={{ animationDelay: '150ms' }} />
@@ -143,10 +146,10 @@ export function ResumeCopilot({ resume }: { resume: Resume }) {
       </div>
 
       {/* Input */}
-      <div className="flex shrink-0 items-center gap-1.5 border-t border-border/50 bg-card p-2.5">
-        <input
+      <div className="flex shrink-0 items-center gap-1.5 border-t border-border/50 neuro-surface p-2.5">
+        <Input
           placeholder="Ask co-pilot to rewrite…"
-          className="flex-1 rounded-xs border border-border bg-background px-2.5 py-1.5 text-[11px] outline-none focus:border-primary"
+          className="flex-1 px-3 py-2 text-sm"
           onKeyDown={(e) => {
             if (e.key === 'Enter' && !e.shiftKey) {
               e.preventDefault()
@@ -158,23 +161,25 @@ export function ResumeCopilot({ resume }: { resume: Resume }) {
           disabled={isStreaming}
         />
         {isStreaming ? (
-          <button
+          <Button
+            variant="outline"
             onClick={stop}
-            className="cursor-pointer rounded-xs border border-border bg-card px-2.5 py-1.5 text-[11px] font-medium text-muted-foreground hover:bg-background"
+            className="px-3 py-2 text-sm font-medium"
           >
             Stop
-          </button>
+          </Button>
         ) : (
-          <button
+          <Button
+            variant="default"
             onClick={(e) => {
               const input = (e.currentTarget.previousElementSibling as HTMLInputElement)
               handleSend(input.value)
               input.value = ''
             }}
-            className="cursor-pointer rounded-xs bg-primary px-2.5 py-1.5 text-[11px] font-medium text-primary-foreground transition-all hover:opacity-90 active:scale-[0.98]"
+            className="px-3 py-2 text-sm font-medium"
           >
             Send
-          </button>
+          </Button>
         )}
       </div>
     </div>

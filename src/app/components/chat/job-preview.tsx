@@ -6,7 +6,8 @@ import {
   Bookmark, Loader2, ChevronRight, Plane, X, Brain,
   DollarSign, Briefcase,
 } from 'lucide-react'
-import { cn } from '~/lib/utils'
+import { ScoreBadge } from '~/components/ui/score-badge'
+import { Button } from '~/components/ui/button'
 import { useApplications, useCreateApplication, useDeleteApplication } from '~/hooks/use-apps'
 import { notify } from '~/lib/toast'
 import { companyColor, companyLogo } from '~/lib/company-data'
@@ -96,18 +97,18 @@ export function JobPreview({ resume, onDismiss, onLoadComplete }: { resume: Resu
   // ── Loading ──
   if (loading) {
     return (
-      <div className="w-full rounded-md border border-border bg-card p-4">
+      <div className="w-full rounded-md neuro-card p-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2 text-muted-foreground">
             <Loader2 size={12} className="animate-spin text-primary" />
-            <span className="font-mono text-[11px]">
+            <span className="font-mono text-sm">
               Searching real jobs across 9 sources…
             </span>
           </div>
           {onDismiss && (
-            <button onClick={onDismiss} className="cursor-pointer text-muted-foreground hover:text-foreground">
+            <Button variant="ghost" size="icon" onClick={onDismiss} className="h-5 w-5 text-muted-foreground hover:text-foreground">
               <X size={13} />
-            </button>
+            </Button>
           )}
         </div>
       </div>
@@ -121,29 +122,30 @@ export function JobPreview({ resume, onDismiss, onLoadComplete }: { resume: Resu
 
   // ── Results ──
   return (
-    <div className="w-full rounded-md border border-border bg-card p-4">
+    <div className="w-full rounded-md neuro-card p-4">
       <div>
         {/* Header */}
         <div className="mb-2 flex items-center justify-between">
           <div className="flex items-center gap-1.5">
-            <span className="text-[12px] font-semibold text-foreground">
+            <span className="text-sm font-semibold text-foreground">
               {total > jobs.length ? `${total} real jobs` : `${jobs.length} real job${jobs.length !== 1 ? 's' : ''}`}
             </span>
-            <span className="text-[11px] text-muted-foreground">
+            <span className="text-sm text-muted-foreground">
               for &ldquo;{resume.role}&rdquo;
             </span>
           </div>
           <div className="flex items-center gap-2">
-            <button
+            <Button
+              variant="link"
               onClick={() => router.push(`/resume/${resume.id}`)}
-              className="flex cursor-pointer items-center gap-0.5 text-[11px] font-medium text-primary hover:underline"
+              className="flex items-center gap-0.5 text-sm"
             >
               View all <ChevronRight size={12} />
-            </button>
+            </Button>
             {onDismiss && (
-              <button onClick={onDismiss} className="cursor-pointer text-muted-foreground hover:text-foreground">
+              <Button variant="ghost" size="icon" onClick={onDismiss} className="h-5 w-5 text-muted-foreground hover:text-foreground">
                 <X size={13} />
-              </button>
+              </Button>
             )}
           </div>
         </div>
@@ -156,41 +158,37 @@ export function JobPreview({ resume, onDismiss, onLoadComplete }: { resume: Resu
             return (
               <div
                 key={key}
-                className="cursor-pointer rounded-sm border border-border bg-background p-2.5 transition-colors hover:border-primary/40"
+                className="cursor-pointer rounded-sm border border-border bg-background p-2.5 transition-colors hover:border-brand/40"
                 onClick={() => setPanelJob(scoredJobToPipelineJob(job, resume.skills || []))}
               >
                 <div className="flex items-start justify-between gap-2">
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-1.5">
                       <span
-                        className="flex h-5 w-5 shrink-0 items-center justify-center rounded-xs font-mono text-[9px] font-bold text-white"
+                        className="flex h-5 w-5 shrink-0 items-center justify-center rounded-xs font-mono text-[10px] font-bold text-white"
                         style={{ background: companyColor(job.company) }}
                       >
                         {companyLogo(job.company)}
                       </span>
-                      <span className="truncate text-[12px] font-semibold">{job.title}</span>
+                      <span className="truncate text-sm font-semibold">{job.title}</span>
                     </div>
-                    <div className="mt-0.5 truncate text-[11px] text-muted-foreground">
+                    <div className="mt-0.5 truncate text-sm text-muted-foreground">
                       {job.company} · {job.location}
                     </div>
                   </div>
-                  <span
-                    className={cn(
-                      'shrink-0 rounded-xs px-1.5 py-0.5 font-mono text-[10px] font-semibold',
-                      job.score >= 75 ? 'bg-success-soft text-success' : job.score >= 50 ? 'bg-warn-soft text-[var(--warn)]' : 'bg-muted text-muted-foreground',
-                    )}
-                  >
-                    {job.score}%
-                  </span>
+                  <ScoreBadge
+                    score={job.score}
+                    className="shrink-0 px-1.5 py-0.5 text-[10px]"
+                  />
                 </div>
 
                 {/* Tags */}
                 <div className="mt-1 flex flex-wrap gap-1">
-                  <span className="rounded-xs bg-muted/50 px-1.5 py-0.5 text-[9px] text-muted-foreground">
+                  <span className="rounded-xs bg-muted/50 px-1.5 py-0.5 text-[10px] text-muted-foreground">
                     {SOURCE_SHORT[job.source] || job.source}
                   </span>
                   {(job.salaryMin || job.salary) && (
-                    <span className="flex items-center gap-0.5 rounded-xs bg-emerald-50/50 px-1.5 py-0.5 text-[9px] font-medium text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-400">
+                    <span className="flex items-center gap-0.5 rounded-xs bg-success-soft px-1.5 py-0.5 text-[10px] font-medium text-success dark:bg-success/10 dark:text-success">
                       <DollarSign size={8} />
                       {job.salaryMin && job.salaryMax
                         ? `${job.salaryCurrency === 'USD' ? '$' : job.salaryCurrency === 'GBP' ? '£' : job.salaryCurrency === 'EUR' ? '€' : `${job.salaryCurrency ?? ''} `}${Math.round(job.salaryMin / 1000)}k–${Math.round(job.salaryMax / 1000)}k`
@@ -198,18 +196,18 @@ export function JobPreview({ resume, onDismiss, onLoadComplete }: { resume: Resu
                     </span>
                   )}
                   {job.visaSponsorship && (
-                    <span className="rounded-xs bg-accent-soft px-1.5 py-0.5 text-[9px] font-medium text-primary">
+                    <span className="rounded-xs bg-accent-soft px-1.5 py-0.5 text-[10px] font-medium text-primary">
                       <Plane size={8} className="mr-0.5 inline" />Visa
                     </span>
                   )}
                   {job.experienceYears && (
-                    <span className="flex items-center gap-0.5 rounded-xs bg-muted/50 px-1.5 py-0.5 text-[9px] text-muted-foreground">
+                    <span className="flex items-center gap-0.5 rounded-xs bg-muted/50 px-1.5 py-0.5 text-[10px] text-muted-foreground">
                       <Briefcase size={8} />
                       {job.experienceYears}
                     </span>
                   )}
                   {job.postedAt && (
-                    <span className="rounded-xs bg-muted/50 px-1.5 py-0.5 text-[9px] text-muted-foreground">
+                    <span className="rounded-xs bg-muted/50 px-1.5 py-0.5 text-[10px] text-muted-foreground">
                       {formatDate(job.postedAt)}
                     </span>
                   )}
@@ -217,7 +215,8 @@ export function JobPreview({ resume, onDismiss, onLoadComplete }: { resume: Resu
 
                 {/* Actions */}
                 <div className="mt-2 flex items-center gap-1.5" onClick={(e) => e.stopPropagation()}>
-                  <button
+                  <Button
+                    variant={bm ? 'default' : 'outline'}
                     onClick={() => {
                       if (bm) {
                         toggleBookmark(key)
@@ -260,14 +259,12 @@ export function JobPreview({ resume, onDismiss, onLoadComplete }: { resume: Resu
                         notify({ message: `Bookmarked: ${job.title}`, type: 'success' })
                       }
                     }}
-                    className={cn(
-                      'flex cursor-pointer items-center gap-0.5 rounded-xs border px-1.5 py-0.5 text-[10px] transition-all',
-                      bm ? 'border-primary bg-primary text-primary-foreground' : 'border-border bg-card hover:border-primary',
-                    )}
+                    className="flex items-center gap-0.5 px-2 py-1 text-xs"
                   >
                     <Bookmark size={9} fill={bm ? 'currentColor' : 'none'} />
-                  </button>
-                  <button
+                  </Button>
+                  <Button
+                    variant="outline"
                     onClick={() => {
                       if (typeof window !== 'undefined') {
                         sessionStorage.setItem('jfs_pending_ats_jd', job.description)
@@ -276,24 +273,26 @@ export function JobPreview({ resume, onDismiss, onLoadComplete }: { resume: Resu
                       }
                       router.push('/ats')
                     }}
-                    className="flex cursor-pointer items-center gap-0.5 rounded-xs border border-border bg-card px-1.5 py-0.5 text-[10px] transition-colors hover:border-primary hover:text-primary"
+                    className="flex items-center gap-0.5 px-2 py-1 text-xs"
                   >
                     <span>🎯 ATS Fit</span>
-                  </button>
-                  <button
+                  </Button>
+                  <Button
+                    variant="outline"
                     onClick={() => {
                       router.push(`/interview?company=${encodeURIComponent(job.company)}&role=${encodeURIComponent(job.title)}`)
                     }}
-                    className="flex cursor-pointer items-center gap-0.5 rounded-xs border border-border bg-card px-1.5 py-0.5 text-[10px] transition-colors hover:border-primary hover:text-primary"
+                    className="flex items-center gap-0.5 px-2 py-1 text-xs"
                   >
                     <Brain size={9} /> Interview
-                  </button>
-                  <button
+                  </Button>
+                  <Button
+                    variant="default"
                     onClick={() => setPanelJob(scoredJobToPipelineJob(job, resume.skills || []))}
-                    className="ml-auto flex cursor-pointer items-center gap-0.5 rounded-xs bg-primary px-1.5 py-0.5 text-[10px] font-medium text-primary-foreground transition-all hover:opacity-90"
+                    className="ml-auto flex items-center gap-0.5 px-2 py-1 text-xs font-medium"
                   >
                     Details <ChevronRight size={8} />
-                  </button>
+                  </Button>
                 </div>
               </div>
             )
@@ -302,12 +301,13 @@ export function JobPreview({ resume, onDismiss, onLoadComplete }: { resume: Resu
 
         {/* View more */}
         {jobs.length > 5 && (
-          <button
+          <Button
+            variant="outline"
             onClick={() => router.push(`/resume/${resume.id}`)}
-            className="mt-2 flex w-full cursor-pointer items-center justify-center gap-1 rounded-sm border border-dashed border-border py-1.5 text-[11px] text-muted-foreground transition-colors hover:border-primary hover:text-primary"
+            className="mt-2 flex w-full items-center justify-center gap-1 border-dashed py-2 text-sm"
           >
             +{jobs.length - 5} more jobs · View all <ChevronRight size={11} />
-          </button>
+          </Button>
         )}
 
       </div>

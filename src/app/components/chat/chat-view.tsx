@@ -23,6 +23,9 @@ import { ConfirmDialog } from '~/components/ui/confirm-dialog'
 import { Skeleton } from '~/components/ui/skeleton'
 import { UploadCardMessage } from '~/components/chat/upload-card-message'
 import { Upload, FileText, ClipboardList, Loader2, Paperclip, RotateCcw, Sparkles, Save, Pencil } from 'lucide-react'
+import { Button } from '~/components/ui/button'
+
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '~/components/ui/select'
 
 // (ParsedResumeFields + normalizeParsed now live in ~/lib/resume-normalize and
 // are imported above.)
@@ -517,27 +520,29 @@ export function ChatView() {
             <div className="mx-auto flex max-w-an items-center justify-between gap-3">
               <div className="flex min-w-0 items-center gap-2">
                 <Sparkles size={12} className="shrink-0 text-primary" />
-                <span className="truncate text-[11px] text-foreground">
+                <span className="truncate text-sm text-foreground">
                   Building: <strong>{building.role}</strong>
                   {building.industry ? ` · ${building.industry}` : ''}
                 </span>
               </div>
               <div className="flex shrink-0 items-center gap-1.5">
-                <button
+                <Button
+                  variant="outline"
                   onClick={() => setShowManualDialog(true)}
-                  className="flex cursor-pointer items-center gap-1 rounded-xs border border-border bg-background px-2 py-1 text-[10px] text-muted-foreground transition-colors hover:text-foreground"
+                  className="flex items-center gap-1 px-2 py-1 text-[10px]"
                   title="Open what you have so far in the editor"
                 >
                   <Pencil size={10} /> Edit Manually
-                </button>
-                <button
+                </Button>
+                <Button
+                  variant="default"
                   onClick={() => handleSaveResumeRef.current()}
                   disabled={saving}
-                  className="flex cursor-pointer items-center gap-1 rounded-xs bg-primary px-2.5 py-1 text-[10px] font-medium text-primary-foreground transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
+                  className="flex items-center gap-1 px-2.5 py-1 text-[10px]"
                   title="Save your resume"
                 >
                   <Save size={10} /> {saving ? 'Saving...' : 'Save Resume'}
-                </button>
+                </Button>
               </div>
             </div>
             {/* Row 2: AI-driven progress steps */}
@@ -554,7 +559,7 @@ export function ChatView() {
                       done ? 'bg-success' : current ? 'bg-primary' : 'bg-border',
                     )} />
                     <span className={cn(
-                      'text-[9px] font-mono transition-colors',
+                      'text-[10px] font-mono transition-colors',
                       done ? 'text-success' : current ? 'text-primary' : 'text-muted-foreground',
                     )}>
                       {s.label}
@@ -563,7 +568,7 @@ export function ChatView() {
                 )
               })}
               {buildStepRef.current === 'complete' && (
-                <span className="text-[9px] font-mono text-success ml-1">✓ Ready to save!</span>
+                <span className="text-[10px] font-mono text-success ml-1">✓ Ready to save!</span>
               )}
             </div>
           </div>
@@ -574,27 +579,30 @@ export function ChatView() {
           <div className="px-3">
             <div className="mx-auto max-w-an">
               <div className="flex items-center gap-1.5 pb-1.5">
-                <button
+                <Button
+                  variant="ghost"
                   onClick={() => fileRef.current?.click()}
-                  className="inline-flex cursor-pointer items-center gap-1 rounded-md border border-border bg-card px-2 py-1 text-[11px] font-medium text-foreground transition-all hover:border-primary/30 hover:bg-accent-soft"
+                  className="neuro-pill rounded-xl inline-flex items-center gap-1 px-2 py-1 text-xs font-medium hover:-translate-y-0.5"
                 >
                   <Upload size={11} />
                   Upload Resume
-                </button>
-                <button
+                </Button>
+                <Button
+                  variant="ghost"
                   onClick={() => setWizardOpen(true)}
-                  className="inline-flex cursor-pointer items-center gap-1 rounded-md border border-border bg-card px-2 py-1 text-[11px] font-medium text-foreground transition-all hover:border-primary/30 hover:bg-accent-soft"
+                  className="neuro-pill rounded-xl inline-flex items-center gap-1 px-2 py-1 text-xs font-medium hover:-translate-y-0.5"
                 >
                   <FileText size={11} />
                   Build with AI
-                </button>
-                <button
+                </Button>
+                <Button
+                  variant="ghost"
                   onClick={() => setPasteOpen(true)}
-                  className="inline-flex cursor-pointer items-center gap-1 rounded-md border border-border bg-card px-2 py-1 text-[11px] font-medium text-foreground transition-all hover:border-primary/30 hover:bg-accent-soft"
+                  className="neuro-pill rounded-xl inline-flex items-center gap-1 px-2 py-1 text-xs font-medium hover:-translate-y-0.5"
                 >
                   <ClipboardList size={11} />
                   Paste Job
-                </button>
+                </Button>
               </div>
             </div>
           </div>
@@ -605,13 +613,15 @@ export function ChatView() {
           autoFocus={false}
           disabled={isUploadingRef.current || saving}
           leftActions={
-            <button
+            <Button
+              variant="ghost"
+              size="icon"
               onClick={() => fileRef.current?.click()}
-              className="size-7 rounded-full inline-flex items-center justify-center hover:bg-muted transition-colors cursor-pointer"
+              className="size-7 rounded-full"
               aria-label="Attach file"
             >
-              <Paperclip size={14} className="text-neutral-400 dark:text-neutral-600" />
-            </button>
+              <Paperclip size={14} className="text-muted-foreground" />
+            </Button>
           }
         />
       </div>
@@ -631,53 +641,61 @@ export function ChatView() {
   const showEntryCards = messages.length === 0 && uploadStage === 'idle'
 
   return (
-    <div className="flex h-full flex-col">
+    <div className="neuro-chat flex h-full flex-col">
       {/* Status bar — hidden during build mode */}
       {!buildData && (
-      <div className="flex shrink-0 flex-wrap items-center justify-between gap-2 border-b border-border/50 bg-card px-4 md:px-8 py-2.5 text-[11px]">
+      <div className="neuro-surface flex shrink-0 flex-wrap items-center justify-between gap-2 px-4 md:px-8 py-2.5 text-xs">
         <div className="flex items-center gap-1.5">
           <span className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">Profile:</span>
-          <select
+          <Select
             value={activeResumeId ?? 'none'}
-            onChange={(e) => {
-              const val = e.target.value
+            onValueChange={(val) => {
               if (val !== 'none') setActiveResumeId(val)
             }}
             disabled={resumes.length === 0}
-            className="rounded-xs border border-border bg-background px-1.5 py-0.5 text-[11px] text-foreground outline-none focus:border-primary"
           >
-            {resumes.length === 0 ? (
-              <option value="none">None (Upload first)</option>
-            ) : (
-              resumes.map((r) => (
-                <option key={r.id} value={r.id}>{r.name} ({r.score}%)</option>
-              ))
-            )}
-          </select>
+            <SelectTrigger className="h-auto rounded-xs neuro-inset px-2 py-1 text-sm">
+              <SelectValue placeholder={resumes.length === 0 ? 'None (Upload first)' : undefined} />
+            </SelectTrigger>
+            <SelectContent className="min-w-56">
+              {resumes.length === 0 ? (
+                <SelectItem value="none">None (Upload first)</SelectItem>
+              ) : (
+                resumes.map((r) => (
+                  <SelectItem key={r.id} value={r.id}>{r.name} ({r.score}%)</SelectItem>
+                ))
+              )}
+            </SelectContent>
+          </Select>
         </div>
         <div className="flex items-center gap-1.5">
           <span className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">Target:</span>
-          <select
+          <Select
             value={targetCompanyKey}
-            onChange={(e) => setTargetCompanyKey(e.target.value)}
+            onValueChange={(val) => { if (val) setTargetCompanyKey(val) }}
             disabled={(applications?.bookmark?.length ?? 0) === 0}
-            className="rounded-xs border border-border bg-background px-1.5 py-0.5 text-[11px] text-foreground outline-none focus:border-primary"
           >
-            <option value="none">General Career Coach</option>
-            {(applications?.bookmark ?? []).map((job) => (
-              <option key={job.key} value={job.key}>{job.company} ({job.title})</option>
-            ))}
-          </select>
+            <SelectTrigger className="h-auto rounded-xs neuro-inset px-2 py-1 text-sm">
+              <SelectValue placeholder="General Career Coach" />
+            </SelectTrigger>
+            <SelectContent className="min-w-56">
+              <SelectItem value="none">General Career Coach</SelectItem>
+              {(applications?.bookmark ?? []).map((job) => (
+                <SelectItem key={job.key} value={job.key}>{job.company} ({job.title})</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
         {messages.length > 0 && (
-          <button
+          <Button
+            variant="ghost"
             onClick={handleNewChat}
-            className="ml-auto flex cursor-pointer items-center gap-1 rounded-xs px-1.5 py-0.5 text-[10px] text-muted-foreground hover:text-foreground transition-colors"
+            className="ml-auto flex items-center gap-1 px-1.5 py-0.5 text-[10px]"
             title="Start a new conversation"
           >
             <RotateCcw size={11} />
             New Chat
-          </button>
+          </Button>
         )}
       </div>
       )}
@@ -687,50 +705,59 @@ export function ChatView() {
       {showEntryCards && (
         <div className="flex flex-col items-center justify-center px-6 py-10">
           <div
-            className="mb-6 animate-fade-up text-center text-2xl text-foreground"
+            className="neuro-title mb-6 animate-fade-up text-center text-2xl"
             style={{ fontFamily: 'var(--font-instrument-serif), serif', animationDelay: '0ms', animationFillMode: 'both' }}
           >
             How do you want to start?
           </div>
-          <div className="grid w-full max-w-2xl grid-cols-1 gap-3 sm:grid-cols-3">
+          <div className="grid w-full max-w-2xl grid-cols-1 gap-4 sm:grid-cols-3">
             {/* Upload */}
-            <button
+            <div
               onClick={() => fileRef.current?.click()}
-              className="group flex cursor-pointer flex-col items-center rounded-lg border border-border bg-card p-5 text-center transition-all hover:border-primary/30 hover:shadow-sm animate-fade-up"
+              onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); fileRef.current?.click() } }}
+              role="button"
+              tabIndex={0}
+              className="neuro-card group flex cursor-pointer flex-col items-center rounded-2xl p-5 text-center transition-all hover:-translate-y-0.5 active:translate-y-0 animate-fade-up focus-visible:outline-2 focus-visible:outline-ring focus-visible:outline-offset-2"
               style={{ animationDelay: '100ms', animationFillMode: 'both' }}
             >
-              <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-md bg-accent-soft text-primary transition-transform group-hover:scale-110">
+              <div className="neuro-icon-well mb-3 flex h-10 w-10 items-center justify-center rounded-full text-primary transition-transform group-hover:scale-110">
                 <Upload size={18} />
               </div>
-              <div className="text-sm font-semibold text-foreground">Upload Resume</div>
-              <div className="mt-0.5 text-[11px] text-muted-foreground">PDF, DOCX, or text</div>
-            </button>
+              <div className="neuro-title text-sm font-semibold">Upload Resume</div>
+              <div className="mt-0.5 text-sm text-muted-foreground">PDF, DOCX, or text</div>
+            </div>
 
             {/* Build from Template */}
-            <button
+            <div
               onClick={() => setWizardOpen(true)}
-              className="group flex cursor-pointer flex-col items-center rounded-lg border border-border bg-card p-5 text-center transition-all hover:border-primary/30 hover:shadow-sm animate-fade-up"
+              onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setWizardOpen(true) } }}
+              role="button"
+              tabIndex={0}
+              className="neuro-card group flex cursor-pointer flex-col items-center rounded-2xl p-5 text-center transition-all hover:-translate-y-0.5 active:translate-y-0 animate-fade-up focus-visible:outline-2 focus-visible:outline-ring focus-visible:outline-offset-2"
               style={{ animationDelay: '200ms', animationFillMode: 'both' }}
             >
-              <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-md bg-success-soft text-success transition-transform group-hover:scale-110">
+              <div className="neuro-icon-well mb-3 flex h-10 w-10 items-center justify-center rounded-full text-success transition-transform group-hover:scale-110">
                 <FileText size={18} />
               </div>
-              <div className="text-sm font-semibold text-foreground">Build with AI</div>
-              <div className="mt-0.5 text-[11px] text-muted-foreground">Answer questions · 5 min</div>
-            </button>
+              <div className="neuro-title text-sm font-semibold">Build with AI</div>
+              <div className="mt-0.5 text-sm text-muted-foreground">Answer questions · 5 min</div>
+            </div>
 
             {/* Paste Job Posting */}
-            <button
+            <div
               onClick={() => setPasteOpen(true)}
-              className="group flex cursor-pointer flex-col items-center rounded-lg border border-border bg-card p-5 text-center transition-all hover:border-primary/30 hover:shadow-sm animate-fade-up"
+              onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setPasteOpen(true) } }}
+              role="button"
+              tabIndex={0}
+              className="neuro-card group flex cursor-pointer flex-col items-center rounded-2xl p-5 text-center transition-all hover:-translate-y-0.5 active:translate-y-0 animate-fade-up focus-visible:outline-2 focus-visible:outline-ring focus-visible:outline-offset-2"
               style={{ animationDelay: '300ms', animationFillMode: 'both' }}
             >
-              <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-md bg-warn-soft text-[var(--warn)] transition-transform group-hover:scale-110">
+              <div className="neuro-icon-well mb-3 flex h-10 w-10 items-center justify-center rounded-full text-warn transition-transform group-hover:scale-110">
                 <ClipboardList size={18} />
               </div>
-              <div className="text-sm font-semibold text-foreground">Paste Job Posting</div>
-              <div className="mt-0.5 text-[11px] text-muted-foreground">Analyze a JD</div>
-            </button>
+              <div className="neuro-title text-sm font-semibold">Paste Job Posting</div>
+              <div className="mt-0.5 text-sm text-muted-foreground">Analyze a JD</div>
+            </div>
           </div>
         </div>
       )}
@@ -753,10 +780,10 @@ export function ChatView() {
             bottomContent={
               uploadStage === 'parsing' ? (
                 <div className="mx-auto max-w-an w-full px-4 py-3">
-                  <div className="rounded-md border border-border bg-card p-4">
+                  <div className="neuro-card rounded-2xl p-4">
                     <div className="flex items-center gap-2 text-muted-foreground">
                       <Loader2 size={12} className="animate-spin text-primary" />
-                      <span className="font-mono text-[11px]">Parsing your resume…</span>
+                      <span className="font-mono text-xs">Parsing your resume…</span>
                     </div>
                     <div className="mt-3 space-y-2">
                       <Skeleton className="h-3 w-3/5" />

@@ -1,11 +1,13 @@
 'use client'
 
+import { Button } from '~/components/ui/button'
+import { Input } from '~/components/ui/input'
+import { useState } from 'react'
 import {
   MapPin, Bus, DollarSign, Home, Hotel, Shield, Star, HeartPulse,
   UtensilsCrossed, ChevronDown, ChevronUp, ExternalLink,
   LocateFixed, Loader2, Pencil, Check,
 } from 'lucide-react'
-import { useState } from 'react'
 import * as Links from '~/lib/area-links'
 import { detectArea } from '~/lib/geo'
 import { notify } from '~/lib/toast'
@@ -76,7 +78,7 @@ export function AreaIntelligence({ job, homeLocation, city, district, countryCod
   }
 
   return (
-    <div className="rounded-lg border border-border bg-card p-4 space-y-3">
+    <div className="rounded-lg neuro-card p-5 space-y-6">
       <div className="flex items-center gap-1.5 text-xs font-semibold text-foreground">
         <MapPin size={12} className="text-primary" />
         Area Intelligence
@@ -86,64 +88,68 @@ export function AreaIntelligence({ job, homeLocation, city, district, countryCod
       {!homeLocation || editing ? (
         // EMPTY / EDITING STATE
         <div>
-          <div className="label-mono px-0 pt-1 pb-1.5 text-[11px]">Commute</div>
+          <div className="label-mono px-0 pt-1 pb-1.5 text-xs">Commute</div>
 
           {detecting ? (
-            <div className="flex items-center gap-2 text-[11px] text-muted-foreground py-2">
+            <div className="flex items-center gap-2 text-xs text-muted-foreground py-2">
               <Loader2 size={14} className="animate-spin text-primary" />
               Detecting your area…
             </div>
           ) : editing ? (
             <div className="space-y-2">
-              <input
+              <Input
                 value={areaInput}
                 onChange={(e) => setAreaInput(e.target.value)}
                 onKeyDown={(e) => { if (e.key === 'Enter') handleSave() }}
                 placeholder="e.g. Bang Na, Bangkok"
                 autoFocus
-                className="w-full rounded-xs border border-border bg-background px-2 py-1.5 text-[12px] outline-none focus:border-primary"
+                className="w-full px-2 py-1.5 text-xs"
               />
               <div className="flex items-center gap-1.5">
-                <button
+                <Button
+                  variant="default"
                   onClick={handleSave}
                   disabled={saving || !areaInput.trim()}
-                  className="flex cursor-pointer items-center gap-1 rounded-xs bg-primary px-2.5 py-1.5 text-[11px] font-medium text-primary-foreground transition-opacity hover:opacity-90 disabled:opacity-50"
+                  className="flex items-center gap-1 px-2.5 py-1.5 text-xs font-medium"
                 >
                   {saving ? <Loader2 size={12} className="animate-spin" /> : <Check size={12} />}
                   Save
-                </button>
+                </Button>
                 {homeLocation && (
-                  <button
+                  <Button
+                    variant="ghost"
                     onClick={() => { setEditing(false); setAreaInput(homeLocation) }}
-                    className="cursor-pointer rounded-xs px-2 py-1.5 text-[11px] text-muted-foreground hover:text-foreground"
+                    className="px-2 py-1.5 text-xs"
                   >
                     Cancel
-                  </button>
+                  </Button>
                 )}
               </div>
             </div>
           ) : (
             // INITIAL EMPTY STATE — never set location before
             <div className="space-y-2">
-              <p className="text-[11px] text-muted-foreground py-1">
+              <p className="text-xs text-muted-foreground py-1">
                 Set your area to see commute directions and travel prices.
               </p>
               <div className="flex flex-wrap gap-1.5">
-                <button
+                <Button
+                  variant="outline"
                   onClick={handleDetect}
                   disabled={detecting}
-                  className="flex cursor-pointer items-center gap-1 rounded-xs border border-border bg-background px-2.5 py-1.5 text-[11px] font-medium text-foreground transition-colors hover:bg-sidebar-hover disabled:opacity-50"
+                  className="flex items-center gap-1 px-2.5 py-1.5 text-xs font-medium"
                 >
                   <LocateFixed size={12} />
                   Use current location
-                </button>
-                <button
+                </Button>
+                <Button
+                  variant="outline"
                   onClick={() => setEditing(true)}
-                  className="flex cursor-pointer items-center gap-1 rounded-xs border border-border bg-background px-2.5 py-1.5 text-[11px] font-medium text-foreground transition-colors hover:bg-sidebar-hover"
+                  className="flex items-center gap-1 px-2.5 py-1.5 text-xs font-medium"
                 >
                   <Pencil size={12} />
                   Type area
-                </button>
+                </Button>
               </div>
             </div>
           )}
@@ -158,12 +164,13 @@ export function AreaIntelligence({ job, homeLocation, city, district, countryCod
           <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground">
             <span>from: {homeLocation}</span>
             <span>·</span>
-            <button
+            <Button
+              variant="link"
               onClick={() => { setEditing(true); setAreaInput(homeLocation) }}
-              className="cursor-pointer text-primary hover:underline"
+              className="text-[10px]"
             >
               change
-            </button>
+            </Button>
           </div>
         </>
       )}
@@ -184,14 +191,14 @@ export function AreaIntelligence({ job, homeLocation, city, district, countryCod
       )}
 
       {/* EXPANDABLE MORE */}
-      <button onClick={() => setExpanded(!expanded)} className="flex cursor-pointer items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors">
+      <Button variant="ghost" size="sm" onClick={() => setExpanded(!expanded)} className="flex items-center gap-1 text-xs">
         {expanded ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
         {expanded ? 'Less' : 'More'} area info
-      </button>
+      </Button>
 
       {expanded && (
-        <div className="space-y-2 pt-1">
-          <div className="flex flex-wrap gap-1.5">
+        <div className="space-y-2.5 pt-1">
+          <div className="flex flex-wrap gap-2.5">
             <LinkButton href={Links.agodaUrl(city)} icon={<Hotel size={14} />} label="Temporary Stay" />
             {visa && <LinkButton href={visa.url} icon={<Shield size={14} />} label={visa.name} />}
             <LinkButton href={Links.crimeUrl(city, countryCode)} icon={<Shield size={14} />} label="Safety / Crime" />
@@ -210,8 +217,8 @@ export function AreaIntelligence({ job, homeLocation, city, district, countryCod
 function Section({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div>
-      <div className="label-mono px-0 pt-1 pb-1.5 text-[11px]">{label}</div>
-      <div className="flex flex-wrap gap-1.5">{children}</div>
+      <div className="label-mono px-0 pt-1 pb-2.5 text-xs">{label}</div>
+      <div className="flex flex-wrap gap-2.5">{children}</div>
     </div>
   )
 }
@@ -223,7 +230,7 @@ function LinkButton({ href, icon, label }: { href: string; icon: React.ReactNode
       href={href}
       target="_blank"
       rel="noopener noreferrer"
-      className="inline-flex items-center gap-1.5 rounded-xs border border-border bg-background px-2.5 py-1.5 text-[11px] font-medium text-foreground transition-colors hover:bg-sidebar-hover"
+      className="inline-flex items-center gap-1.5 rounded-xs neuro-pill px-3 py-2 text-xs font-medium text-foreground transition-shadow hover:bg-accent-soft"
     >
       {icon}
       {label}

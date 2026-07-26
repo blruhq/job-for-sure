@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from '~/i18n/routing'
 import { Skeleton } from '~/components/ui/skeleton'
+import { Button } from '~/components/ui/button'
 
 type UsageData = {
   allowed: boolean
@@ -97,20 +98,20 @@ export default function BillingPage() {
     : null
 
   return (
-    <div className="mx-auto max-w-2xl space-y-8 p-6">
+    <div className="mx-auto max-w-2xl space-y-8 p-6 neuro-surface">
       <div>
         <h1 className="text-xl font-semibold tracking-tight text-foreground">Billing</h1>
-        <p className="mt-1 text-xs text-muted-foreground">Manage your subscription and usage</p>
+        <p className="mt-1 text-sm text-muted-foreground">Manage your subscription and usage</p>
       </div>
 
       {/* Current plan card */}
-      <div className="rounded-lg border border-border bg-card p-5">
+      <div className="rounded-lg neuro-card p-5">
         <div className="flex items-center justify-between">
           <div>
             <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Current Plan</p>
             <p className="mt-1 text-2xl font-bold text-foreground capitalize">{data?.plan}</p>
             {isPro && data?.subscription && (
-              <p className="mt-0.5 text-xs text-muted-foreground">
+              <p className="mt-0.5 text-sm text-muted-foreground">
                 {data.subscription.interval === 'year' ? 'Yearly' : 'Monthly'} billing
               </p>
             )}
@@ -127,43 +128,45 @@ export default function BillingPage() {
         </div>
 
         {isCanceled && endDate && (
-          <p className="mt-3 rounded-md bg-amber-50 px-3 py-2 text-xs text-amber-700">
+          <p className="mt-3 rounded-md bg-warn-soft px-3 py-2 text-sm text-warn">
             Your Pro access ends on {endDate}. After that, you&apos;ll be downgraded to Free.
           </p>
         )}
 
         <div className="mt-4 flex items-center gap-3">
           {isPro ? (
-            <button
+            <Button
+              variant="outline"
               onClick={handlePortal}
-              className="rounded-lg border border-border px-4 py-2 text-xs font-medium text-foreground hover:bg-muted transition-colors cursor-pointer"
+              className="rounded-lg px-4 py-2.5 text-sm font-medium"
             >
               Manage in Stripe
-            </button>
+            </Button>
           ) : (
-            <button
+            <Button
               onClick={() => router.push('/pricing')}
-              className="rounded-lg bg-primary px-4 py-2 text-xs font-medium text-primary-foreground hover:opacity-90 transition-opacity cursor-pointer"
+              className="rounded-lg px-4 py-2.5 text-sm font-medium"
             >
               Upgrade to Pro
-            </button>
+            </Button>
           )}
           {isPro && !isCanceled && (
-            <button
+            <Button
+              variant="outline"
               onClick={handleCancel}
               disabled={canceling}
-              className="rounded-lg border border-border px-4 py-2 text-xs text-muted-foreground hover:text-red-500 hover:border-red-200 transition-colors disabled:opacity-50 cursor-pointer"
+              className="rounded-lg border-border px-4 py-2.5 text-sm text-muted-foreground hover:text-destructive hover:border-red-200"
             >
               {canceling ? 'Canceling…' : 'Cancel subscription'}
-            </button>
+            </Button>
           )}
         </div>
       </div>
 
       {/* Usage breakdown */}
       {!isPro && data?.usage && (
-        <div className="rounded-lg border border-border bg-card p-5">
-          <h2 className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+        <div className="rounded-lg neuro-card p-5">
+          <h2 className="text-sm font-medium uppercase tracking-wider text-muted-foreground">
             Usage this period
           </h2>
           <div className="mt-3 space-y-3">
@@ -174,7 +177,7 @@ export default function BillingPage() {
               const pct = u.limit > 0 ? Math.round((used / u.limit) * 100) : 0
               return (
                 <div key={feature}>
-                  <div className="flex items-center justify-between text-xs">
+                  <div className="flex items-center justify-between text-sm">
                     <span className="text-foreground">{label}</span>
                     <span className="text-muted-foreground">
                       {used} / {u.limit}
@@ -183,7 +186,7 @@ export default function BillingPage() {
                   <div className="mt-1 h-1.5 w-full rounded-full bg-muted">
                     <div
                       className={`h-full rounded-full transition-all ${
-                        pct >= 90 ? 'bg-red-500' : pct >= 70 ? 'bg-amber-500' : 'bg-primary'
+                        pct >= 90 ? 'bg-destructive' : pct >= 70 ? 'bg-warn' : 'bg-primary'
                       }`}
                       style={{ width: `${pct}%` }}
                     />

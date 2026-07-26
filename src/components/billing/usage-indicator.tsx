@@ -60,8 +60,8 @@ export function UsageIndicator({ feature, className, showIcon = true }: UsageInd
       className={cn(
         'flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-medium transition-colors cursor-pointer',
         isCritical
-          ? 'bg-red-50 text-red-600 hover:bg-red-100'
-          : 'bg-amber-50 text-amber-700 hover:bg-amber-100',
+          ? 'bg-danger-soft text-destructive hover:bg-red-100'
+          : 'bg-warn-soft text-warn hover:bg-amber-100',
         className,
       )}
     >

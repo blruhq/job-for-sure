@@ -48,7 +48,7 @@ export function HowItWorks() {
                 {i < STEPS.length - 1 && (
                   <div className="absolute -right-5 top-8 hidden h-px w-10 border-t border-dashed border-border/40 md:block" />
                 )}
-                <div className="flex h-14 w-14 items-center justify-center rounded-xl border border-border bg-card text-primary shadow-sm">
+                <div className="flex h-14 w-14 items-center justify-center rounded-xl neuro-icon-well text-primary">
                   <Icon size={24} />
                 </div>
                 <div className="mt-5 font-mono text-xs font-semibold uppercase tracking-widest text-muted-foreground">

@@ -2,7 +2,6 @@
 
 import { Clock, Bookmark, Send, CalendarCheck, XCircle } from 'lucide-react'
 import type { PipelineJob } from '~/types/resume'
-import { notify } from '~/lib/toast'
 
 // ═══════════════════════════════════════════════════════════════
 // Timeline — shows the lifecycle of a job application.
@@ -32,7 +31,7 @@ export function Timeline({ job, currentStatus }: { job: PipelineJob; currentStat
       icon: <Send size={11} />,
       label: 'Applied',
       date: job.appliedAt || job.addedAt,
-      color: 'text-blue-500',
+      color: 'text-primary',
     })
   }
 
@@ -41,7 +40,7 @@ export function Timeline({ job, currentStatus }: { job: PipelineJob; currentStat
       icon: <CalendarCheck size={11} />,
       label: 'Interviewing',
       date: job.addedAt,
-      color: 'text-amber-500',
+      color: 'text-warn',
     })
   }
 
@@ -50,7 +49,7 @@ export function Timeline({ job, currentStatus }: { job: PipelineJob; currentStat
       icon: <CalendarCheck size={11} />,
       label: 'Offer received',
       date: job.addedAt,
-      color: 'text-green-500',
+      color: 'text-success',
     })
   }
 
@@ -59,7 +58,7 @@ export function Timeline({ job, currentStatus }: { job: PipelineJob; currentStat
       icon: <XCircle size={11} />,
       label: 'Rejected',
       date: job.addedAt,
-      color: 'text-red-500',
+      color: 'text-destructive',
     })
   }
 
@@ -75,16 +74,16 @@ export function Timeline({ job, currentStatus }: { job: PipelineJob; currentStat
           <div key={i} className="flex gap-2.5">
             {/* Vertical line + dot */}
             <div className="flex flex-col items-center">
-              <div className={`flex h-4 w-4 items-center justify-center rounded-full bg-background ${event.color}`}>
+              <div className={`flex h-4 w-4 items-center justify-center rounded-full neuro-surface ${event.color}`}>
                 {event.icon}
               </div>
               {i < events.length - 1 && (
-                <div className="mt-0.5 h-full w-px bg-border" />
+                <div className="mt-0.5 h-full w-px bg-muted-foreground/20" />
               )}
             </div>
             {/* Content */}
             <div className="pb-3">
-              <div className="text-[11px] font-medium text-foreground">{event.label}</div>
+              <div className="text-xs font-medium text-foreground">{event.label}</div>
               <div className="text-[10px] text-muted-foreground">
                 {formatTimelineDate(event.date)}
               </div>

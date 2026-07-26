@@ -21,12 +21,12 @@ Browser ──► Next.js 16 ──► API Routes ──► AI SDK (OpenAI)
    ├── Protected route check (cookie-based, lightweight)
    └── Passes through to app
 
-2. Client-side AuthGuard in (app)/layout.tsx
+2. Client-side AuthGuard in `src/app/[locale]/(app)/layout.tsx`
    ├── Calls authClient.getSession()
    ├── If no session → redirect /login
    └── If session → identify in PostHog, render children
 
-3. API routes use requireUser() from auth-helpers.ts
+3. API routes use `requireUser()` from `src/app/lib/auth-helpers.ts`
    ├── Reads session cookie via headers()
    ├── Returns 401 if invalid
    └── Returns user object if valid
@@ -118,11 +118,16 @@ User ──1:N──► Resumes
 
 ## State Management
 
-Custom React context store (`app/lib/store.tsx`):
-- `useAppStore()` hook returns all app state + actions
-- State: resumes, applications, sidebar state, onboarding
-- No external state lib — simple Context + useReducer pattern
-- All state is client-side only (no SSR for dynamic data)
+**Zustand v5 + Immer** for local UI state and store:
+- `src/app/hooks/use-ui.ts` — sidebar, modals, pending tailor state
+- `src/app/lib/resume-editor-store.ts` — resume editor form state
+
+**TanStack Query v5** for server state:
+- `src/app/hooks/use-resumes.ts` — resume CRUD
+- `src/app/hooks/use-apps.ts` — application CRUD
+- `src/app/hooks/use-cover-letters.ts` — cover letter CRUD
+
+All server-fetched data goes through TanStack Query with automatic cache invalidation. Zustand stores are used only for client-side UI concerns.
 
 ## Important Guardrails
 
@@ -130,4 +135,4 @@ Custom React context store (`app/lib/store.tsx`):
 2. **SSRF protection**: `scraper.ts` validates all URLs before fetching. Blocks private IPs, loopback, metadata endpoints.
 3. **No direct AI SDK calls**: Always use `ai-providers.ts` wrappers for failover.
 4. **PDF is server-only**: `@react-pdf/renderer` never runs in browser. Export endpoint generates and streams PDF.
-5. **i18n routing**: All pages have locale prefix (`/en/...`, `/th/...`). Handled by proxy.ts + next-intl.
+5. **i18n routing**: All pages have locale prefix (`/en/...`, `/th/...`). Handled by `src/proxy.ts` + next-intl.

@@ -16,6 +16,7 @@ import { getRedis } from '~/lib/redis'
 let _aiRatelimit: Ratelimit | null = null
 let _generalRatelimit: Ratelimit | null = null
 let _authIpRatelimit: Ratelimit | null = null
+let _pdfRatelimit: Ratelimit | null = null
 
 function getAiRatelimit(): Ratelimit {
   if (!_aiRatelimit) {
@@ -54,6 +55,19 @@ function getAuthIpRatelimit(): Ratelimit {
   return _authIpRatelimit
 }
 
+function getPdfRatelimit(): Ratelimit {
+  if (!_pdfRatelimit) {
+    _pdfRatelimit = new Ratelimit({
+      redis: getRedis(),
+      // 10 req/min — CPU-intensive @react-pdf/renderer renders
+      limiter: Ratelimit.slidingWindow(10, '1 m'),
+      prefix: 'jfs:pdf',
+      analytics: true,
+    })
+  }
+  return _pdfRatelimit
+}
+
 /**
  * Check AI rate limit for a user (20 req/min).
  * Returns null if allowed, or a Response (429) if rate limited.
@@ -84,6 +98,17 @@ export async function checkAuthIpRateLimit(
   ip: string,
 ): Promise<Response | null> {
   return doLimit(getAuthIpRatelimit(), ip)
+}
+
+/**
+ * Check PDF rate limit for a user (10 req/min).
+ * CPU-intensive @react-pdf/renderer renders should not be hammered.
+ * Returns null if allowed, or a Response (429) if rate limited.
+ */
+export async function checkPdfRateLimit(
+  userId: string,
+): Promise<Response | null> {
+  return doLimit(getPdfRatelimit(), userId)
 }
 
 /**

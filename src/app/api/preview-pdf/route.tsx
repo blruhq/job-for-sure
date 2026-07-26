@@ -57,4 +57,4 @@ export const POST = withAuth(async (request, { user: _user }) => {
       { status: 500 },
     )
   }
-}, { rateLimitType: 'general', route: '/api/preview-pdf' })
+}, { rateLimitType: 'pdf', route: '/api/preview-pdf' })

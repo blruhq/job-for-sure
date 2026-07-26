@@ -14,6 +14,7 @@ import {
   Building2,
   Lightbulb,
 } from 'lucide-react'
+import { Button } from '~/components/ui/button'
 import { cn } from '~/lib/utils'
 import type { SmartOverviewResult } from '~/types/smart-overview'
 import * as Links from '~/lib/area-links'
@@ -93,16 +94,17 @@ export function SmartOverview(props: SmartOverviewProps) {
   if (state === 'error') {
     return (
       <div className="rounded-lg border border-destructive/30 bg-danger-soft p-4">
-        <p className="text-xs text-foreground mb-2">
+        <p className="text-sm text-foreground mb-2">
           Couldn&apos;t generate overview. The AI may be busy.
         </p>
-        <button
+        <Button
+          variant="link"
           onClick={generate}
-          className="flex cursor-pointer items-center gap-1.5 text-xs font-medium text-primary hover:underline"
+          className="flex items-center gap-1.5 text-xs font-medium"
         >
           <RefreshCw size={12} />
           Try again
-        </button>
+        </Button>
       </div>
     )
   }
@@ -110,15 +112,16 @@ export function SmartOverview(props: SmartOverviewProps) {
   // ── STATE 1: Not generated yet ──
   if (state === 'idle' && !overview) {
     return (
-      <div className="rounded-lg border border-border bg-card p-4">
-        <button
+      <div className="rounded-lg neuro-card p-4">
+        <Button
+          variant="default"
           onClick={generate}
-          className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-md bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90"
+          className="flex w-full items-center justify-center gap-2 px-4 py-2.5 text-sm font-semibold"
         >
           <Sparkles size={16} />
           Generate AI Overview
-        </button>
-        <p className="mt-2 text-center text-xs text-muted-foreground">
+        </Button>
+        <p className="mt-2 text-center text-sm text-muted-foreground">
           Get a personalized analysis: match, salary, commute, company
         </p>
       </div>
@@ -128,7 +131,7 @@ export function SmartOverview(props: SmartOverviewProps) {
   // ── STATE 2: Loading ──
   if (state === 'loading') {
     return (
-      <div className="rounded-lg border border-border bg-card p-4">
+      <div className="rounded-lg neuro-card p-4">
         <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
           <Loader2 size={16} className="animate-spin" />
           Generating your overview...
@@ -181,12 +184,13 @@ function OverviewContent({
           <Sparkles size={14} className="text-primary" />
           AI Overview
         </div>
-        <button
+        <Button
+          variant="ghost"
           onClick={onRegenerate}
-          className="cursor-pointer text-muted-foreground hover:text-foreground"
+          className="text-muted-foreground"
         >
           <RefreshCw size={12} />
-        </button>
+        </Button>
       </div>
 
       {/* VERDICT (the headline) */}
@@ -207,19 +211,19 @@ function OverviewContent({
       {/* MATCH ANALYSIS */}
       <Section icon={<TrendingUp size={12} />} label="Why You Fit">
         {overview.matchAnalysis.strengths.map((s, i) => (
-          <div key={i} className="flex items-start gap-1.5 text-xs text-foreground">
+          <div key={i} className="flex items-start gap-1.5 text-sm text-foreground">
             <span className="text-success shrink-0">&#10003;</span>
             <span>{s}</span>
           </div>
         ))}
         {overview.matchAnalysis.gaps.map((g, i) => (
-          <div key={i} className="flex items-start gap-1.5 text-xs text-muted-foreground">
+          <div key={i} className="flex items-start gap-1.5 text-sm text-muted-foreground">
             <span className="text-destructive shrink-0">&#10007;</span>
             <span>{g}</span>
           </div>
         ))}
         {overview.matchAnalysis.insight && (
-          <div className="flex items-start gap-1.5 text-xs text-primary pt-1">
+          <div className="flex items-start gap-1.5 text-sm text-primary pt-1">
             <Lightbulb size={12} className="shrink-0 mt-px" />
             <span>{overview.matchAnalysis.insight}</span>
           </div>
@@ -229,7 +233,7 @@ function OverviewContent({
       {/* ROLE SUMMARY */}
       <Section icon={<Building2 size={12} />} label="The Role">
         {overview.roleSummary.map((r, i) => (
-          <div key={i} className="text-xs text-foreground">
+          <div key={i} className="text-sm text-foreground">
             &bull; {r}
           </div>
         ))}
@@ -238,11 +242,11 @@ function OverviewContent({
       {/* SALARY CHECK */}
       {overview.salaryCheck && (
         <Section icon={<DollarSign size={12} />} label="Salary Check">
-          <div className="text-xs text-foreground">
+          <div className="text-sm text-foreground">
             Listed: {overview.salaryCheck.listed || 'Not specified'}
           </div>
           {overview.salaryCheck.estimate && (
-            <div className="text-xs text-muted-foreground">
+            <div className="text-sm text-muted-foreground">
               Market: {overview.salaryCheck.estimate}
             </div>
           )}
@@ -267,9 +271,9 @@ function OverviewContent({
       {/* COMMUTE ESTIMATE */}
       {overview.commuteEstimate && (
         <Section icon={<Bus size={12} />} label="Commute">
-          <div className="text-xs text-foreground">{overview.commuteEstimate.summary}</div>
+          <div className="text-sm text-foreground">{overview.commuteEstimate.summary}</div>
           {overview.commuteEstimate.monthlyCostEstimate && (
-            <div className="text-xs text-muted-foreground">
+            <div className="text-sm text-muted-foreground">
               Est. cost: {overview.commuteEstimate.monthlyCostEstimate}
             </div>
           )}
@@ -282,9 +286,9 @@ function OverviewContent({
 
       {/* COMPANY SNAPSHOT */}
       <Section icon={<Building2 size={12} />} label="Company">
-        <div className="text-xs text-foreground">{overview.companySnapshot.description}</div>
+        <div className="text-sm text-foreground">{overview.companySnapshot.description}</div>
         {!overview.companySnapshot.known && (
-          <div className="text-xs text-muted-foreground italic">
+          <div className="text-sm text-muted-foreground italic">
             Limited info &mdash; verify with links below
           </div>
         )}
@@ -301,7 +305,7 @@ function OverviewContent({
           <Lightbulb size={12} />
           Coach Tip
         </div>
-        <div className="text-xs text-foreground">{overview.coachTip}</div>
+        <div className="text-sm text-foreground">{overview.coachTip}</div>
       </div>
 
       {/* RECOMMENDED ACTIONS */}

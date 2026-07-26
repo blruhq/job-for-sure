@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { RefreshCw, CheckCircle, XCircle, HelpCircle, Loader2 } from 'lucide-react'
 import { cn } from '~/lib/utils'
+import { Button } from '~/components/ui/button'
 
 type SourceStatus = {
   source: string
@@ -58,14 +59,15 @@ export function SourceHealth() {
         <h2 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
           Job Source Health
         </h2>
-        <button
+        <Button
+          variant="link"
           onClick={fetchHealth}
           disabled={loading}
-          className="flex cursor-pointer items-center gap-1 text-[10px] text-muted-foreground hover:text-foreground disabled:opacity-50"
+          className="flex items-center gap-1 text-[10px] h-auto p-0 text-muted-foreground hover:text-foreground disabled:opacity-50"
         >
           <RefreshCw size={11} className={cn(loading && 'animate-spin')} />
           {loading ? 'Checking…' : 'Refresh'}
-        </button>
+        </Button>
       </div>
 
       {data && (
@@ -83,19 +85,19 @@ export function SourceHealth() {
       {loading && !data && (
         <div className="flex items-center justify-center py-8 gap-2 text-muted-foreground">
           <Loader2 size={14} className="animate-spin" />
-          <span className="text-[11px]">Testing sources…</span>
+          <span className="text-xs">Testing sources…</span>
         </div>
       )}
 
       {error && (
-        <div className="rounded-xs border border-destructive/30 bg-destructive/5 px-3 py-2 text-[11px] text-destructive">
+        <div className="rounded-xs border border-destructive/30 bg-destructive/5 px-3 py-2 text-xs text-destructive">
           {error}
         </div>
       )}
 
       {data && (
         <div className="overflow-hidden rounded-lg border border-border">
-          <table className="w-full text-[11px]">
+          <table className="w-full text-xs">
             <thead className="bg-muted/30">
               <tr>
                 <th className="px-3 py-2 text-left font-medium text-muted-foreground">Source</th>

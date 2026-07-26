@@ -169,7 +169,9 @@
     "resume": "Resume:",
     "all": "All",
     "noApplications": "No applications yet",
-    "addJobs": "Chat with the AI coach to start bookmarking jobs"
+    "addJobs": "Chat with the AI coach to start bookmarking jobs",
+    "cancel": "Cancel",
+    "add": "Add"
   },
   "ats": {
     "jobDescription": "1. Job Description",

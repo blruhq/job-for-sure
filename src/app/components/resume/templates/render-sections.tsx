@@ -242,7 +242,7 @@ export function renderPdfSections(resume: Resume, s: SectionStyleSet): React.Rea
                       <Text style={{ fontSize: 9, color: COLORS.muted }}>• {item.description}</Text>
                     ) : null}
                     {item.link ? (
-                      <Text style={{ fontSize: 8, color: '#5B6ABF' }}>{item.link}</Text>
+                      <Text style={{ fontSize: 8, color: COLORS.primary }}>{item.link}</Text>
                     ) : null}
                   </View>
                 ))
@@ -372,7 +372,7 @@ export function renderMainSections(resume: Resume, s: SectionStyleSet): React.Re
                       <Text style={{ fontSize: 9, color: COLORS.muted }}>• {item.description}</Text>
                     ) : null}
                     {item.link ? (
-                      <Text style={{ fontSize: 8, color: '#5B6ABF' }}>{item.link}</Text>
+                      <Text style={{ fontSize: 8, color: COLORS.primary }}>{item.link}</Text>
                     ) : null}
                   </View>
                 ))

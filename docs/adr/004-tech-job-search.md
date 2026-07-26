@@ -17,7 +17,7 @@
 
 ### Architecture
 
-All source adapters normalize to a unified `JobResult` type (defined in `app/lib/job-sources/types.ts`). The orchestrator (`app/lib/job-sources/index.ts`):
+All source adapters normalize to a unified `JobResult` type (defined in `src/app/lib/job-sources/types.ts`). The orchestrator (`src/app/lib/job-sources/index.ts`):
 1. Fetches from all enabled sources in parallel (with per-source timeout)
 2. Deduplicates by company + title
 3. Filters by query keywords and location

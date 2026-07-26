@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useRouter } from '~/i18n/routing'
 import { authClient } from '~/lib/auth-client'
 import { cn } from '~/lib/utils'
+import { Button } from '~/components/ui/button'
 
 const PLANS = [
   {
@@ -77,7 +78,7 @@ export default function PricingPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen neuro-surface">
       <div className="mx-auto max-w-4xl px-4 py-16 sm:px-6 sm:py-24">
         {/* Header */}
         <div className="text-center">
@@ -97,8 +98,8 @@ export default function PricingPage() {
               className={cn(
                 'rounded-xl border p-6',
                 plan.highlight
-                  ? 'border-primary/40 bg-card ring-1 ring-primary/20'
-                  : 'border-border bg-card',
+                  ? 'border-primary/40 neuro-card ring-1 ring-primary/20'
+                  : 'border-border neuro-card',
               )}
             >
               <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
@@ -111,7 +112,7 @@ export default function PricingPage() {
                 <span className="text-3xl font-bold text-foreground">{plan.price}</span>
                 <span className="text-sm font-normal text-muted-foreground">{plan.period}</span>
                 {plan.discount && (
-                  <span className="rounded-full bg-green-600 px-2 py-0.5 text-[10px] font-semibold text-white">{plan.discount}</span>
+                  <span className="rounded-full bg-success px-2 py-0.5 text-[10px] font-semibold text-white">{plan.discount}</span>
                 )}
               </p>
               <p className="mt-1 text-xs text-muted-foreground">{plan.description}</p>
@@ -132,28 +133,30 @@ export default function PricingPage() {
               </ul>
 
               {plan.name === 'Free' ? (
-                <button
+                <Button
+                  variant="outline"
                   onClick={() => router.push('/chat')}
-                  className="mt-6 w-full rounded-lg border border-border px-4 py-2 text-sm font-medium text-foreground hover:bg-muted transition-colors cursor-pointer"
+                  className="mt-6 w-full rounded-lg px-4 py-2 text-sm font-medium"
                 >
                   {plan.cta}
-                </button>
+                </Button>
               ) : (
                 <div className="mt-4 flex flex-col gap-2">
-                  <button
+                  <Button
                     onClick={() => handleSubscribe('month')}
                     disabled={loading === 'monthly'}
-                    className="w-full rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:opacity-90 transition-opacity disabled:opacity-50 cursor-pointer"
+                    className="w-full rounded-lg px-4 py-2 text-sm font-medium"
                   >
                     {loading === 'monthly' ? 'Redirecting…' : `${plan.price}${plan.period}`}
-                  </button>
-                  <button
+                  </Button>
+                  <Button
+                    variant="outline"
                     onClick={() => handleSubscribe('year')}
                     disabled={loading === 'yearly'}
-                    className="w-full rounded-lg border border-primary/30 px-4 py-2 text-xs font-medium text-primary hover:bg-primary/5 transition-colors disabled:opacity-50 cursor-pointer"
+                    className="w-full rounded-lg border-primary/30 px-4 py-2 text-xs font-medium text-primary hover:bg-primary/5"
                   >
                     {loading === 'yearly' ? 'Redirecting…' : '$29 / year (save 70% vs $8/mo)'}
-                  </button>
+                  </Button>
                 </div>
               )}
             </div>

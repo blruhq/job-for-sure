@@ -55,7 +55,7 @@ export function FeaturesBento() {
           >
             <div>
               <div
-                className={`flex h-12 w-12 items-center justify-center rounded-xl border ${large.borderAccent} bg-card ${large.color} shadow-sm`}
+                className={`flex h-12 w-12 items-center justify-center rounded-xl neuro-icon-well ${large.color}`}
               >
                 <large.icon size={24} />
               </div>
@@ -65,7 +65,7 @@ export function FeaturesBento() {
               </p>
             </div>
             {/* Chat mockup — blown up */}
-            <div className="mt-8 overflow-hidden rounded-xl border border-border/60 bg-card shadow-sm">
+            <div className="mt-8 overflow-hidden rounded-xl neuro-card">
               <div className="flex items-center gap-1.5 border-b border-border px-4 py-2.5">
                 <span className="h-2.5 w-2.5 rounded-full bg-[#FF5F57]" />
                 <span className="h-2.5 w-2.5 rounded-full bg-[#FFBD2E]" />
@@ -131,7 +131,7 @@ export function FeaturesBento() {
               >
                 <div>
                   <div
-                    className={`flex h-12 w-12 items-center justify-center rounded-xl border ${f.borderAccent} bg-card ${f.color} shadow-sm`}
+                    className={`flex h-12 w-12 items-center justify-center rounded-xl neuro-icon-well ${f.color}`}
                   >
                     <Icon size={24} />
                   </div>
@@ -139,7 +139,7 @@ export function FeaturesBento() {
                   <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{f.desc}</p>
                 </div>
                 {/* Mini score/tracker mockup */}
-                <div className="mt-6 overflow-hidden rounded-lg border border-border/60 bg-card p-4 shadow-sm">
+                <div className="mt-6 overflow-hidden rounded-lg neuro-card p-4">
                   {f.title === t('feature2Title') ? (
                     <div>
                       <div className="flex items-center justify-between text-xs">

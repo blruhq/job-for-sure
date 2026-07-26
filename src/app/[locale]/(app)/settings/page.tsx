@@ -6,6 +6,8 @@ import { authClient } from '~/lib/auth-client'
 import { Loader2, User, Bell, AlertTriangle, Check, X, Eye, EyeOff, LocateFixed, CreditCard } from 'lucide-react'
 import { Sun, Moon } from 'lucide-react'
 import { useTheme } from '~/components/layout/theme-provider'
+import { Button } from '~/components/ui/button'
+import { Input } from '~/components/ui/input'
 
 // ── TYPES ──
 type Tab = 'profile' | 'notifications' | 'danger' | 'billing'
@@ -35,19 +37,21 @@ function Toast({ notif, onClose }: { notif: NonNullable<ReturnType<typeof useNot
           ? 'border-emerald-500/30 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400'
           : notif.type === 'error'
             ? 'border-red-500/30 bg-red-500/10 text-red-600 dark:text-red-400'
-            : 'border-border bg-card text-foreground'
+            : 'neuro-surface text-foreground'
       }`}
     >
       {notif.type === 'success' && <Check size={13} />}
       {notif.type === 'error' && <X size={13} />}
       <span className="flex-1">{notif.message}</span>
-      <button
+      <Button
+        variant="ghost"
+        size="icon"
         onClick={onClose}
-        className="ml-2 cursor-pointer text-current opacity-60 hover:opacity-100 transition-opacity"
+        className="ml-2 h-5 w-5 p-0 opacity-60 hover:opacity-100"
         aria-label="Dismiss"
       >
         <X size={13} />
-      </button>
+      </Button>
     </div>
   )
 }
@@ -266,12 +270,12 @@ export default function SettingsPage() {
   }
 
   return (
-    <div className="flex-1 overflow-y-auto p-6">
-      <div className="mx-auto" style={{ maxWidth: '600px' }}>
+    <div className="flex-1 overflow-y-auto p-6 neuro-surface">
+      <div className="mx-auto max-w-2xl">
         {/* Header */}
         <div className="mb-6">
           <h1 className="text-lg font-semibold">Settings</h1>
-          <div className="text-xs text-muted-foreground">Manage your account and preferences</div>
+          <div className="text-sm text-muted-foreground">Manage your account and preferences</div>
         </div>
 
         {/* Tabs */}
@@ -286,7 +290,7 @@ export default function SettingsPage() {
                 }
                 setTab(t)
               }}
-              className={`flex items-center gap-1.5 border-b-2 px-4 pb-2.5 text-xs font-medium transition-colors ${
+              className={`flex items-center gap-1.5 border-b-2 px-4 pb-2.5 text-sm font-medium transition-colors ${
                 tab === t
                   ? 'border-foreground text-foreground'
                   : 'border-transparent text-muted-foreground hover:text-foreground'
@@ -308,43 +312,47 @@ export default function SettingsPage() {
         {tab === 'profile' && (
           <div className="space-y-5">
             {/* Name */}
-            <div className="rounded-sm border border-border bg-card p-4">
-              <div className="mb-3 text-xs font-medium">Display Name</div>
+            <div className="rounded-sm neuro-card p-4">
+              <div className="mb-3 text-sm font-medium">Display Name</div>
               <div className="flex gap-2">
-                <input
+                <Input
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  className="flex-1 rounded-sm border border-border bg-background px-3 py-1.5 text-xs outline-none focus:border-foreground/50"
+                  className="flex-1 rounded-sm text-sm px-3 py-2"
                   placeholder="Your name"
+                  neumorphic
                 />
-                <button
+                <Button
                   onClick={handleUpdateName}
                   disabled={savingName || name === user?.name}
-                  className="rounded-sm bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground transition-opacity hover:opacity-90 disabled:opacity-50"
+                  size="sm"
+                  className="rounded-sm text-sm px-3"
                 >
                   {savingName ? <Loader2 size={13} className="animate-spin" /> : 'Save'}
-                </button>
+                </Button>
               </div>
             </div>
 
             {/* Email */}
-            <div className="rounded-sm border border-border bg-card p-4">
-              <div className="mb-3 text-xs font-medium">Email Address</div>
+            <div className="rounded-sm neuro-card p-4">
+              <div className="mb-3 text-sm font-medium">Email Address</div>
               <div className="flex gap-2">
-                <input
+                <Input
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="flex-1 rounded-sm border border-border bg-background px-3 py-1.5 text-xs outline-none focus:border-foreground/50"
+                  className="flex-1 rounded-sm text-sm px-3 py-2"
                   placeholder="email@example.com"
                   type="email"
+                  neumorphic
                 />
-                <button
+                <Button
                   onClick={handleUpdateEmail}
                   disabled={savingEmail || email === user?.email || !email.trim()}
-                  className="rounded-sm bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground transition-opacity hover:opacity-90 disabled:opacity-50"
+                  size="sm"
+                  className="rounded-sm text-sm px-3"
                 >
                   {savingEmail ? <Loader2 size={13} className="animate-spin" /> : 'Update'}
-                </button>
+                </Button>
               </div>
               {email !== user?.email && (
                 <div className="mt-2 text-[10px] text-muted-foreground">
@@ -354,111 +362,126 @@ export default function SettingsPage() {
             </div>
 
             {/* My Area */}
-            <div className="rounded-sm border border-border bg-card p-4">
-              <div className="mb-1 text-xs font-medium">My Area</div>
+            <div className="rounded-sm neuro-card p-4">
+              <div className="mb-1 text-sm font-medium">My Area</div>
               <p className="mb-3 text-[10px] text-muted-foreground">
                 District or neighborhood is enough — we use this for commute
                 directions and living cost estimates. Not your exact address.
               </p>
               <div className="flex gap-2">
-                <input
+                <Input
                   value={homeLocation}
                   onChange={(e) => setHomeLocation(e.target.value)}
                   onKeyDown={(e) => { if (e.key === 'Enter') handleSaveHomeLocation() }}
-                  className="flex-1 rounded-sm border border-border bg-background px-3 py-1.5 text-xs outline-none focus:border-foreground/50"
+                  className="flex-1 rounded-sm text-sm px-3 py-2"
                   placeholder="e.g. Bang Na, Bangkok"
+                  neumorphic
                 />
-                <button
+                <Button
                   onClick={handleSaveHomeLocation}
                   disabled={savingHomeLocation}
-                  className="shrink-0 rounded-sm bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground transition-opacity hover:opacity-90 disabled:opacity-50"
+                  size="sm"
+                  className="shrink-0 rounded-sm text-sm px-3"
                 >
                   {savingHomeLocation ? <Loader2 size={13} className="animate-spin" /> : 'Save'}
-                </button>
+                </Button>
               </div>
-              <button
+              <Button
+                variant="link"
                 onClick={handleDetectLocation}
                 disabled={detectingLocation}
-                className="mt-2 flex cursor-pointer items-center gap-1.5 text-[11px] text-primary hover:underline disabled:opacity-50"
+                className="mt-2 flex items-center gap-1.5 text-sm h-auto p-0 disabled:opacity-50"
               >
                 {detectingLocation ? <Loader2 size={12} className="animate-spin" /> : <LocateFixed size={12} />}
                 {detectingLocation ? 'Detecting…' : 'Use my current location'}
-              </button>
+              </Button>
             </div>
 
             {/* Change Password */}
-            <div className="rounded-sm border border-border bg-card p-4">
-              <div className="mb-3 text-xs font-medium">Change Password</div>
+            <div className="rounded-sm neuro-card p-4">
+              <div className="mb-3 text-sm font-medium">Change Password</div>
               <div className="space-y-2.5">
                 <div className="relative">
-                  <input
+                  <Input
                     value={currentPassword}
                     onChange={(e) => setCurrentPassword(e.target.value)}
                     type={showCurrent ? 'text' : 'password'}
-                    className="w-full rounded-sm border border-border bg-background px-3 py-1.5 pr-8 text-xs outline-none focus:border-foreground/50"
+                    className="w-full rounded-sm text-sm px-3 py-2 pr-8"
                     placeholder="Current password"
+                    neumorphic
                   />
-                  <button
+                  <Button
+                    variant="ghost"
+                    size="icon"
                     onClick={() => setShowCurrent(!showCurrent)}
-                    className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                    className="absolute right-2 top-1/2 -translate-y-1/2 h-6 w-6 p-0 text-muted-foreground hover:text-foreground"
+                    type="button"
                   >
                     {showCurrent ? <EyeOff size={13} /> : <Eye size={13} />}
-                  </button>
+                  </Button>
                 </div>
                 <div className="relative">
-                  <input
+                  <Input
                     value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
                     type={showNew ? 'text' : 'password'}
-                    className="w-full rounded-sm border border-border bg-background px-3 py-1.5 pr-8 text-xs outline-none focus:border-foreground/50"
+                    className="w-full rounded-sm text-sm px-3 py-2 pr-8"
                     placeholder="New password (min 8 chars)"
+                    neumorphic
                   />
-                  <button
+                  <Button
+                    variant="ghost"
+                    size="icon"
                     onClick={() => setShowNew(!showNew)}
-                    className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                    className="absolute right-2 top-1/2 -translate-y-1/2 h-6 w-6 p-0 text-muted-foreground hover:text-foreground"
+                    type="button"
                   >
                     {showNew ? <EyeOff size={13} /> : <Eye size={13} />}
-                  </button>
+                  </Button>
                 </div>
-                <input
+                <Input
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   type="password"
-                  className="w-full rounded-sm border border-border bg-background px-3 py-1.5 text-xs outline-none focus:border-foreground/50"
+                  className="w-full rounded-sm text-sm px-3 py-2"
                   placeholder="Confirm new password"
+                  neumorphic
                 />
-                <button
+                <Button
                   onClick={handleChangePassword}
                   disabled={changingPassword}
-                  className="rounded-sm bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground transition-opacity hover:opacity-90 disabled:opacity-50"
+                  size="sm"
+                  className="rounded-sm text-sm px-3"
                 >
                   {changingPassword ? <Loader2 size={13} className="animate-spin" /> : 'Change Password'}
-                </button>
+                </Button>
               </div>
             </div>
 
             {/* Account info (read-only) */}
-            <div className="rounded-sm border border-border bg-card px-4 py-3">
-              <div className="flex justify-between text-[11px]">
+            <div className="rounded-sm neuro-card px-4 py-3">
+              <div className="flex justify-between text-sm">
                 <span className="text-muted-foreground">Account ID</span>
                 <span className="font-mono text-[10px]">{user?.id}</span>
               </div>
             </div>
 
             {/* Theme */}
-            <div className="rounded-sm border border-border bg-card px-4 py-3">
+            <div className="rounded-sm neuro-card px-4 py-3">
               <div className="flex items-center justify-between">
                 <div>
-                  <div className="text-xs font-medium">Theme</div>
-                  <div className="text-[11px] text-muted-foreground">Light or dark mode</div>
+                  <div className="text-sm font-medium">Theme</div>
+                  <div className="text-sm text-muted-foreground">Light or dark mode</div>
                 </div>
-                <button
+                <Button
+                  variant="outline"
                   onClick={toggle}
-                  className="flex items-center gap-1.5 rounded-sm border border-border bg-background px-3 py-1.5 text-xs hover:bg-background"
+                  size="sm"
+                  className="flex items-center gap-1.5 rounded-sm text-sm"
                 >
                   {theme === 'dark' ? <Sun size={13} /> : <Moon size={13} />}
                   Toggle
-                </button>
+                </Button>
               </div>
             </div>
           </div>
@@ -466,7 +489,7 @@ export default function SettingsPage() {
 
         {/* ── NOTIFICATIONS TAB ── */}
         {tab === 'notifications' && (
-          <div className="rounded-sm border border-border bg-card">
+          <div className="rounded-sm neuro-card">
             {[
               { key: 'emailNotifications' as keyof Prefs, label: 'Email Notifications', desc: 'Receive emails about resume views, interview invites, and job matches' },
               { key: 'weeklyDigest' as keyof Prefs, label: 'Weekly Digest', desc: 'Get a weekly summary of your application activity and new opportunities' },
@@ -474,10 +497,12 @@ export default function SettingsPage() {
             ].map((item) => (
               <div key={item.key} className="flex items-center justify-between border-b border-border/50 px-4 py-3 last:border-b-0">
                 <div>
-                  <div className="text-xs font-medium">{item.label}</div>
-                  <div className="text-[11px] text-muted-foreground">{item.desc}</div>
+                  <div className="text-sm font-medium">{item.label}</div>
+                  <div className="text-sm text-muted-foreground">{item.desc}</div>
                 </div>
                 <button
+                  role="switch"
+                  aria-checked={!!(prefs?.[item.key])}
                   onClick={() => handleTogglePref(item.key)}
                   className={`relative h-5 w-9 rounded-full transition-colors ${
                     prefs?.[item.key] ? 'bg-primary' : 'bg-border'
@@ -497,28 +522,31 @@ export default function SettingsPage() {
         {/* ── DANGER ZONE TAB ── */}
         {tab === 'danger' && (
           <div className="rounded-sm border border-red-500/30 bg-red-500/5 p-4">
-            <div className="mb-1 flex items-center gap-1.5 text-xs font-medium text-red-600 dark:text-red-400">
+            <div className="mb-1 flex items-center gap-1.5 text-sm font-medium text-red-600 dark:text-red-400">
               <AlertTriangle size={13} />
               Danger Zone
             </div>
-            <div className="mb-4 text-[11px] text-muted-foreground">
+            <div className="mb-4 text-sm text-muted-foreground">
               Permanently delete your account and all associated data. This action cannot be undone.
             </div>
-            <div className="mb-3 text-[11px] font-medium">Type DELETE to confirm</div>
+            <div className="mb-3 text-sm font-medium">Type DELETE to confirm</div>
             <div className="flex gap-2">
-              <input
+              <Input
                 value={confirmDelete}
                 onChange={(e) => setConfirmDelete(e.target.value)}
-                className="flex-1 rounded-sm border border-red-500/30 bg-background px-3 py-1.5 text-xs outline-none focus:border-red-500/50"
+                className="flex-1 rounded-sm text-sm px-3 py-2 border-red-500/30 focus:border-red-500/50"
                 placeholder="Type DELETE"
+                neumorphic
               />
-              <button
+              <Button
+                variant="destructive"
                 onClick={handleDeleteAccount}
                 disabled={confirmDelete !== 'DELETE' || deleting}
-                className="rounded-sm bg-red-600 px-3 py-1.5 text-xs font-medium text-white transition-opacity hover:bg-red-700 disabled:opacity-50"
+                size="sm"
+                className="rounded-sm text-sm px-3"
               >
                 {deleting ? <Loader2 size={13} className="animate-spin" /> : 'Delete Account'}
-              </button>
+              </Button>
             </div>
           </div>
         )}

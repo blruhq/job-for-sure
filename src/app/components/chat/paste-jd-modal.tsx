@@ -1,7 +1,10 @@
 'use client'
 
 import { useState } from 'react'
-import { X, ClipboardList } from 'lucide-react'
+import { ClipboardList } from 'lucide-react'
+import { Button } from '~/components/ui/button'
+import { Textarea } from '~/components/ui/textarea'
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '~/components/ui/dialog'
 
 interface PasteJDModalProps {
   open: boolean
@@ -11,8 +14,6 @@ interface PasteJDModalProps {
 
 export function PasteJDModal({ open, onClose, onSubmit }: PasteJDModalProps) {
   const [jdText, setJdText] = useState('')
-
-  if (!open) return null
 
   const handleClose = () => {
     setJdText('')
@@ -27,33 +28,28 @@ export function PasteJDModal({ open, onClose, onSubmit }: PasteJDModalProps) {
   }
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 backdrop-blur-sm" onClick={handleClose}>
-      <div
-        className="w-full max-w-lg rounded-lg border border-border bg-card shadow-lg"
-        onClick={(e) => e.stopPropagation()}
-      >
-        {/* Header */}
-        <div className="flex items-center justify-between border-b border-border px-5 py-3">
-          <div className="flex items-center gap-2">
-            <ClipboardList size={14} className="text-primary" />
-            <span className="text-sm font-semibold text-foreground">Paste Job Description</span>
-          </div>
-          <button onClick={handleClose} className="cursor-pointer rounded-sm p-1 text-muted-foreground hover:bg-muted">
-            <X size={14} />
-          </button>
-        </div>
+    <Dialog open={open} onOpenChange={(o) => { if (!o) handleClose() }}>
+      <DialogContent className="neuro-modal max-w-lg rounded-2xl ring-0">
+        <DialogHeader>
+          <DialogTitle>
+            <div className="flex items-center gap-2">
+              <ClipboardList size={14} className="text-primary" />
+              <span>Paste Job Description</span>
+            </div>
+          </DialogTitle>
+        </DialogHeader>
 
-        {/* Body */}
-        <div className="p-5">
+        <div>
           <p className="mb-3 text-xs text-muted-foreground">
             Paste a job description and I'll analyze it against your resume to find the match score and missing keywords.
           </p>
-          <textarea
+          <Textarea
             value={jdText}
             onChange={(e) => setJdText(e.target.value)}
             rows={10}
             placeholder="Paste the full job description here…"
-            className="w-full resize-y rounded-md border border-border bg-background px-3 py-2.5 text-sm leading-relaxed outline-none transition-colors focus:border-primary"
+            neumorphic
+            className="w-full resize-y rounded-2xl px-3 py-2.5 text-sm leading-relaxed"
             autoFocus
           />
           <div className="mt-2 flex items-center justify-between">
@@ -61,30 +57,22 @@ export function PasteJDModal({ open, onClose, onSubmit }: PasteJDModalProps) {
               {jdText.length} characters
             </span>
             {jdText.length > 0 && jdText.length < 50 && (
-              <span className="font-mono text-[10px] text-[var(--warn)]">
+              <span className="font-mono text-[10px] text-warn">
                 Need at least 50 characters
               </span>
             )}
           </div>
         </div>
 
-        {/* Footer */}
-        <div className="flex items-center justify-end gap-2 border-t border-border px-5 py-3">
-          <button
-            onClick={handleClose}
-            className="cursor-pointer rounded-md px-3 py-1.5 text-xs text-muted-foreground hover:bg-muted"
-          >
+        <DialogFooter>
+          <Button variant="outline" onClick={handleClose} className="rounded-md px-3 py-1.5 text-xs">
             Cancel
-          </button>
-          <button
-            onClick={handleSubmit}
-            disabled={jdText.trim().length < 50}
-            className="cursor-pointer rounded-md bg-primary px-4 py-1.5 text-xs font-medium text-primary-foreground transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40"
-          >
+          </Button>
+          <Button variant="default" onClick={handleSubmit} disabled={jdText.trim().length < 50} className="rounded-md px-4 py-1.5 text-xs">
             Analyze Match
-          </button>
-        </div>
-      </div>
-    </div>
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   )
 }

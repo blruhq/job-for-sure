@@ -4,6 +4,8 @@ import { memo, useState, useRef } from 'react'
 import { useRouter } from '~/i18n/routing'
 import type { UIMessage } from 'ai'
 import { Briefcase, MapPin, Check, Pencil } from 'lucide-react'
+import { Button } from '~/components/ui/button'
+import { Input } from '~/components/ui/input'
 import { UserMessage } from '@/components/agent-elements/user-message'
 import { useResumes, useUpdateResume } from '~/hooks/use-resumes'
 import { JobPreview } from '~/components/chat/job-preview'
@@ -50,58 +52,54 @@ export const UploadCardMessage = memo(function UploadCardMessage({
     return (
       <div className="w-full space-y-3">
         {/* Resume summary card */}
-        <div className="rounded-md border border-border bg-card p-4">
+        <div className="rounded-md neuro-card p-4">
           <div className="flex items-center justify-between mb-3">
-            <span className="text-[13px] font-semibold text-foreground">{resume.persona || 'Your Name'}</span>
+            <span className="text-sm font-semibold text-foreground">{resume.persona || 'Your Name'}</span>
             {!isEditing && (
-              <button 
-                onClick={() => setIsEditing(true)}
-                className="cursor-pointer text-[10px] text-muted-foreground hover:text-foreground flex items-center gap-1"
-              >
+              <Button variant="ghost" size="sm" onClick={() => setIsEditing(true)} className="text-[10px] flex items-center gap-1 h-auto p-0">
                 <Pencil size={10} /> Edit Filters
-              </button>
+              </Button>
             )}
           </div>
 
           {isEditing ? (
-            <div className="space-y-3 bg-muted/30 p-2.5 rounded-sm border border-border/50">
+            <div className="space-y-3 bg-muted/30 p-3 rounded-sm border border-border/50">
               <div className="space-y-1.5">
                 <label className="text-[10px] font-medium text-muted-foreground flex items-center gap-1">
                   <Briefcase size={10} /> Target Role
                 </label>
-                <input
-                  type="text"
+                <Input
                   value={roleInput}
                   onChange={(e) => setRoleInput(e.target.value)}
                   placeholder="e.g. Software Engineer"
-                  className="w-full text-[11px] px-2 py-1 rounded border border-border bg-background outline-none focus:border-primary"
+                  className="w-full text-sm px-3 py-2"
                 />
               </div>
               <div className="space-y-1.5">
                 <label className="text-[10px] font-medium text-muted-foreground flex items-center gap-1">
                   <MapPin size={10} /> Location
                 </label>
-                <input
-                  type="text"
+                <Input
                   value={locationInput}
                   onChange={(e) => setLocationInput(e.target.value)}
                   placeholder="e.g. Thailand or Remote"
-                  className="w-full text-[11px] px-2 py-1 rounded border border-border bg-background outline-none focus:border-primary"
+                  className="w-full text-sm px-3 py-2"
                 />
               </div>
-              <button
+              <Button
+                variant="default"
                 onClick={() => {
                   updateResume({ id: resume.id, data: { role: roleInput, location: locationInput } })
                   setIsEditing(false)
                 }}
                 disabled={roleInput.trim().length < 2}
-                className="w-full flex cursor-pointer items-center justify-center gap-1 rounded bg-primary py-1 text-[11px] font-medium text-primary-foreground transition-opacity hover:opacity-90 disabled:opacity-50"
+                className="w-full flex items-center justify-center gap-1.5 py-2 text-sm font-medium"
               >
                 <Check size={11} /> Confirm & Search Jobs
-              </button>
+              </Button>
             </div>
           ) : (
-            <div className="space-y-1 text-[11px] text-muted-foreground">
+            <div className="space-y-1 text-sm text-muted-foreground">
               {resume.role && (
                 <div className="flex items-center gap-1.5">
                   <Briefcase size={10} className="text-primary shrink-0" />
@@ -118,34 +116,36 @@ export const UploadCardMessage = memo(function UploadCardMessage({
           )}
 
           {resume.summary && !isEditing && (
-            <p className="mt-2 text-[11px] text-muted-foreground leading-relaxed">{resume.summary}</p>
+            <p className="mt-2 text-sm text-muted-foreground leading-relaxed">{resume.summary}</p>
           )}
 
           {resume.skills.length > 0 && !isEditing && (
             <div className="mt-2 flex flex-wrap gap-1">
               {resume.skills.slice(0, 12).map((s, i) => (
-                <span key={i} className="rounded-xs bg-muted/50 px-1.5 py-0.5 text-[9px] text-muted-foreground">{s}</span>
+                <span key={i} className="rounded-xs bg-muted/50 px-1.5 py-0.5 text-[10px] text-muted-foreground">{s}</span>
               ))}
               {resume.skills.length > 12 && (
-                <span className="text-[9px] text-muted-foreground">+{resume.skills.length - 12} more</span>
+                <span className="text-[10px] text-muted-foreground">+{resume.skills.length - 12} more</span>
               )}
             </div>
           )}
 
           {!isEditing && (
             <div className="mt-3 flex items-center gap-3">
-              <button
+              <Button
+                variant="link"
                 onClick={() => router.push(`/resume/${resume.id}`)}
-                className="cursor-pointer text-[11px] font-medium text-primary hover:underline"
+                className="text-sm font-medium"
               >
                 View Resume →
-              </button>
-              <button
+              </Button>
+              <Button
+                variant="ghost"
                 onClick={() => router.push(`/resume/${resume.id}?tab=editor`)}
-                className="cursor-pointer text-[11px] font-medium text-muted-foreground hover:text-foreground"
+                className="text-sm font-medium"
               >
                 Edit Resume →
-              </button>
+              </Button>
             </div>
           )}
         </div>

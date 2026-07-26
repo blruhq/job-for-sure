@@ -1,17 +1,12 @@
-'use client'
-
-import { useEffect, useCallback, useRef } from 'react'
 import { useRouter } from '~/i18n/routing'
-import { Sparkles, X } from 'lucide-react'
+import { Sparkles } from 'lucide-react'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '~/components/ui/dialog'
+import { Button } from '~/components/ui/button'
 
 export type UpgradeModalData = {
-  /** Which feature hit the limit, e.g. 'chat', 'resume_create' */
   feature?: string
-  /** The numeric limit that was reached, e.g. 15 (chat/day) or 3 (resumes) */
   limit?: number
-  /** Human-readable label for what was limited, e.g. "chat messages" */
   featureLabel?: string
-  /** Period of the limit, e.g. "today", "per week", "total" */
   period?: string
 }
 
@@ -21,59 +16,8 @@ interface UpgradeModalProps {
   data?: UpgradeModalData
 }
 
-/**
- * Reusable upgrade prompt modal. Shown when a Free-plan user hits a feature
- * limit (chat, resume_create, cover_letter, ats_match, interview).
- *
- * Routes to /pricing (public plans page) or /settings/billing (existing
- * subscribers can manage/cancel).
- */
 export function UpgradeModal({ open, onClose, data }: UpgradeModalProps) {
   const router = useRouter()
-  const dialogRef = useRef<HTMLDivElement>(null)
-  const previouslyFocused = useRef<HTMLElement | null>(null)
-
-  const handleKeyDown = useCallback(
-    (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        onClose()
-      }
-      if (e.key === 'Tab' && dialogRef.current) {
-        const focusable = dialogRef.current.querySelectorAll<HTMLElement>(
-          'button:not([disabled]), a:not([disabled])',
-        )
-        if (focusable.length === 0) return
-        const first = focusable[0]
-        const last = focusable[focusable.length - 1]
-        if (e.shiftKey && document.activeElement === first) {
-          e.preventDefault()
-          last.focus()
-        } else if (!e.shiftKey && document.activeElement === last) {
-          e.preventDefault()
-          first.focus()
-        }
-      }
-    },
-    [onClose],
-  )
-
-  useEffect(() => {
-    if (!open) return
-    previouslyFocused.current = document.activeElement as HTMLElement | null
-    document.addEventListener('keydown', handleKeyDown)
-    document.body.style.overflow = 'hidden'
-    const id = window.setTimeout(() => {
-      dialogRef.current?.querySelector<HTMLElement>('button:not([disabled])')?.focus()
-    }, 0)
-    return () => {
-      document.removeEventListener('keydown', handleKeyDown)
-      document.body.style.overflow = ''
-      window.clearTimeout(id)
-      previouslyFocused.current?.focus?.()
-    }
-  }, [open, handleKeyDown])
-
-  if (!open) return null
 
   const featureLabel = data?.featureLabel ?? 'features'
   const limit = data?.limit
@@ -84,39 +28,19 @@ export function UpgradeModal({ open, onClose, data }: UpgradeModalProps) {
     : `You've reached the free plan limit for ${featureLabel}.`
 
   return (
-    <div
-      className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 backdrop-blur-sm"
-      onClick={onClose}
-    >
-      <div
-        ref={dialogRef}
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="upgrade-modal-title"
-        tabIndex={-1}
-        className="w-full max-w-md rounded-lg border border-border bg-card shadow-xl outline-none"
-        onClick={(e) => e.stopPropagation()}
-      >
-        {/* Close button */}
-        <button
-          onClick={onClose}
-          className="absolute right-3 top-3 cursor-pointer rounded-sm p-1 text-muted-foreground hover:bg-muted"
-          aria-label="Close"
-        >
-          <X size={16} />
-        </button>
+    <Dialog open={open} onOpenChange={(o) => { if (!o) onClose() }}>
+      <DialogContent className="max-w-md">
+        <DialogHeader>
+          <DialogTitle>
+            {limit ? 'Limit Reached' : 'Upgrade to Continue'}
+          </DialogTitle>
+        </DialogHeader>
 
-        {/* Body */}
-        <div className="px-6 py-7 text-center">
+        <div className="px-6 pb-6 text-center">
           {/* Icon */}
           <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
             <Sparkles size={22} className="text-primary" />
           </div>
-
-          {/* Title */}
-          <h3 id="upgrade-modal-title" className="text-base font-semibold text-foreground">
-            {limit ? 'Limit Reached' : 'Upgrade to Continue'}
-          </h3>
 
           {/* Limit description */}
           <p className="mt-2 text-sm text-muted-foreground leading-relaxed">
@@ -140,33 +64,18 @@ export function UpgradeModal({ open, onClose, data }: UpgradeModalProps) {
 
           {/* CTA buttons */}
           <div className="mt-5 flex flex-col gap-2">
-            <button
-              onClick={() => {
-                onClose()
-                router.push('/pricing')
-              }}
-              className="w-full cursor-pointer rounded-md bg-primary px-4 py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90"
-            >
+            <Button variant="default" onClick={() => { onClose(); router.push('/pricing') }} className="w-full px-4 py-2.5 text-sm font-semibold">
               View Plans
-            </button>
-            <button
-              onClick={() => {
-                onClose()
-                router.push('/settings/billing')
-              }}
-              className="w-full cursor-pointer rounded-md border border-border bg-card px-4 py-2.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted"
-            >
+            </Button>
+            <Button variant="outline" onClick={() => { onClose(); router.push('/settings/billing') }} className="w-full px-4 py-2.5 text-sm font-medium">
               Go to Billing Settings
-            </button>
-            <button
-              onClick={onClose}
-              className="mt-1 w-full cursor-pointer text-xs font-medium text-muted-foreground hover:text-foreground"
-            >
+            </Button>
+            <Button variant="link" onClick={onClose} className="mt-1 w-full text-xs font-medium">
               Maybe later
-            </button>
+            </Button>
           </div>
         </div>
-      </div>
-    </div>
+      </DialogContent>
+    </Dialog>
   )
 }

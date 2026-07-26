@@ -74,7 +74,7 @@ export const ResumePreview = memo(function ResumePreview({ resume }: { resume: R
       if (debounceRef.current) clearTimeout(debounceRef.current)
       debounceRef.current = setTimeout(() => {
         if (thisGen === genRef.current) generatePreview(resume, thisGen)
-      }, 200)
+      }, 500)
     }
 
     return () => {
@@ -99,7 +99,7 @@ export const ResumePreview = memo(function ResumePreview({ resume }: { resume: R
       <div className="flex h-full min-h-[600px] items-center justify-center">
         <div className="flex flex-col items-center gap-2">
           <div className="h-5 w-5 animate-spin rounded-full border-2 border-border border-t-primary" />
-          <div className="text-[11px] text-muted-foreground">Loading preview…</div>
+          <div className="text-xs text-muted-foreground">Loading preview…</div>
         </div>
       </div>
     )
@@ -108,7 +108,7 @@ export const ResumePreview = memo(function ResumePreview({ resume }: { resume: R
   if (error && !blobUrl) {
     return (
       <div className="flex h-full min-h-[600px] items-center justify-center">
-        <div className="text-[11px] text-red-500">Preview unavailable</div>
+        <div className="text-xs text-destructive">Preview unavailable</div>
       </div>
     )
   }
@@ -119,13 +119,13 @@ export const ResumePreview = memo(function ResumePreview({ resume }: { resume: R
       {loading && blobUrl && (
         <div className="absolute right-2 top-2 z-10 flex items-center gap-1.5 rounded-full bg-background/80 px-2 py-1 backdrop-blur-sm">
           <div className="h-2.5 w-2.5 animate-spin rounded-full border border-border border-t-primary" />
-          <span className="text-[9px] text-muted-foreground">Updating…</span>
+          <span className="text-[10px] text-muted-foreground">Updating…</span>
         </div>
       )}
       {blobUrl && (
         <iframe
           src={blobUrl}
-          style={{ width: '100%', height: '100%', border: 'none', minHeight: '600px' }}
+          className="w-full h-full border-0 min-h-[600px]"
           title="Resume Preview"
         />
       )}

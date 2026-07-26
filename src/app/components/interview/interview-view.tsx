@@ -7,6 +7,7 @@ import { InterviewSummary } from './interview-summary'
 import type { InterviewConfig, InterviewExchange, InterviewSessionRow } from '~/types/interview'
 import { useActiveResume } from '~/hooks/use-active-resume'
 import { notify } from '~/lib/toast'
+import { Button } from '~/components/ui/button'
 
 export function InterviewView() {
   const { resumes, activeResumeId } = useActiveResume()
@@ -88,7 +89,7 @@ export function InterviewView() {
   }
 
   return (
-    <div className="flex h-full w-full flex-col overflow-hidden bg-background">
+    <div className="flex h-full w-full flex-col overflow-hidden neuro-surface">
       {phase === 'setup' && (
         <Suspense fallback={
           <div className="flex h-full w-full items-center justify-center p-6">
@@ -114,9 +115,9 @@ export function InterviewView() {
       {/* Detail Modal for Past Session */}
       {selectedPastSession && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-[2px]" role="dialog" aria-modal="true" aria-labelledby="interview-modal-title">
-          <div className="flex h-[85vh] w-full max-w-[680px] flex-col rounded-lg border border-border bg-card shadow-lg overflow-hidden animate-fade-up">
+          <div className="flex h-[85vh] w-full max-w-[680px] flex-col rounded-lg neuro-card shadow-lg overflow-hidden animate-fade-up">
             {/* Modal Header */}
-            <div className="flex shrink-0 items-center justify-between border-b border-border bg-muted/20 px-5 py-4">
+            <div className="flex shrink-0 items-center justify-between border-b border-border neuro-inset px-5 py-4">
               <div>
                 <h3 id="interview-modal-title" className="text-sm font-semibold text-foreground">
                   Mock Interview Review: {selectedPastSession.company}
@@ -129,13 +130,15 @@ export function InterviewView() {
                 <span className="rounded bg-success-soft px-2 py-0.5 font-mono text-[10px] font-bold text-success border border-success/15">
                   Score: {selectedPastSession.score}/10
                 </span>
-                <button
+                <Button
+                  variant="outline"
                   onClick={() => setSelectedPastSession(null)}
                   aria-label="Close"
-                  className="rounded-sm border border-border bg-card px-2.5 py-1 text-[10px] hover:bg-muted font-medium cursor-pointer"
+                  size="sm"
+                  className="rounded-sm px-2.5 py-1 text-[10px] font-medium"
                 >
                   Close
-                </button>
+                </Button>
               </div>
             </div>
 
@@ -143,18 +146,18 @@ export function InterviewView() {
             <div className="flex-1 overflow-y-auto p-5 space-y-6">
               {(selectedPastSession.exchanges || []).map((exchange, idx: number) => (
                 <div key={idx} className="space-y-3 border-b border-border/40 pb-5 last:border-0 last:pb-0">
-                  <div className="text-[9px] font-mono uppercase text-muted-foreground tracking-wider">
+                  <div className="text-[10px] font-mono uppercase text-muted-foreground tracking-wider">
                     Question {idx + 1}
                   </div>
                   
                   {/* Question */}
-                  <div className="rounded-md border border-border bg-background p-3.5">
+                  <div className="rounded-md neuro-inset p-3.5">
                     <div className="flex items-center gap-1.5 mb-1.5">
-                      <span className="text-[9px] font-mono uppercase tracking-wider bg-muted text-muted-foreground px-1.5 py-0.5 rounded">
+                      <span className="text-[10px] font-mono uppercase tracking-wider bg-muted text-muted-foreground px-1.5 py-0.5 rounded">
                         {exchange.question?.category}
                       </span>
                       {(exchange.question?.tags || []).map((tag: string) => (
-                        <span key={tag} className="text-[9px] bg-muted/40 text-muted-foreground px-1.5 py-0.5 rounded">
+                        <span key={tag} className="text-[10px] bg-muted/40 text-muted-foreground px-1.5 py-0.5 rounded">
                           #{tag}
                         </span>
                       ))}
@@ -169,7 +172,7 @@ export function InterviewView() {
                   </div>
 
                   {/* Feedback */}
-                  <div className="rounded-md border border-border bg-card p-3.5 space-y-2.5">
+                  <div className="rounded-md neuro-inset p-3.5 space-y-2.5">
                     <div className="flex items-center justify-between border-b border-border pb-2">
                       <span className="text-[10px] font-bold text-foreground">AI Review</span>
                       <span className="text-[10px] font-bold text-success font-mono">Score: {exchange.feedback?.score}/10</span>
@@ -177,10 +180,10 @@ export function InterviewView() {
 
                     <div className="space-y-2">
                       <div>
-                        <span className="text-[9px] font-mono uppercase text-success font-semibold block mb-0.5">Strengths</span>
+                        <span className="text-[10px] font-mono uppercase text-success font-semibold block mb-0.5">Strengths</span>
                         <ul className="space-y-1">
                           {(exchange.feedback?.strengths || []).map((str: string, i: number) => (
-                            <li key={i} className="text-[11px] text-muted-foreground flex items-start gap-1">
+                            <li key={i} className="text-xs text-muted-foreground flex items-start gap-1">
                               <span className="text-success">•</span> {str}
                             </li>
                           ))}
@@ -188,10 +191,10 @@ export function InterviewView() {
                       </div>
 
                       <div>
-                        <span className="text-[9px] font-mono uppercase text-warn font-semibold block mb-0.5">Improvements</span>
+                        <span className="text-[10px] font-mono uppercase text-warn font-semibold block mb-0.5">Improvements</span>
                         <ul className="space-y-1">
                           {(exchange.feedback?.improvements || []).map((imp: string, i: number) => (
-                            <li key={i} className="text-[11px] text-muted-foreground flex items-start gap-1">
+                            <li key={i} className="text-xs text-muted-foreground flex items-start gap-1">
                               <span className="text-warn">•</span> {imp}
                             </li>
                           ))}
@@ -199,8 +202,8 @@ export function InterviewView() {
                       </div>
 
                       <div>
-                        <span className="text-[9px] font-mono uppercase text-primary font-semibold block mb-0.5">Model Answer</span>
-                        <p className="text-[11px] text-muted-foreground leading-relaxed italic bg-muted/30 p-2 rounded border border-border/40">
+                        <span className="text-[10px] font-mono uppercase text-primary font-semibold block mb-0.5">Model Answer</span>
+                        <p className="text-xs text-muted-foreground leading-relaxed italic bg-muted/30 p-2 rounded border border-border/40">
                           "{exchange.feedback?.modelAnswer}"
                         </p>
                       </div>

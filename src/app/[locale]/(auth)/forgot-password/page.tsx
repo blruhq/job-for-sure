@@ -4,6 +4,8 @@ import { useState } from 'react'
 import { Link } from '~/i18n/routing'
 import { Mail } from 'lucide-react'
 import { authClient } from '~/lib/auth-client'
+import { Button } from '~/components/ui/button'
+import { Input } from '~/components/ui/input'
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState('')
@@ -36,34 +38,31 @@ export default function ForgotPasswordPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background px-6">
+    <div className="flex min-h-screen items-center justify-center neuro-surface px-6">
       <div className="w-full max-w-sm">
         {/* Logo */}
         <div className="mb-6 text-center">
           <Link href="/" className="inline-flex cursor-pointer items-center gap-2 no-underline">
-            <div className="h-4 w-4 rounded-[3px] bg-primary" />
+            <div className="h-4 w-4 rounded-[3px] bg-brand" />
             <span className="text-sm font-semibold tracking-tight text-foreground">JOB FOR SURE</span>
           </Link>
         </div>
 
-        <div className="rounded-lg border border-border bg-card p-8 shadow-sm">
+        <div className="rounded-lg neuro-card p-8">
           {sent ? (
             <div className="text-center">
               <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
                 <Mail size="24" className="text-primary" />
               </div>
-              <h1
-                className="text-2xl text-foreground"
-                style={{ fontFamily: 'var(--font-instrument-serif), serif' }}
-              >
-                Check your email
-              </h1>
+                <h1 className="text-2xl text-foreground font-display">
+                  Check your email
+                </h1>
               <p className="mt-2 text-xs text-muted-foreground">
                 We sent a password reset link to{' '}
                 <span className="font-medium text-foreground">{email}</span>.
                 Click the link to set a new password.
               </p>
-              <p className="mt-4 text-[11px] text-muted-foreground/60">
+              <p className="mt-4 text-xs text-muted-foreground/60">
                 Didn&apos;t get an email? Check your spam folder.
               </p>
               <Link
@@ -76,10 +75,7 @@ export default function ForgotPasswordPage() {
           ) : (
             <>
               <div className="text-center">
-                <h1
-                  className="text-2xl text-foreground"
-                  style={{ fontFamily: 'var(--font-instrument-serif), serif' }}
-                >
+                <h1 className="text-2xl text-foreground font-display">
                   Forgot password?
                 </h1>
                 <p className="mt-1 text-xs text-muted-foreground">
@@ -98,23 +94,24 @@ export default function ForgotPasswordPage() {
                   <label className="mb-1 block font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
                     Email
                   </label>
-                  <input
+                  <Input
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="you@example.com"
                     required
-                    className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground outline-none transition-colors placeholder:text-muted-foreground/50 focus:border-primary"
+                    className="w-full rounded-md px-3 py-2 text-sm"
+                    neumorphic
                   />
                 </div>
 
-                <button
+                <Button
                   type="submit"
                   disabled={loading}
-                  className="w-full cursor-pointer rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-opacity hover:opacity-90 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
+                  className="w-full rounded-md text-sm font-medium active:scale-[0.98]"
                 >
                   {loading ? 'Sending…' : 'Send reset link'}
-                </button>
+                </Button>
               </form>
 
               <p className="mt-5 text-center text-xs text-muted-foreground">
