@@ -3,9 +3,11 @@ import ReactPDF from '@react-pdf/renderer'
 import { ResumePDF } from '~/components/resume/resume-pdf'
 import { CoverLetterPDF } from '~/components/resume/cover-letter-pdf'
 import { db } from '~/lib/db'
-import { resumes, coverLetters } from '~/lib/schema'
+import { coverLetters } from '~/lib/schema'
+import { getResumeForUser } from '~/lib/queries'
 import { withAuth } from '~/lib/with-auth'
 import { eq, and, isNull, desc } from 'drizzle-orm'
+import { pdfStreamToBuffer } from '~/components/resume/templates/shared-pdf'
 import type { Resume } from '~/types/resume'
 
 export const runtime = 'nodejs'
@@ -24,13 +26,7 @@ export const GET = withAuth(async (request, { user }) => {
     return NextResponse.json({ error: 'Invalid export type' }, { status: 400 })
   }
 
-  // FIX: Added isNull(resumes.deletedAt) — previously soft-deleted resumes
-  // could still be exported.
-  const [row] = await db
-    .select()
-    .from(resumes)
-    .where(and(eq(resumes.id, id), eq(resumes.userId, user.id), isNull(resumes.deletedAt)))
-    .limit(1)
+  const row = await getResumeForUser(user.id, id)
 
   if (!row) return NextResponse.json({ error: 'Resume not found' }, { status: 404 })
 
@@ -56,13 +52,7 @@ export const GET = withAuth(async (request, { user }) => {
   let pdfBuffer: Uint8Array
   try {
     const stream = await ReactPDF.renderToStream(doc)
-
-    // Convert stream to buffer
-    const chunks: Uint8Array[] = []
-    for await (const chunk of stream as unknown as AsyncIterable<Uint8Array>) {
-      chunks.push(chunk)
-    }
-    pdfBuffer = Buffer.concat(chunks)
+    pdfBuffer = await pdfStreamToBuffer(stream)
   } catch (err) {
     console.error('[export-pdf] Generation failed:', err)
     return NextResponse.json({ error: 'Failed to generate PDF' }, { status: 500 })

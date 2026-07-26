@@ -62,6 +62,20 @@ export function registerFonts() {
   })
 }
 
+/**
+ * Convert a @react-pdf/renderer stream to a Buffer.
+ * Eliminates the duplicated stream-buffering loop in export/pdf and preview-pdf routes.
+ */
+export async function pdfStreamToBuffer(
+  stream: NodeJS.ReadableStream,
+): Promise<Buffer> {
+  const chunks: Uint8Array[] = []
+  for await (const chunk of stream as unknown as AsyncIterable<Uint8Array>) {
+    chunks.push(chunk)
+  }
+  return Buffer.concat(chunks)
+}
+
 // Shared spacing system — professional resume standards
 export const SPACING = {
   pagePadding: 40,
