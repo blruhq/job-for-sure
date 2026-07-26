@@ -202,7 +202,7 @@ export const resumes = pgTable("resumes", {
   updatedAt: timestamp("updated_at").defaultNow().$onUpdate(() => new Date()).notNull(),
   deletedAt: timestamp("deleted_at"),
 }, (table) => [
-  index("resumes_userId_idx").on(table.userId),
+  index("resumes_userId_deletedAt_idx").on(table.userId, table.deletedAt),
   index("resumes_userId_isBase_idx").on(table.userId, table.isBase),
 ]);
 
@@ -240,7 +240,7 @@ export const applications = pgTable("applications", {
   updatedAt: timestamp("updated_at").defaultNow().$onUpdate(() => new Date()).notNull(),
   deletedAt: timestamp("deleted_at"),
 }, (table) => [
-  index("applications_userId_idx").on(table.userId),
+  index("applications_userId_deletedAt_idx").on(table.userId, table.deletedAt),
   index("applications_userId_status_idx").on(table.userId, table.status),
   index("applications_resumeId_idx").on(table.resumeId),
   index("applications_coverLetterId_idx").on(table.coverLetterId),
@@ -291,7 +291,7 @@ export const interviewSessions = pgTable("interview_sessions", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
   deletedAt: timestamp("deleted_at"),
 }, (table) => [
-  index("interview_sessions_userId_idx").on(table.userId),
+  index("interview_sessions_userId_deletedAt_idx").on(table.userId, table.deletedAt),
   index("interview_sessions_resumeId_idx").on(table.resumeId),
 ]);
 
@@ -318,7 +318,7 @@ export const coverLetters = pgTable("cover_letters", {
   updatedAt: timestamp("updated_at").defaultNow().$onUpdate(() => new Date()).notNull(),
   deletedAt: timestamp("deleted_at"),
 }, (table) => [
-  index("cover_letters_userId_idx").on(table.userId),
+  index("cover_letters_userId_deletedAt_idx").on(table.userId, table.deletedAt),
   index("cover_letters_resumeId_idx").on(table.resumeId),
 ]);
 
