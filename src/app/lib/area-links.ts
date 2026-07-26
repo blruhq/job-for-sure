@@ -179,9 +179,9 @@ export interface PropertySite {
 
 export const PROPERTY_SITES: Record<string, PropertySite[]> = {
   TH: [
-    { name: 'Hipflat', url: 'https://www.hipflat.co.th/en/condo-for-rent/' },
-    { name: 'PropertyHub', url: 'https://www.propertyhub.in.th/search?q=' },
-    { name: 'Baania', url: 'https://baania.com/condo-for-rent?q=' },
+    { name: 'Hipflat', url: 'https://www.hipflat.co.th/en/rent/condo/' },
+    { name: 'RentHub', url: 'https://www.renthub.in.th/condo-for-rent?q=' },
+    { name: 'Baania', url: 'https://baania.com/en/s/all/rent?q=' },
   ],
   US: [
     { name: 'Zillow', url: 'https://www.zillow.com/homes/for_rent/' },
@@ -212,7 +212,9 @@ export function getPropertySites(countryCode: string): PropertySite[] {
 
 /** Build full housing search URL for a specific site + area */
 export function housingUrl(site: PropertySite, area: string): string {
-  return `${site.url}${enc(area)}`
+  // Path-based sites (URL ends with '/') need a lowercase slug; query-param sites (contain '?') use encoded area.
+  const isPathBased = site.url.endsWith('/')
+  return `${site.url}${isPathBased ? slug(area) : enc(area)}`
 }
 
 // ── TEMPORARY STAY ──
@@ -281,7 +283,7 @@ export function cultureProfileUrl(company: string): string {
 
 /** Reddit discussions — real employee opinions */
 export function redditSearchUrl(company: string): string {
-  return `https://www.google.com/search?q=${enc(company + ' site:reddit.com')}`
+  return `https://www.reddit.com/search/?q=${enc(company)}`
 }
 
 /** OpenCorporates — is this company legally registered? */
