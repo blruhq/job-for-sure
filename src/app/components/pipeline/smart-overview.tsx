@@ -16,6 +16,7 @@ import {
 } from 'lucide-react'
 import { Button } from '~/components/ui/button'
 import { cn } from '~/lib/utils'
+import { handleSmartOverviewLimit } from '~/lib/smart-overview-quota'
 import type { SmartOverviewResult } from '~/types/smart-overview'
 import * as Links from '~/lib/area-links'
 
@@ -77,6 +78,13 @@ export function SmartOverview(props: SmartOverviewProps) {
           applicationId: props.applicationId,
         }),
       })
+      // 402 = Free-plan daily AI analysis limit reached (shared with ATS Match).
+      // Open the global UpgradeModal and bail WITHOUT the generic error UI.
+      if (await handleSmartOverviewLimit(res)) {
+        // Keep an existing overview visible (regenerate case); else back to idle.
+        setState(overview ? 'complete' : 'idle')
+        return
+      }
       const data = await res.json()
       if (!res.ok) {
         throw new Error(data.error || 'Failed to generate overview')
@@ -123,6 +131,9 @@ export function SmartOverview(props: SmartOverviewProps) {
         </Button>
         <p className="mt-2 text-center text-sm text-muted-foreground">
           Get a personalized analysis: match, salary, commute, company
+        </p>
+        <p className="mt-1 text-center text-xs text-muted-foreground/80">
+          Shares your 5/day free AI analyses with ATS Match
         </p>
       </div>
     )
