@@ -43,7 +43,8 @@ test.describe('ATS Optimizer Flow', () => {
           body: JSON.stringify([
             {
               id: 'resume-1',
-              data: JSON.stringify({
+              isBase: true,
+              data: {
                 id: 'resume-1',
                 name: 'Frontend Engineer',
                 persona: 'John Doe',
@@ -59,7 +60,7 @@ test.describe('ATS Optimizer Flow', () => {
                 ],
                 companies: [],
                 stretch: [],
-              }),
+              },
             },
           ]),
         })
@@ -169,9 +170,19 @@ test.describe('ATS Optimizer Flow', () => {
     // Verifies the page loads correctly
     await expect(page.locator('h1')).toContainText('ATS Optimizer')
 
-    // Verifies the General Health Audit runs automatically
+    // Select the first resume so the Health Check button becomes enabled
+    // (auto-run was removed in a765139 — user must explicitly click Health Check)
+    // First open the Select dropdown, then click the resume option
+    await page.getByRole('combobox').click()
+    await page.getByRole('option', { name: 'Frontend Engineer' }).waitFor({ state: 'visible', timeout: 10000 })
+    await page.getByRole('option', { name: 'Frontend Engineer' }).click()
+
+    // Trigger the baseline health check
+    await page.getByRole('button', { name: /Health Check/i }).click()
+
+    // Verifies the General Health Audit runs
     await page.waitForSelector('text=Excellent Health', { timeout: 10000 })
-    await expect(page.locator('body')).toContainText('Baseline resume audit and formatting report')
+    await expect(page.locator('body')).toContainText('Baseline resume health report')
     await expect(page.locator('body')).toContainText('ATS Format')
     await expect(page.locator('body')).toContainText('Clean standard structure.')
 
