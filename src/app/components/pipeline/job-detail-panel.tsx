@@ -269,25 +269,23 @@ export function JobDetailPanel({
           )}
 
           {/* ── Smart AI Overview ── */}
-          {description && description.length >= 50 && (
-            <SmartOverview
-              job={{
-                company: job.company,
-                title: job.title,
-                loc: job.loc,
-                url: job.url,
-                score: job.score,
-                salary: job.salary,
-                jobData: job.jobData,
-              }}
-              resumeData={activeResume as unknown as Record<string, unknown> | null}
-              homeLocation={homeLocation}
-              matchScore={job.score}
-              matchedSkills={matchedSkills}
-              missingSkills={missingSkills}
-              applicationId={job.applicationId}
-            />
-          )}
+          <SmartOverview
+            job={{
+              company: job.company,
+              title: job.title,
+              loc: job.loc,
+              url: job.url,
+              score: job.score,
+              salary: job.salary,
+              jobData: job.jobData,
+            }}
+            resumeData={activeResume as unknown as Record<string, unknown> | null}
+            homeLocation={homeLocation}
+            matchScore={job.score}
+            matchedSkills={matchedSkills}
+            missingSkills={missingSkills}
+            applicationId={job.applicationId}
+          />
 
           {/* Area & Company Intelligence */}
           <AreaIntelligence
