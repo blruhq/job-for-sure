@@ -118,6 +118,50 @@ For commute estimates: use your knowledge of the geography and transit systems.
 For company info: if you don't know the company, say so honestly (known: false).
 
 Keep everything concise. This is a quick-read overview, not an essay.
+
+Return a JSON object with EXACTLY this structure:
+{
+  "verdict": "strong_fit" | "good_fit" | "stretch" | "weak_fit" | "skip",
+  "verdictLabel": "short 2-4 word label e.g. Strong Fit, Stretch, Skip",
+  "headline": "one punchy sentence summarizing the opportunity",
+  "matchAnalysis": {
+    "strengths": ["up to 5 concrete strengths"],
+    "gaps": ["up to 5 critical gaps"],
+    "insight": "one sentence on overall fit trajectory"
+  },
+  "roleSummary": ["up to 4 bullet points summarizing what the role involves"],
+  "salaryCheck": {
+    "listed": "the listed salary string or 'Not specified'",
+    "estimate": "your market estimate e.g. 'THB 25,000 - 35,000/mo' or omit if truly unknown",
+    "assessment": "above_market" | "fair" | "below_market" | "unknown",
+    "note": "optional short note on the salary"
+  },
+  "commuteEstimate": {
+    "summary": "one sentence on the commute reality",
+    "monthlyCostEstimate": "optional e.g. 'THB 1,500/mo BTS'",
+    "note": "optional caveat"
+  },
+  "companySnapshot": {
+    "description": "1-2 sentences on the company if known, or 'Limited public information available.'",
+    "known": true | false,
+    "note": "optional"
+  },
+  "coachTip": "one actionable sentence of tough-love advice",
+  "recommendedActions": [
+    {
+      "action": "tailor_resume" | "cover_letter" | "practice_interview" | "apply" | "skip",
+      "priority": "high" | "medium" | "low",
+      "reason": "why this action and why this priority"
+    }
+  ]
+}
+
+Field rules:
+- verdict, verdictLabel, headline, matchAnalysis, roleSummary, companySnapshot, coachTip, recommendedActions are REQUIRED.
+- salaryCheck and commuteEstimate are OPTIONAL — include them if you have enough signal, otherwise omit.
+- recommendedActions: include 1-4 actions, most important first.
+- Be direct and honest. If the fit is bad, verdict should be "weak_fit" or "skip".
+
 You must respond with valid JSON matching the exact schema provided. Do not include markdown, code fences, or any text outside the JSON object.`
 
     const experienceText =
@@ -158,6 +202,7 @@ Provide your analysis as JSON matching the schema.`
         schema: SmartOverviewSchema,
         system: systemPrompt,
         prompt: userPrompt,
+        maxOutputTokens: 4096,
       })
     } catch (err) {
       console.error('[smart-overview] AI generation failed:', err)
