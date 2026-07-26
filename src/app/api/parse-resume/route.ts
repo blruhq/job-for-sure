@@ -119,14 +119,25 @@ export const POST = withAuth(async (req, { user }) => {
       )
     }
   } else {
-    const body = z.object({ text: z.string().min(20).max(50000) }).safeParse(await req.json())
+    const body = z.object({ text: z.string().min(20).max(28000) }).safeParse(await req.json())
     if (!body.success) {
       return NextResponse.json(
-        { error: 'Resume text is too short or too long.' },
+        { error: body.data === undefined ? 'Resume text is too short (minimum 20 characters).' : 'Resume text is too long. We support up to 8 pages.' },
         { status: 400 },
       )
     }
     text = body.data.text
+  }
+
+  // ── Page-limit guard: ~3,500 chars per page (industry average) ──
+  const MAX_PAGES = 8
+  const CHARS_PER_PAGE = 3500
+  const estimatedPages = Math.ceil(text.length / CHARS_PER_PAGE)
+  if (estimatedPages > MAX_PAGES) {
+    return NextResponse.json(
+      { error: `Your resume is approximately ${estimatedPages} pages long. We support up to ${MAX_PAGES} pages. Please trim your resume and try again. For best results, keep it to 1-2 pages.` },
+      { status: 413 },
+    )
   }
 
   // ── AI parse (strict first → lenient fallback + safety net) ──
