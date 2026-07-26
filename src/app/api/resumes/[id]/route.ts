@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { db } from '~/lib/db'
 import { resumes } from '~/lib/schema'
+import { getResumeForUser } from '~/lib/queries'
 import { withAuth } from '~/lib/with-auth'
 import { eq, and, isNull } from 'drizzle-orm'
 import { z } from 'zod'
@@ -10,11 +11,7 @@ import { MAX_RESUME_JSON_BYTES } from '~/lib/constants'
 // GET /api/resumes/[id] — get a single resume
 export const GET = withAuth(async (req, { user, params }) => {
   const { id } = params
-  const [resume] = await db
-    .select()
-    .from(resumes)
-    .where(and(eq(resumes.id, id), eq(resumes.userId, user.id), isNull(resumes.deletedAt)))
-    .limit(1)
+  const resume = await getResumeForUser(user.id, id)
 
   if (!resume) return NextResponse.json({ error: 'Not found' }, { status: 404 })
   return NextResponse.json(resume)
