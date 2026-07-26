@@ -257,15 +257,15 @@ html[lang="th"] {
 .dark {
   --background: #0E1116;
   --foreground: #F2F4F8;
-  --card: #181D27;
+  --card: #1C2230;
   --card-foreground: #F2F4F8;
-  --popover: #181D27;
+  --popover: #232938;
   --popover-foreground: #F2F4F8;
   --primary: #F59E0B;               /* fresh yellow — action/CTA in dark mode */
   --primary-foreground: #0E1116;    /* dark text on yellow */
   --brand: #F59E0B;                  /* fresh yellow for dark mode */
   --brand-foreground: #0E1116;
-  --secondary: #232936;
+  --secondary: #252B39;
   --secondary-foreground: #F2F4F8;
   --muted: #232936;
   --muted-foreground: #87909F;
@@ -273,9 +273,11 @@ html[lang="th"] {
   --accent-foreground: #FBBF24;       /* amber-400 for dark mode text accents */
   --destructive: #F85149;
   --destructive-foreground: #FFFFFF;
-  --border: rgba(255, 255, 255, 0.08);
+  --border: rgba(255, 255, 255, 0.15);
   --input: rgba(255, 255, 255, 0.10);
   --ring: #F59E0B;
+  --primary-hover: #D97706;
+  --input-border: rgba(255, 255, 255, 0.15);
 
   --chart-1: #F59E0B;
   --chart-2: #5A6BA0;
@@ -283,11 +285,11 @@ html[lang="th"] {
   --chart-4: #F85149;
   --chart-5: #87909F;
 
-  --sidebar: #131720;
+  --sidebar: #11151E;
   --sidebar-foreground: #F2F4F8;
   --sidebar-hover: #232936;
   --sidebar-active: #2D3444;
-  --sidebar-border: rgba(255, 255, 255, 0.08);
+  --sidebar-border: rgba(255, 255, 255, 0.15);
   --sidebar-accent: #F59E0B;
 
   --success: #3FB950;
@@ -299,10 +301,13 @@ html[lang="th"] {
   --accent-blueprint: rgba(245, 158, 11, 0.08);
 
   --neuro-surface: var(--background);
+  --neuro-surface-raised: var(--card);
+  --neuro-surface-card: var(--card);
+  --neuro-surface-card-raised: var(--card);
 
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
-  --shadow-md: 0 1px 3px rgba(0, 0, 0, 0.4);
-  --shadow-lg: 0 2px 8px rgba(0, 0, 0, 0.4);
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.2);
+  --shadow-md: 0 1px 2px rgba(0, 0, 0, 0.2);
+  --shadow-lg: 0 4px 12px rgba(0, 0, 0, 0.4);
   --shadow-paper: 0 0 0 1px var(--border);
 
   /* ── Agent Elements dark overrides ── */
@@ -703,10 +708,14 @@ html[lang="th"] {
 .dark .neuro-card,
 .dark .neuro-inset,
 .dark .neuro-icon-well,
-.dark .neuro-pill,
-.dark .neuro-modal {
+.dark .neuro-pill {
   background-color: var(--card);
   box-shadow: var(--shadow-md);
+}
+
+.dark .neuro-modal {
+  background-color: var(--popover);
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.5);
 }
 
 .dark .neuro-card:hover,
@@ -737,6 +746,7 @@ html[lang="th"] {
 }
 
 .dark .neuro-chat .bg-an-input-background {
+  background-color: var(--card);
   border-color: var(--border);
   box-shadow: none;
 }
