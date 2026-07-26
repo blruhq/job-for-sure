@@ -216,6 +216,6 @@ Guidelines:
     }
   }
 
-  await captureServerEvent(user.id, 'resume_uploaded')
+  await captureServerEvent(user.id, 'resume_created', { method: 'upload' })
   return NextResponse.json(parsed)
 }, { rateLimitType: 'ai', route: '/api/parse-resume' })

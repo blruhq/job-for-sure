@@ -7,6 +7,7 @@ import { eq, and, isNull } from 'drizzle-orm'
 import { z } from 'zod'
 import { ResumeDataSchema } from '~/lib/schemas'
 import { MAX_RESUME_JSON_BYTES } from '~/lib/constants'
+import { captureServerEvent } from '~/lib/posthog-server'
 
 // GET /api/resumes/[id] — get a single resume
 export const GET = withAuth(async (req, { user, params }) => {
@@ -81,5 +82,8 @@ export const DELETE = withAuth(async (req, { user, params }) => {
     .returning()
 
   if (!updated) return NextResponse.json({ error: 'Not found' }, { status: 404 })
+
+  await captureServerEvent(user.id, 'resume_deleted')
+
   return NextResponse.json({ success: true })
 })

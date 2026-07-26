@@ -3,6 +3,7 @@ import { generateObjectWithFailover } from '~/lib/ai-providers'
 import { withAuth } from '~/lib/with-auth'
 import { ResumeDataSchema } from '~/lib/schemas'
 import { gateFeature, recordUsage } from '~/lib/plan'
+import { captureServerEvent } from '~/lib/posthog-server'
 import { z } from 'zod'
 
 export const maxDuration = 60
@@ -107,6 +108,7 @@ Definitions:
   })
 
   await recordUsage(user.id, 'ats_match')
+  await captureServerEvent(user.id, 'ats_match_run', { input_type: hasJd ? 'text' : 'text', has_jd: hasJd })
 
   return NextResponse.json(result)
 }, { rateLimitType: 'ai', route: '/api/ai/ats-match' })

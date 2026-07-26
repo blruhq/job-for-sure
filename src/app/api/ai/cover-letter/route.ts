@@ -125,7 +125,7 @@ ANTI-FABRICATION RULES (CRITICAL — never violate these):
   })
 
   await recordUsage(user.id, 'cover_letter')
-  await captureServerEvent(user.id, 'cover_letter_created', { company, role, language })
+  await captureServerEvent(user.id, 'cover_letter_generated', { has_jd: !!jdText, company, role, language })
 
   const letterId = crypto.randomUUID()
   let savedId: string | null = letterId

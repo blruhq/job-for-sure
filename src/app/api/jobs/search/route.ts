@@ -40,6 +40,6 @@ export const POST = withAuth(async (req, { user }) => {
     fresh: fresh || false,
   })
 
-  await captureServerEvent(user.id, 'job_searched', { query, location })
+  await captureServerEvent(user.id, 'job_search_run', { query: query || '', location: location || '', result_count: result.total })
   return NextResponse.json(result)
 }, { rateLimitType: 'general', route: '/api/jobs/search' })

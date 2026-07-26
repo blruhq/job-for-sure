@@ -13,6 +13,12 @@ export default function Error({
 }) {
   useEffect(() => {
     console.error('[AppError]', error)
+    // Capture error in PostHog (fail-open)
+    import('posthog-js').then(({ default: ph }) => {
+      try {
+        ph.captureException(error, { error_type: 'app_error_boundary' })
+      } catch { /* fail-open */ }
+    }).catch(() => {})
   }, [error])
 
   return (
