@@ -179,9 +179,11 @@ export interface PropertySite {
 
 export const PROPERTY_SITES: Record<string, PropertySite[]> = {
   TH: [
-    { name: 'Hipflat', url: 'https://www.hipflat.co.th/en/rent/condo/' },
-    { name: 'RentHub', url: 'https://www.renthub.in.th/condo-for-rent?q=' },
-    { name: 'Baania', url: 'https://baania.com/en/s/all/rent?q=' },
+    // Hipflat uses base listing page only — NO area deep-linking available.
+    // User manually filters by province in the in-page sidebar.
+    { name: 'Hipflat', url: 'https://www.hipflat.co.th/en/condo-for-rent' },
+    // Baania uses /s/{area}/rent path pattern. Verified: baania.com/s/bangkok/rent → 219 listings.
+    { name: 'Baania', url: 'https://baania.com/s/{area}/rent' },
   ],
   US: [
     { name: 'Zillow', url: 'https://www.zillow.com/homes/for_rent/' },
@@ -210,11 +212,21 @@ export function getPropertySites(countryCode: string): PropertySite[] {
   return PROPERTY_SITES[countryCode.toUpperCase()] || []
 }
 
-/** Build full housing search URL for a specific site + area */
+/**
+ * Build full housing search URL for a specific site + area.
+ *
+ * Sites that support area search use a `{area}` placeholder in their URL
+ * (e.g. Baania: `baania.com/s/{area}/rent`). The placeholder is replaced
+ * with a lowercase slug of the area name.
+ *
+ * Sites without `{area}` (e.g. Hipflat) return their base URL as-is —
+ * the user manually filters by province in the site's UI.
+ */
 export function housingUrl(site: PropertySite, area: string): string {
-  // Path-based sites (URL ends with '/') need a lowercase slug; query-param sites (contain '?') use encoded area.
-  const isPathBased = site.url.endsWith('/')
-  return `${site.url}${isPathBased ? slug(area) : enc(area)}`
+  if (site.url.includes('{area}')) {
+    return site.url.replace('{area}', slug(area))
+  }
+  return site.url
 }
 
 // ── TEMPORARY STAY ──
