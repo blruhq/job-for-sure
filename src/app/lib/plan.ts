@@ -164,10 +164,56 @@ export async function getUsageBreakdown(
   plan: string,
 ): Promise<Record<Feature, LimitResult>> {
   const entries = Object.entries(FEATURES) as [Feature, FeatureConfig][]
+  const effectivePlan = getEffectivePlan(role, plan)
+
+  // Batch usage_events counts into two GROUP BY queries:
+  //   week-level (covers cover_letter, interview) and day-level (covers chat, ats_match).
+  // This replaces N sequential getFeatureCount calls with at most 2 queries.
+  const sinceDay = periodBoundary('day')
+  const sinceWeek = periodBoundary('week')
+
+  const dayRows = sinceDay
+    ? await db
+        .select({ feature: usageEvents.feature, total: count() })
+        .from(usageEvents)
+        .where(and(eq(usageEvents.userId, userId), gte(usageEvents.createdAt, sinceDay)))
+        .groupBy(usageEvents.feature)
+    : []
+
+  const weekRows = sinceWeek
+    ? await db
+        .select({ feature: usageEvents.feature, total: count() })
+        .from(usageEvents)
+        .where(and(eq(usageEvents.userId, userId), gte(usageEvents.createdAt, sinceWeek)))
+        .groupBy(usageEvents.feature)
+    : []
+
+  const dayUsageMap = new Map(dayRows.map((r) => [r.feature, r.total]))
+  const weekUsageMap = new Map(weekRows.map((r) => [r.feature, r.total]))
+
   const results: Record<Feature, LimitResult> = {} as Record<Feature, LimitResult>
 
-  for (const [feature] of entries) {
-    results[feature] = await checkLimit(userId, feature, role, plan)
+  for (const [feature, config] of entries) {
+    const limit = config.limit[effectivePlan]
+
+    // Unlimited
+    if (limit === -1) {
+      results[feature] = { allowed: true, remaining: Infinity, limit: Infinity, plan: effectivePlan }
+      continue
+    }
+
+    // resume_create uses actual DB rows, not usage_events
+    let used: number
+    if (feature === 'resume_create') {
+      used = await getResumeCount(userId)
+    } else if (config.period === 'day') {
+      used = dayUsageMap.get(feature) ?? 0
+    } else {
+      used = weekUsageMap.get(feature) ?? 0
+    }
+
+    const remaining = Math.max(0, limit - used)
+    results[feature] = { allowed: remaining > 0, remaining, limit, plan: effectivePlan }
   }
 
   return results
