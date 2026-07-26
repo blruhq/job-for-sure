@@ -105,7 +105,8 @@ export function BuildWizard({ open, onClose, onComplete }: BuildWizardProps) {
                   value={data.role}
                   onChange={(e) => setData({ ...data, role: e.target.value })}
                   placeholder="e.g. Senior Product Designer, Registered Nurse, Marketing Manager"
-                  className="neuro-inset w-full rounded-lg border-0 px-3 py-2 text-sm"
+                  neumorphic
+                  className="w-full rounded-lg px-3 py-2 text-sm"
                   autoFocus
                 />
               </div>
@@ -117,7 +118,8 @@ export function BuildWizard({ open, onClose, onComplete }: BuildWizardProps) {
                   value={data.industry}
                   onChange={(e) => setData({ ...data, industry: e.target.value })}
                   placeholder="e.g. Tech, Healthcare, Finance, Education"
-                  className="neuro-inset w-full rounded-lg border-0 px-3 py-2 text-sm"
+                  neumorphic
+                  className="w-full rounded-lg px-3 py-2 text-sm"
                 />
               </div>
               <p className="font-mono text-xs text-muted-foreground">

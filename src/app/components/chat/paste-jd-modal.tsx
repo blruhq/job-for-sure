@@ -48,7 +48,8 @@ export function PasteJDModal({ open, onClose, onSubmit }: PasteJDModalProps) {
             onChange={(e) => setJdText(e.target.value)}
             rows={10}
             placeholder="Paste the full job description here…"
-            className="neuro-inset w-full resize-y rounded-2xl border-0 px-3 py-2.5 text-sm leading-relaxed"
+            neumorphic
+            className="w-full resize-y rounded-2xl px-3 py-2.5 text-sm leading-relaxed"
             autoFocus
           />
           <div className="mt-2 flex items-center justify-between">

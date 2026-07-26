@@ -490,10 +490,7 @@ html[lang="th"] {
   box-shadow: none !important;
 }
 
-/* ── Sidebar: suppress focus ring (neumorphism inset provides visual feedback) ── */
-aside a:focus-visible {
-  outline: none !important;
-}
+/* ── Sidebar: focus ring now uses global *:focus-visible ring ── */
 
 /* ── Command palette: exempt from global focus-visible ring ── */
 [data-cmdk-root]:focus,
