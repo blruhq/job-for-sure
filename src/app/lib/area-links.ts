@@ -5,7 +5,11 @@
 // ═══════════════════════════════════════════════════════════════
 
 function slug(s: string): string {
-  return s.toLowerCase().trim().replace(/\s+/g, '-')
+  return s.toLowerCase().trim()
+    .replace(/[^a-z0-9\s-]/g, '')   // strip punctuation (keeps alphanumeric, spaces, hyphens)
+    .replace(/\s+/g, '-')            // spaces → hyphens
+    .replace(/-+/g, '-')             // collapse consecutive hyphens
+    .replace(/^-|-$/g, '')           // trim leading/trailing hyphens
 }
 
 function enc(s: string): string {
@@ -239,7 +243,7 @@ export function agodaUrl(city: string): string {
 // ── VISA (country-specific) ──
 
 export const VISA_LINKS: Record<string, { name: string; url: string }> = {
-  TH: { name: 'Thai Visa Guide', url: 'https://www.thaivisa.com/' },
+  TH: { name: 'Thai Visa Forum (AseanNow)', url: 'https://aseannow.com/' },
   US: { name: 'USCIS Working in US', url: 'https://www.uscis.gov/working-in-the-united-states' },
   SG: { name: 'MOM Singapore Passes', url: 'https://www.mom.gov.sg/passes-and-permits' },
   UK: { name: 'UK Skilled Worker Visa', url: 'https://www.gov.uk/skilled-worker-visa' },
