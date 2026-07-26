@@ -6,5 +6,5 @@ export const metadata: Metadata = {
 }
 
 export default function SettingsLayout({ children }: { children: React.ReactNode }) {
-  return <div className="neuro-surface">{children}</div>
+  return <div className="flex flex-1 flex-col overflow-hidden neuro-surface">{children}</div>
 }

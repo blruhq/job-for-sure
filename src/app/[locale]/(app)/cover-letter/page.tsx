@@ -14,10 +14,11 @@ import { Input } from '~/components/ui/input'
 import { Textarea } from '~/components/ui/textarea'
 import { EmptyState } from '~/components/ui/empty-state'
 import { SegmentedControl } from '~/components/ui/segmented-control'
-import { useTranslations } from 'next-intl'
+import { useTranslations, useLocale } from 'next-intl'
 
 export default function StandaloneCoverLetterPage() {
   const t = useTranslations('coverLetter')
+  const locale = useLocale()
   const { resumes, activeResumeId, setActiveResumeId } = useActiveResume()
   const { mutate: addResume } = useCreateResume()
 
@@ -397,7 +398,7 @@ export default function StandaloneCoverLetterPage() {
                     {letter.company || letter.role || 'Untitled'}
                   </div>
                   <div className="font-mono text-[10px] text-muted-foreground">
-                    {new Date(letter.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                    {new Date(letter.createdAt).toLocaleDateString(locale, { month: 'short', day: 'numeric' })}
                   </div>
                 </div>
                 <Button

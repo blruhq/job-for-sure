@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from '~/i18n/routing'
+import { useLocale } from 'next-intl'
 import { useResumes, useDeleteResume } from '~/hooks/use-resumes'
 import { useUIStore } from '~/hooks/use-ui'
 import { ConfirmDialog } from '~/components/ui/confirm-dialog'
@@ -15,6 +16,7 @@ import type { Resume } from '~/types/resume'
 
 export default function ResumesPage() {
   const router = useRouter()
+  const locale = useLocale()
   const { data: resumes = [], isLoading } = useResumes()
   const setActiveResumeId = useUIStore((s) => s.setActiveResumeId)
   const { mutateAsync: deleteResume } = useDeleteResume()
@@ -46,7 +48,7 @@ export default function ResumesPage() {
     if (!iso) return ''
     try {
       const d = new Date(iso)
-      return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+      return d.toLocaleDateString(locale, { month: 'short', day: 'numeric', year: 'numeric' })
     } catch { return '' }
   }
 

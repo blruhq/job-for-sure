@@ -91,11 +91,13 @@ export default function ForgotPasswordPage() {
                 )}
 
                 <div>
-                  <label className="mb-1 block font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
+                  <label htmlFor="forgot-email" className="mb-1 block font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
                     Email
                   </label>
                   <Input
+                    id="forgot-email"
                     type="email"
+                    autoComplete="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="you@example.com"

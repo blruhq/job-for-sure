@@ -188,6 +188,7 @@ function OverviewContent({
           variant="ghost"
           onClick={onRegenerate}
           className="text-muted-foreground"
+          aria-label="Regenerate AI overview"
         >
           <RefreshCw size={12} />
         </Button>

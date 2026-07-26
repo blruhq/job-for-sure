@@ -104,11 +104,38 @@ export async function checkAuthIpRateLimit(
  * Check PDF rate limit for a user (10 req/min).
  * CPU-intensive @react-pdf/renderer renders should not be hammered.
  * Returns null if allowed, or a Response (429) if rate limited.
+ *
+ * PDF generation is a resource-intensive feature that MUST fail-closed
+ * when Redis is unavailable — otherwise unlimited PDF generation is possible.
+ * Unlike other rate limiters (which fail-open per fail-open policy), this one
+ * returns 429 when the rate limiter cannot be checked.
  */
 export async function checkPdfRateLimit(
   userId: string,
 ): Promise<Response | null> {
-  return doLimit(getPdfRatelimit(), userId)
+  try {
+    const { success, reset } = await getPdfRatelimit().limit(userId)
+    if (!success) {
+      const retryAfter = Math.ceil((reset - Date.now()) / 1000)
+      return new Response(
+        JSON.stringify({ error: 'Rate limit exceeded. Please slow down.' }),
+        {
+          status: 429,
+          headers: {
+            'Content-Type': 'application/json',
+            'Retry-After': String(retryAfter),
+          },
+        },
+      )
+    }
+    return null
+  } catch {
+    // Fail-closed: if Redis is down, deny PDF generation to prevent abuse
+    return new Response(
+      JSON.stringify({ error: 'Service temporarily unavailable. Try again.' }),
+      { status: 429, headers: { 'Content-Type': 'application/json' } },
+    )
+  }
 }
 
 /**
