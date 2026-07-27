@@ -51,7 +51,7 @@ export function FeaturesBento() {
         <div className="mt-20 grid gap-5 md:grid-cols-[1.6fr_1fr] md:grid-rows-[1fr_1fr]">
           {/* Large card — AI Chat Coach */}
           <div
-            className={`${large.bgAccent} ${large.borderAccent} row-span-2 flex flex-col justify-between rounded-2xl border p-8 md:p-10 shadow-sm`}
+            className={`${large.bgAccent} ${large.borderAccent} row-span-2 flex flex-col justify-between rounded-2xl border p-5 sm:p-8 md:p-10 shadow-sm`}
           >
             <div>
               <div
@@ -80,7 +80,7 @@ export function FeaturesBento() {
                   <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary/10 text-xs font-bold text-primary">
                     AI
                   </div>
-                  <div className="max-w-[80%] rounded-xl bg-muted px-4 py-3">
+                  <div className="max-w-[85%] rounded-xl bg-muted px-4 py-3">
                     <p
                       className="text-sm leading-relaxed text-foreground"
                       dangerouslySetInnerHTML={{ __html: t.raw('featuresChatMsg1') }}
@@ -93,7 +93,7 @@ export function FeaturesBento() {
                 </div>
                 {/* User message */}
                 <div className="flex items-start gap-3 justify-end">
-                  <div className="max-w-[75%] rounded-xl bg-primary/10 px-4 py-3">
+                  <div className="max-w-[85%] rounded-xl bg-primary/10 px-4 py-3">
                     <p className="text-sm text-foreground">{t('featuresChatUser')}</p>
                   </div>
                   <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-muted-foreground/10 text-xs font-bold text-muted-foreground">
@@ -127,7 +127,7 @@ export function FeaturesBento() {
             return (
               <div
                 key={f.title}
-                className={`${f.bgAccent} ${f.borderAccent} flex flex-col justify-between rounded-2xl border p-8 shadow-sm`}
+                className={`${f.bgAccent} ${f.borderAccent} flex flex-col justify-between rounded-2xl border p-5 sm:p-8 shadow-sm`}
               >
                 <div>
                   <div

@@ -96,7 +96,7 @@ export default function PricingPage() {
             <div
               key={plan.name}
               className={cn(
-                'rounded-xl border p-6',
+                'rounded-xl border p-4 sm:p-6',
                 plan.highlight
                   ? 'border-primary/40 neuro-card ring-1 ring-primary/20'
                   : 'border-border neuro-card',
@@ -136,7 +136,7 @@ export default function PricingPage() {
                 <Button
                   variant="outline"
                   onClick={() => router.push('/chat')}
-                  className="mt-6 w-full rounded-lg px-4 py-2 text-sm font-medium"
+                  className="mt-6 flex min-h-[44px] w-full items-center justify-center rounded-lg px-4 py-2 text-sm font-medium"
                 >
                   {plan.cta}
                 </Button>
@@ -145,7 +145,7 @@ export default function PricingPage() {
                   <Button
                     onClick={() => handleSubscribe('month')}
                     disabled={loading === 'monthly'}
-                    className="w-full rounded-lg px-4 py-2 text-sm font-medium"
+                    className="flex min-h-[44px] w-full items-center justify-center rounded-lg px-4 py-2 text-sm font-medium"
                   >
                     {loading === 'monthly' ? 'Redirecting…' : `${plan.price}${plan.period}`}
                   </Button>
@@ -153,7 +153,7 @@ export default function PricingPage() {
                     variant="outline"
                     onClick={() => handleSubscribe('year')}
                     disabled={loading === 'yearly'}
-                    className="w-full rounded-lg border-primary/30 px-4 py-2 text-xs font-medium text-primary hover:bg-primary/5"
+                    className="flex min-h-[44px] w-full items-center justify-center rounded-lg border-primary/30 px-4 py-2 text-xs font-medium text-primary hover:bg-primary/5"
                   >
                     {loading === 'yearly' ? 'Redirecting…' : '$29 / year (save 70% vs $8/mo)'}
                   </Button>

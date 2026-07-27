@@ -31,6 +31,11 @@
 - `src/app/components/ats/ats-view.tsx`: Responsive split layout refinement (flex-col on mobile with full width, clean gauge sizing, touch buttons).
 - `src/app/components/pipeline/applications-view.tsx`: Kanban responsive column width and horizontal scroll container enhancements for mobile touch screens.
 - `src/app/components/pipeline/job-detail-panel.tsx` & `src/app/components/chat/paste-jd-modal.tsx`: Modal and sheet drawer mobile bottom-sheet styling and touch dismiss fixes.
+- `src/app/components/marketing/marketing-nav.tsx`: Mobile header drawer scrollability (`max-h-[calc(100dvh-3.5rem)] overflow-y-auto`), touch target optimization (`min-h-[44px]`), and auto-close drawer behavior.
+- `src/app/[locale]/(marketing)/page.tsx`: Hero button stacking (`flex-col sm:flex-row`), text truncation/wrap fixes in mockups (`whitespace-normal`), footer link flex-wrap for 320px viewports.
+- `src/app/[locale]/(marketing)/pricing/page.tsx`: Touch target heights for subscription CTA buttons (`min-h-[44px]`) and price text scaling on 320px screens.
+- `src/app/components/marketing/features-bento.tsx`: Card padding reduction for mobile (`p-5 sm:p-8`), chat mockup word break protections.
+- `src/app/components/marketing/interview-section.tsx`: Button touch heights, mock feedback strengths/improvements responsive stack (`grid-cols-1 sm:grid-cols-2`).
 
 *File size rule*: All modified files maintain single responsibility and remain within established code size guidelines.
 
@@ -83,20 +88,44 @@
 - Ensure standard buttons across modals (`UploadModal`, `PasteJDModal`, `ConfirmDialog`) utilize `min-h-[44px]` touch targets.
 - Set `meta viewport` verification to ensure proper `viewport-fit=cover` and no unwanted initial zoom behavior on form inputs (font size minimum 16px or appropriate mobile scale to prevent iOS auto-zoom).
 
+#### Step 4.7: Landing Page (`(marketing)`) Mobile Audit & Enhancements ✅
+- **Mobile Header Navigation (`marketing-nav.tsx`)**:
+  - Add `max-h-[calc(100dvh-3.5rem)] overflow-y-auto` to `#mobile-menu` overlay to prevent screen clipping on small devices (e.g. 320px iPhone SE).
+  - Ensure links and CTA buttons have minimum `min-h-[44px]` touch targets with flex center alignment.
+  - Auto-close drawer on link click and hash navigation.
+- **Hero & Mockup Card (`(marketing)/page.tsx`)**:
+  - Hero CTA buttons: change container to `flex-col sm:flex-row w-full sm:w-auto gap-3` on mobile (320px-430px) for full-width touchable CTAs.
+  - Hero AI Chat mockup: replace `whitespace-nowrap` on text line 108 with `whitespace-normal break-words` to eliminate horizontal scrollbar leak on narrow screens.
+  - Stat items: ensure 2-column grid (`grid-cols-2`) padding `p-2` fits cleanly on 320px screens.
+- **Features Bento & How-it-Works (`features-bento.tsx`, `how-it-works.tsx`)**:
+  - Bento cards: reduce padding on mobile from `p-8` to `p-5 sm:p-8` so content does not overflow 320px viewports.
+  - Chat mockup inside Bento card: cap maximum user bubble width to `max-w-[85%]` and ensure text wraps gracefully without leaking.
+- **Interview Section (`interview-section.tsx`)**:
+  - Feedback card: change strengths/improvements grid from `grid-cols-2` to `grid-cols-1 sm:grid-cols-2` on mobile so bullet lists don't truncate on 320px screens.
+  - Action buttons: change `flex items-center gap-3` to `flex-col sm:flex-row w-full sm:w-auto` with `min-h-[44px]` touch targets.
+- **Pricing Page (`(marketing)/pricing/page.tsx`)**:
+  - Ensure plan subscription CTAs (`handleSubscribe('month')` and `handleSubscribe('year')`) meet `min-h-[44px]` minimum height.
+  - Ensure plan card pricing text scales down on 320px screens without overflow.
+- **Footer & CTA Section (`(marketing)/page.tsx`)**:
+  - Footer container: change `flex items-center justify-between` to `flex-col sm:flex-row gap-4 items-center justify-between text-center sm:text-left` to prevent text overlap on mobile.
+
 ---
 
 ### 4.5 Vertical-Slice Order
 1. **Slice 1 (Mobile Navigation & Layout Shell)**: Topbar + Sidebar overlay auto-close + layout viewport lock (`src/app/[locale]/(app)/layout.tsx`, `navbar.tsx`, `sidebar.tsx`).
-2. **Slice 2 (Chat UI Mobile Polish)**: Topbar selects + entry cards + input bar + pill bar touch targets (`chat-view.tsx`).
-3. **Slice 3 (Resume Detail & PDF Mobile View)**: Responsive header tabs + touch inputs + editor/preview switcher (`resume-detail.tsx`).
-4. **Slice 4 (ATS & Applications Kanban Mobile)**: ATS flex-col stack + Kanban snap scrolling + touch cards (`ats-view.tsx`, `applications-view.tsx`).
+2. **Slice 2 (Marketing Landing Page & Mobile Drawer)**: MarketingNav mobile drawer + Hero layout/mockup wrap + Bento & Pricing mobile stack (`marketing-nav.tsx`, `(marketing)/page.tsx`, `pricing/page.tsx`, `features-bento.tsx`, `interview-section.tsx`).
+3. **Slice 3 (Chat UI Mobile Polish)**: Topbar selects + entry cards + input bar + pill bar touch targets (`chat-view.tsx`).
+4. **Slice 4 (Resume Detail & PDF Mobile View)**: Responsive header tabs + touch inputs + editor/preview switcher (`resume-detail.tsx`).
+5. **Slice 5 (ATS & Applications Kanban Mobile)**: ATS flex-col stack + Kanban snap scrolling + touch cards (`ats-view.tsx`, `applications-view.tsx`).
 
 ---
 
 ### 5. Assertion & Testing Requirements
 - **Unit & UI Layout Tests**: Verify responsive utility classes compile cleanly with zero layout regressions via `pnpm build` and `pnpm lint`.
 - **Manual Mobile Viewport Verification**:
-  - Mobile Sidebar overlay opens and auto-closes upon selecting a navigation item.
+  - Mobile Sidebar overlay and Marketing header drawer open/auto-close cleanly upon selecting navigation items.
+  - Landing page (Hero, Bento grid, How It Works, Interview section, Footer) and Pricing page display zero horizontal scroll leaks on 320px-430px viewports.
+  - Landing page hero buttons, navigation links, and pricing CTAs meet minimum touch target height (≥44px).
   - Chat input, pills, and dropdowns fit within 320px - 430px viewports without horizontal screen overflow.
   - Resume editor form inputs are easily touchable (≥44px height) and mobile Edit/Preview switcher switches seamlessly.
   - Applications Kanban board swipes horizontally with touch snap points.

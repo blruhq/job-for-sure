@@ -39,7 +39,7 @@ export default function LandingPage() {
               <p className="mt-5 max-w-md text-base leading-relaxed text-muted-foreground md:text-lg">
                 {t('subtitle')}
               </p>
-              <div className="mt-8 flex items-center gap-3">
+              <div className="mt-8 flex w-full flex-col gap-3 sm:w-auto sm:flex-row sm:items-center sm:gap-3">
                 <Link
                   href="/chat"
                   className="inline-flex cursor-pointer items-center gap-1.5 rounded-lg bg-primary px-6 py-3 text-sm font-medium text-primary-foreground shadow-lg shadow-primary/20 transition-all hover:bg-primary/90 hover:-translate-y-0.5 active:scale-[0.98]"
@@ -82,7 +82,7 @@ export default function LandingPage() {
                       {statItems.map((stat) => (
                         <div
                           key={stat.label}
-                          className="rounded-lg neuro-inset p-2.5"
+                          className="rounded-lg neuro-inset p-2 sm:p-4"
                         >
                           <span className="text-xs text-muted-foreground">{stat.label}</span>
                           <div className="mt-0.5 flex items-baseline gap-1">
@@ -105,7 +105,7 @@ export default function LandingPage() {
                               {t('mockupJustNow')}
                             </span>
                           </div>
-                          <div className="mt-1 animate-fade-up overflow-hidden whitespace-nowrap [animation-delay:2.2s] [animation-fill-mode:backwards]">
+                          <div className="mt-1 animate-fade-up overflow-hidden whitespace-normal break-words [animation-delay:2.2s] [animation-fill-mode:backwards]">
                             <span
                               className="inline-block text-sm leading-relaxed text-muted-foreground"
                               dangerouslySetInnerHTML={{ __html: t.raw('mockupResumeMatch') }}
@@ -168,7 +168,7 @@ export default function LandingPage() {
 
       {/* ── FOOTER ── */}
       <footer className="border-t border-brand-foreground/10 bg-brand px-6 py-8">
-        <div className="mx-auto flex max-w-[1120px] items-center justify-between">
+        <div className="mx-auto flex max-w-[1120px] flex-col items-center justify-between gap-4 text-center sm:flex-row sm:text-left">
           <span className="text-sm text-brand-foreground/60">{t('footerCopyright')}</span>
           <div className="flex gap-6 text-sm text-brand-foreground/60">
             <Link href="/pricing" className="cursor-pointer transition-colors hover:text-brand-foreground">

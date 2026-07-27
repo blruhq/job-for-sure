@@ -96,7 +96,7 @@ export function MarketingNav() {
 
       {/* Mobile dropdown */}
       {open && (
-        <div id="mobile-menu" className="border-t border-border neuro-surface md:hidden">
+        <div id="mobile-menu" className="max-h-[calc(100dvh-3.5rem)] overflow-y-auto border-t border-border neuro-surface md:hidden">
           <div className="flex flex-col gap-0 px-6 py-3">
             {links.map((link) =>
               link.scroll ? (
@@ -104,7 +104,7 @@ export function MarketingNav() {
                   key={link.href as string}
                   href={link.href as string}
                   onClick={() => setOpen(false)}
-                  className="cursor-pointer py-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
+                  className="flex min-h-[44px] cursor-pointer items-center text-sm text-muted-foreground transition-colors hover:text-foreground"
                 >
                   {link.label}
                 </a>
@@ -113,7 +113,7 @@ export function MarketingNav() {
                   key={link.href as string}
                   href={link.href as string}
                   onClick={() => setOpen(false)}
-                  className="cursor-pointer py-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
+                  className="flex min-h-[44px] cursor-pointer items-center text-sm text-muted-foreground transition-colors hover:text-foreground"
                 >
                   {link.label}
                 </Link>
@@ -123,14 +123,14 @@ export function MarketingNav() {
             <Link
               href="/login"
               onClick={() => setOpen(false)}
-              className="cursor-pointer py-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
+              className="flex min-h-[44px] cursor-pointer items-center text-sm text-muted-foreground transition-colors hover:text-foreground"
             >
               {t('footerSignIn')}
             </Link>
             <Link
               href="/register"
               onClick={() => setOpen(false)}
-              className="cursor-pointer py-2 text-sm font-medium text-primary transition-colors hover:text-foreground"
+              className="flex min-h-[44px] cursor-pointer items-center text-sm font-medium text-primary transition-colors hover:text-foreground"
             >
               {t('footerGetStarted')}
             </Link>

@@ -49,16 +49,16 @@ export function InterviewSection() {
               ))}
             </ul>
 
-            <div className="mt-8 flex items-center gap-3">
+            <div className="mt-8 flex w-full flex-col gap-3 sm:w-auto sm:flex-row sm:items-center sm:gap-3">
               <Link
                 href="/interview"
-                className="inline-flex cursor-pointer items-center gap-1.5 rounded-lg bg-primary px-6 py-3 text-sm font-medium text-primary-foreground shadow-lg shadow-primary/20 transition-all hover:bg-primary/90 hover:-translate-y-0.5 active:scale-[0.98]"
+                className="inline-flex min-h-[44px] cursor-pointer items-center justify-center gap-1.5 rounded-lg bg-primary px-6 py-3 text-sm font-medium text-primary-foreground shadow-lg shadow-primary/20 transition-all hover:bg-primary/90 hover:-translate-y-0.5 active:scale-[0.98]"
               >
                 {t('interviewCtaPrimary')} <ArrowRight size={14} />
               </Link>
               <Link
                 href="/chat"
-                className="inline-flex cursor-pointer items-center rounded-lg neuro-pill px-6 py-3 text-sm font-medium text-foreground transition-shadow active:scale-[0.98]"
+                className="inline-flex min-h-[44px] cursor-pointer items-center justify-center rounded-lg neuro-pill px-6 py-3 text-sm font-medium text-foreground transition-shadow active:scale-[0.98]"
               >
                 {t('interviewCtaSecondary')}
               </Link>
@@ -129,7 +129,7 @@ export function InterviewSection() {
                     </div>
                   </div>
 
-                  <div className="mt-3 grid grid-cols-2 gap-3">
+                  <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
                     <div>
                       <h4 className="text-[10px] font-mono font-semibold uppercase text-success">
                         {t('interviewStrengths')}
