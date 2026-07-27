@@ -5,6 +5,7 @@ import { GridPattern } from '~/components/marketing/grid-pattern'
 import { HowItWorks } from '~/components/marketing/how-it-works'
 import { FeaturesBento } from '~/components/marketing/features-bento'
 import { InterviewSection } from '~/components/marketing/interview-section'
+import { Mascot } from '~/components/marketing/mascot'
 import { useTranslations } from 'next-intl'
 
 export const metadata: Metadata = {
@@ -33,7 +34,10 @@ export default function LandingPage() {
           />
           <div className="relative mx-auto grid w-full max-w-7xl items-center gap-12 md:grid-cols-[1fr_1.2fr] md:gap-16">
             <div className="max-w-lg">
-              <h1 className="text-4xl font-semibold leading-[1.08] tracking-tight text-foreground sm:text-5xl md:text-[3.5rem] md:leading-[1.05]">
+              <span className="mb-4 block font-mono text-xs font-medium uppercase tracking-[0.2em] text-primary">
+                {t('heroAccentTag')}
+              </span>
+              <h1 className="text-4xl font-bold leading-[1.08] tracking-tighter text-foreground sm:text-5xl md:text-[3.5rem] md:leading-[1.05]">
                 {t('title')}
               </h1>
               <p className="mt-5 max-w-md text-base leading-relaxed text-muted-foreground md:text-lg">
@@ -54,8 +58,17 @@ export default function LandingPage() {
                 </Link>
               </div>
             </div>
-            <div className="flex justify-center md:justify-end">
-              <div className="relative w-full max-w-lg">
+            <div className="relative flex justify-center md:justify-end">
+              {/* Jobby mascot — floats behind/beside the mockup card */}
+              <Mascot
+                src="/mascot/jobby-hero.webp"
+                alt="Jobby — your AI career assistant"
+                size="lg"
+                priority
+                glowColor="var(--amber-glow)"
+                className="absolute -top-16 -left-4 z-0 hidden sm:block md:-left-16 lg:-left-20"
+              />
+              <div className="relative z-10 w-full max-w-lg">
                 <div className="relative overflow-hidden rounded-2xl neuro-card">
                   <div className="flex items-center gap-1.5 border-b border-border px-4 py-2.5">
                     <span className="h-2.5 w-2.5 rounded-full bg-[#FF5F57]" />
@@ -150,7 +163,10 @@ export default function LandingPage() {
       <section className="bg-brand">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-20 md:py-28">
           <div className="max-w-2xl">
-            <h2 className="text-3xl font-semibold tracking-tight text-brand-foreground md:text-4xl">
+            <span className="mb-3 block font-mono text-xs font-medium uppercase tracking-[0.2em] text-brand-foreground/60">
+              {t('sectionLabelCta')}
+            </span>
+            <h2 className="text-3xl font-bold tracking-tighter text-brand-foreground md:text-4xl">
               {t('tagline')}
             </h2>
             <p className="mt-4 text-lg leading-relaxed text-brand-foreground/80">

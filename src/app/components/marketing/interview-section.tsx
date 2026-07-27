@@ -1,6 +1,7 @@
 import { Brain, Sparkles, Target, CheckCircle, ArrowRight, User } from 'lucide-react'
 import { Link } from '~/i18n/routing'
 import { useTranslations } from 'next-intl'
+import { Mascot } from '~/components/marketing/mascot'
 
 export function InterviewSection() {
   const t = useTranslations('landing')
@@ -21,6 +22,9 @@ export function InterviewSection() {
         <div className="grid items-center gap-12 md:grid-cols-[1fr_1.2fr] md:gap-16">
           {/* ── Left: Copy ── */}
           <div className="max-w-lg">
+            <span className="mb-3 block font-mono text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground">
+              {t('sectionLabelInterview')}
+            </span>
             {/* Badge */}
             <div className="mb-4 flex w-fit items-center gap-1.5 rounded-full border border-primary/15 bg-primary/5 px-3 py-1">
               <Brain size={13} className="text-primary" />
@@ -30,7 +34,7 @@ export function InterviewSection() {
             </div>
 
             <h2
-              className="text-4xl font-semibold leading-[1.08] tracking-tight text-foreground sm:text-5xl md:text-[3rem] md:leading-[1.05]"
+              className="text-4xl font-semibold leading-[1.08] tracking-tighter text-foreground sm:text-5xl md:text-[3rem] md:leading-[1.05]"
               dangerouslySetInnerHTML={{ __html: t.raw('interviewTitle') }}
             />
 
@@ -67,7 +71,15 @@ export function InterviewSection() {
 
           {/* ── Right: Mockup ── */}
           <div className="relative w-full max-w-lg justify-self-end">
-            <div className="relative overflow-hidden rounded-2xl neuro-card">
+            {/* Preppy mascot — interview prep robot with headset */}
+            <Mascot
+              src="/mascot/preppy.webp"
+              alt="Preppy — AI interview prep robot"
+              size="md"
+              glowColor="var(--accent-soft)"
+              className="absolute -top-12 -right-4 z-0 hidden md:block md:-right-12 lg:-right-16"
+            />
+            <div className="relative z-10 overflow-hidden rounded-2xl neuro-card">
               {/* Window chrome */}
               <div className="flex items-center gap-1.5 border-b border-border px-4 py-2.5">
                 <span className="h-2.5 w-2.5 rounded-full bg-[#FF5F57]" />

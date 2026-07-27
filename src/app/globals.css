@@ -449,6 +449,21 @@ html[lang="th"] {
   50%      { opacity: 1; transform: translateY(-2px); }
 }
 
+@keyframes mascot-float {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-12px); }
+}
+
+.animate-mascot-float {
+  animation: mascot-float 3s var(--ease) infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-mascot-float {
+    animation: none;
+  }
+}
+
 
 
 .animate-fade-up { animation: fade-up 0.25s var(--ease); }

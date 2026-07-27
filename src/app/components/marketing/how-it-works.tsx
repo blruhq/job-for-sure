@@ -2,6 +2,7 @@ import { Upload, Search, FileCheck, LayoutDashboard } from 'lucide-react'
 import { Link } from '~/i18n/routing'
 import { ArrowRight } from 'lucide-react'
 import { useTranslations } from 'next-intl'
+import { Mascot } from '~/components/marketing/mascot'
 
 export function HowItWorks() {
   const t = useTranslations('landing')
@@ -31,15 +32,26 @@ export function HowItWorks() {
 
   return (
     <section id="how-it-works" className="border-t border-border bg-muted/30 py-24 md:py-32">
-      <div className="mx-auto max-w-[1120px] px-6">
+      <div className="relative mx-auto max-w-[1120px] px-6">
         <div className="max-w-xl">
-          <h2 className="text-4xl font-semibold tracking-tight text-foreground md:text-5xl">
+          <span className="mb-3 block font-mono text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground">
+            {t('sectionLabelHow')}
+          </span>
+          <h2 className="text-4xl font-semibold tracking-tighter text-foreground md:text-5xl">
             {t('howTitle')}
           </h2>
           <p className="mt-5 text-lg leading-relaxed text-muted-foreground">
             {t('howSubtitle')}
           </p>
         </div>
+        {/* Resuby mascot — firefighter robot, resume builder companion */}
+        <Mascot
+          src="/mascot/resuby.webp"
+          alt="Resuby — AI resume builder robot"
+          size="md"
+          glowColor="var(--gold-glow)"
+          className="absolute -top-8 right-0 z-0 hidden lg:block opacity-90"
+        />
         <div className="mt-20 grid gap-10 md:grid-cols-4">
           {STEPS.map((step, i) => {
             const Icon = step.icon

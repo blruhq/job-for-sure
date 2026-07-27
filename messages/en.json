@@ -98,7 +98,13 @@
 
     "footerCopyright": "© 2026 Job For Sure",
     "footerSignIn": "Sign In",
-    "footerGetStarted": "Get Started"
+    "footerGetStarted": "Get Started",
+
+    "heroAccentTag": "AI-Powered Job Search",
+    "sectionLabelHow": "HOW IT WORKS",
+    "sectionLabelFeatures": "FEATURES",
+    "sectionLabelInterview": "INTERVIEW PREP",
+    "sectionLabelCta": "READY TO START"
   },
   "dashboard": {
     "welcomeBack": "Welcome back",

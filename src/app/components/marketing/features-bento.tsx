@@ -2,6 +2,7 @@ import { MessageSquare, ShieldCheck, KanbanSquare } from 'lucide-react'
 import { Link } from '~/i18n/routing'
 import { ArrowRight } from 'lucide-react'
 import { useTranslations } from 'next-intl'
+import { Mascot } from '~/components/marketing/mascot'
 
 export function FeaturesBento() {
   const t = useTranslations('landing')
@@ -38,9 +39,12 @@ export function FeaturesBento() {
 
   return (
     <section id="features" className="border-t border-border py-24 md:py-32">
-      <div className="mx-auto max-w-[1120px] px-6">
+      <div className="relative mx-auto max-w-[1120px] px-6">
         <div className="max-w-xl">
-          <h2 className="text-4xl font-semibold tracking-tight text-foreground md:text-5xl">
+          <span className="mb-3 block font-mono text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground">
+            {t('sectionLabelFeatures')}
+          </span>
+          <h2 className="text-4xl font-semibold tracking-tighter text-foreground md:text-5xl">
             {t('featuresTitle')}
           </h2>
           <p className="mt-5 text-lg leading-relaxed text-muted-foreground">
@@ -48,10 +52,19 @@ export function FeaturesBento() {
           </p>
         </div>
 
+        {/* Scrappy mascot — scavenger robot, job search companion */}
+        <Mascot
+          src="/mascot/scrappy.webp"
+          alt="Scrappy — AI job search robot"
+          size="md"
+          glowColor="var(--accent-soft)"
+          className="absolute top-0 right-0 z-0 hidden lg:block opacity-90"
+        />
+
         <div className="mt-20 grid gap-5 md:grid-cols-[1.6fr_1fr] md:grid-rows-[1fr_1fr]">
           {/* Large card — AI Chat Coach */}
           <div
-            className={`${large.bgAccent} ${large.borderAccent} row-span-2 flex flex-col justify-between rounded-2xl border p-5 sm:p-8 md:p-10 shadow-sm`}
+            className={`${large.bgAccent} ${large.borderAccent} row-span-2 flex flex-col justify-between rounded-2xl border p-5 sm:p-8 md:p-10 shadow-lg shadow-primary/5 transition-shadow hover:shadow-xl hover:shadow-primary/10`}
           >
             <div>
               <div
@@ -127,7 +140,7 @@ export function FeaturesBento() {
             return (
               <div
                 key={f.title}
-                className={`${f.bgAccent} ${f.borderAccent} flex flex-col justify-between rounded-2xl border p-5 sm:p-8 shadow-sm`}
+                className={`${f.bgAccent} ${f.borderAccent} flex flex-col justify-between rounded-2xl border p-5 sm:p-8 shadow-lg shadow-primary/5 transition-shadow hover:shadow-xl hover:shadow-primary/10`}
               >
                 <div>
                   <div
