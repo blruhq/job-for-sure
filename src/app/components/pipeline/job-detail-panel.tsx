@@ -20,6 +20,8 @@ import { extractCity, extractDistrict, detectCountry } from '~/lib/area-links'
 import { Button } from '~/components/ui/button'
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '~/components/ui/select'
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '~/components/ui/sheet'
+import { useUserPreferences } from '~/hooks/use-user-preferences'
+import { useQueryClient } from '@tanstack/react-query'
 
 // ═══════════════════════════════════════════════════════════════
 // JobDetailPanel — slide-over panel showing everything about a job.
@@ -62,20 +64,17 @@ export function JobDetailPanel({
   const router = useRouter()
   const { activeResume, activeResumeId } = useActiveResume()
   const { mutateAsync: updateApp } = useUpdateApplication()
+  const { data: prefsData } = useUserPreferences()
+  const queryClient = useQueryClient()
 
   const [status, setStatus] = useState(currentStatus || 'bookmarked')
   const [description, setDescription] = useState<string>('')
   const [homeLocation, setHomeLocation] = useState<string>('')
 
-  // ── Load home location from user preferences ──
+  // ── Sync home location from cached user preferences ──
   useEffect(() => {
-    fetch('/api/user/preferences')
-      .then(res => res.ok ? res.json() : null)
-      .then(data => {
-        if (data?.homeLocation) setHomeLocation(data.homeLocation)
-      })
-      .catch(() => {})
-  }, [])
+    if (prefsData?.homeLocation) setHomeLocation(prefsData.homeLocation)
+  }, [prefsData])
 
   // ── Extract description from jobData or from job object ──
   useEffect(() => {
@@ -302,6 +301,7 @@ export function JobDetailPanel({
                   headers: { 'Content-Type': 'application/json' },
                   body: JSON.stringify({ homeLocation: location || null }),
                 })
+                queryClient.invalidateQueries({ queryKey: ['user-preferences'] })
               } catch {
                 console.error('Failed to save home location')
                 notify({ message: 'Failed to save home location', type: 'error' })
