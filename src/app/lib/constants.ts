@@ -20,9 +20,8 @@ export const MAX_RESUME_JSON_BYTES = 200_000 // 200KB
 
 /**
  * Brand logo asset path (single swap point).
- * Currently the square orange logo. When the "Jobby" logo asset is added
- * to /public, change ONLY this value (e.g. '/jobby-logo.svg') to rebrand
- * every surface: marketing navbar, app topbar.
+ * Jobby logo. To rebrand, change ONLY this value to the new asset path —
+ * every surface (marketing navbar, app topbar) updates automatically.
  */
 export const BRAND_LOGO_SRC = '/logo.png'
 
