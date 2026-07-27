@@ -48,9 +48,9 @@ export function HowItWorks() {
         <Mascot
           src="/mascot/resuby.webp"
           alt="Resuby — AI resume builder robot"
-          size="md"
+          size="xs"
           glowColor="var(--gold-glow)"
-          className="absolute -top-8 right-0 z-0 hidden lg:block opacity-90"
+          className="absolute -top-4 right-0 z-20 hidden lg:block opacity-90"
         />
         <div className="relative z-10 mt-20 grid gap-10 md:grid-cols-4">
           {STEPS.map((step, i) => {

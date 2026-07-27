@@ -75,9 +75,9 @@ export function InterviewSection() {
             <Mascot
               src="/mascot/preppy.webp"
               alt="Preppy — AI interview prep robot"
-              size="md"
+              size="xs"
               glowColor="var(--accent-soft)"
-              className="absolute -top-12 -right-4 z-0 hidden md:block md:-right-12 lg:-right-16"
+              className="absolute -top-8 -right-4 z-20 hidden md:block md:-top-10 md:-right-8"
             />
             <div className="relative z-10 overflow-hidden rounded-2xl neuro-card">
               {/* Window chrome */}

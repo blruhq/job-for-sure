@@ -2,6 +2,7 @@ import Image from 'next/image'
 import { cn } from '~/lib/utils'
 
 const SIZE_MAP = {
+  xs: 'w-24 sm:w-28 md:w-32',
   sm: 'w-28 sm:w-36 md:w-44',
   md: 'w-40 sm:w-52 md:w-64',
   lg: 'w-56 sm:w-72 md:w-80',

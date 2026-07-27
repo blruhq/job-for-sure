@@ -61,12 +61,12 @@ export default function LandingPage() {
             <div className="relative flex justify-center md:justify-end">
               {/* Jobby mascot — floats behind/beside the mockup card */}
               <Mascot
-                src="/mascot/jobby-hero.webp"
-                alt="Jobby — your AI career assistant"
-                size="lg"
-                priority
-                glowColor="var(--amber-glow)"
-                className="absolute -top-16 -left-4 z-0 hidden sm:block md:-left-16 lg:-left-20"
+              src="/mascot/jobby-hero.webp"
+              alt="Jobby — your AI career assistant"
+              size="xs"
+              priority
+              glowColor="var(--amber-glow)"
+              className="absolute -top-10 -left-4 z-20 hidden sm:block md:-top-12 md:-left-8"
               />
               <div className="relative z-10 w-full max-w-lg">
                 <div className="relative overflow-hidden rounded-2xl neuro-card">

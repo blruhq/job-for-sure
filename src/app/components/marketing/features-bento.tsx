@@ -56,9 +56,9 @@ export function FeaturesBento() {
         <Mascot
           src="/mascot/scrappy.webp"
           alt="Scrappy — AI job search robot"
-          size="md"
+          size="xs"
           glowColor="var(--accent-soft)"
-          className="absolute top-0 right-0 z-0 hidden lg:block opacity-90"
+          className="absolute top-0 right-0 z-20 hidden lg:block opacity-90"
         />
 
         <div className="relative z-10 mt-20 grid gap-5 md:grid-cols-[1.6fr_1fr] md:grid-rows-[1fr_1fr]">
