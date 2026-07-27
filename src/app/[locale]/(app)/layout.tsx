@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { useRouter, usePathname } from '~/i18n/routing'
 import { useUIStore } from '~/hooks/use-ui'
 import { Sidebar } from '~/components/layout/sidebar'
@@ -16,63 +16,54 @@ const ADMIN_ALLOWED = new Set(['/admin'])
 function AuthGuard({ children }: { children: React.ReactNode }) {
   const router = useRouter()
   const pathname = usePathname()
-  const [checked, setChecked] = useState(false)
+  // useSession() caches the session in memory via nanostores — it fetches ONCE
+  // on mount and does NOT re-fetch on client navigations within the (app) group.
+  const { data: session, isPending } = authClient.useSession()
 
+  // Redirect to login if session is missing after initial load completes.
   useEffect(() => {
-    let cancelled = false
+    if (!isPending && !session) {
+      router.replace('/login')
+    }
+  }, [isPending, session, router])
 
-    async function check() {
+  // Role-based routing + PostHog identify.
+  // Reads the CACHED session — no network call on navigation.
+  useEffect(() => {
+    if (isPending || !session) return
+
+    const run = async () => {
+      // Identify user in PostHog (with plan for segmentation)
       try {
-        const { data: session } = await authClient.getSession()
-        if (cancelled) return
-
-        if (!session) {
-          router.replace('/login')
-          return
-        }
-
-        // Identify user in PostHog (with plan for segmentation)
-        try {
-          const posthog = (await import('posthog-js')).default
-          const plan = (session.user as { plan?: string }).plan ?? 'free'
-          posthog.identify(session.user.id, {
-            email: session.user.email,
-            name: session.user.name,
-            plan,
-          })
-        } catch {
-          // PostHog not loaded yet — skip
-        }
-
-        // ── Role-based routing ──
-        // usePathname from i18n/routing already returns the locale-stripped path,
-        // so we can compare directly against the allowlist.
-        const stripped = pathname || '/'
-        const isAdmin = (session.user as { role?: string }).role === 'admin'
-
-        if (isAdmin && !ADMIN_ALLOWED.has(stripped)) {
-          router.replace('/admin')
-          return
-        }
-        if (!isAdmin && stripped === '/admin') {
-          router.replace('/chat')
-          return
-        }
-
-        setChecked(true)
+        const posthog = (await import('posthog-js')).default
+        const plan = (session.user as { plan?: string }).plan ?? 'free'
+        posthog.identify(session.user.id, {
+          email: session.user.email,
+          name: session.user.name,
+          plan,
+        })
       } catch {
-        if (!cancelled) router.replace('/login')
+        // PostHog not loaded yet — skip
+      }
+
+      // ── Role-based routing ──
+      const stripped = pathname || '/'
+      const isAdmin = (session.user as { role?: string }).role === 'admin'
+
+      if (isAdmin && !ADMIN_ALLOWED.has(stripped)) {
+        router.replace('/admin')
+        return
+      }
+      if (!isAdmin && stripped === '/admin') {
+        router.replace('/chat')
+        return
       }
     }
 
-    check()
+    run()
+  }, [session, pathname, router, isPending])
 
-    return () => {
-      cancelled = true
-    }
-  }, [router, pathname])
-
-  if (!checked) {
+  if (isPending || !session) {
     return (
       <div className="flex h-screen flex-col items-center justify-center gap-4 neuro-surface">
         <div className="flex items-center gap-2">

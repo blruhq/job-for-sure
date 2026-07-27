@@ -3,6 +3,8 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useRouter } from '~/i18n/routing'
 import { authClient } from '~/lib/auth-client'
+import { useUserPreferences } from '~/hooks/use-user-preferences'
+import { useQueryClient } from '@tanstack/react-query'
 import { Loader2, User, Bell, AlertTriangle, Check, X, Eye, EyeOff, LocateFixed, CreditCard } from 'lucide-react'
 import { Sun, Moon } from 'lucide-react'
 import { useTheme } from '~/components/layout/theme-provider'
@@ -68,6 +70,8 @@ export default function SettingsPage() {
   const [detectingLocation, setDetectingLocation] = useState(false)
   const [loading, setLoading] = useState(true)
   const { notif, notify, dismiss } = useNotify()
+  const { data: prefsData } = useUserPreferences()
+  const queryClient = useQueryClient()
 
   // Profile form state
   const [name, setName] = useState('')
@@ -102,19 +106,18 @@ export default function SettingsPage() {
         setEmail(u.email)
       } catch { notify('Failed to load user session', 'error') }
 
-      try {
-        const res = await fetch('/api/user/preferences')
-        if (res.ok) {
-          const data = await res.json()
-          setPrefs(data)
-          setHomeLocation(data.homeLocation || '')
-        }
-      } catch { notify('Failed to load settings', 'error') }
-
       setLoading(false)
     }
     load()
   }, [router])
+
+  // Sync preferences from TanStack Query cache
+  useEffect(() => {
+    if (prefsData) {
+      setPrefs(prefsData)
+      setHomeLocation(prefsData.homeLocation || '')
+    }
+  }, [prefsData])
 
   // ── HANDLERS ──
 
@@ -197,6 +200,8 @@ export default function SettingsPage() {
       if (!res.ok) {
         setPrefs(prefs) // revert
         notify('Failed to update preference', 'error')
+      } else {
+        queryClient.invalidateQueries({ queryKey: ['user-preferences'] })
       }
     } catch {
       setPrefs(prefs) // revert
@@ -213,6 +218,7 @@ export default function SettingsPage() {
         body: JSON.stringify({ homeLocation: homeLocation.trim() || null }),
       })
       if (res.ok) {
+        queryClient.invalidateQueries({ queryKey: ['user-preferences'] })
         notify('Area saved', 'success')
       } else {
         notify('Failed to save area', 'error')
@@ -235,6 +241,7 @@ export default function SettingsPage() {
         body: JSON.stringify({ homeLocation: area }),
       })
       if (res.ok) {
+        queryClient.invalidateQueries({ queryKey: ['user-preferences'] })
         notify('Location detected: ' + area, 'success')
       }
     } catch {

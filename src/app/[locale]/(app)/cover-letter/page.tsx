@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
+import { useQueryClient } from '@tanstack/react-query'
 import { useActiveResume } from '~/hooks/use-active-resume'
 import { useCreateResume } from '~/hooks/use-resumes'
 import { useCoverLetters } from '~/hooks/use-cover-letters'
@@ -21,6 +22,7 @@ export default function StandaloneCoverLetterPage() {
   const locale = useLocale()
   const { resumes, activeResumeId, setActiveResumeId } = useActiveResume()
   const { mutate: addResume } = useCreateResume()
+  const queryClient = useQueryClient()
 
   // Select first resume by default if activeResumeId is not set
   const [selectedResumeId, setSelectedResumeId] = useState(activeResumeId || 'none')
@@ -36,13 +38,6 @@ export default function StandaloneCoverLetterPage() {
   const [letterText, setLetterText] = useState('')
   const [generating, setGenerating] = useState(false)
   const [outputLanguage, setOutputLanguage] = useState<'en' | 'th'>('en')
-  const [savedLetters, setSavedLetters] = useState<Array<{
-    id: string
-    company: string | null
-    role: string | null
-    content: string
-    createdAt: string
-  }>>([])
   const [activeLetterId, setActiveLetterId] = useState<string | null>(null)
   const [deleteTarget, setDeleteTarget] = useState<string | null>(null)
   const [deleting, setDeleting] = useState(false)
@@ -56,24 +51,17 @@ export default function StandaloneCoverLetterPage() {
     }
   }, [activeResumeId, selectedResumeId])
 
-  // Fetch saved cover letters
-  useEffect(() => {
-    async function loadLetters() {
-      try {
-        const res = await fetch('/api/cover-letters')
-        if (!res.ok) return
-        const data = await res.json()
-        setSavedLetters(data)
-      } catch (err) {
-        console.error(err)
-        notify({ message: 'Failed to load cover letters', type: 'error' })
-      }
-    }
-    loadLetters()
-  }, [])
-
-  // Sync letter text from cover letters table
+  // Fetch saved cover letters via TanStack Query (deduplicated with other consumers)
   const { data: coverLettersData = [] } = useCoverLetters()
+
+  // Derive savedLetters from cached query data (no duplicate GET fetch)
+  const savedLetters = coverLettersData.map((l) => ({
+    id: l.id,
+    company: l.company ?? null,
+    role: l.role ?? null,
+    content: l.content ?? '',
+    createdAt: l.createdAt ?? new Date().toISOString(),
+  }))
 
   useEffect(() => {
     if (selectedResume) {
@@ -160,20 +148,10 @@ export default function StandaloneCoverLetterPage() {
       const data = await res.json()
       if (data.letter) {
         setLetterText(data.letter)
-        // Add to saved letters list
         if (data.id) {
           setActiveLetterId(data.id)
-          setSavedLetters(prev => [
-            {
-              id: data.id,
-              company: mode === 'quick' ? company : null,
-              role: mode === 'quick' ? role : null,
-              content: data.letter,
-              createdAt: new Date().toISOString(),
-            },
-            ...prev,
-          ])
         }
+        queryClient.invalidateQueries({ queryKey: ['cover-letters'] })
         notify({ message: 'Cover letter generated & saved!', type: 'success' })
       } else {
         throw new Error('No letter content returned')
@@ -227,6 +205,7 @@ export default function StandaloneCoverLetterPage() {
         return
       }
     }
+    queryClient.invalidateQueries({ queryKey: ['cover-letters'] })
     notify({ message: 'Cover letter saved successfully!', type: 'success' })
   }
 
@@ -533,7 +512,7 @@ export default function StandaloneCoverLetterPage() {
               const err = await res.json().catch(() => ({}))
               throw new Error(err.error || 'Failed to delete')
             }
-            setSavedLetters(prev => prev.filter(l => l.id !== deleteTarget))
+            queryClient.invalidateQueries({ queryKey: ['cover-letters'] })
             if (activeLetterId === deleteTarget) {
               setActiveLetterId(null)
               setLetterText('')
