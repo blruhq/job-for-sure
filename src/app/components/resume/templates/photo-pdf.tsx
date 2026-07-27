@@ -174,7 +174,7 @@ export function PhotoPDF({ resume }: { resume: Resume }) {
       <Page size="A4" style={styles.page}>
         <View style={styles.body}>
           {/* ── Sidebar ── */}
-          <View style={styles.sidebar}>
+          <View style={styles.sidebar} fixed>
             {/* Photo / Initials */}
             <View style={styles.photoContainer}>
               {resume.photoUrl ? (
