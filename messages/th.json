@@ -44,6 +44,14 @@
     "mockupApplied": "สมัครแล้ว",
     "mockupInterviewing": "สัมภาษณ์",
 
+    "mascotAltHero": "Jobby — ผู้ช่วยอาชีพ AI ของคุณ",
+    "mascotAltStep1": "Jobby ช่วยแนะนำการอัปโหลดเรซูเม่",
+    "mascotAltStep2": "Scrappy ค้นหางานที่ตรงกับทักษะของคุณ",
+    "mascotAltStep3": "Resuby ปรับแต่งเรซูเม่ให้เหมาะกับแต่ละงาน",
+    "mascotAltStep4": "Preppy ช่วยเตรียมสัมภาษณ์และติดตามสถานะ",
+    "mascotAltJobSearch": "Scrappy — หุ่นยนต์ค้นหางาน AI",
+    "mascotAltInterviewer": "Preppy — โค้ชสัมภาษณ์ AI ของคุณ",
+
     "howTitle": "4 ขั้นตอน จากอัปโหลดถึงได้งาน",
     "howSubtitle": "ไม่ต้องมานั่งทำสเปรดชีตให้วุ่นวาย มีแต่เส้นทางชัด ๆ จากเรซูเม่ของคุณถึงบริษัทในฝัน",
     "step1Title": "อัปโหลดเรซูเม่",

@@ -52,14 +52,7 @@ export function FeaturesBento() {
           </p>
         </div>
 
-        {/* Scrappy mascot — scavenger robot, job search companion */}
-        <Mascot
-          src="/mascot/scrappy.webp"
-          alt="Scrappy — AI job search robot"
-          size="xs"
-          glowColor="var(--accent-soft)"
-          className="absolute top-0 right-0 z-20 hidden lg:block opacity-90"
-        />
+        {/* Scrappy mascot moved inside the job-search bento card (Notion pattern) */}
 
         <div className="relative z-10 mt-20 grid gap-5 md:grid-cols-[1.6fr_1fr] md:grid-rows-[1fr_1fr]">
           {/* Large card — AI Chat Coach */}
@@ -137,12 +130,23 @@ export function FeaturesBento() {
           {/* Small cards */}
           {smalls.map((f) => {
             const Icon = f.icon
+            const isJobSearch = f.icon === KanbanSquare
             return (
               <div
                 key={f.title}
-                className={`${f.bgAccent} ${f.borderAccent} flex flex-col justify-between rounded-2xl border p-5 sm:p-8 shadow-lg shadow-primary/5 transition-shadow hover:shadow-xl hover:shadow-primary/10`}
+                className={`${f.bgAccent} ${f.borderAccent} relative flex flex-col justify-between rounded-2xl border p-5 sm:p-8 shadow-lg shadow-primary/5 transition-shadow hover:shadow-xl hover:shadow-primary/10`}
               >
-                <div>
+                {isJobSearch && (
+                  <Mascot
+                    src="/mascot/scrappy.webp"
+                    alt={t('mascotAltJobSearch')}
+                    size="step"
+                    variant="static"
+                    glowColor="transparent"
+                    className="absolute right-3 top-3 opacity-90"
+                  />
+                )}
+                <div className="relative z-10">
                   <div
                     className={`flex h-12 w-12 items-center justify-center rounded-xl neuro-icon-well ${f.color}`}
                   >

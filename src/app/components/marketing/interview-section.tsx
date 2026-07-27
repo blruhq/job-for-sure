@@ -71,13 +71,13 @@ export function InterviewSection() {
 
           {/* ── Right: Mockup ── */}
           <div className="relative w-full max-w-lg justify-self-end">
-            {/* Preppy mascot — interview prep robot with headset */}
+            {/* Preppy mascot — peeks from bottom-left of the mockup card (Sentry-style) */}
             <Mascot
               src="/mascot/preppy.webp"
-              alt="Preppy — AI interview prep robot"
-              size="xs"
+              alt={t('mascotAltInterviewer')}
+              size="step"
               glowColor="var(--accent-soft)"
-              className="absolute -top-8 -right-4 z-20 hidden md:block md:-top-10 md:-right-8"
+              className="absolute -bottom-8 -left-8 z-20 hidden md:block md:-bottom-12 md:-left-12"
             />
             <div className="relative z-10 overflow-hidden rounded-2xl neuro-card">
               {/* Window chrome */}
@@ -100,9 +100,15 @@ export function InterviewSection() {
                 {/* AI question card */}
                 <div className="animate-fade-up rounded-lg border border-border bg-muted/20 p-4 [animation-delay:400ms] [animation-fill-mode:backwards]">
                   <div className="flex items-center gap-2">
-                    <div className="flex h-5 w-5 items-center justify-center rounded bg-primary/10 text-primary">
-                      <Brain size={12} />
-                    </div>
+                    <Mascot
+                      src="/mascot/preppy.webp"
+                      alt={t('mascotAltInterviewer')}
+                      size="avatar"
+                      circular
+                      variant="static"
+                      glowColor="transparent"
+                      className="shrink-0 ring-1 ring-primary/20"
+                    />
                     <span className="rounded bg-muted px-1.5 py-0.5 text-[10px] font-mono uppercase tracking-wider text-muted-foreground">
                       {t('interviewTechnical')}
                     </span>

@@ -12,21 +12,29 @@ export function HowItWorks() {
       icon: Upload,
       title: t('step1Title'),
       desc: t('step1Desc'),
+      mascot: '/mascot/jobby-hero.webp',
+      mascotAlt: t('mascotAltStep1'),
     },
     {
       icon: Search,
       title: t('step2Title'),
       desc: t('step2Desc'),
+      mascot: '/mascot/scrappy.webp',
+      mascotAlt: t('mascotAltStep2'),
     },
     {
       icon: FileCheck,
       title: t('step3Title'),
       desc: t('step3Desc'),
+      mascot: '/mascot/resuby.webp',
+      mascotAlt: t('mascotAltStep3'),
     },
     {
       icon: LayoutDashboard,
       title: t('step4Title'),
       desc: t('step4Desc'),
+      mascot: '/mascot/preppy.webp',
+      mascotAlt: t('mascotAltStep4'),
     },
   ]
 
@@ -44,19 +52,20 @@ export function HowItWorks() {
             {t('howSubtitle')}
           </p>
         </div>
-        {/* Resuby mascot — firefighter robot, resume builder companion */}
-        <Mascot
-          src="/mascot/resuby.webp"
-          alt="Resuby — AI resume builder robot"
-          size="xs"
-          glowColor="var(--gold-glow)"
-          className="absolute -top-4 right-0 z-20 hidden lg:block opacity-90"
-        />
+        {/* Resuby mascot removed — mascots now anchor each step below */}
         <div className="relative z-10 mt-20 grid gap-10 md:grid-cols-4">
           {STEPS.map((step, i) => {
             const Icon = step.icon
             return (
               <div key={step.title} className="relative">
+                <Mascot
+                  src={step.mascot}
+                  alt={step.mascotAlt}
+                  size="step"
+                  variant="static"
+                  glowColor="transparent"
+                  className="mb-3"
+                />
                 {i < STEPS.length - 1 && (
                   <div className="absolute -right-5 top-8 hidden h-px w-10 border-t border-dashed border-border/40 md:block" />
                 )}

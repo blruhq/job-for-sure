@@ -44,6 +44,14 @@
     "mockupApplied": "Applied",
     "mockupInterviewing": "Interview",
 
+    "mascotAltHero": "Jobby — your AI career assistant",
+    "mascotAltStep1": "Jobby guides you to upload your resume",
+    "mascotAltStep2": "Scrappy finds jobs that match your skills",
+    "mascotAltStep3": "Resuby optimizes your resume for each job",
+    "mascotAltStep4": "Preppy helps you prep and track applications",
+    "mascotAltJobSearch": "Scrappy — AI job search robot",
+    "mascotAltInterviewer": "Preppy — your AI interview coach",
+
     "howTitle": "From upload to offer in four steps.",
     "howSubtitle": "No fluff. No spreadsheets. Just a clear path from resume to offer.",
     "step1Title": "Upload Resume",
