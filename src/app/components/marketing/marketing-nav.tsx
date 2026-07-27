@@ -6,7 +6,9 @@ import { useTranslations } from 'next-intl'
 import { LanguageSwitcher } from '~/components/layout/navbar'
 import { ThemeToggle } from '~/components/layout/theme-toggle'
 import { X, Menu } from 'lucide-react'
+import Image from 'next/image'
 import { Button } from '~/components/ui/button'
+import { BRAND_LOGO_SRC } from '~/lib/constants'
 
 export function MarketingNav() {
   const t = useTranslations('landing')
@@ -22,9 +24,18 @@ export function MarketingNav() {
   return (
     <header className="sticky top-0 z-50 h-14 border-b border-border neuro-surface">
       <div className="mx-auto flex h-full max-w-[1120px] items-center justify-between px-6">
-        {/* Brand */}
+        {/* Brand — logo lives in the navbar, not the hero */}
         <Link href="/" className="flex cursor-pointer items-center gap-2 no-underline">
-          <div className="h-3.5 w-3.5 rounded-[3px] bg-primary" />
+          <div className="neuro-icon-well rounded-[3px] p-0.5">
+            <Image
+              src={BRAND_LOGO_SRC}
+              alt="Job For Sure"
+              width={24}
+              height={24}
+              className="shrink-0"
+              priority
+            />
+          </div>
           <span className="text-sm font-semibold tracking-tight text-foreground">JOB FOR SURE</span>
         </Link>
 

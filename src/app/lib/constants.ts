@@ -18,4 +18,12 @@ export const EMPTY_APPLICATIONS: ApplicationBoard = {
  */
 export const MAX_RESUME_JSON_BYTES = 200_000 // 200KB
 
+/**
+ * Brand logo asset path (single swap point).
+ * Currently the square orange logo. When the "Jobby" logo asset is added
+ * to /public, change ONLY this value (e.g. '/jobby-logo.svg') to rebrand
+ * every surface: marketing navbar, app topbar.
+ */
+export const BRAND_LOGO_SRC = '/logo.png'
+
 
