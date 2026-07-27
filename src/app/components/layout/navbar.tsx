@@ -5,6 +5,7 @@ import { PanelLeft, Sun, Moon, Globe } from 'lucide-react'
 import { Button } from '~/components/ui/button'
 import { UserMenu } from '~/components/layout/user-menu'
 import { cn } from '~/lib/utils'
+import { BRAND_LOGO_SRC } from '~/lib/constants'
 import { useTheme } from '~/components/layout/theme-provider'
 import { useUIStore } from '~/hooks/use-ui'
 import { useLocale } from 'next-intl'
@@ -58,7 +59,7 @@ export function Topbar() {
       >
         <div className="neuro-icon-well rounded-[3px] p-0.5">
           <Image
-            src="/logo.png"
+            src={BRAND_LOGO_SRC}
             alt="Job For Sure"
             width={24}
             height={24}
