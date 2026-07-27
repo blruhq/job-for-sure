@@ -28,12 +28,12 @@ export default function LandingPage() {
     <div className="flex min-h-screen flex-col neuro-surface">
       <GridPattern>
         {/* ── HERO ── */}
-        <section className="relative flex min-h-screen flex-col items-center px-4 sm:px-6 pt-[12vh] md:pt-[15vh]">
+        <section className="relative flex min-h-screen flex-col items-center overflow-x-clip px-4 sm:px-6 pt-[12vh] md:pt-[15vh]">
           <div
             className="pointer-events-none absolute inset-0 hero-glow opacity-[0.04]"
           />
           <div className="relative mx-auto grid w-full max-w-7xl items-center gap-12 md:grid-cols-[1fr_1.2fr] md:gap-16">
-            <div className="max-w-lg">
+            <div className="relative z-10 max-w-lg">
               <span className="mb-4 block font-mono text-xs font-medium uppercase tracking-[0.2em] text-primary">
                 {t('heroAccentTag')}
               </span>

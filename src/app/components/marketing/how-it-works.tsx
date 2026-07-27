@@ -32,8 +32,8 @@ export function HowItWorks() {
 
   return (
     <section id="how-it-works" className="border-t border-border bg-muted/30 py-24 md:py-32">
-      <div className="relative mx-auto max-w-[1120px] px-6">
-        <div className="max-w-xl">
+      <div className="relative mx-auto max-w-[1120px] overflow-x-clip px-6">
+        <div className="relative z-10 max-w-xl">
           <span className="mb-3 block font-mono text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground">
             {t('sectionLabelHow')}
           </span>
@@ -52,7 +52,7 @@ export function HowItWorks() {
           glowColor="var(--gold-glow)"
           className="absolute -top-8 right-0 z-0 hidden lg:block opacity-90"
         />
-        <div className="mt-20 grid gap-10 md:grid-cols-4">
+        <div className="relative z-10 mt-20 grid gap-10 md:grid-cols-4">
           {STEPS.map((step, i) => {
             const Icon = step.icon
             return (
@@ -72,7 +72,7 @@ export function HowItWorks() {
             )
           })}
         </div>
-        <div className="mt-16">
+        <div className="relative z-10 mt-16">
           <Link
             href="/register"
             className="inline-flex cursor-pointer items-center gap-1.5 text-sm font-medium text-primary transition-colors hover:text-primary/80"

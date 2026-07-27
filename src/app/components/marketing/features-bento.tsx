@@ -39,8 +39,8 @@ export function FeaturesBento() {
 
   return (
     <section id="features" className="border-t border-border py-24 md:py-32">
-      <div className="relative mx-auto max-w-[1120px] px-6">
-        <div className="max-w-xl">
+      <div className="relative mx-auto max-w-[1120px] overflow-x-clip px-6">
+        <div className="relative z-10 max-w-xl">
           <span className="mb-3 block font-mono text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground">
             {t('sectionLabelFeatures')}
           </span>
@@ -61,7 +61,7 @@ export function FeaturesBento() {
           className="absolute top-0 right-0 z-0 hidden lg:block opacity-90"
         />
 
-        <div className="mt-20 grid gap-5 md:grid-cols-[1.6fr_1fr] md:grid-rows-[1fr_1fr]">
+        <div className="relative z-10 mt-20 grid gap-5 md:grid-cols-[1.6fr_1fr] md:grid-rows-[1fr_1fr]">
           {/* Large card — AI Chat Coach */}
           <div
             className={`${large.bgAccent} ${large.borderAccent} row-span-2 flex flex-col justify-between rounded-2xl border p-5 sm:p-8 md:p-10 shadow-lg shadow-primary/5 transition-shadow hover:shadow-xl hover:shadow-primary/10`}

@@ -18,10 +18,10 @@ export function InterviewSection() {
 
   return (
     <section id="interview" className="border-t border-border py-24 md:py-32">
-      <div className="mx-auto max-w-[1120px] px-6">
+      <div className="mx-auto max-w-[1120px] overflow-x-clip px-6">
         <div className="grid items-center gap-12 md:grid-cols-[1fr_1.2fr] md:gap-16">
           {/* ── Left: Copy ── */}
-          <div className="max-w-lg">
+          <div className="relative z-10 max-w-lg">
             <span className="mb-3 block font-mono text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground">
               {t('sectionLabelInterview')}
             </span>
