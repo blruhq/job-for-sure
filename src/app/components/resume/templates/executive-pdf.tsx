@@ -156,7 +156,7 @@ export function ExecutivePDF({ resume }: { resume: Resume }) {
         {/* Two-column body */}
         <View style={styles.body}>
           {/* ── Sidebar ── */}
-          <View style={styles.sidebar}>
+          <View style={styles.sidebar} fixed>
             {/* Sidebar dynamic sections */}
             {renderSidebarSections(resume, {
               sidebarSection: styles.sidebarSection,

@@ -79,7 +79,7 @@ export function getVisiblePdfSections(resume: Resume): string[] {
 function SummarySection({ resume, s }: { resume: Resume; s: SectionStyleSet }) {
   return (
     <View style={s.section}>
-      <Text style={s.sectionTitle}>Summary</Text>
+      <Text style={s.sectionTitle} minPresenceAhead={30}>Summary</Text>
       <Text style={s.summary}>{resume.summary}</Text>
     </View>
   )
@@ -88,7 +88,7 @@ function SummarySection({ resume, s }: { resume: Resume; s: SectionStyleSet }) {
 function EducationSection({ resume, s }: { resume: Resume; s: SectionStyleSet }) {
   return (
     <View style={s.section}>
-      <Text style={s.sectionTitle}>Education</Text>
+      <Text style={s.sectionTitle} minPresenceAhead={30}>Education</Text>
       {resume.education!.map((edu: ResumeEducation, i: number) => (
         <View key={i} style={s.experienceBlock}>
           <View style={s.expHeader}>
@@ -108,7 +108,7 @@ function SkillsSection({ resume, s }: { resume: Resume; s: SectionStyleSet }) {
   if (s.skillsCol && s.skillBadge) {
     return (
       <View style={s.section}>
-        <Text style={s.sectionTitle}>Skills</Text>
+        <Text style={s.sectionTitle} minPresenceAhead={30}>Skills</Text>
         <View style={s.skillsCol}>
           {resume.skills.map((skill: string, i: number) => (
             <Text key={i} style={s.skillBadge}>{skill}</Text>
@@ -119,7 +119,7 @@ function SkillsSection({ resume, s }: { resume: Resume; s: SectionStyleSet }) {
   }
   return (
     <View style={s.section}>
-      <Text style={s.sectionTitle}>Skills</Text>
+      <Text style={s.sectionTitle} minPresenceAhead={30}>Skills</Text>
       <View style={s.skillsRow}>
         {resume.skills.map((skill: string, i: number) => (
           <Text key={i} style={s.skill}>{skill}</Text>
@@ -132,7 +132,7 @@ function SkillsSection({ resume, s }: { resume: Resume; s: SectionStyleSet }) {
 function ExperienceSection({ resume, s }: { resume: Resume; s: SectionStyleSet }) {
   return (
     <View style={s.section}>
-      <Text style={s.sectionTitle}>Experience</Text>
+      <Text style={s.sectionTitle} minPresenceAhead={30}>Experience</Text>
       {resume.experience!.map((exp: ResumeExperience, i: number) => (
         <View key={i} style={s.experienceBlock}>
           <View style={s.expHeader}>
@@ -152,7 +152,7 @@ function ExperienceSection({ resume, s }: { resume: Resume; s: SectionStyleSet }
 function ProjectsSection({ resume, s }: { resume: Resume; s: SectionStyleSet }) {
   return (
     <View style={s.section}>
-      <Text style={s.sectionTitle}>Projects</Text>
+      <Text style={s.sectionTitle} minPresenceAhead={30}>Projects</Text>
       {resume.projects!.map((proj: ResumeProject, i: number) => (
         <View key={i} style={s.experienceBlock}>
           <View style={s.expHeader}>
@@ -175,7 +175,7 @@ function ProjectsSection({ resume, s }: { resume: Resume; s: SectionStyleSet }) 
 function CertificationsSection({ resume, s }: { resume: Resume; s: SectionStyleSet }) {
   return (
     <View style={s.section}>
-      <Text style={s.sectionTitle}>Certifications</Text>
+      <Text style={s.sectionTitle} minPresenceAhead={30}>Certifications</Text>
       {resume.certifications!.map((cert: ResumeCertification, i: number) => (
         <View key={i} style={s.certItem ?? { marginBottom: 2 }}>
           <View style={s.expHeader}>
@@ -193,7 +193,7 @@ function CertificationsSection({ resume, s }: { resume: Resume; s: SectionStyleS
 function LanguagesSection({ resume, s }: { resume: Resume; s: SectionStyleSet }) {
   return (
     <View style={s.section}>
-      <Text style={s.sectionTitle}>Languages</Text>
+      <Text style={s.sectionTitle} minPresenceAhead={30}>Languages</Text>
       <View style={s.languagesRow}>
         {resume.languages!.map((lang: ResumeLanguage, i: number) => (
           <Text key={i} style={s.langText}>
@@ -226,7 +226,7 @@ export function renderPdfSections(resume: Resume, s: SectionStyleSet): React.Rea
           if (!section) return null
           return (
             <View key={id} style={s.section}>
-              <Text style={s.sectionTitle}>{section.title}</Text>
+              <Text style={s.sectionTitle} minPresenceAhead={30}>{section.title}</Text>
               {section.items && section.items.length > 0 ? (
                 section.items.map((item, j) => (
                   <View key={j} style={{ marginBottom: 4 }}>
@@ -294,7 +294,7 @@ export function renderSidebarSections(
       case 'skills':
         return (
           <View key={id} style={sidebarStyles.sidebarSection}>
-            <Text style={sidebarStyles.sidebarSectionTitle}>Skills</Text>
+            <Text style={sidebarStyles.sidebarSectionTitle} minPresenceAhead={30}>Skills</Text>
             {sidebarStyles.skillsCol && sidebarStyles.skillBadge ? (
               <View style={sidebarStyles.skillsCol}>
                 {resume.skills!.map((skill: string, i: number) => (
@@ -311,7 +311,7 @@ export function renderSidebarSections(
       case 'languages':
         return (
           <View key={id} style={sidebarStyles.sidebarSection}>
-            <Text style={sidebarStyles.sidebarSectionTitle}>Languages</Text>
+            <Text style={sidebarStyles.sidebarSectionTitle} minPresenceAhead={30}>Languages</Text>
             {resume.languages!.map((lang: ResumeLanguage, i: number) => (
               <Text key={i} style={sidebarStyles.langText}>
                 {lang.name} — {lang.proficiency}
@@ -322,7 +322,7 @@ export function renderSidebarSections(
       case 'certifications':
         return (
           <View key={id} style={sidebarStyles.sidebarSection}>
-            <Text style={sidebarStyles.sidebarSectionTitle}>Certifications</Text>
+            <Text style={sidebarStyles.sidebarSectionTitle} minPresenceAhead={30}>Certifications</Text>
             {resume.certifications!.map((cert: ResumeCertification, i: number) => (
               <View key={i} style={sidebarStyles.certItem ?? { marginBottom: 3 }}>
                 <Text style={{ fontSize: 9, fontWeight: 600 }}>{cert.name}</Text>
@@ -356,7 +356,7 @@ export function renderMainSections(resume: Resume, s: SectionStyleSet): React.Re
           if (!section) return null
           return (
             <View key={id} style={s.section}>
-              <Text style={s.sectionTitle}>{section.title}</Text>
+              <Text style={s.sectionTitle} minPresenceAhead={30}>{section.title}</Text>
               {section.items && section.items.length > 0 ? (
                 section.items.map((item, j) => (
                   <View key={j} style={{ marginBottom: 4 }}>

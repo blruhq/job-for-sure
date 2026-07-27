@@ -167,7 +167,7 @@ export function ModernPDF({ resume }: { resume: Resume }) {
         {/* Two-column body */}
         <View style={styles.body}>
           {/* ── Sidebar ── */}
-          <View style={styles.sidebar}>
+          <View style={styles.sidebar} fixed>
             {/* Contact */}
             <View style={styles.sidebarSection}>
               <Text style={styles.sidebarSectionTitle}>Contact</Text>
