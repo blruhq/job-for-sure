@@ -1,0 +1,40 @@
+$ next dev
+▲ Next.js 16.2.11 (Turbopack)
+- Local:         http://localhost:3000
+- Network:       http://172.20.10.3:3000
+- Environments: .env.local
+✓ Ready in 388ms
+⚠ Warning: Next.js inferred your workspace root, but it may not be correct.
+ We detected multiple lockfiles and selected the directory of /Users/pantorn/satori/projects/job-for-sure/pnpm-workspace.yaml as the root directory.
+ To silence this warning, set `turbopack.root` in your Next.js config, or consider removing one of the lockfiles if it's not needed.
+   See https://nextjs.org/docs/app/api-reference/config/next-config-js/turbopack#root-directory for more information.
+ Detected additional lockfiles: 
+   * /Users/pantorn/satori/projects/job-for-sure/.worktrees/blueprint-ux-full-neumorphism/pnpm-workspace.yaml
+
+
+ GET /en 200 in 1275ms (next.js: 546ms, proxy.ts: 5ms, application-code: 724ms)
+ GET /en 200 in 95ms (next.js: 6ms, proxy.ts: 2ms, application-code: 86ms)
+ GET /en 200 in 337ms (next.js: 137ms, proxy.ts: 6ms, application-code: 194ms)
+ GET /en 200 in 197ms (next.js: 4ms, proxy.ts: 5ms, application-code: 188ms)
+ GET /en 200 in 140ms (next.js: 45ms, proxy.ts: 4ms, application-code: 92ms)
+ GET /en 200 in 93ms (next.js: 3ms, proxy.ts: 3ms, application-code: 87ms)
+ GET /en 200 in 100ms (next.js: 29ms, proxy.ts: 1636µs, application-code: 69ms)
+ GET /en 200 in 73ms (next.js: 2ms, proxy.ts: 1843µs, application-code: 69ms)
+ GET /en 200 in 117ms (next.js: 29ms, proxy.ts: 3ms, application-code: 85ms)
+ GET /en 200 in 90ms (next.js: 3ms, proxy.ts: 1881µs, application-code: 85ms)
+ GET /en 200 in 129ms (next.js: 11ms, proxy.ts: 1908µs, application-code: 116ms)
+ GET /en 200 in 82ms (next.js: 2ms, proxy.ts: 1501µs, application-code: 78ms)
+ GET /en/ats 200 in 1254ms (next.js: 1026ms, proxy.ts: 53ms, application-code: 175ms)
+ GET /en 200 in 112ms (next.js: 12ms, proxy.ts: 1979µs, application-code: 98ms)
+ GET /en 200 in 85ms (next.js: 2ms, proxy.ts: 1594µs, application-code: 81ms)
+ GET /en/ats 200 in 49ms (next.js: 5ms, proxy.ts: 2ms, application-code: 41ms)
+ GET /en 200 in 88ms (next.js: 5ms, proxy.ts: 1977µs, application-code: 80ms)
+ GET /en 200 in 130ms (next.js: 3ms, proxy.ts: 1856µs, application-code: 125ms)
+ GET /en/ats 200 in 57ms (next.js: 6ms, proxy.ts: 6ms, application-code: 44ms)
+[browser] Base UI: A component is changing the uncontrolled value state of Select to be controlled.
+Elements should not switch from uncontrolled to controlled (or vice versa).
+Decide between using a controlled or uncontrolled Select element for the lifetime of the component.
+The nature of the state is determined during the first render. It's considered controlled if the value is not `undefined`.
+More info: https://fb.me/react-controlled-components 
+ POST /api/preview-pdf 401 in 1012ms (next.js: 985ms, application-code: 27ms)
+[?25h
