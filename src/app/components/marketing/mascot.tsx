@@ -2,12 +2,12 @@ import Image from 'next/image'
 import { cn } from '~/lib/utils'
 
 const SIZE_MAP = {
-  avatar: 'w-12',
-  step: 'w-16 sm:w-20 md:w-24',
-  xs: 'w-24 sm:w-28 md:w-32',
-  sm: 'w-28 sm:w-36 md:w-44',
-  md: 'w-40 sm:w-52 md:w-64',
-  lg: 'w-56 sm:w-72 md:w-80',
+  avatar: 'w-12 max-h-[48px]',
+  step: 'w-16 sm:w-20 md:w-24 max-h-[150px]',
+  xs: 'w-24 sm:w-28 md:w-32 max-h-[200px]',
+  sm: 'w-28 sm:w-36 md:w-44 max-h-[280px]',
+  md: 'w-40 sm:w-52 md:w-64 max-h-[400px]',
+  lg: 'w-56 sm:w-72 md:w-80 max-h-[500px]',
 } as const
 
 interface MascotProps {
@@ -54,7 +54,7 @@ export function Mascot({
         height={1270}
         priority={priority}
         className={cn(
-          'h-auto drop-shadow-xl',
+          'h-auto w-auto max-w-full object-contain drop-shadow-xl',
           SIZE_MAP[size],
           isFloating && 'animate-mascot-float',
           circular && 'rounded-full object-cover aspect-square',

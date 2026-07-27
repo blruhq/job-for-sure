@@ -58,7 +58,7 @@ export default function LandingPage() {
                 </Link>
               </div>
             </div>
-            <div className="relative flex justify-center md:justify-end">
+            <div className="relative flex flex-col-reverse items-center gap-4 md:flex-row md:justify-end">
               {/* Jobby mascot — peeks from bottom-left of the mockup card (Sentry-style) */}
               <Mascot
               src="/mascot/jobby-hero.webp"
@@ -66,7 +66,7 @@ export default function LandingPage() {
               size="sm"
               priority
               glowColor="var(--amber-glow)"
-              className="absolute -bottom-6 -left-6 z-20 hidden md:block md:-bottom-10 md:-left-10"
+              className="relative md:absolute md:-bottom-10 md:-left-10 z-20"
               />
               <div className="relative z-10 w-full max-w-lg">
                 <div className="relative overflow-hidden rounded-2xl neuro-card">

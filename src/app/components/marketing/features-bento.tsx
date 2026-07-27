@@ -3,6 +3,7 @@ import { Link } from '~/i18n/routing'
 import { ArrowRight } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { Mascot } from '~/components/marketing/mascot'
+import { cn } from '~/lib/utils'
 
 export function FeaturesBento() {
   const t = useTranslations('landing')
@@ -134,7 +135,7 @@ export function FeaturesBento() {
             return (
               <div
                 key={f.title}
-                className={`${f.bgAccent} ${f.borderAccent} relative flex flex-col justify-between rounded-2xl border p-5 sm:p-8 shadow-lg shadow-primary/5 transition-shadow hover:shadow-xl hover:shadow-primary/10`}
+                className={`${f.bgAccent} ${f.borderAccent} relative overflow-hidden flex flex-col justify-between rounded-2xl border p-5 sm:p-8 shadow-lg shadow-primary/5 transition-shadow hover:shadow-xl hover:shadow-primary/10`}
               >
                 {isJobSearch && (
                   <Mascot
@@ -143,10 +144,10 @@ export function FeaturesBento() {
                     size="step"
                     variant="static"
                     glowColor="transparent"
-                    className="absolute right-3 top-3 opacity-90"
+                    className="absolute bottom-0 right-0 opacity-95"
                   />
                 )}
-                <div className="relative z-10">
+                <div className={cn('relative z-10', isJobSearch && 'max-w-[70%]')}>
                   <div
                     className={`flex h-12 w-12 items-center justify-center rounded-xl neuro-icon-well ${f.color}`}
                   >
