@@ -205,9 +205,9 @@ export function AtsView() {
     : 'Paste a job description and click "Analyze Match" to see your score.'
 
   return (
-    <div className="flex h-full w-full flex-col md:flex-row">
+    <div className="flex h-full w-full flex-col lg:flex-row">
       {/* Left panel — inputs + analysis */}
-      <div className="flex w-full md:w-[45%] flex-col gap-5 overflow-y-auto border-b md:border-b-0 md:border-r neuro-surface p-4 md:p-6">
+      <div className="flex w-full lg:w-[45%] flex-col gap-5 overflow-y-auto border-b lg:border-b-0 lg:border-r neuro-surface p-4 sm:p-5 lg:p-6">
         <div>
           <h1 className="text-lg font-semibold">ATS Optimizer</h1>
           <div className="text-sm text-muted-foreground">
@@ -466,7 +466,7 @@ export function AtsView() {
       </div>
 
       {/* Right panel — live resume preview */}
-      <div className="flex w-full md:w-[55%] flex-col items-center overflow-y-auto neuro-surface p-4 md:p-6">
+      <div className="flex w-full lg:w-[55%] flex-col items-center overflow-y-auto neuro-surface p-4 sm:p-5 lg:p-6">
         <div className="mb-4 flex w-full max-w-[550px] items-center justify-between rounded-sm neuro-card p-2 px-3">
           <span className="text-sm font-semibold text-muted-foreground">ATS Real-Time Sheet</span>
           <Button

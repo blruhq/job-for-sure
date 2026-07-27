@@ -644,7 +644,7 @@ export function ChatView() {
     <div className="neuro-chat flex h-full flex-col">
       {/* Status bar — hidden during build mode */}
       {!buildData && (
-      <div className="neuro-surface flex shrink-0 flex-wrap items-center justify-between gap-2 px-4 md:px-8 py-2.5 text-xs">
+      <div className="neuro-surface flex shrink-0 flex-wrap items-center justify-between gap-2 px-3 sm:px-4 md:px-8 py-2.5 text-xs">
         <div className="flex items-center gap-1.5">
           <span className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">Profile:</span>
           <Select

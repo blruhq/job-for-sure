@@ -93,12 +93,12 @@ export function Topbar() {
         )}
       />
 
-      {/* Sidebar toggle — visible on all sizes */}
+      {/* Sidebar toggle — visible on all sizes, enhanced touch target on mobile */}
       <Button
         variant="ghost"
         size="icon"
         onClick={toggleSidebar}
-        className="ml-1 h-[30px] w-[30px] rounded-sm text-muted-foreground"
+        className="ml-1 h-[30px] w-[30px] sm:h-[34px] sm:w-[34px] rounded-sm text-muted-foreground touch-target"
         title="Toggle sidebar"
       >
         <PanelLeft size={15} />
@@ -107,13 +107,13 @@ export function Topbar() {
       <div className="flex-1" />
 
       {/* Actions */}
-      <div className="flex items-center gap-1 pr-3">
+      <div className="flex items-center gap-1 sm:gap-1.5 pr-2 sm:pr-3">
         <LanguageSwitcher />
         <Button
           variant="ghost"
           size="icon"
           onClick={toggle}
-          className="relative h-[30px] w-[30px] rounded-sm text-muted-foreground"
+          className="relative h-[30px] w-[30px] sm:h-[34px] sm:w-[34px] rounded-sm text-muted-foreground touch-target"
           title="Toggle theme"
         >
           {theme === 'dark' ? <Sun size={16} /> : <Moon size={16} />}

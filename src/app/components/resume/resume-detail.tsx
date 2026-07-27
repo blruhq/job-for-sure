@@ -1118,7 +1118,7 @@ export function ResumeDetail({ resumeId }: { resumeId: string }) {
   return (
     <div className="flex h-full flex-col">
       {/* Header with tabs */}
-      <div className="flex shrink-0 flex-col md:flex-row md:items-center justify-between gap-2 neuro-surface px-4 md:px-6 py-3">
+      <div className="flex shrink-0 flex-col md:flex-row md:items-center justify-between gap-2 neuro-surface px-3 sm:px-4 md:px-6 py-3">
         <div className="flex items-center gap-2 overflow-x-auto min-w-0 max-w-full">
           <Button variant="outline" size="sm" onClick={() => router.push('/chat')} className="flex shrink-0 items-center gap-1 rounded-sm px-2.5 py-1.5 text-sm">
             <ArrowLeft size={12} /> Back
@@ -1241,14 +1241,14 @@ export function ResumeDetail({ resumeId }: { resumeId: string }) {
               <Button
                 variant="ghost"
                 onClick={() => setMobileView('edit')}
-                className={cn('flex-1 rounded-none py-2 text-xs font-medium', mobileView === 'edit' ? 'border-b-2 border-primary text-foreground font-semibold' : 'text-muted-foreground')}
+                className={cn('flex-1 rounded-none min-h-[44px] py-2 text-xs font-medium touch-target', mobileView === 'edit' ? 'border-b-2 border-primary text-foreground font-semibold' : 'text-muted-foreground')}
               >
                 ✏️ Edit
               </Button>
               <Button
                 variant="ghost"
                 onClick={() => setMobileView('preview')}
-                className={cn('flex-1 rounded-none py-2 text-xs font-medium', mobileView === 'preview' ? 'border-b-2 border-primary text-foreground font-semibold' : 'text-muted-foreground')}
+                className={cn('flex-1 rounded-none min-h-[44px] py-2 text-xs font-medium touch-target', mobileView === 'preview' ? 'border-b-2 border-primary text-foreground font-semibold' : 'text-muted-foreground')}
               >
                 📄 Preview
               </Button>

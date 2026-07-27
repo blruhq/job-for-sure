@@ -88,7 +88,7 @@ function DroppableColumn({ colId, isOver, children }: { colId: ApplicationColumn
     <div
       ref={setNodeRef}
       className={cn(
-        'flex w-[85vw] max-w-[320px] sm:w-72 shrink-0 snap-center flex-col rounded-sm neuro-inset neuro-inset-container transition-all duration-150',
+        'flex w-[82vw] max-w-[300px] sm:max-w-[320px] lg:w-72 shrink-0 snap-center flex-col rounded-sm neuro-inset neuro-inset-container transition-all duration-150',
         isOver && 'ring-2 ring-primary bg-primary/10 scale-[1.02]',
       )}
     >
@@ -410,7 +410,7 @@ export function ApplicationsView() {
   return (
     <div className="flex h-full w-full flex-col neuro-surface">
       {/* ── Header ── */}
-      <div className="flex flex-col gap-2 neuro-divider px-4 py-2.5 shrink-0">
+      <div className="flex flex-col gap-2 neuro-divider px-3 sm:px-4 py-2.5 shrink-0">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <h1 className="text-sm font-semibold text-foreground">
@@ -491,7 +491,7 @@ export function ApplicationsView() {
           }
         }}
       >
-        <div className="flex flex-1 gap-3 sm:gap-5 overflow-x-auto p-4 snap-x snap-mandatory">
+        <div className="flex flex-1 gap-3 sm:gap-5 overflow-x-auto p-3 sm:p-4 snap-x snap-mandatory">
           {COLUMNS.map((col) => {
             const jobs = filterJobs(applications[col.id])
             const isOver = dragOverCol === col.id

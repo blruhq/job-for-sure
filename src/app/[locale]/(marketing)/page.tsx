@@ -27,11 +27,11 @@ export default function LandingPage() {
     <div className="flex min-h-screen flex-col neuro-surface">
       <GridPattern>
         {/* ── HERO ── */}
-        <section className="relative flex min-h-screen flex-col items-center px-6 pt-[12vh] md:pt-[15vh]">
+        <section className="relative flex min-h-screen flex-col items-center px-4 sm:px-6 pt-[12vh] md:pt-[15vh]">
           <div
             className="pointer-events-none absolute inset-0 hero-glow opacity-[0.04]"
           />
-          <div className="relative mx-auto grid w-full max-w-[1120px] items-center gap-12 md:grid-cols-[1fr_1.2fr] md:gap-16">
+          <div className="relative mx-auto grid w-full max-w-7xl items-center gap-12 md:grid-cols-[1fr_1.2fr] md:gap-16">
             <div className="max-w-lg">
               <h1 className="text-4xl font-semibold leading-[1.08] tracking-tight text-foreground sm:text-5xl md:text-[3.5rem] md:leading-[1.05]">
                 {t('title')}
@@ -148,7 +148,7 @@ export default function LandingPage() {
 
       {/* ── CTA ── */}
       <section className="bg-brand">
-        <div className="mx-auto max-w-[1120px] px-6 py-20 md:py-28">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-20 md:py-28">
           <div className="max-w-2xl">
             <h2 className="text-3xl font-semibold tracking-tight text-brand-foreground md:text-4xl">
               {t('tagline')}

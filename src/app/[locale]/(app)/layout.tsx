@@ -95,7 +95,7 @@ function AppShell({ children }: { children: React.ReactNode }) {
   // Lock body scroll while the mobile sidebar overlay is open so the
   // background page can't scroll behind it. Also auto-close sidebar on page change.
   useEffect(() => {
-    if (typeof window !== 'undefined' && window.innerWidth < 768) {
+    if (typeof window !== 'undefined' && window.innerWidth < 1024) {
       useUIStore.getState().setSidebarCollapsed(true)
     }
   }, [pathname])
@@ -103,7 +103,7 @@ function AppShell({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (typeof document === 'undefined') return
     // Only lock on mobile widths — desktop renders the sidebar in-flow.
-    const isMobile = window.matchMedia('(max-width: 767px)').matches
+    const isMobile = window.matchMedia('(max-width: 1023px)').matches
     if (sidebarOpen && isMobile) {
       const prev = document.body.style.overflow
       document.body.style.overflow = 'hidden'
@@ -118,7 +118,7 @@ function AppShell({ children }: { children: React.ReactNode }) {
       <Topbar />
       <div className="relative flex flex-1 overflow-hidden">
         {/* Desktop sidebar — in flow, toggles between 220px and 56px */}
-        <div className="hidden md:block shrink-0">
+        <div className="hidden lg:block shrink-0">
           <Sidebar />
         </div>
 
@@ -126,12 +126,12 @@ function AppShell({ children }: { children: React.ReactNode }) {
         {!sidebarCollapsed && (
           <>
             <div
-              className="fixed inset-0 top-[var(--topbar-height)] z-40 bg-black/40 backdrop-blur-[1px] md:hidden animate-fade-up"
+              className="fixed inset-0 top-[var(--topbar-height)] z-40 bg-black/40 backdrop-blur-[1px] lg:hidden animate-fade-up"
               onClick={toggleSidebar}
               aria-hidden="true"
             />
             <div
-              className="fixed left-0 top-[var(--topbar-height)] bottom-0 z-50 md:hidden animate-slide-in"
+              className="fixed left-0 top-[var(--topbar-height)] bottom-0 z-50 lg:hidden animate-slide-in"
               role="dialog"
               aria-modal="true"
             >

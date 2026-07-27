@@ -464,6 +464,72 @@ html[lang="th"] {
 ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
 ::-webkit-scrollbar-thumb:hover { background: var(--muted-foreground); }
 
+/* ═══════════════════════════════════════════════════════════════
+   RESPONSIVE / TOUCH ADAPTATION
+   ═══════════════════════════════════════════════════════════════ */
+
+/* Touch target minimum — applied to interactive controls on touch devices */
+@media (pointer: coarse) {
+  .touch-target,
+  button:not(.touch-exempt),
+  input:not(.touch-exempt),
+  select:not(.touch-exempt),
+  [role="button"]:not(.touch-exempt) {
+    min-height: 44px;
+    min-width: 44px;
+  }
+  /* Active state feedback for tactile response */
+  .touch-active:active {
+    transform: scale(0.96);
+  }
+  /* Suppress sticky hover on touch devices — only show hover on fine pointers */
+  @media (hover: none) {
+    .hover-only {
+      display: none;
+    }
+  }
+}
+
+/* Fine pointer hover restoration — scoped so touch never inherits sticky bg */
+@media (pointer: fine) {
+  .hover-visible:hover {
+    background-color: var(--accent-soft);
+  }
+}
+
+/* Dynamic viewport height utility for interactive workspaces */
+.min-h-dynamic {
+  min-height: 100dvh;
+}
+.h-dynamic {
+  height: 100dvh;
+}
+
+/* Container width standards */
+.container-app {
+  max-width: 80rem; /* 7xl */
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+@media (width >= 480px) {
+  .container-app { padding-left: 1.5rem; padding-right: 1.5rem; }
+}
+@media (width >= 1024px) {
+  .container-app { padding-left: 2rem; padding-right: 2rem; }
+}
+
+.container-fullbleed {
+  width: 100%;
+  max-width: 100%;
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
+}
+@media (width >= 480px) {
+  .container-fullbleed { padding-left: 1rem; padding-right: 1rem; }
+}
+
 /* ── Resume paper base (all templates) ── */
 .resume-paper {
   background: #FFFFFF;

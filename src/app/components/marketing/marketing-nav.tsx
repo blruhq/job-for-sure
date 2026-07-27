@@ -23,7 +23,7 @@ export function MarketingNav() {
 
   return (
     <header className="sticky top-0 z-50 h-14 border-b border-border neuro-surface">
-      <div className="mx-auto flex h-full max-w-[1120px] items-center justify-between px-6">
+      <div className="mx-auto flex h-full max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
         {/* Brand — logo lives in the navbar, not the hero */}
         <Link href="/" className="flex cursor-pointer items-center gap-2 no-underline">
           <div className="neuro-icon-well rounded-[3px] p-0.5">
@@ -46,7 +46,7 @@ export function MarketingNav() {
               <a
                 key={link.href as string}
                 href={link.href as string}
-                className="cursor-pointer text-sm text-muted-foreground transition-colors hover:text-foreground"
+                className="cursor-pointer text-sm text-muted-foreground transition-colors hover-visible touch-target flex items-center"
               >
                 {link.label}
               </a>
@@ -54,7 +54,7 @@ export function MarketingNav() {
               <Link
                 key={link.href as string}
                 href={link.href as string}
-                className="cursor-pointer text-sm text-muted-foreground transition-colors hover:text-foreground"
+                className="cursor-pointer text-sm text-muted-foreground transition-colors hover-visible touch-target flex items-center"
               >
                 {link.label}
               </Link>
@@ -68,13 +68,13 @@ export function MarketingNav() {
           <LanguageSwitcher />
           <Link
             href="/login"
-            className="cursor-pointer rounded-md px-3 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+            className="cursor-pointer rounded-md px-3 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover-visible touch-target flex items-center"
           >
             {t('footerSignIn')}
           </Link>
           <Link
             href="/register"
-            className="cursor-pointer rounded-md bg-primary px-4 py-1.5 text-sm font-medium text-primary-foreground transition-opacity hover:opacity-90"
+            className="cursor-pointer rounded-md bg-primary px-4 py-1.5 text-sm font-medium text-primary-foreground transition-opacity hover:opacity-90 touch-target flex items-center"
           >
             {t('footerGetStarted')}
           </Link>

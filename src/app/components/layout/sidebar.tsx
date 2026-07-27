@@ -70,7 +70,7 @@ function NavSection({
               <Link
                 href={item.href}
                 onClick={() => {
-                  if (typeof window !== 'undefined' && window.innerWidth < 768) {
+                  if (typeof window !== 'undefined' && window.innerWidth < 1024) {
                     useUIStore.getState().setSidebarCollapsed(true)
                   }
                 }}
@@ -182,7 +182,7 @@ export function Sidebar() {
                 <Link
                   href="/resumes"
                   onClick={() => {
-                    if (typeof window !== 'undefined' && window.innerWidth < 768) {
+                    if (typeof window !== 'undefined' && window.innerWidth < 1024) {
                       useUIStore.getState().setSidebarCollapsed(true)
                     }
                   }}
@@ -244,7 +244,7 @@ export function Sidebar() {
             <Link
               href="/settings"
               onClick={() => {
-                if (typeof window !== 'undefined' && window.innerWidth < 768) {
+                if (typeof window !== 'undefined' && window.innerWidth < 1024) {
                   useUIStore.getState().setSidebarCollapsed(true)
                 }
               }}
