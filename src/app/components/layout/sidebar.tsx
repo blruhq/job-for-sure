@@ -67,9 +67,14 @@ function NavSection({
         const navLabel = t(item.labelKey)
         return (
           <Tooltip key={item.href} label={navLabel} disabled={!collapsed}>
-            <Link
-              href={item.href}
-              className={cn(
+              <Link
+                href={item.href}
+                onClick={() => {
+                  if (typeof window !== 'undefined' && window.innerWidth < 768) {
+                    useUIStore.getState().setSidebarCollapsed(true)
+                  }
+                }}
+                className={cn(
                 'flex items-center gap-2 rounded-sm text-sm font-medium transition-[padding,background-color,color] duration-200 ease-[cubic-bezier(0.2,0,0,1)]',
                 isActive
                   ? 'neuro-inset text-foreground font-semibold'
@@ -176,6 +181,11 @@ export function Sidebar() {
               <Tooltip label={t('resumes')} disabled={!c}>
                 <Link
                   href="/resumes"
+                  onClick={() => {
+                    if (typeof window !== 'undefined' && window.innerWidth < 768) {
+                      useUIStore.getState().setSidebarCollapsed(true)
+                    }
+                  }}
                   className={cn(
                     'flex items-center gap-2 rounded-sm text-sm font-medium transition-[padding,background-color,color] duration-200 ease-[cubic-bezier(0.2,0,0,1)]',
                     pathname === '/resumes'
@@ -233,6 +243,11 @@ export function Sidebar() {
           <Tooltip label={t('settings')} disabled={!c}>
             <Link
               href="/settings"
+              onClick={() => {
+                if (typeof window !== 'undefined' && window.innerWidth < 768) {
+                  useUIStore.getState().setSidebarCollapsed(true)
+                }
+              }}
               className={cn(
                 'flex items-center gap-2 rounded-sm text-xs font-medium transition-[padding,background-color,color] duration-200 ease-[cubic-bezier(0.2,0,0,1)]',
                 pathname === '/settings'

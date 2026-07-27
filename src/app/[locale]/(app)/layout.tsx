@@ -84,6 +84,7 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
 }
 
 function AppShell({ children }: { children: React.ReactNode }) {
+  const pathname = usePathname()
   const sidebarCollapsed = useUIStore((s) => s.sidebarCollapsed)
   const toggleSidebar = useUIStore((s) => s.toggleSidebar)
   const closeUpgradeModal = useUIStore((s) => s.closeUpgradeModal)
@@ -92,7 +93,13 @@ function AppShell({ children }: { children: React.ReactNode }) {
   const sidebarOpen = !sidebarCollapsed
 
   // Lock body scroll while the mobile sidebar overlay is open so the
-  // background page can't scroll behind it.
+  // background page can't scroll behind it. Also auto-close sidebar on page change.
+  useEffect(() => {
+    if (typeof window !== 'undefined' && window.innerWidth < 768) {
+      useUIStore.getState().setSidebarCollapsed(true)
+    }
+  }, [pathname])
+
   useEffect(() => {
     if (typeof document === 'undefined') return
     // Only lock on mobile widths — desktop renders the sidebar in-flow.

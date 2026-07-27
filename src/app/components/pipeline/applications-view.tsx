@@ -88,7 +88,7 @@ function DroppableColumn({ colId, isOver, children }: { colId: ApplicationColumn
     <div
       ref={setNodeRef}
       className={cn(
-        'flex w-72 shrink-0 flex-col rounded-sm neuro-inset neuro-inset-container transition-all duration-150',
+        'flex w-[85vw] max-w-[320px] sm:w-72 shrink-0 snap-center flex-col rounded-sm neuro-inset neuro-inset-container transition-all duration-150',
         isOver && 'ring-2 ring-primary bg-primary/10 scale-[1.02]',
       )}
     >
@@ -491,7 +491,7 @@ export function ApplicationsView() {
           }
         }}
       >
-        <div className="flex flex-1 gap-5 overflow-x-auto p-4">
+        <div className="flex flex-1 gap-3 sm:gap-5 overflow-x-auto p-4 snap-x snap-mandatory">
           {COLUMNS.map((col) => {
             const jobs = filterJobs(applications[col.id])
             const isOver = dragOverCol === col.id
