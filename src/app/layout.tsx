@@ -13,6 +13,7 @@ const jetbrainsMono = JetBrains_Mono({
   variable: '--font-jetbrains-mono',
   subsets: ['latin'],
   display: 'swap',
+  preload: false,
 })
 
 const instrumentSerif = Instrument_Serif({
@@ -21,13 +22,15 @@ const instrumentSerif = Instrument_Serif({
   weight: ['400'],
   style: ['normal', 'italic'],
   display: 'swap',
+  preload: false,
 })
 
 const kanit = Kanit({
   variable: '--font-kanit',
   subsets: ['thai', 'latin-ext'],
-  weight: ['300', '400', '500', '600'],
+  weight: ['400', '500', '600'],
   display: 'swap',
+  preload: false,
 })
 
 // Inline script that runs BEFORE hydration to apply the saved theme.

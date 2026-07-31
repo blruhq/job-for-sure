@@ -149,9 +149,9 @@ export function InterviewSection() {
 
                   <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
                     <div>
-                      <h4 className="text-[10px] font-mono font-semibold uppercase text-success">
+                      <h3 className="text-[10px] font-mono font-semibold uppercase text-success">
                         {t('interviewStrengths')}
-                      </h4>
+                      </h3>
                       <ul className="mt-1.5 space-y-1">
                         {strengths.map((s) => (
                           <li key={s} className="flex items-start gap-1.5 text-sm text-muted-foreground">
@@ -162,9 +162,9 @@ export function InterviewSection() {
                       </ul>
                     </div>
                     <div>
-                      <h4 className="text-[10px] font-mono font-semibold uppercase text-warn">
+                      <h3 className="text-[10px] font-mono font-semibold uppercase text-warn">
                         {t('interviewImprove')}
-                      </h4>
+                      </h3>
                       <ul className="mt-1.5 space-y-1">
                         {improvements.map((s) => (
                           <li key={s} className="flex items-start gap-1.5 text-sm text-muted-foreground">

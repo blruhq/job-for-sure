@@ -46,7 +46,7 @@ export function MarketingNav() {
               <a
                 key={link.href as string}
                 href={link.href as string}
-                className="cursor-pointer text-sm text-muted-foreground transition-colors hover-visible touch-target flex items-center"
+                className="cursor-pointer text-sm text-slate-600 dark:text-slate-300 transition-colors hover-visible touch-target flex items-center"
               >
                 {link.label}
               </a>
@@ -54,7 +54,7 @@ export function MarketingNav() {
               <Link
                 key={link.href as string}
                 href={link.href as string}
-                className="cursor-pointer text-sm text-muted-foreground transition-colors hover-visible touch-target flex items-center"
+                className="cursor-pointer text-sm text-slate-600 dark:text-slate-300 transition-colors hover-visible touch-target flex items-center"
               >
                 {link.label}
               </Link>
@@ -68,7 +68,7 @@ export function MarketingNav() {
           <LanguageSwitcher />
           <Link
             href="/login"
-            className="cursor-pointer rounded-md px-3 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover-visible touch-target flex items-center"
+            className="cursor-pointer rounded-md px-3 py-1.5 text-sm font-medium text-slate-600 dark:text-slate-300 transition-colors hover-visible touch-target flex items-center"
           >
             {t('footerSignIn')}
           </Link>
@@ -104,7 +104,7 @@ export function MarketingNav() {
                   key={link.href as string}
                   href={link.href as string}
                   onClick={() => setOpen(false)}
-                  className="flex min-h-[44px] cursor-pointer items-center text-sm text-muted-foreground transition-colors hover:text-foreground"
+                  className="flex min-h-[44px] cursor-pointer items-center text-sm text-slate-600 dark:text-slate-300 transition-colors hover:text-foreground"
                 >
                   {link.label}
                 </a>
@@ -113,7 +113,7 @@ export function MarketingNav() {
                   key={link.href as string}
                   href={link.href as string}
                   onClick={() => setOpen(false)}
-                  className="flex min-h-[44px] cursor-pointer items-center text-sm text-muted-foreground transition-colors hover:text-foreground"
+                  className="flex min-h-[44px] cursor-pointer items-center text-sm text-slate-600 dark:text-slate-300 transition-colors hover:text-foreground"
                 >
                   {link.label}
                 </Link>
@@ -123,7 +123,7 @@ export function MarketingNav() {
             <Link
               href="/login"
               onClick={() => setOpen(false)}
-              className="flex min-h-[44px] cursor-pointer items-center text-sm text-muted-foreground transition-colors hover:text-foreground"
+              className="flex min-h-[44px] cursor-pointer items-center text-sm text-slate-600 dark:text-slate-300 transition-colors hover:text-foreground"
             >
               {t('footerSignIn')}
             </Link>

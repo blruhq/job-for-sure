@@ -1,6 +1,7 @@
 'use client'
 
 import Image from 'next/image'
+import { useState, useEffect } from 'react'
 import { PanelLeft, Sun, Moon, Globe } from 'lucide-react'
 import { Button } from '~/components/ui/button'
 import { UserMenu } from '~/components/layout/user-menu'
@@ -43,6 +44,8 @@ export function LanguageSwitcher() {
 
 export function Topbar() {
   const { theme, toggle } = useTheme()
+  const [mounted, setMounted] = useState(false)
+  useEffect(() => setMounted(true), [])
   const sidebarCollapsed = useUIStore((s) => s.sidebarCollapsed)
   const toggleSidebar = useUIStore((s) => s.toggleSidebar)
 
@@ -116,7 +119,7 @@ export function Topbar() {
           className="relative h-[30px] w-[30px] sm:h-[34px] sm:w-[34px] rounded-sm text-muted-foreground touch-target"
           title="Toggle theme"
         >
-          {theme === 'dark' ? <Sun size={16} /> : <Moon size={16} />}
+          {mounted ? (theme === 'dark' ? <Sun size={16} /> : <Moon size={16} />) : <Moon size={16} />}
         </Button>
         <UserMenu />
       </div>

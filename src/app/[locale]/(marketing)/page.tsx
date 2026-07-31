@@ -49,7 +49,7 @@ export default function LandingPage() {
   ]
 
   return (
-    <div className="flex min-h-screen flex-col neuro-surface">
+    <main className="flex min-h-screen flex-col neuro-surface">
       <GridPattern>
         {/* ── HERO ── */}
         <section className="relative flex min-h-screen flex-col items-center overflow-x-clip px-4 sm:px-6 pt-[12vh] md:pt-[15vh]">
@@ -187,7 +187,7 @@ export default function LandingPage() {
       <section className="bg-brand">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-20 md:py-28">
           <div className="max-w-2xl">
-            <span className="mb-3 block font-mono text-xs font-medium uppercase tracking-[0.2em] text-brand-foreground/60">
+            <span className="mb-3 block font-mono text-xs font-medium uppercase tracking-[0.2em] text-brand-foreground/80">
               {t('sectionLabelCta')}
             </span>
             <h2 className="text-3xl font-bold tracking-tighter text-brand-foreground md:text-4xl">
@@ -209,8 +209,8 @@ export default function LandingPage() {
       {/* ── FOOTER ── */}
       <footer className="border-t border-brand-foreground/10 bg-brand px-6 py-8">
         <div className="mx-auto flex max-w-[1120px] flex-col items-center justify-between gap-4 text-center sm:flex-row sm:text-left">
-          <span className="text-sm text-brand-foreground/60">{t('footerCopyright')}</span>
-          <div className="flex gap-6 text-sm text-brand-foreground/60">
+          <span className="text-sm text-brand-foreground/80">{t('footerCopyright')}</span>
+          <div className="flex gap-6 text-sm text-brand-foreground/80">
             <Link href="/pricing" className="cursor-pointer transition-colors hover:text-brand-foreground">
               Pricing
             </Link>
@@ -249,6 +249,6 @@ export default function LandingPage() {
           answer: 'Yes, Job For Sure is available in English and Thai, with more languages coming soon.',
         },
       ])} />
-    </div>
+    </main>
   )
 }
