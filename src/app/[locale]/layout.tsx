@@ -1,13 +1,56 @@
 import type { Metadata, Viewport } from 'next'
+import { Inter, JetBrains_Mono, Instrument_Serif, Kanit } from 'next/font/google'
 import { ThemeProvider } from '~/components/layout/theme-provider'
 import '../globals.css'
 import { Toaster } from 'sonner'
 import { NextIntlClientProvider } from 'next-intl'
 import { getMessages } from 'next-intl/server'
+import { setRequestLocale } from 'next-intl/server'
 import { notFound } from 'next/navigation'
 import { routing } from '~/i18n/routing'
 import { QueryProvider } from '~/components/layout/query-provider'
 import { SITE_URL, buildAlternates, ogImageUrl } from '~/lib/seo'
+
+// Font definitions (moved from root layout)
+const inter = Inter({
+  variable: '--font-inter',
+  subsets: ['latin'],
+  display: 'swap',
+})
+
+const jetbrainsMono = JetBrains_Mono({
+  variable: '--font-jetbrains-mono',
+  subsets: ['latin'],
+  display: 'swap',
+  preload: false,
+})
+
+const instrumentSerif = Instrument_Serif({
+  variable: '--font-instrument-serif',
+  subsets: ['latin'],
+  weight: ['400'],
+  style: ['normal', 'italic'],
+  display: 'swap',
+  preload: false,
+})
+
+const kanit = Kanit({
+  variable: '--font-kanit',
+  subsets: ['thai', 'latin-ext'],
+  weight: ['400', '500', '600'],
+  display: 'swap',
+  preload: false,
+})
+
+// Inline script that runs BEFORE hydration to apply the saved theme.
+// Prevents the white-flash dark-mode users see when ThemeProvider mounts.
+// Must be a string — Next.js will render it verbatim inside <head>.
+const themeNoFlashScript = `(function(){try{var t=localStorage.getItem('theme');if(t==='dark'||(t==null&&window.matchMedia('(prefers-color-scheme: dark)').matches)){document.documentElement.classList.add('dark');}}catch(e){}})();`
+
+// Static rendering: pre-render all locale variants at build time
+export function generateStaticParams() {
+  return routing.locales.map((locale) => ({ locale }))
+}
 
 export const viewport: Viewport = {
   themeColor: [
@@ -75,16 +118,30 @@ export default async function LocaleLayout({
     notFound()
   }
 
+  // Enable static rendering for this locale
+  setRequestLocale(locale)
+
   const messages = await getMessages()
 
   return (
-    <NextIntlClientProvider messages={messages}>
-      <ThemeProvider>
-        <QueryProvider>
-          {children}
-        </QueryProvider>
-        <Toaster position="bottom-center" richColors />
-      </ThemeProvider>
-    </NextIntlClientProvider>
+    <html
+      lang={locale}
+      className={`${inter.variable} ${jetbrainsMono.variable} ${instrumentSerif.variable}${locale === 'th' ? ` ${kanit.variable}` : ''}`}
+      suppressHydrationWarning
+    >
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: themeNoFlashScript }} />
+      </head>
+      <body className="min-h-screen bg-background text-foreground antialiased">
+        <NextIntlClientProvider messages={messages}>
+          <ThemeProvider>
+            <QueryProvider>
+              {children}
+            </QueryProvider>
+            <Toaster position="bottom-center" richColors />
+          </ThemeProvider>
+        </NextIntlClientProvider>
+      </body>
+    </html>
   )
 }

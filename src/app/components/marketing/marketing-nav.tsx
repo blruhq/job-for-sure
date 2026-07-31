@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { Link } from '~/i18n/routing'
 import { useTranslations } from 'next-intl'
-import { LanguageSwitcher } from '~/components/layout/navbar'
+import { LanguageSwitcher } from '~/components/layout/language-switcher'
 import { ThemeToggle } from '~/components/layout/theme-toggle'
 import { X, Menu } from 'lucide-react'
 import Image from 'next/image'

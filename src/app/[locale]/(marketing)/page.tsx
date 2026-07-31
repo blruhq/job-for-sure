@@ -6,7 +6,7 @@ import { HowItWorks } from '~/components/marketing/how-it-works'
 import { FeaturesBento } from '~/components/marketing/features-bento'
 import { InterviewSection } from '~/components/marketing/interview-section'
 import { Mascot } from '~/components/marketing/mascot'
-import { useTranslations } from 'next-intl'
+import { setRequestLocale, getTranslations } from 'next-intl/server'
 import { buildAlternates, ogImageUrl, organizationSchema, websiteSchema, faqSchema, JsonLd } from '~/lib/seo'
 
 export async function generateMetadata({
@@ -38,8 +38,14 @@ export async function generateMetadata({
   }
 }
 
-export default function LandingPage() {
-  const t = useTranslations('landing')
+export default async function LandingPage({
+  params,
+}: {
+  params: Promise<{ locale: string }>
+}) {
+  const { locale } = await params
+  setRequestLocale(locale)
+  const t = await getTranslations('landing')
 
   const statItems = [
     { label: t('mockupKeywords'), value: '14/18', color: 'text-success' },
