@@ -5,6 +5,10 @@ import { ArrowLeft } from 'lucide-react'
 export const metadata: Metadata = {
   title: 'Account',
   description: 'Sign in or create your Job For Sure account.',
+  robots: {
+    index: false,
+    follow: true,
+  },
 }
 
 export default function AuthLayout({ children }: { children: React.ReactNode }) {

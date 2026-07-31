@@ -7,11 +7,35 @@ import { FeaturesBento } from '~/components/marketing/features-bento'
 import { InterviewSection } from '~/components/marketing/interview-section'
 import { Mascot } from '~/components/marketing/mascot'
 import { useTranslations } from 'next-intl'
+import { buildAlternates, ogImageUrl, organizationSchema, websiteSchema, faqSchema, JsonLd } from '~/lib/seo'
 
-export const metadata: Metadata = {
-  title: { absolute: 'Job For Sure' },
-  description:
-    'Upload your resume once. Get AI-matched jobs, ATS-optimized resumes, mock interview practice, and a full application tracker.',
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>
+}): Promise<Metadata> {
+  const { locale } = await params
+  const title = 'Job For Sure'
+  const description = 'Upload your resume once. Get AI-matched jobs, ATS-optimized resumes, mock interview practice, and a full application tracker.'
+
+  return {
+    title: { absolute: title },
+    description,
+    alternates: buildAlternates(''),
+    openGraph: {
+      title,
+      description,
+      type: 'website',
+      locale: locale === 'th' ? 'th_TH' : 'en_US',
+      images: [{ url: ogImageUrl(title, description), width: 1200, height: 630 }],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+      images: [ogImageUrl(title)],
+    },
+  }
 }
 
 export default function LandingPage() {
@@ -199,6 +223,32 @@ export default function LandingPage() {
           </div>
         </div>
       </footer>
+
+      {/* ── STRUCTURED DATA ── */}
+      <JsonLd data={organizationSchema()} />
+      <JsonLd data={websiteSchema()} />
+      <JsonLd data={faqSchema([
+        {
+          question: 'What is Job For Sure?',
+          answer: 'Job For Sure is an AI-powered career coach that helps you build resumes, match against job descriptions, prepare for interviews, and track your applications — all in one place.',
+        },
+        {
+          question: 'Is Job For Sure free?',
+          answer: 'Yes! The Free plan includes 3 resumes, 15 AI chats per day, 3 cover letters per week, 5 ATS matches per day, and 3 interview prep sessions per week. Upgrade to Pro for unlimited everything at $4/month or $29/year.',
+        },
+        {
+          question: 'How does the ATS resume matcher work?',
+          answer: 'Paste a job description and our AI analyzes your resume against it, scoring the match percentage, identifying matched and missing skills, and giving actionable recommendations to improve your chances.',
+        },
+        {
+          question: 'Can I use Job For Sure for non-tech jobs?',
+          answer: 'Absolutely. While we have deep tech job board integrations, the resume builder, cover letter generator, ATS matcher, and interview prep work for any industry.',
+        },
+        {
+          question: 'Do you support multiple languages?',
+          answer: 'Yes, Job For Sure is available in English and Thai, with more languages coming soon.',
+        },
+      ])} />
     </div>
   )
 }

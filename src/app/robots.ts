@@ -1,4 +1,5 @@
 import { MetadataRoute } from 'next'
+import { SITE_URL } from '~/lib/seo'
 
 export default function robots(): MetadataRoute.Robots {
   return {
@@ -10,14 +11,19 @@ export default function robots(): MetadataRoute.Robots {
         '/*/dashboard',
         '/*/chat',
         '/*/resume',
+        '/*/resumes',
         '/*/applications',
         '/*/interview',
         '/*/cover-letter',
         '/*/settings',
+        '/*/admin',
+        '/*/ats',
+        '/*/login',
+        '/*/register',
         '/*/forgot-password',
         '/*/reset-password',
       ],
     },
-    sitemap: 'https://jobforsure.app/sitemap.xml',
+    sitemap: `${SITE_URL}/sitemap.xml`,
   }
 }
