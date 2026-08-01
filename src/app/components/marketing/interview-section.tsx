@@ -69,7 +69,7 @@ export function InterviewSection() {
           </div>
 
           {/* ── Right: Mockup ── */}
-          <div className="relative border-b border-zinc-300 p-6 md:border-b-0 md:p-10 lg:p-12">
+          <div className="relative flex justify-center border-b border-zinc-300 p-6 md:border-b-0 md:p-10 lg:p-12">
             {/* Preppy mascot — peeks from bottom-right (Sentry-style) */}
             <Mascot
               src="/mascot/preppy.webp"
@@ -78,7 +78,7 @@ export function InterviewSection() {
               variant="breathe"
               className="pointer-events-none absolute -bottom-6 -right-4 z-20 hidden sm:block drop-shadow-2xl"
             />
-            <div className="relative z-10 overflow-hidden rounded-2xl neuro-card">
+            <div className="relative z-10 w-full max-w-lg overflow-hidden rounded-2xl neuro-card">
               {/* Window chrome */}
               <div className="flex items-center gap-1.5 border-b border-border px-4 py-2.5">
                 <span className="h-2.5 w-2.5 rounded-full bg-[#FF5F57]" />
