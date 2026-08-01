@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { Link } from '~/i18n/routing'
-import { ArrowRight, CheckCircle2, FileText, Target, Mic, SquareKanban } from 'lucide-react'
+import { ArrowRight, CheckCircle2, FileText, Target, Mic, SquareKanban, Sparkles } from 'lucide-react'
 import { Mascot } from '~/components/marketing/mascot'
 import { useTranslations } from 'next-intl'
 import { cn } from '~/lib/utils'
@@ -61,18 +61,18 @@ export function HeroSection() {
 
       {/* ── 1200px PEEKING BROWSER MOCKUP FRAME ── */}
       <div className="relative mt-14 md:mt-20 w-full max-w-[1200px] z-10">
-        {/* Jobby Mascot Peeking higher above top-right corner so it doesn't obscure content */}
+        {/* Jobby Mascot Peeking behind top-left corner — completely out of text way */}
         <Mascot
           src="/mascot/jobby-hero.webp"
           alt={t('mascotAltHero')}
           size="sm"
           priority
           variant="breathe"
-          className="absolute -top-20 -right-2 sm:-top-28 sm:right-4 md:-top-36 md:right-8 z-20 drop-shadow-2xl pointer-events-none"
+          className="absolute -top-24 left-2 sm:-top-32 sm:left-6 md:-top-36 md:left-10 z-0 opacity-90 drop-shadow-xl pointer-events-none"
         />
 
         {/* App Window Container — Peeking cutout bottom fold */}
-        <div className="relative overflow-hidden rounded-t-2xl sm:rounded-t-3xl neuro-card border border-border/80 shadow-2xl translate-y-3 sm:translate-y-4">
+        <div className="relative overflow-hidden rounded-t-2xl sm:rounded-t-3xl neuro-card border border-border/80 shadow-2xl translate-y-3 sm:translate-y-4 bg-background">
           {/* macOS Browser Header */}
           <div className="flex flex-col sm:flex-row items-center justify-between border-b border-border/60 bg-muted/40 px-4 py-3 gap-3">
             <div className="flex items-center gap-2 w-full sm:w-auto justify-between sm:justify-start">
@@ -82,7 +82,7 @@ export function HeroSection() {
                 <span className="h-3 w-3 rounded-full bg-[#27C93F] inline-block" />
               </div>
               <span className="text-xs font-mono text-muted-foreground/80 bg-background/50 px-3 py-1 rounded-md border border-border/40">
-                jobforsure.app/chat
+                jobforsure.app/{activeTab === 'ats' ? 'chat' : activeTab === 'resume' ? 'resumes' : activeTab === 'interview' ? 'interview' : 'applications'}
               </span>
             </div>
 
@@ -110,86 +110,68 @@ export function HeroSection() {
             </div>
           </div>
 
-          {/* Tab Content Area */}
-          <div className="p-3 sm:p-5 md:p-6 bg-background/50 min-h-[360px] sm:min-h-[440px] flex flex-col justify-between">
+          {/* Tab Content Area — Real UI Replica */}
+          <div className="p-4 sm:p-6 bg-background min-h-[380px] sm:min-h-[460px] flex flex-col justify-between">
             {activeTab === 'ats' && (
-              <div className="grid grid-cols-1 md:grid-cols-[220px_1fr] gap-4 animate-fade-in h-full">
-                {/* Desktop Chat Sidebar */}
-                <div className="hidden md:flex flex-col justify-between rounded-xl neuro-inset p-3 border border-border/40 text-xs">
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between border-b border-border/40 pb-2">
-                      <span className="font-bold text-foreground">Chat Sessions</span>
-                      <span className="text-[10px] bg-primary/10 text-primary px-1.5 py-0.5 rounded font-mono">New +</span>
-                    </div>
-                    <div className="space-y-1.5">
-                      <div className="rounded-lg bg-background p-2 font-medium text-foreground border border-border/60 shadow-sm flex items-center gap-2">
-                        <span className="h-2 w-2 rounded-full bg-primary" />
-                        <span className="truncate">TechCorp ATS Tailor</span>
-                      </div>
-                      <div className="rounded-lg p-2 text-muted-foreground hover:bg-background/40 transition-colors truncate">
-                        Resume Review — Senior FE
-                      </div>
-                      <div className="rounded-lg p-2 text-muted-foreground hover:bg-background/40 transition-colors truncate">
-                        Mock Interview Prep
-                      </div>
-                    </div>
+              <div className="flex flex-col h-full space-y-4 animate-fade-in">
+                {/* Real App Status Bar */}
+                <div className="neuro-surface flex items-center justify-between gap-2 px-4 py-2.5 rounded-xl border border-border/40 text-xs">
+                  <div className="flex items-center gap-2">
+                    <span className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">Profile:</span>
+                    <span className="font-semibold text-foreground">Alex_Morgan_Resume.pdf (89%)</span>
                   </div>
-                  <div className="pt-2 border-t border-border/40 text-[11px] text-muted-foreground flex items-center justify-between">
-                    <span>AI Model</span>
-                    <span className="font-mono text-primary font-semibold">DeepSeek V4</span>
+                  <div className="flex items-center gap-2">
+                    <span className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">Target:</span>
+                    <span className="font-semibold text-primary">Senior Full-Stack Engineer @ TechCorp</span>
                   </div>
                 </div>
 
-                {/* Main Desktop Chat Stream */}
-                <div className="flex flex-col justify-between rounded-xl neuro-card p-4 sm:p-5 border border-border/60 bg-background/80 space-y-4">
-                  {/* Message Stream */}
-                  <div className="space-y-4 text-xs sm:text-sm">
-                    {/* User Message */}
-                    <div className="flex items-start justify-end gap-2.5">
-                      <div className="max-w-[85%] rounded-2xl bg-primary text-primary-foreground p-3 shadow-sm">
-                        Check my match for Senior Full-Stack Engineer at TechCorp and optimize keywords.
+                {/* Real Entry Cards Flow */}
+                <div className="flex-1 flex flex-col items-center justify-center py-6">
+                  <div className="text-center font-bold text-lg text-foreground mb-4">
+                    How do you want to start?
+                  </div>
+                  <div className="grid w-full max-w-xl grid-cols-1 gap-3 sm:grid-cols-3">
+                    {/* Upload */}
+                    <div className="neuro-card flex flex-col items-center rounded-xl p-4 text-center border border-border/60">
+                      <div className="neuro-icon-well mb-2 flex h-9 w-9 items-center justify-center rounded-full text-primary">
+                        <FileText size={16} />
                       </div>
-                      <div className="h-7 w-7 rounded-full bg-primary/20 text-primary flex items-center justify-center font-bold text-xs shrink-0 mt-0.5">
-                        ME
-                      </div>
+                      <div className="text-xs font-bold text-foreground">Upload Resume</div>
+                      <div className="mt-0.5 text-[11px] text-muted-foreground">PDF, DOCX, or text</div>
                     </div>
 
-                    {/* AI Coach Message with Rich ATS Match Card */}
-                    <div className="flex items-start gap-2.5">
-                      <div className="h-7 w-7 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold text-xs shrink-0 mt-0.5 shadow-sm">
-                        AI
+                    {/* Build with AI */}
+                    <div className="neuro-card flex flex-col items-center rounded-xl p-4 text-center border border-primary/30 bg-primary/5">
+                      <div className="neuro-icon-well mb-2 flex h-9 w-9 items-center justify-center rounded-full text-success">
+                        <Sparkles size={16} />
                       </div>
-                      <div className="max-w-[90%] space-y-3 rounded-2xl bg-muted/60 p-4 border border-border/40">
-                        <div className="flex items-center justify-between border-b border-border/40 pb-2">
-                          <span className="font-semibold text-foreground text-xs">ATS Optimization Analysis</span>
-                          <span className="font-mono text-base font-extrabold text-primary">89% Match</span>
-                        </div>
-                        <p className="text-xs sm:text-sm text-foreground leading-relaxed">
-                          Your profile strongly matches <strong className="text-foreground">14 required skills</strong>. Here are 4 missing keywords to add:
-                        </p>
-                        <div className="flex flex-wrap gap-1.5">
-                          {['GraphQL', 'Docker', 'Redis', 'CI/CD Pipelines'].map((skill) => (
-                            <span key={skill} className="rounded-md bg-warn/10 px-2 py-0.5 text-xs font-semibold text-warn border border-warn/20">
-                              + {skill}
-                            </span>
-                          ))}
-                        </div>
+                      <div className="text-xs font-bold text-foreground">Build with AI</div>
+                      <div className="mt-0.5 text-[11px] text-muted-foreground">Answer questions · 5 min</div>
+                    </div>
+
+                    {/* Paste Job Posting */}
+                    <div className="neuro-card flex flex-col items-center rounded-xl p-4 text-center border border-border/60">
+                      <div className="neuro-icon-well mb-2 flex h-9 w-9 items-center justify-center rounded-full text-warn">
+                        <Target size={16} />
                       </div>
+                      <div className="text-xs font-bold text-foreground">Paste Job Posting</div>
+                      <div className="mt-0.5 text-[11px] text-muted-foreground">Analyze ATS Match</div>
                     </div>
                   </div>
+                </div>
 
-                  {/* Desktop Chat Input Bar */}
-                  <div className="flex items-center gap-2 rounded-xl neuro-input p-2 border border-border/60 bg-background">
-                    <input
-                      type="text"
-                      readOnly
-                      value="Inject missing keywords into Work Experience bullet points..."
-                      className="w-full bg-transparent text-xs sm:text-sm text-foreground placeholder:text-muted-foreground outline-none px-2"
-                    />
-                    <button className="rounded-lg bg-primary px-3 py-1.5 text-xs font-semibold text-primary-foreground shrink-0 shadow-sm">
-                      Send
-                    </button>
-                  </div>
+                {/* Real Input Bar */}
+                <div className="flex items-center gap-2 rounded-xl neuro-input p-2.5 border border-border/60 bg-muted/20">
+                  <input
+                    type="text"
+                    readOnly
+                    value="Ask Career Coach: How can I optimize my bullet points for TechCorp?"
+                    className="w-full bg-transparent text-xs sm:text-sm text-foreground outline-none px-2"
+                  />
+                  <button className="rounded-lg bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground shrink-0 shadow-sm flex items-center gap-1">
+                    Send <ArrowRight size={13} />
+                  </button>
                 </div>
               </div>
             )}
