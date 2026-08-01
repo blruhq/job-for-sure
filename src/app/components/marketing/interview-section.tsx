@@ -71,6 +71,14 @@ export function InterviewSection() {
 
           {/* ── Right: Mockup ── */}
           <div className="relative w-full max-w-lg justify-self-end">
+            {/* Preppy mascot — peeks from bottom-right (Sentry-style) */}
+            <Mascot
+              src="/mascot/preppy.webp"
+              alt={t('mascotAltInterviewer')}
+              size="xs"
+              variant="breathe"
+              className="pointer-events-none absolute -bottom-6 -right-4 z-20 hidden sm:block drop-shadow-2xl"
+            />
             <div className="relative z-10 overflow-hidden rounded-2xl neuro-card">
               {/* Window chrome */}
               <div className="flex items-center gap-1.5 border-b border-border px-4 py-2.5">
@@ -92,14 +100,9 @@ export function InterviewSection() {
                 {/* AI question card */}
                 <div className="animate-fade-up rounded-lg border border-border bg-muted/20 p-4 [animation-delay:400ms] [animation-fill-mode:backwards]">
                   <div className="flex items-center gap-2">
-                    <Mascot
-                      src="/mascot/preppy.webp"
-                      alt={t('mascotAltInterviewer')}
-                      size="avatar"
-                      circular
-                      variant="static"
-                      className="shrink-0 ring-1 ring-primary/20"
-                    />
+                    <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-primary/10 text-[10px] font-bold text-primary">
+                      AI
+                    </div>
                     <span className="rounded bg-muted px-1.5 py-0.5 text-[10px] font-mono uppercase tracking-wider text-muted-foreground">
                       {t('interviewTechnical')}
                     </span>
