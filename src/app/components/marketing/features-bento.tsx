@@ -143,7 +143,6 @@ export function FeaturesBento() {
                     alt={t('mascotAltJobSearch')}
                     size="step"
                     variant="static"
-                    glowColor="transparent"
                     className="absolute bottom-0 right-0 opacity-95"
                   />
                 )}

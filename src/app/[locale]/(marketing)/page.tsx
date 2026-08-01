@@ -91,12 +91,12 @@ export default async function LandingPage({
             <div className="relative flex flex-col-reverse items-center gap-4 md:flex-row md:justify-end">
               {/* Jobby mascot — peeks from bottom-left of the mockup card (Sentry-style) */}
               <Mascot
-              src="/mascot/jobby-hero.webp"
-              alt={t('mascotAltHero')}
-              size="sm"
-              priority
-              glowColor="var(--amber-glow)"
-              className="relative md:absolute md:-bottom-10 md:-left-10 z-20"
+                src="/mascot/jobby-hero.webp"
+                alt={t('mascotAltHero')}
+                size="sm"
+                priority
+                variant="breathe"
+                className="relative md:absolute md:-bottom-8 md:-left-6 z-20 drop-shadow-2xl"
               />
               <div className="relative z-10 w-full max-w-lg">
                 <div className="relative overflow-hidden rounded-2xl neuro-card">

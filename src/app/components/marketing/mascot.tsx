@@ -15,12 +15,10 @@ interface MascotProps {
   alt: string
   size?: keyof typeof SIZE_MAP
   className?: string
-  /** Glow color CSS. Defaults to primary amber. Use 'var(--gold-glow)' for gold tint. */
-  glowColor?: string
   /** Set true for above-the-fold mascots (hero). Adds priority loading. */
   priority?: boolean
-  /** "floating" (default): float animation + glow. "static": no animation, no glow — for inline/inside-mockup use. */
-  variant?: 'floating' | 'static'
+  /** "breathe" (default): subtle breathing animation. "static": no animation — for inline/inside-mockup use. */
+  variant?: 'breathe' | 'static'
   /** Circular crop — for avatar use inside mockups. */
   circular?: boolean
 }
@@ -30,23 +28,13 @@ export function Mascot({
   alt,
   size = 'md',
   className,
-  glowColor = 'var(--accent-soft)',
   priority = false,
-  variant = 'floating',
+  variant = 'breathe',
   circular = false,
 }: MascotProps) {
-  const isFloating = variant === 'floating'
+  const isBreathing = variant === 'breathe'
   return (
     <div className={cn('relative pointer-events-none select-none', className)}>
-      {/* Ambient glow — sits behind the mascot image (floating variant only) */}
-      {isFloating && (
-        <div
-          className="absolute inset-0 -z-10 blur-3xl opacity-60"
-          style={{ backgroundColor: glowColor }}
-          aria-hidden="true"
-        />
-      )}
-      {/* Mascot image — floats via CSS keyframe (floating variant only) */}
       <Image
         src={src}
         alt={alt}
@@ -56,7 +44,7 @@ export function Mascot({
         className={cn(
           'h-auto w-auto max-w-full object-contain drop-shadow-xl',
           SIZE_MAP[size],
-          isFloating && 'animate-mascot-float',
+          isBreathing && 'animate-mascot-breathe',
           circular && 'rounded-full object-cover aspect-square',
         )}
       />

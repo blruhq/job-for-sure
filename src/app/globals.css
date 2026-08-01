@@ -449,17 +449,18 @@ html[lang="th"] {
   50%      { opacity: 1; transform: translateY(-2px); }
 }
 
-@keyframes mascot-float {
-  0%, 100% { transform: translateY(0); }
-  50%      { transform: translateY(-12px); }
+/* NEW — Breathing animation (subtle scale, not bounce) */
+@keyframes mascot-breathe {
+  0%, 100% { transform: scale(1); }
+  50%      { transform: scale(1.02); }
 }
 
-.animate-mascot-float {
-  animation: mascot-float 3s var(--ease) infinite;
+.animate-mascot-breathe {
+  animation: mascot-breathe 5s var(--ease) infinite;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .animate-mascot-float {
+  .animate-mascot-breathe {
     animation: none;
   }
 }

@@ -2,7 +2,6 @@ import { Upload, Search, FileCheck, LayoutDashboard } from 'lucide-react'
 import { Link } from '~/i18n/routing'
 import { ArrowRight } from 'lucide-react'
 import { useTranslations } from 'next-intl'
-import { Mascot } from '~/components/marketing/mascot'
 
 export function HowItWorks() {
   const t = useTranslations('landing')
@@ -12,29 +11,21 @@ export function HowItWorks() {
       icon: Upload,
       title: t('step1Title'),
       desc: t('step1Desc'),
-      mascot: '/mascot/jobby-hero.webp',
-      mascotAlt: t('mascotAltStep1'),
     },
     {
       icon: Search,
       title: t('step2Title'),
       desc: t('step2Desc'),
-      mascot: '/mascot/scrappy.webp',
-      mascotAlt: t('mascotAltStep2'),
     },
     {
       icon: FileCheck,
       title: t('step3Title'),
       desc: t('step3Desc'),
-      mascot: '/mascot/resuby.webp',
-      mascotAlt: t('mascotAltStep3'),
     },
     {
       icon: LayoutDashboard,
       title: t('step4Title'),
       desc: t('step4Desc'),
-      mascot: '/mascot/preppy.webp',
-      mascotAlt: t('mascotAltStep4'),
     },
   ]
 
@@ -58,14 +49,6 @@ export function HowItWorks() {
             const Icon = step.icon
             return (
               <div key={step.title} className="relative">
-                <Mascot
-                  src={step.mascot}
-                  alt={step.mascotAlt}
-                  size="step"
-                  variant="static"
-                  glowColor="transparent"
-                  className="mb-3"
-                />
                 {i < STEPS.length - 1 && (
                   <div className="absolute -right-5 top-8 hidden h-px w-10 border-t border-dashed border-border/40 md:block" />
                 )}

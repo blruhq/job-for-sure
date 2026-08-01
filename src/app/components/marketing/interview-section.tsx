@@ -71,14 +71,6 @@ export function InterviewSection() {
 
           {/* ── Right: Mockup ── */}
           <div className="relative w-full max-w-lg justify-self-end">
-            {/* Preppy mascot — peeks from bottom-left of the mockup card (Sentry-style) */}
-            <Mascot
-              src="/mascot/preppy.webp"
-              alt={t('mascotAltInterviewer')}
-              size="step"
-              glowColor="var(--accent-soft)"
-              className="absolute -bottom-8 -left-8 z-20 hidden md:block md:-bottom-12 md:-left-12"
-            />
             <div className="relative z-10 overflow-hidden rounded-2xl neuro-card">
               {/* Window chrome */}
               <div className="flex items-center gap-1.5 border-b border-border px-4 py-2.5">
@@ -106,7 +98,6 @@ export function InterviewSection() {
                       size="avatar"
                       circular
                       variant="static"
-                      glowColor="transparent"
                       className="shrink-0 ring-1 ring-primary/20"
                     />
                     <span className="rounded bg-muted px-1.5 py-0.5 text-[10px] font-mono uppercase tracking-wider text-muted-foreground">
