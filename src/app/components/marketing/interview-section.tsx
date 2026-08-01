@@ -1,17 +1,10 @@
-import { Brain, Sparkles, Target, CheckCircle, ArrowRight, User } from 'lucide-react'
+import { Brain, Sparkles, ArrowRight, User } from 'lucide-react'
 import { Link } from '~/i18n/routing'
 import { useTranslations } from 'next-intl'
 import { Mascot } from '~/components/marketing/mascot'
 
 export function InterviewSection() {
   const t = useTranslations('landing')
-
-  const BULLETS = [
-    { icon: Target, text: t('interviewBullet1') },
-    { icon: Sparkles, text: t('interviewBullet2') },
-    { icon: CheckCircle, text: t('interviewBullet3') },
-    { icon: Brain, text: t('interviewBullet4') },
-  ]
 
   const strengths = [t('interviewStrength1'), t('interviewStrength2')]
   const improvements = [t('interviewImprove1'), t('interviewImprove2')]
@@ -24,13 +17,6 @@ export function InterviewSection() {
             <span className="mb-3 block font-mono text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground">
               {t('sectionLabelInterview')}
             </span>
-            {/* Badge */}
-            <div className="mb-4 flex w-fit items-center gap-1.5 rounded-full border border-primary/15 bg-primary/5 px-3 py-1">
-              <Brain size={13} className="text-primary" />
-              <span className="text-xs font-semibold uppercase tracking-wider text-primary">
-                {t('interviewBadge')}
-              </span>
-            </div>
 
             <h2
               className="text-4xl font-semibold leading-[1.08] tracking-tighter text-foreground sm:text-5xl md:text-[3rem] md:leading-[1.05]"
@@ -41,29 +27,12 @@ export function InterviewSection() {
               {t('interviewSubtitle')}
             </p>
 
-            <ul className="mt-8 space-y-3">
-              {BULLETS.map((item) => (
-                <li key={item.text} className="flex items-start gap-3">
-                  <div className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
-                    <item.icon size={13} />
-                  </div>
-                  <span className="text-sm leading-relaxed text-muted-foreground">{item.text}</span>
-                </li>
-              ))}
-            </ul>
-
-            <div className="mt-8 flex w-full flex-col gap-3 sm:w-auto sm:flex-row sm:items-center sm:gap-3">
+            <div className="mt-8">
               <Link
                 href="/interview"
                 className="inline-flex min-h-[44px] cursor-pointer items-center justify-center gap-1.5 rounded-lg bg-primary px-6 py-3 text-sm font-medium text-primary-foreground shadow-lg shadow-primary/20 transition-all hover:bg-primary/90 hover:-translate-y-0.5 active:scale-[0.98]"
               >
                 {t('interviewCtaPrimary')} <ArrowRight size={14} />
-              </Link>
-              <Link
-                href="/chat"
-                className="inline-flex min-h-[44px] cursor-pointer items-center justify-center rounded-lg neuro-pill px-6 py-3 text-sm font-medium text-foreground transition-shadow active:scale-[0.98]"
-              >
-                {t('interviewCtaSecondary')}
               </Link>
             </div>
           </div>
