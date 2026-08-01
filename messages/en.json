@@ -93,7 +93,7 @@
     "interviewTechnical": "Behavioral",
     "interviewTags": "#leadership #architecture",
     "interviewQuestion": "Tell me about a time you resolved a technical disagreement within your team.",
-    "interviewUserAnswer": "Two engineers disagreed on REST vs GraphQL for our API. I ran a benchmark on core endpoints to compare latency. Data showed GraphQL cut payload size by 40%, so we agreed on a hybrid rollout.",
+    "interviewUserAnswer": "Two engineers disagreed on REST vs GraphQL. I benchmarked payload size on core endpoints — data showed GraphQL cut latency by 40%, so we chose a hybrid rollout.",
     "interviewAiScoreFeedback": "AI Score & Feedback",
     "interviewScore": "Score: 7/10",
     "interviewStrengths": "Strengths",
