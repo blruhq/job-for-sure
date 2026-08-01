@@ -76,15 +76,15 @@ export function HeroSection() {
           {/* App Window Container — Production 16:10 Proportions */}
           <div className="relative overflow-hidden rounded-t-2xl sm:rounded-t-3xl neuro-card border border-border/80 shadow-2xl translate-y-3 sm:translate-y-4 bg-background aspect-[16/10] min-h-[480px] md:min-h-[580px] flex flex-col w-full">
             {/* macOS Browser Header */}
-            <div className="flex flex-col sm:flex-row items-center justify-between border-b border-border/60 bg-muted/40 px-4 py-3 gap-3 shrink-0">
-              <div className="flex items-center gap-1.5">
+            <div className="flex items-center border-b border-border/60 bg-muted/40 px-4 py-3 gap-4 sm:gap-6 shrink-0">
+              <div className="flex items-center gap-1.5 shrink-0">
                 <span className="h-3 w-3 rounded-full bg-[#FF5F57] inline-block" />
                 <span className="h-3 w-3 rounded-full bg-[#FFBD2E] inline-block" />
                 <span className="h-3 w-3 rounded-full bg-[#27C93F] inline-block" />
               </div>
 
               {/* Interactive Tabs Bar */}
-              <div className="flex w-full sm:w-auto items-center gap-1 overflow-x-auto no-scrollbar pb-1 sm:pb-0">
+              <div className="flex items-center gap-1 overflow-x-auto no-scrollbar">
                 {tabs.map((tab) => {
                   const Icon = tab.icon
                   const isActive = activeTab === tab.id
