@@ -2,12 +2,12 @@
 
 import { useState } from 'react'
 import { Link } from '~/i18n/routing'
-import { ArrowRight, CheckCircle2, FileText, Target, Mic, SquareKanban, Sparkles, Wand2, MessageSquare, AlertCircle, Upload, ClipboardList } from 'lucide-react'
+import { ArrowRight, CheckCircle2, FileText, Target, Mic, Sparkles, Wand2, MessageSquare, AlertCircle, Upload, ClipboardList, GripVertical, PlusCircle, X } from 'lucide-react'
 import { Mascot } from '~/components/marketing/mascot'
 import { useTranslations } from 'next-intl'
 import { cn } from '~/lib/utils'
 
-type TabType = 'chat' | 'ats' | 'resume' | 'interview' | 'tracker'
+type TabType = 'chat' | 'ats' | 'resume' | 'interview'
 
 export function HeroSection() {
   const t = useTranslations('landing')
@@ -18,7 +18,6 @@ export function HeroSection() {
     { id: 'ats', label: '🎯 ATS Optimizer (89%)', icon: Target },
     { id: 'resume', label: '📄 Resume Builder', icon: FileText },
     { id: 'interview', label: '🎙️ Mock Interview', icon: Mic },
-    { id: 'tracker', label: '📊 Job Tracker', icon: SquareKanban },
   ]
 
   return (
@@ -84,7 +83,7 @@ export function HeroSection() {
                   <span className="h-3 w-3 rounded-full bg-[#27C93F] inline-block" />
                 </div>
                 <span className="text-xs font-mono text-muted-foreground/80 bg-background/50 px-3 py-1 rounded-md border border-border/40">
-                  jobforsure.app/{activeTab === 'ats' ? 'ats' : activeTab === 'chat' ? 'chat' : activeTab === 'resume' ? 'resumes' : activeTab === 'interview' ? 'interview' : 'applications'}
+                  jobforsure.app/{activeTab === 'ats' ? 'ats' : activeTab === 'chat' ? 'chat' : activeTab === 'resume' ? 'resumes' : 'interview'}
                 </span>
               </div>
 
@@ -303,75 +302,138 @@ export function HeroSection() {
                 </div>
               )}
 
-              {/* TAB 3: RESUME BUILDER (Matches src/app/components/resume/resume-editor-store.ts & ResumeEditor) */}
+              {/* TAB 3: RESUME BUILDER (Matches src/app/components/resume/resume-detail.tsx) */}
               {activeTab === 'resume' && (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 animate-fade-in h-full">
-                  {/* Editor Inputs */}
-                  <div className="space-y-4 rounded-xl neuro-inset p-5 flex flex-col justify-between">
-                    <div className="flex items-center justify-between border-b border-border/40 pb-3">
-                      <span className="text-sm font-bold uppercase tracking-wider text-foreground">Resume Sections</span>
-                      <span className="text-xs bg-primary/10 text-primary px-2.5 py-1 rounded-md font-mono font-semibold">Editing</span>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 animate-fade-in h-full">
+                  {/* Editor — left panel */}
+                  <div className="flex flex-col gap-2.5 overflow-hidden">
+                    {/* Section: Personal Details */}
+                    <div className="relative rounded-xs neuro-inset p-3">
+                      <div className="flex items-center gap-1.5">
+                        <GripVertical size={14} className="shrink-0 text-muted-foreground/50" />
+                        <div className="flex-1 grid grid-cols-2 gap-2">
+                          <div>
+                            <span className="label-mono block text-[10px] text-muted-foreground">Full Name</span>
+                            <div className="rounded-xs border border-border/60 bg-background px-2.5 py-1.5 text-xs font-medium text-foreground">Alex Morgan</div>
+                          </div>
+                          <div>
+                            <span className="label-mono block text-[10px] text-muted-foreground">Headline / Target Role</span>
+                            <div className="rounded-xs border border-border/60 bg-background px-2.5 py-1.5 text-xs font-medium text-foreground">Senior Full-Stack Engineer</div>
+                          </div>
+                        </div>
+                      </div>
                     </div>
-                    <div className="space-y-3 text-sm overflow-y-auto pr-1">
-                      <div className="rounded-lg border border-border/60 bg-background p-3 space-y-2">
-                        <span className="text-xs font-bold text-primary uppercase tracking-wider block">Personal Details</span>
-                        <div className="grid grid-cols-2 gap-2 text-xs">
-                          <div>
-                            <span className="text-muted-foreground block text-[10px]">Full Name</span>
-                            <span className="font-semibold text-foreground">Alex Morgan</span>
-                          </div>
-                          <div>
-                            <span className="text-muted-foreground block text-[10px]">Target Role</span>
-                            <span className="font-semibold text-foreground">Senior Full-Stack Engineer</span>
+
+                    {/* Section: Summary */}
+                    <div className="relative rounded-xs neuro-inset p-3">
+                      <div className="flex items-center gap-1.5">
+                        <GripVertical size={14} className="shrink-0 text-muted-foreground/50" />
+                        <div className="flex-1">
+                          <span className="label-mono block text-[10px] text-muted-foreground mb-1">Professional Summary</span>
+                          <div className="rounded-xs border border-border/60 bg-background px-2.5 py-1.5 text-[11px] text-muted-foreground leading-relaxed">
+                            Senior Full-Stack Engineer with 5+ years specializing in React 19, TypeScript & Node.js microservices.
                           </div>
                         </div>
                       </div>
+                    </div>
 
-                      <div className="rounded-lg border border-border/60 bg-background p-3 space-y-1.5">
-                        <span className="text-xs font-bold text-foreground uppercase tracking-wider block">Professional Summary</span>
-                        <p className="text-xs text-muted-foreground leading-relaxed line-clamp-2">
-                          Senior Full-Stack Engineer with 5+ years of experience specializing in React 19, TypeScript, and high-throughput Node.js microservices.
-                        </p>
-                      </div>
-
-                      <div className="rounded-lg border border-border/60 bg-background p-3 space-y-1.5">
-                        <span className="text-xs font-bold text-foreground uppercase tracking-wider block">Work Experience</span>
-                        <div className="flex justify-between text-xs font-semibold text-foreground">
-                          <span>Senior Full-Stack Engineer</span>
-                          <span className="text-muted-foreground font-normal">2022 — Present</span>
+                    {/* Section: Skills */}
+                    <div className="relative rounded-xs neuro-inset p-3">
+                      <div className="flex items-center gap-1.5">
+                        <GripVertical size={14} className="shrink-0 text-muted-foreground/50" />
+                        <div className="flex-1">
+                          <span className="label-mono block text-[10px] text-muted-foreground mb-1.5">Skills</span>
+                          <div className="flex flex-wrap gap-1">
+                            {['React 19', 'TypeScript', 'Next.js', 'Node.js', 'GraphQL', 'PostgreSQL', 'Tailwind CSS'].map((tag) => (
+                              <span key={tag} className="inline-flex items-center gap-0.5 rounded-xs bg-primary/10 px-1.5 py-0.5 text-[10px] font-medium text-primary">
+                                {tag}
+                                <X size={8} className="text-primary/50" />
+                              </span>
+                            ))}
+                          </div>
                         </div>
                       </div>
+                    </div>
+
+                    {/* Section: Work Experience */}
+                    <div className="relative rounded-xs neuro-inset p-3">
+                      <div className="flex items-center gap-1.5">
+                        <GripVertical size={14} className="shrink-0 text-muted-foreground/50" />
+                        <div className="flex-1">
+                          <div className="flex items-center justify-between mb-1.5">
+                            <span className="label-mono text-[10px] text-muted-foreground">Work Experience</span>
+                          </div>
+                          <div className="rounded-xs border border-border/60 bg-background p-2.5 space-y-1.5">
+                            <div className="flex gap-2">
+                              <div className="flex-1">
+                                <span className="label-mono block text-[9px] text-muted-foreground/70">Company</span>
+                                <span className="text-xs font-semibold text-foreground">TechCorp</span>
+                              </div>
+                              <div className="flex-1">
+                                <span className="label-mono block text-[9px] text-muted-foreground/70">Role</span>
+                                <span className="text-xs font-semibold text-foreground">Sr. Full-Stack Engineer</span>
+                              </div>
+                            </div>
+                            <div>
+                              <span className="label-mono block text-[9px] text-muted-foreground/70">Highlights</span>
+                              <p className="text-[11px] text-muted-foreground leading-relaxed mt-0.5">
+                                • Optimized web app performance with React 19 server components<br />
+                                • Led cross-functional team of 6 engineers on analytics dashboard<br />
+                                • Reduced API latency by 35% across onboarding endpoints
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* + Add Section button */}
+                    <div className="flex items-center justify-center gap-1 rounded-xs border border-dashed border-border py-2 text-xs text-muted-foreground">
+                      <PlusCircle size={13} /> Add Section
                     </div>
                   </div>
 
-                  {/* PDF Live Preview */}
-                  <div className="rounded-xl border border-border/60 bg-white p-6 text-zinc-900 shadow-md flex flex-col justify-between">
-                    <div className="space-y-4">
-                      <div className="border-b border-zinc-200 pb-3 flex justify-between items-start">
+                  {/* PDF Live Preview — right panel */}
+                  <div className="rounded-xl border border-border/60 bg-white p-5 text-zinc-900 shadow-md flex flex-col overflow-hidden">
+                    <div className="space-y-3 flex-1">
+                      {/* Header */}
+                      <div className="border-b border-zinc-200 pb-2.5 flex justify-between items-start">
                         <div>
-                          <h4 className="text-lg font-bold text-zinc-900">Alex Morgan</h4>
-                          <p className="text-xs text-zinc-500">alex.morgan@email.com · San Francisco, CA</p>
+                          <h4 className="text-base font-bold text-zinc-900">Alex Morgan</h4>
+                          <p className="text-[10px] text-zinc-500 mt-0.5">alex.morgan@email.com · San Francisco, CA · github.com/alexmorgan</p>
+                          <p className="text-[10px] text-zinc-600 font-medium mt-0.5">Senior Full-Stack Engineer</p>
                         </div>
-                        <span className="text-xs bg-zinc-100 text-zinc-600 px-2.5 py-1 rounded font-serif uppercase tracking-widest font-semibold">Modern Template</span>
                       </div>
 
-                      <div className="space-y-2">
-                        <span className="text-xs font-bold tracking-wider uppercase text-zinc-800 border-b border-zinc-200 block pb-1">Work Experience</span>
-                        <div className="text-xs space-y-1">
-                          <div className="flex justify-between font-bold text-zinc-900">
-                            <span>Senior Frontend Engineer</span>
+                      {/* Skills */}
+                      <div className="space-y-1">
+                        <span className="text-[10px] font-bold tracking-wider uppercase text-zinc-800 border-b border-zinc-200 block pb-0.5">Skills</span>
+                        <div className="flex flex-wrap gap-1">
+                          {['React 19', 'TypeScript', 'Next.js', 'Node.js', 'GraphQL', 'PostgreSQL'].map((k) => (
+                            <span key={k} className="rounded-full bg-zinc-100 px-2 py-0.5 text-[9px] font-medium text-zinc-700">{k}</span>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Work Experience */}
+                      <div className="space-y-1.5">
+                        <span className="text-[10px] font-bold tracking-wider uppercase text-zinc-800 border-b border-zinc-200 block pb-0.5">Work Experience</span>
+                        <div>
+                          <div className="flex justify-between text-xs font-bold text-zinc-900">
+                            <span>Sr. Full-Stack Engineer — TechCorp</span>
                             <span className="text-zinc-500 font-normal">2022 — Present</span>
                           </div>
-                          <p className="text-xs text-zinc-600 leading-relaxed">
-                            • Optimized web app performance using React 19 server components and Tailwind CSS v4.<br />
-                            • Led cross-functional team of 6 engineers to ship real-time analytics dashboard.
+                          <p className="text-[10px] text-zinc-600 leading-relaxed mt-1">
+                            • Optimized web app performance with React 19 server components<br />
+                            • Led cross-functional team of 6 engineers on analytics dashboard<br />
+                            • Reduced API latency by 35% across onboarding endpoints
                           </p>
                         </div>
                       </div>
                     </div>
 
-                    <div className="pt-3 border-t border-zinc-100 flex items-center justify-between text-xs text-zinc-400">
-                      <span>Generated by Job For Sure AI</span>
+                    <div className="pt-2 border-t border-zinc-100 flex items-center justify-between text-[9px] text-zinc-400">
+                      <span>Modern Template</span>
                       <span>Page 1 of 1</span>
                     </div>
                   </div>
@@ -420,72 +482,6 @@ export function HeroSection() {
                       <span className="text-xs font-semibold text-success bg-success/10 px-2.5 py-1 rounded-md text-center block">
                         Feedback Complete
                       </span>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {/* TAB 5: JOB TRACKER (Matches src/app/[locale]/(app)/applications/page.tsx) */}
-              {activeTab === 'tracker' && (
-                <div className="space-y-4 animate-fade-in flex flex-col justify-between h-full">
-                  {/* Kanban Headers */}
-                  <div className="flex items-center justify-between border-b border-border/40 pb-3">
-                    <span className="text-sm font-bold uppercase tracking-wider text-foreground">Application Board</span>
-                    <span className="text-xs text-muted-foreground font-semibold">4 Active Applications</span>
-                  </div>
-
-                  {/* Kanban Columns */}
-                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 flex-1">
-                    {/* Bookmarked */}
-                    <div className="rounded-xl neuro-inset p-4 space-y-3">
-                      <div className="flex items-center justify-between text-xs font-bold text-muted-foreground">
-                        <span>Bookmarked</span>
-                        <span className="rounded-full bg-muted px-2 py-0.5 text-xs">1</span>
-                      </div>
-                      <div className="rounded-xl neuro-card p-3.5 space-y-1.5 border border-border/60">
-                        <span className="text-xs font-semibold text-primary">Stripe</span>
-                        <h5 className="text-sm font-bold text-foreground">Staff Frontend Dev</h5>
-                        <span className="text-xs text-muted-foreground block">San Francisco · Remote</span>
-                      </div>
-                    </div>
-
-                    {/* Applied */}
-                    <div className="rounded-xl neuro-inset p-4 space-y-3">
-                      <div className="flex items-center justify-between text-xs font-bold text-warn">
-                        <span>Applied</span>
-                        <span className="rounded-full bg-warn/15 px-2 py-0.5 text-xs">1</span>
-                      </div>
-                      <div className="rounded-xl neuro-card p-3.5 space-y-1.5 border border-warn/30">
-                        <span className="text-xs font-semibold text-warn">Vercel</span>
-                        <h5 className="text-sm font-bold text-foreground">React Engineer</h5>
-                        <span className="text-xs text-muted-foreground block">Applied 2d ago</span>
-                      </div>
-                    </div>
-
-                    {/* Interviewing */}
-                    <div className="rounded-xl neuro-inset p-4 space-y-3">
-                      <div className="flex items-center justify-between text-xs font-bold text-primary">
-                        <span>Interviewing</span>
-                        <span className="rounded-full bg-primary/15 px-2 py-0.5 text-xs">1</span>
-                      </div>
-                      <div className="rounded-xl neuro-card p-3.5 space-y-1.5 border border-primary/40 bg-primary/5">
-                        <span className="text-xs font-semibold text-primary">OpenAI</span>
-                        <h5 className="text-sm font-bold text-foreground">Product Engineer</h5>
-                        <span className="text-xs text-primary font-semibold block">Round 2 · Tomorrow</span>
-                      </div>
-                    </div>
-
-                    {/* Offer */}
-                    <div className="rounded-xl neuro-inset p-4 space-y-3">
-                      <div className="flex items-center justify-between text-xs font-bold text-success">
-                        <span>Offer</span>
-                        <span className="rounded-full bg-success/15 px-2 py-0.5 text-xs">1</span>
-                      </div>
-                      <div className="rounded-xl neuro-card p-3.5 space-y-1.5 border border-success/40 bg-success/5">
-                        <span className="text-xs font-semibold text-success">Linear</span>
-                        <h5 className="text-sm font-bold text-foreground">Senior UI Engineer</h5>
-                        <span className="text-xs text-success font-bold block">🎉 $185k Offer</span>
-                      </div>
                     </div>
                   </div>
                 </div>
