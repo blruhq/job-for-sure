@@ -40,7 +40,7 @@ export function FeaturesBento() {
 
   return (
     <section id="features" className="border-t border-border py-24 md:py-32">
-      <div className="relative mx-auto max-w-[1120px] overflow-x-clip border-x border-border px-6">
+      <div className="relative mx-auto max-w-[1120px] overflow-x-clip border-x border-zinc-300 px-6">
         <div className="relative z-10 max-w-xl">
           <span className="mb-3 block font-mono text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground">
             {t('sectionLabelFeatures')}
