@@ -17,11 +17,10 @@ export function InterviewSection() {
   const improvements = [t('interviewImprove1'), t('interviewImprove2')]
 
   return (
-    <section id="interview" className="border-t border-zinc-300 py-24 md:py-32">
-      <div className="overflow-x-clip px-6">
-        <div className="grid items-center gap-12 md:grid-cols-[1fr_1.2fr] md:gap-16">
+    <section id="interview" className="border-t border-zinc-300">
+      <div className="grid items-stretch md:grid-cols-[1fr_1.2fr] md:-mx-6">
           {/* ── Left: Copy ── */}
-          <div className="relative z-10 max-w-lg">
+          <div className="relative z-10 border-b border-zinc-300 p-6 md:border-b-0 md:border-r md:p-10 lg:p-12">
             <span className="mb-3 block font-mono text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground">
               {t('sectionLabelInterview')}
             </span>
@@ -70,7 +69,7 @@ export function InterviewSection() {
           </div>
 
           {/* ── Right: Mockup ── */}
-          <div className="relative w-full max-w-lg justify-self-end md:pl-12 md:border-l md:border-zinc-300">
+          <div className="relative border-b border-zinc-300 p-6 md:border-b-0 md:p-10 lg:p-12">
             {/* Preppy mascot — peeks from bottom-right (Sentry-style) */}
             <Mascot
               src="/mascot/preppy.webp"
@@ -181,7 +180,6 @@ export function InterviewSection() {
             </div>
           </div>
         </div>
-      </div>
     </section>
   )
 }
