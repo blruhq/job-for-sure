@@ -67,15 +67,14 @@ export default async function LandingPage({
 
         {/* ── CTA ── */}
         <section className="bg-brand border-t border-zinc-300">
-          <div className="px-4 py-20 sm:px-6 lg:px-8 md:py-28">
-          <div className="max-w-2xl">
+          <div className="flex flex-col items-center px-4 py-20 text-center sm:px-6 md:py-28">
             <span className="mb-3 block font-mono text-xs font-medium uppercase tracking-[0.2em] text-brand-foreground/80">
               {t('sectionLabelCta')}
             </span>
-            <h2 className="text-3xl font-bold tracking-tighter text-brand-foreground md:text-4xl">
+            <h2 className="max-w-2xl text-3xl font-bold tracking-tighter text-brand-foreground md:text-4xl">
               {t('tagline')}
             </h2>
-            <p className="mt-4 text-lg leading-relaxed text-brand-foreground/80">
+            <p className="mt-4 max-w-md text-lg leading-relaxed text-brand-foreground/80">
               {t('subtagline')}
             </p>
             <Link
@@ -85,8 +84,7 @@ export default async function LandingPage({
               {t('getStarted')} <ArrowRight size={14} />
             </Link>
           </div>
-        </div>
-      </section>
+        </section>
 
       {/* ── FOOTER ── */}
       <footer className="border-t border-zinc-300 bg-brand px-6 py-8">
