@@ -61,14 +61,6 @@ export function HowItWorks() {
             )
           })}
         </div>
-        <div className="relative z-10 mt-16">
-          <Link
-            href="/register"
-            className="inline-flex cursor-pointer items-center gap-1.5 text-sm font-medium text-primary transition-colors hover:text-primary/80"
-          >
-            {t('howCta')} <ArrowRight size={14} />
-          </Link>
-        </div>
       </div>
     </section>
   )
