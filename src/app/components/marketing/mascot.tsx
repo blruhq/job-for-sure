@@ -43,7 +43,7 @@ export function Mascot({
         priority={priority}
         className={cn(
           circular
-            ? 'object-cover drop-shadow-xl'
+            ? 'object-cover object-top drop-shadow-xl'
             : 'h-auto w-auto max-w-full object-contain drop-shadow-xl',
           SIZE_MAP[size],
           isBreathing && 'animate-mascot-breathe',
