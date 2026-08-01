@@ -44,11 +44,11 @@ export function HowItWorks() {
           </p>
         </div>
         {/* Resuby mascot removed — mascots now anchor each step below */}
-        <div className="relative z-10 mt-20 grid grid-cols-1 border-t border-l border-zinc-300 md:grid-cols-4">
+        <div className="relative z-10 mt-20 grid grid-cols-1 border-t border-zinc-300 md:grid-cols-4 md:-mx-6">
           {STEPS.map((step, i) => {
             const Icon = step.icon
             return (
-              <div key={step.title} className="relative border-b border-r border-zinc-300 p-6 md:p-8">
+              <div key={step.title} className="relative border-b border-r border-zinc-300 p-6 md:px-8 last:border-r-0">
                 <div className="flex h-14 w-14 items-center justify-center rounded-xl neuro-icon-well text-primary">
                   <Icon size={24} />
                 </div>
