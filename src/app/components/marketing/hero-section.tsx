@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { Link } from '~/i18n/routing'
-import { ArrowRight, CheckCircle2, FileText, Target, Mic, Sparkles, Wand2, MessageSquare, AlertCircle, Upload, ClipboardList, GripVertical, PlusCircle, X } from 'lucide-react'
+import { ArrowRight, CheckCircle2, FileText, Target, Mic, Sparkles, Wand2, MessageSquare, AlertCircle, Upload, ClipboardList, GripVertical, PlusCircle, X, Brain, User, RotateCcw } from 'lucide-react'
 import { Mascot } from '~/components/marketing/mascot'
 import { useTranslations } from 'next-intl'
 import { cn } from '~/lib/utils'
@@ -442,46 +442,149 @@ export function HeroSection() {
 
               {/* TAB 4: MOCK INTERVIEW (Matches src/app/components/interview/interview-session.tsx) */}
               {activeTab === 'interview' && (
-                <div className="space-y-5 animate-fade-in flex flex-col justify-between h-full">
-                  {/* Session Bar */}
-                  <div className="flex items-center justify-between border-b border-border/40 pb-3">
+                <div className="animate-fade-in flex flex-col h-full overflow-hidden">
+                  {/* Header bar — matches real component */}
+                  <div className="flex items-center justify-between border-b border-border px-4 py-2.5 shrink-0">
                     <div className="flex items-center gap-2">
-                      <span className="h-2.5 w-2.5 rounded-full bg-primary animate-pulse" />
-                      <span className="text-sm font-bold uppercase tracking-wider text-foreground">AI Mock Interview Session</span>
-                    </div>
-                    <span className="text-xs text-muted-foreground font-mono font-semibold">Question 2 of 5</span>
-                  </div>
-
-                  {/* AI Question */}
-                  <div className="rounded-xl neuro-card p-5 border border-primary/20 space-y-2">
-                    <span className="text-xs font-bold uppercase tracking-wider text-primary">Behavioral Question</span>
-                    <p className="text-base font-semibold text-foreground leading-relaxed">
-                      &ldquo;Describe a situation where a critical production bug occurred right before a launch. How did you handle it?&rdquo;
-                    </p>
-                  </div>
-
-                  {/* Candidate Answer + AI Evaluation */}
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div className="md:col-span-2 rounded-xl neuro-inset p-4 space-y-2">
-                      <span className="text-xs font-bold text-muted-foreground">Your Response</span>
-                      <p className="text-xs sm:text-sm text-foreground leading-relaxed italic">
-                        &ldquo;I stayed calm, isolated the issue to a Redis connection timeout, rolled back the release, and communicated transparently with stakeholders...&rdquo;
-                      </p>
-                    </div>
-
-                    <div className="rounded-xl neuro-card p-4 space-y-2 bg-success/5 border border-success/20 flex flex-col justify-between">
-                      <div>
-                        <div className="flex items-center justify-between">
-                          <span className="text-xs font-bold text-success">AI Rating</span>
-                          <span className="font-mono text-2xl font-extrabold text-success">9/10</span>
-                        </div>
-                        <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
-                          Excellent structured response with clear resolution metrics.
-                        </p>
+                      <div className="rounded bg-primary/10 p-1 text-primary">
+                        <Brain size={14} />
                       </div>
-                      <span className="text-xs font-semibold text-success bg-success/10 px-2.5 py-1 rounded-md text-center block">
-                        Feedback Complete
-                      </span>
+                      <div>
+                        <div className="text-xs font-semibold text-foreground">Mock Interview: Stripe</div>
+                        <div className="text-[9px] text-muted-foreground">Staff Frontend Dev · medium · behavioral</div>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-xs font-semibold text-muted-foreground">Question 2 of 5</div>
+                    </div>
+                  </div>
+
+                  {/* Chat stream area */}
+                  <div className="flex-1 overflow-hidden px-4 py-4">
+                    <div className="mx-auto max-w-[560px] space-y-4">
+
+                      {/* Question 1 (collapsed history) */}
+                      <div className="space-y-3 border-b border-border/40 pb-3">
+                        <div className="text-[9px] font-semibold text-muted-foreground uppercase tracking-wider">Question 1</div>
+                        {/* Question card */}
+                        <div className="rounded-lg neuro-card p-3">
+                          <div className="flex items-center gap-2 mb-1.5">
+                            <div className="flex h-4 w-4 items-center justify-center rounded bg-primary/10 text-primary">
+                              <Brain size={10} />
+                            </div>
+                            <span className="text-[9px] font-mono uppercase tracking-wider bg-muted text-muted-foreground px-1.5 py-0.5 rounded">technical</span>
+                          </div>
+                          <p className="text-xs text-foreground font-medium leading-relaxed">Walk me through how you'd implement a virtual scrolling list for 10k items.</p>
+                        </div>
+                        {/* Answer (right-aligned) */}
+                        <div className="flex items-start gap-2 justify-end pl-8">
+                          <div className="rounded-lg bg-primary/5 border border-primary/10 p-2.5 text-[11px] text-foreground max-w-full">
+                            <p className="leading-relaxed">I'd use windowing — only render visible rows plus a buffer. Track scroll position, compute visible range...</p>
+                          </div>
+                          <div className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground">
+                            <User size={10} />
+                          </div>
+                        </div>
+                        {/* Feedback (collapsed) */}
+                        <div className="rounded-lg neuro-card p-3 ml-4 mr-4">
+                          <div className="flex items-center justify-between border-b border-border pb-2 mb-2">
+                            <div className="flex items-center gap-1.5">
+                              <Sparkles size={12} className="text-primary" />
+                              <span className="text-[11px] font-semibold text-foreground">AI Score & Feedback</span>
+                            </div>
+                            <div className="flex items-center gap-1 rounded bg-success-soft px-2 py-0.5 border border-success/15">
+                              <span className="text-[9px] font-bold text-success">Score: 8/10</span>
+                            </div>
+                          </div>
+                          <div>
+                            <h4 className="text-[9px] font-mono uppercase text-success font-semibold mb-1">Strengths</h4>
+                            <ul className="space-y-0.5">
+                              <li className="text-[11px] text-muted-foreground flex items-start gap-1.5">
+                                <span className="text-success">•</span> Clear understanding of windowing concept
+                              </li>
+                            </ul>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Active Question 2 */}
+                      <div className="space-y-3">
+                        <div className="text-[9px] font-semibold text-primary uppercase tracking-wider">Active Question</div>
+                        {/* Question card */}
+                        <div className="rounded-lg neuro-card p-3">
+                          <div className="flex items-center gap-2 mb-1.5">
+                            <div className="flex h-4 w-4 items-center justify-center rounded bg-primary/10 text-primary">
+                              <Brain size={10} />
+                            </div>
+                            <span className="text-[9px] font-mono uppercase tracking-wider bg-muted text-muted-foreground px-1.5 py-0.5 rounded">behavioral</span>
+                            <span className="text-[9px] bg-muted/40 text-muted-foreground px-1.5 py-0.5 rounded">#crisis</span>
+                          </div>
+                          <p className="text-xs text-foreground font-semibold leading-relaxed">
+                            Describe a situation where a critical production bug occurred right before a launch. How did you handle it?
+                          </p>
+                        </div>
+
+                        {/* Answer (submitted) */}
+                        <div className="flex items-start gap-2 justify-end pl-8">
+                          <div className="rounded-lg bg-primary/5 border border-primary/10 p-2.5 text-[11px] text-foreground max-w-full">
+                            <p className="leading-relaxed">I stayed calm, isolated the issue to a Redis connection timeout, rolled back the release, and communicated transparently with stakeholders about the timeline...</p>
+                          </div>
+                          <div className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground">
+                            <User size={10} />
+                          </div>
+                        </div>
+
+                        {/* Feedback card */}
+                        <div className="rounded-lg neuro-card p-3 ml-4 mr-4">
+                          <div className="flex items-center justify-between border-b border-border pb-2 mb-2">
+                            <div className="flex items-center gap-1.5">
+                              <Sparkles size={12} className="text-primary" />
+                              <span className="text-[11px] font-semibold text-foreground">AI Score & Feedback</span>
+                            </div>
+                            <div className="flex items-center gap-1 rounded bg-success-soft px-2 py-0.5 border border-success/15">
+                              <span className="text-[9px] font-bold text-success">Score: 9/10</span>
+                            </div>
+                          </div>
+                          <div className="space-y-2">
+                            <div>
+                              <h4 className="text-[9px] font-mono uppercase text-success font-semibold mb-1">Strengths</h4>
+                              <ul className="space-y-0.5">
+                                <li className="text-[11px] text-muted-foreground flex items-start gap-1.5">
+                                  <span className="text-success">•</span> Clear structured response with STAR method
+                                </li>
+                                <li className="text-[11px] text-muted-foreground flex items-start gap-1.5">
+                                  <span className="text-success">•</span> Specific resolution metrics (rollback time)
+                                </li>
+                              </ul>
+                            </div>
+                            <div>
+                              <h4 className="text-[9px] font-mono uppercase text-warn font-semibold mb-1">Areas to Improve</h4>
+                              <ul className="space-y-0.5">
+                                <li className="text-[11px] text-muted-foreground flex items-start gap-1.5">
+                                  <span className="text-warn">•</span> Mention post-mortem action items
+                                </li>
+                              </ul>
+                            </div>
+                            <div>
+                              <h4 className="text-[9px] font-mono uppercase text-primary font-semibold mb-1">Suggested Model Answer</h4>
+                              <p className="text-[11px] text-muted-foreground leading-relaxed italic bg-muted/30 p-2 rounded-sm border border-border/50">
+                                &ldquo;During a launch, our monitoring flagged Redis timeouts...&rdquo;
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Action buttons */}
+                        <div className="flex justify-end gap-2 pt-1">
+                          <span className="inline-flex items-center gap-1 rounded-lg border border-border px-3 py-1.5 text-[11px] font-medium text-muted-foreground">
+                            <RotateCcw size={10} /> Try Again
+                          </span>
+                          <span className="inline-flex items-center gap-1 rounded-lg bg-primary px-3 py-1.5 text-[11px] font-medium text-primary-foreground">
+                            Next Question <ArrowRight size={10} />
+                          </span>
+                        </div>
+                      </div>
+
                     </div>
                   </div>
                 </div>
