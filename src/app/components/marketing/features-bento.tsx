@@ -37,7 +37,7 @@ export function FeaturesBento() {
             </div>
             {/* Chat mockup — stripped of rounded corners */}
             <div className="mt-8 flex-1 border border-zinc-300">
-              <div className="flex items-center gap-1.5 border-b border-zinc-300 px-4 py-2.5">
+              <div className="flex items-center gap-1.5 border-b border-zinc-300 bg-muted/30 px-4 py-2.5">
                 <span className="h-2.5 w-2.5 rounded-full bg-[#FF5F57]" />
                 <span className="h-2.5 w-2.5 rounded-full bg-[#FFBD2E]" />
                 <span className="h-2.5 w-2.5 rounded-full bg-[#27C93F]" />
@@ -45,13 +45,13 @@ export function FeaturesBento() {
                   {t('mockupCareerCoach')}
                 </span>
               </div>
-              <div className="space-y-4 p-5">
+              <div className="space-y-3 p-5">
                 {/* AI message */}
                 <div className="flex items-start gap-3">
-                  <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center border border-zinc-300 text-xs font-bold text-primary">
+                  <div className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center bg-primary text-xs font-bold text-primary-foreground">
                     AI
                   </div>
-                  <div className="max-w-[85%] border border-zinc-300 px-4 py-3">
+                  <div className="max-w-[85%] bg-muted/60 px-4 py-3">
                     <p
                       className="text-sm leading-relaxed text-foreground"
                       dangerouslySetInnerHTML={{ __html: t.raw('featuresChatMsg1') }}
@@ -64,19 +64,19 @@ export function FeaturesBento() {
                 </div>
                 {/* User message */}
                 <div className="flex items-start gap-3 justify-end">
-                  <div className="max-w-[85%] border border-zinc-300 px-4 py-3">
+                  <div className="max-w-[85%] bg-primary/10 px-4 py-3">
                     <p className="text-sm text-foreground">{t('featuresChatUser')}</p>
                   </div>
-                  <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center border border-zinc-300 text-xs font-bold text-muted-foreground">
+                  <div className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center bg-muted-foreground/15 text-xs font-bold text-muted-foreground">
                     U
                   </div>
                 </div>
                 {/* AI typing indicator */}
                 <div className="flex items-start gap-3">
-                  <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center border border-zinc-300 text-xs font-bold text-primary">
+                  <div className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center bg-primary text-xs font-bold text-primary-foreground">
                     AI
                   </div>
-                  <div className="flex items-center gap-1.5 border border-zinc-300 px-4 py-3">
+                  <div className="flex items-center gap-1.5 bg-muted/60 px-4 py-3">
                     <span className="h-2 w-2 animate-bounce rounded-full bg-muted-foreground/40 [animation-delay:0ms]" />
                     <span className="h-2 w-2 animate-bounce rounded-full bg-muted-foreground/40 [animation-delay:150ms]" />
                     <span className="h-2 w-2 animate-bounce rounded-full bg-muted-foreground/40 [animation-delay:300ms]" />
@@ -100,12 +100,12 @@ export function FeaturesBento() {
             <h3 className="mt-5 text-xl font-semibold text-foreground">{t('feature2Title')}</h3>
             <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{t('feature2Desc')}</p>
             {/* ATS score mockup */}
-            <div className="mt-6 border border-zinc-300 p-4">
-              <div className="flex items-center justify-between text-xs">
-                <span className="text-muted-foreground">{t('featuresMatchScore')}</span>
-                <span className="font-mono font-bold text-primary">84%</span>
+            <div className="mt-6 border border-zinc-300 bg-muted/30 p-4">
+              <div className="flex items-center justify-between">
+                <span className="text-xs text-muted-foreground">{t('featuresMatchScore')}</span>
+                <span className="text-2xl font-bold text-primary">84%</span>
               </div>
-              <div className="mt-2 h-1.5 w-full bg-muted">
+              <div className="mt-3 h-2 w-full bg-muted">
                 <div className="h-full w-[84%] bg-primary" />
               </div>
             </div>
@@ -128,17 +128,17 @@ export function FeaturesBento() {
               <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{t('feature3Desc')}</p>
             </div>
             {/* Tracker mockup */}
-            <div className="relative z-10 mt-6 border border-zinc-300 p-4">
-              <div className="flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
-                <span className="flex items-center gap-1.5">
+            <div className="relative z-10 mt-6 border border-zinc-300 bg-muted/30 p-4">
+              <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+                <span className="flex items-center gap-1.5 bg-background px-2.5 py-1 border border-zinc-300">
                   <span className="h-2 w-2 rounded-full bg-success/70" />
                   {t('mockupSaved')} (4)
                 </span>
-                <span className="flex items-center gap-1.5">
+                <span className="flex items-center gap-1.5 bg-background px-2.5 py-1 border border-zinc-300">
                   <span className="h-2 w-2 rounded-full bg-warn/70" />
                   {t('mockupApplied')} (2)
                 </span>
-                <span className="flex items-center gap-1.5">
+                <span className="flex items-center gap-1.5 bg-background px-2.5 py-1 border border-zinc-300">
                   <span className="h-2 w-2 rounded-full bg-primary/70" />
                   {t('mockupInterviewing')} (1)
                 </span>
