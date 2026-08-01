@@ -2,7 +2,7 @@ import Image from 'next/image'
 import { cn } from '~/lib/utils'
 
 const SIZE_MAP = {
-  avatar: 'w-12 max-h-[48px]',
+  avatar: 'w-10 h-10 sm:w-12 sm:h-12',
   step: 'w-16 sm:w-20 md:w-24 max-h-[150px]',
   xs: 'w-24 sm:w-28 md:w-32 max-h-[200px]',
   sm: 'w-28 sm:w-36 md:w-44 max-h-[280px]',
@@ -42,10 +42,12 @@ export function Mascot({
         height={1270}
         priority={priority}
         className={cn(
-          'h-auto w-auto max-w-full object-contain drop-shadow-xl',
+          circular
+            ? 'object-cover drop-shadow-xl'
+            : 'h-auto w-auto max-w-full object-contain drop-shadow-xl',
           SIZE_MAP[size],
           isBreathing && 'animate-mascot-breathe',
-          circular && 'rounded-full object-cover aspect-square',
+          circular && 'rounded-full aspect-square',
         )}
       />
     </div>
