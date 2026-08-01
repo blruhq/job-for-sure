@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { Link } from '~/i18n/routing'
-import { ArrowRight, CheckCircle2, Sparkles, FileText, Target, Mic, SquareKanban } from 'lucide-react'
+import { ArrowRight, CheckCircle2, FileText, Target, Mic, SquareKanban } from 'lucide-react'
 import { Mascot } from '~/components/marketing/mascot'
 import { useTranslations } from 'next-intl'
 import { cn } from '~/lib/utils'
@@ -21,42 +21,32 @@ export function HeroSection() {
   ]
 
   return (
-    <section className="relative flex flex-col items-center overflow-x-clip px-4 sm:px-6 pt-[10vh] md:pt-[12vh] pb-0">
-      <div className="pointer-events-none absolute inset-0 hero-glow opacity-[0.05]" />
+    <section className="relative flex flex-col items-center overflow-x-clip px-4 sm:px-6 pt-[8vh] md:pt-[10vh] pb-0">
+      <div className="pointer-events-none absolute inset-0 hero-glow opacity-[0.04]" />
 
-      {/* ── CENTERED TYPOGRAPHY & BADGE ── */}
+      {/* ── CENTERED TYPOGRAPHY ── */}
       <div className="relative z-10 mx-auto flex max-w-4xl flex-col items-center text-center">
-        {/* Top Badge */}
-        <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-primary shadow-sm backdrop-blur-sm">
-          <span className="relative flex h-2 w-2">
-            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-75" />
-            <span className="relative inline-flex h-2 w-2 rounded-full bg-primary" />
-          </span>
-          <Sparkles size={13} className="text-primary" />
-          <span>{t('heroBadge')}</span>
-        </div>
-
         {/* Headline */}
-        <h1 className="text-4xl font-extrabold leading-[1.08] tracking-tighter text-foreground sm:text-6xl lg:text-7xl">
+        <h1 className="text-4xl font-bold leading-[1.08] tracking-tighter text-foreground sm:text-6xl lg:text-7xl">
           {t('title')}
         </h1>
 
         {/* Subtitle */}
-        <p className="mt-6 max-w-2xl text-lg leading-relaxed text-muted-foreground sm:text-xl">
+        <p className="mt-5 max-w-2xl text-base leading-relaxed text-muted-foreground sm:text-lg">
           {t('subtitle')}
         </p>
 
         {/* CTAs */}
-        <div className="mt-8 flex w-full flex-col items-center justify-center gap-3 sm:w-auto sm:flex-row sm:gap-4">
+        <div className="mt-8 flex w-full flex-col items-center justify-center gap-3 sm:w-auto sm:flex-row sm:gap-3">
           <Link
             href="/chat"
-            className="inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-primary px-7 py-3.5 text-base font-semibold text-primary-foreground shadow-lg shadow-primary/25 transition-all hover:bg-primary/90 hover:-translate-y-0.5 active:scale-[0.98] sm:w-auto"
+            className="inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground shadow-lg shadow-primary/20 transition-all hover:bg-primary/90 hover:-translate-y-0.5 active:scale-[0.98] sm:w-auto"
           >
-            {t('startChat')} <ArrowRight size={16} />
+            {t('startChat')} <ArrowRight size={15} />
           </Link>
           <Link
             href="/register"
-            className="inline-flex w-full cursor-pointer items-center justify-center rounded-xl neuro-pill px-7 py-3.5 text-base font-semibold text-foreground transition-all active:scale-[0.98] sm:w-auto"
+            className="inline-flex w-full cursor-pointer items-center justify-center rounded-lg neuro-pill px-6 py-3 text-sm font-semibold text-foreground transition-all active:scale-[0.98] sm:w-auto"
           >
             {t('createAccount')}
           </Link>
@@ -70,15 +60,15 @@ export function HeroSection() {
       </div>
 
       {/* ── 1200px PEEKING BROWSER MOCKUP FRAME ── */}
-      <div className="relative mt-12 md:mt-16 w-full max-w-[1200px] z-10">
-        {/* Jobby Mascot Peeking over top-right corner */}
+      <div className="relative mt-14 md:mt-20 w-full max-w-[1200px] z-10">
+        {/* Jobby Mascot Peeking higher above top-right corner so it doesn't obscure content */}
         <Mascot
           src="/mascot/jobby-hero.webp"
           alt={t('mascotAltHero')}
           size="sm"
           priority
           variant="breathe"
-          className="absolute -top-14 -right-2 sm:-top-20 sm:right-6 md:-top-24 md:right-10 z-20 drop-shadow-2xl pointer-events-none"
+          className="absolute -top-20 -right-2 sm:-top-28 sm:right-4 md:-top-36 md:right-8 z-20 drop-shadow-2xl pointer-events-none"
         />
 
         {/* App Window Container — Peeking cutout bottom fold */}
@@ -92,7 +82,7 @@ export function HeroSection() {
                 <span className="h-3 w-3 rounded-full bg-[#27C93F] inline-block" />
               </div>
               <span className="text-xs font-mono text-muted-foreground/80 bg-background/50 px-3 py-1 rounded-md border border-border/40">
-                jobforsure.app/workspace
+                jobforsure.app/chat
               </span>
             </div>
 
@@ -121,81 +111,85 @@ export function HeroSection() {
           </div>
 
           {/* Tab Content Area */}
-          <div className="p-4 sm:p-6 md:p-8 bg-background/50 min-h-[340px] sm:min-h-[420px] flex flex-col justify-between">
+          <div className="p-3 sm:p-5 md:p-6 bg-background/50 min-h-[360px] sm:min-h-[440px] flex flex-col justify-between">
             {activeTab === 'ats' && (
-              <div className="space-y-6 animate-fade-in">
-                {/* ATS Header */}
-                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-border/40 pb-4">
-                  <div>
-                    <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                      {t('mockupAtsScore')}
-                    </span>
-                    <h3 className="text-lg sm:text-xl font-bold text-foreground">
-                      Senior Full-Stack Engineer @ TechCorp
-                    </h3>
+              <div className="grid grid-cols-1 md:grid-cols-[220px_1fr] gap-4 animate-fade-in h-full">
+                {/* Desktop Chat Sidebar */}
+                <div className="hidden md:flex flex-col justify-between rounded-xl neuro-inset p-3 border border-border/40 text-xs">
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between border-b border-border/40 pb-2">
+                      <span className="font-bold text-foreground">Chat Sessions</span>
+                      <span className="text-[10px] bg-primary/10 text-primary px-1.5 py-0.5 rounded font-mono">New +</span>
+                    </div>
+                    <div className="space-y-1.5">
+                      <div className="rounded-lg bg-background p-2 font-medium text-foreground border border-border/60 shadow-sm flex items-center gap-2">
+                        <span className="h-2 w-2 rounded-full bg-primary" />
+                        <span className="truncate">TechCorp ATS Tailor</span>
+                      </div>
+                      <div className="rounded-lg p-2 text-muted-foreground hover:bg-background/40 transition-colors truncate">
+                        Resume Review — Senior FE
+                      </div>
+                      <div className="rounded-lg p-2 text-muted-foreground hover:bg-background/40 transition-colors truncate">
+                        Mock Interview Prep
+                      </div>
+                    </div>
                   </div>
-                  <div className="flex items-center gap-3">
-                    <span className="font-mono text-3xl sm:text-4xl font-extrabold text-primary tabular-nums">
-                      89<span className="text-sm font-normal text-muted-foreground">%</span>
-                    </span>
-                    <span className="rounded-full bg-success/15 px-3 py-1 text-xs font-bold text-success border border-success/20">
-                      Strong Match
-                    </span>
+                  <div className="pt-2 border-t border-border/40 text-[11px] text-muted-foreground flex items-center justify-between">
+                    <span>AI Model</span>
+                    <span className="font-mono text-primary font-semibold">DeepSeek V4</span>
                   </div>
                 </div>
 
-                {/* Progress Bar */}
-                <div className="space-y-1.5">
-                  <div className="flex justify-between text-xs text-muted-foreground font-medium">
-                    <span>ATS Compatibility Bar</span>
-                    <span>89 / 100</span>
-                  </div>
-                  <div className="h-2.5 overflow-hidden rounded-full bg-muted">
-                    <div className="h-full w-[89%] rounded-full bg-primary transition-all duration-500" />
-                  </div>
-                </div>
+                {/* Main Desktop Chat Stream */}
+                <div className="flex flex-col justify-between rounded-xl neuro-card p-4 sm:p-5 border border-border/60 bg-background/80 space-y-4">
+                  {/* Message Stream */}
+                  <div className="space-y-4 text-xs sm:text-sm">
+                    {/* User Message */}
+                    <div className="flex items-start justify-end gap-2.5">
+                      <div className="max-w-[85%] rounded-2xl bg-primary text-primary-foreground p-3 shadow-sm">
+                        Check my match for Senior Full-Stack Engineer at TechCorp and optimize keywords.
+                      </div>
+                      <div className="h-7 w-7 rounded-full bg-primary/20 text-primary flex items-center justify-center font-bold text-xs shrink-0 mt-0.5">
+                        ME
+                      </div>
+                    </div>
 
-                {/* Skills Grid */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="rounded-xl neuro-inset p-4 space-y-2">
-                    <span className="text-xs font-bold uppercase tracking-wider text-success flex items-center gap-1.5">
-                      <CheckCircle2 size={14} /> Matched Skills (14)
-                    </span>
-                    <div className="flex flex-wrap gap-1.5 pt-1">
-                      {['React 19', 'TypeScript', 'Next.js', 'PostgreSQL', 'Tailwind CSS', 'Node.js', 'REST APIs', 'Git'].map((skill) => (
-                        <span key={skill} className="rounded-md bg-success/10 px-2.5 py-1 text-xs font-medium text-success border border-success/20">
-                          {skill}
-                        </span>
-                      ))}
+                    {/* AI Coach Message with Rich ATS Match Card */}
+                    <div className="flex items-start gap-2.5">
+                      <div className="h-7 w-7 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold text-xs shrink-0 mt-0.5 shadow-sm">
+                        AI
+                      </div>
+                      <div className="max-w-[90%] space-y-3 rounded-2xl bg-muted/60 p-4 border border-border/40">
+                        <div className="flex items-center justify-between border-b border-border/40 pb-2">
+                          <span className="font-semibold text-foreground text-xs">ATS Optimization Analysis</span>
+                          <span className="font-mono text-base font-extrabold text-primary">89% Match</span>
+                        </div>
+                        <p className="text-xs sm:text-sm text-foreground leading-relaxed">
+                          Your profile strongly matches <strong className="text-foreground">14 required skills</strong>. Here are 4 missing keywords to add:
+                        </p>
+                        <div className="flex flex-wrap gap-1.5">
+                          {['GraphQL', 'Docker', 'Redis', 'CI/CD Pipelines'].map((skill) => (
+                            <span key={skill} className="rounded-md bg-warn/10 px-2 py-0.5 text-xs font-semibold text-warn border border-warn/20">
+                              + {skill}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
                     </div>
                   </div>
 
-                  <div className="rounded-xl neuro-inset p-4 space-y-2">
-                    <span className="text-xs font-bold uppercase tracking-wider text-warn flex items-center gap-1.5">
-                      <Sparkles size={14} /> Missing Keywords (4)
-                    </span>
-                    <div className="flex flex-wrap gap-1.5 pt-1">
-                      {['GraphQL', 'Docker', 'Redis', 'CI/CD Pipelines'].map((skill) => (
-                        <span key={skill} className="rounded-md bg-warn/10 px-2.5 py-1 text-xs font-medium text-warn border border-warn/20">
-                          + {skill}
-                        </span>
-                      ))}
-                    </div>
+                  {/* Desktop Chat Input Bar */}
+                  <div className="flex items-center gap-2 rounded-xl neuro-input p-2 border border-border/60 bg-background">
+                    <input
+                      type="text"
+                      readOnly
+                      value="Inject missing keywords into Work Experience bullet points..."
+                      className="w-full bg-transparent text-xs sm:text-sm text-foreground placeholder:text-muted-foreground outline-none px-2"
+                    />
+                    <button className="rounded-lg bg-primary px-3 py-1.5 text-xs font-semibold text-primary-foreground shrink-0 shadow-sm">
+                      Send
+                    </button>
                   </div>
-                </div>
-
-                {/* AI Coach Box */}
-                <div className="rounded-xl neuro-card border border-primary/20 p-4 bg-primary/5 space-y-2">
-                  <div className="flex items-center gap-2">
-                    <div className="flex h-6 w-6 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-primary-foreground">
-                      AI
-                    </div>
-                    <span className="text-xs font-bold text-foreground">{t('mockupCareerCoach')}</span>
-                    <span className="text-[10px] text-muted-foreground">{t('mockupJustNow')}</span>
-                  </div>
-                  <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
-                    Adding <strong className="text-foreground">GraphQL</strong> and <strong className="text-foreground">Docker</strong> to your experience bullets will boost your ATS score to <strong>96%</strong>. Click below to inject keywords.
-                  </p>
                 </div>
               </div>
             )}
