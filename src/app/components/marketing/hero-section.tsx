@@ -59,9 +59,9 @@ export function HeroSection() {
         </p>
       </div>
 
-      {/* ── 1200px PEEKING BROWSER MOCKUP FRAME ── */}
-      <div className="relative mt-14 md:mt-20 w-full max-w-[1200px] z-10">
-        {/* Jobby Mascot Peeking behind top-left corner — completely out of text way */}
+      {/* ── 1140px FIXED 16:10 DESKTOP ASPECT BROWSER MOCKUP FRAME ── */}
+      <div className="relative mt-12 md:mt-16 w-full max-w-[1140px] z-10">
+        {/* Jobby Mascot Peeking behind top-left corner */}
         <Mascot
           src="/mascot/jobby-hero.webp"
           alt={t('mascotAltHero')}
@@ -71,10 +71,10 @@ export function HeroSection() {
           className="absolute -top-24 left-2 sm:-top-32 sm:left-6 md:-top-36 md:left-10 z-0 opacity-90 drop-shadow-xl pointer-events-none"
         />
 
-        {/* App Window Container — Peeking cutout bottom fold */}
-        <div className="relative overflow-hidden rounded-t-2xl sm:rounded-t-3xl neuro-card border border-border/80 shadow-2xl translate-y-3 sm:translate-y-4 bg-background">
+        {/* App Window Container — Natural 16:10 Proportions */}
+        <div className="relative overflow-hidden rounded-t-2xl sm:rounded-t-3xl neuro-card border border-border/80 shadow-2xl translate-y-3 sm:translate-y-4 bg-background aspect-[16/10] min-h-[420px] max-h-[580px] flex flex-col">
           {/* macOS Browser Header */}
-          <div className="flex flex-col sm:flex-row items-center justify-between border-b border-border/60 bg-muted/40 px-4 py-3 gap-3">
+          <div className="flex flex-col sm:flex-row items-center justify-between border-b border-border/60 bg-muted/40 px-4 py-3 gap-3 shrink-0">
             <div className="flex items-center gap-2 w-full sm:w-auto justify-between sm:justify-start">
               <div className="flex items-center gap-1.5">
                 <span className="h-3 w-3 rounded-full bg-[#FF5F57] inline-block" />
@@ -96,7 +96,7 @@ export function HeroSection() {
                     key={tab.id}
                     onClick={() => setActiveTab(tab.id)}
                     className={cn(
-                      'flex items-center gap-2 shrink-0 rounded-lg px-3 py-1.5 text-xs sm:text-sm font-medium transition-all cursor-pointer',
+                      'flex items-center gap-2 shrink-0 rounded-lg px-3.5 py-1.5 text-xs sm:text-sm font-medium transition-all cursor-pointer',
                       isActive
                         ? 'bg-background text-foreground shadow-sm border border-border/60'
                         : 'text-muted-foreground hover:text-foreground hover:bg-background/40'
@@ -110,67 +110,67 @@ export function HeroSection() {
             </div>
           </div>
 
-          {/* Tab Content Area — Real UI Replica */}
-          <div className="p-4 sm:p-6 bg-background min-h-[380px] sm:min-h-[460px] flex flex-col justify-between">
+          {/* Tab Content Area — Real Proportional UI */}
+          <div className="p-5 sm:p-7 bg-background flex-1 flex flex-col justify-between overflow-hidden">
             {activeTab === 'ats' && (
-              <div className="flex flex-col h-full space-y-4 animate-fade-in">
+              <div className="flex flex-col h-full justify-between space-y-4 animate-fade-in">
                 {/* Real App Status Bar */}
-                <div className="neuro-surface flex items-center justify-between gap-2 px-4 py-2.5 rounded-xl border border-border/40 text-xs">
+                <div className="neuro-surface flex items-center justify-between gap-3 px-4 py-3 rounded-xl border border-border/40 text-xs sm:text-sm">
                   <div className="flex items-center gap-2">
-                    <span className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">Profile:</span>
+                    <span className="font-mono text-xs uppercase tracking-wider text-muted-foreground">Profile:</span>
                     <span className="font-semibold text-foreground">Alex_Morgan_Resume.pdf (89%)</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">Target:</span>
+                    <span className="font-mono text-xs uppercase tracking-wider text-muted-foreground">Target:</span>
                     <span className="font-semibold text-primary">Senior Full-Stack Engineer @ TechCorp</span>
                   </div>
                 </div>
 
                 {/* Real Entry Cards Flow */}
-                <div className="flex-1 flex flex-col items-center justify-center py-6">
-                  <div className="text-center font-bold text-lg text-foreground mb-4">
+                <div className="flex-1 flex flex-col items-center justify-center py-4">
+                  <div className="text-center font-bold text-xl text-foreground mb-5">
                     How do you want to start?
                   </div>
-                  <div className="grid w-full max-w-xl grid-cols-1 gap-3 sm:grid-cols-3">
+                  <div className="grid w-full max-w-2xl grid-cols-1 gap-4 sm:grid-cols-3">
                     {/* Upload */}
-                    <div className="neuro-card flex flex-col items-center rounded-xl p-4 text-center border border-border/60">
-                      <div className="neuro-icon-well mb-2 flex h-9 w-9 items-center justify-center rounded-full text-primary">
-                        <FileText size={16} />
+                    <div className="neuro-card flex flex-col items-center rounded-2xl p-5 text-center border border-border/60">
+                      <div className="neuro-icon-well mb-3 flex h-11 w-11 items-center justify-center rounded-full text-primary">
+                        <FileText size={20} />
                       </div>
-                      <div className="text-xs font-bold text-foreground">Upload Resume</div>
-                      <div className="mt-0.5 text-[11px] text-muted-foreground">PDF, DOCX, or text</div>
+                      <div className="text-sm font-bold text-foreground">Upload Resume</div>
+                      <div className="mt-1 text-xs text-muted-foreground">PDF, DOCX, or text</div>
                     </div>
 
                     {/* Build with AI */}
-                    <div className="neuro-card flex flex-col items-center rounded-xl p-4 text-center border border-primary/30 bg-primary/5">
-                      <div className="neuro-icon-well mb-2 flex h-9 w-9 items-center justify-center rounded-full text-success">
-                        <Sparkles size={16} />
+                    <div className="neuro-card flex flex-col items-center rounded-2xl p-5 text-center border border-primary/30 bg-primary/5">
+                      <div className="neuro-icon-well mb-3 flex h-11 w-11 items-center justify-center rounded-full text-success">
+                        <Sparkles size={20} />
                       </div>
-                      <div className="text-xs font-bold text-foreground">Build with AI</div>
-                      <div className="mt-0.5 text-[11px] text-muted-foreground">Answer questions · 5 min</div>
+                      <div className="text-sm font-bold text-foreground">Build with AI</div>
+                      <div className="mt-1 text-xs text-muted-foreground">Answer questions · 5 min</div>
                     </div>
 
                     {/* Paste Job Posting */}
-                    <div className="neuro-card flex flex-col items-center rounded-xl p-4 text-center border border-border/60">
-                      <div className="neuro-icon-well mb-2 flex h-9 w-9 items-center justify-center rounded-full text-warn">
-                        <Target size={16} />
+                    <div className="neuro-card flex flex-col items-center rounded-2xl p-5 text-center border border-border/60">
+                      <div className="neuro-icon-well mb-3 flex h-11 w-11 items-center justify-center rounded-full text-warn">
+                        <Target size={20} />
                       </div>
-                      <div className="text-xs font-bold text-foreground">Paste Job Posting</div>
-                      <div className="mt-0.5 text-[11px] text-muted-foreground">Analyze ATS Match</div>
+                      <div className="text-sm font-bold text-foreground">Paste Job Posting</div>
+                      <div className="mt-1 text-xs text-muted-foreground">Analyze ATS Match</div>
                     </div>
                   </div>
                 </div>
 
                 {/* Real Input Bar */}
-                <div className="flex items-center gap-2 rounded-xl neuro-input p-2.5 border border-border/60 bg-muted/20">
+                <div className="flex items-center gap-3 rounded-2xl neuro-input p-3 border border-border/60 bg-muted/20">
                   <input
                     type="text"
                     readOnly
                     value="Ask Career Coach: How can I optimize my bullet points for TechCorp?"
-                    className="w-full bg-transparent text-xs sm:text-sm text-foreground outline-none px-2"
+                    className="w-full bg-transparent text-sm text-foreground outline-none px-2"
                   />
-                  <button className="rounded-lg bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground shrink-0 shadow-sm flex items-center gap-1">
-                    Send <ArrowRight size={13} />
+                  <button className="rounded-xl bg-primary px-5 py-2.5 text-xs sm:text-sm font-semibold text-primary-foreground shrink-0 shadow-sm flex items-center gap-1.5">
+                    Send <ArrowRight size={14} />
                   </button>
                 </div>
               </div>
