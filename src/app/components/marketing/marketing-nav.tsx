@@ -40,7 +40,7 @@ export function MarketingNav() {
         </Link>
 
         {/* Desktop nav */}
-        <nav className="hidden items-center gap-6 md:flex">
+        <nav className="hidden items-center gap-6 lg:flex">
           {links.map((link) =>
             link.scroll ? (
               <a
@@ -63,7 +63,7 @@ export function MarketingNav() {
         </nav>
 
         {/* Desktop auth */}
-        <div className="hidden items-center gap-2 md:flex">
+        <div className="hidden items-center gap-2 lg:flex">
           <ThemeToggle />
           <LanguageSwitcher />
           <Link
@@ -85,7 +85,7 @@ export function MarketingNav() {
           variant="ghost"
           size="icon"
           onClick={() => setOpen(!open)}
-          className="md:hidden"
+          className="lg:hidden"
           aria-label="Toggle menu"
           aria-expanded={open}
           aria-controls="mobile-menu"
@@ -96,7 +96,7 @@ export function MarketingNav() {
 
       {/* Mobile dropdown */}
       {open && (
-        <div id="mobile-menu" className="max-h-[calc(100dvh-3.5rem)] overflow-y-auto border-t border-border neuro-surface md:hidden">
+        <div id="mobile-menu" className="max-h-[calc(100dvh-3.5rem)] overflow-y-auto border-t border-border neuro-surface lg:hidden">
           <div className="flex flex-col gap-0 px-6 py-3">
             {links.map((link) =>
               link.scroll ? (
