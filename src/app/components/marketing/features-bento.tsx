@@ -118,7 +118,7 @@ export function FeaturesBento() {
               alt={t('mascotAltJobSearch')}
               size="step"
               variant="static"
-              className="absolute bottom-0 right-0 opacity-95"
+              className="absolute top-0 right-0 opacity-95"
             />
             <div className="relative z-10 max-w-[70%]">
               <div className="flex h-10 w-10 items-center justify-center border border-zinc-300 text-primary">
