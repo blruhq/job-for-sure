@@ -6,8 +6,8 @@ import { Mascot } from '~/components/marketing/mascot'
 export function InterviewSection() {
   const t = useTranslations('landing')
 
-  const strengths = [t('interviewStrength1'), t('interviewStrength2')]
-  const improvements = [t('interviewImprove1'), t('interviewImprove2')]
+  const strengths = [t('interviewStrength1'), t('interviewStrength2')].filter(Boolean)
+  const improvements = [t('interviewImprove1'), t('interviewImprove2')].filter(Boolean)
 
   return (
     <section id="interview" className="border-t border-zinc-300">
