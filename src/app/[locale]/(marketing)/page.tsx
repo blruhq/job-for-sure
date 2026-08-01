@@ -54,18 +54,20 @@ export default async function LandingPage({
         <HeroSection />
       </GridPattern>
 
-      {/* ── HOW IT WORKS ── */}
-      <HowItWorks />
+      {/* ── CONTINUOUS GRID CONTAINER ── */}
+      <div className="mx-auto max-w-[1120px] border-x border-zinc-300">
+        {/* ── HOW IT WORKS ── */}
+        <HowItWorks />
 
-      {/* ── FEATURES (Bento) ── */}
-      <FeaturesBento />
+        {/* ── FEATURES (Bento) ── */}
+        <FeaturesBento />
 
-      {/* ── INTERVIEW PREP ── */}
-      <InterviewSection />
+        {/* ── INTERVIEW PREP ── */}
+        <InterviewSection />
 
-      {/* ── CTA ── */}
-      <section className="bg-brand">
-        <div className="mx-auto max-w-[1120px] border-x border-brand-foreground/30 px-4 py-20 sm:px-6 lg:px-8 md:py-28">
+        {/* ── CTA ── */}
+        <section className="bg-brand border-t border-zinc-300">
+          <div className="px-4 py-20 sm:px-6 lg:px-8 md:py-28">
           <div className="max-w-2xl">
             <span className="mb-3 block font-mono text-xs font-medium uppercase tracking-[0.2em] text-brand-foreground/80">
               {t('sectionLabelCta')}
@@ -87,8 +89,8 @@ export default async function LandingPage({
       </section>
 
       {/* ── FOOTER ── */}
-      <footer className="border-t border-brand-foreground/10 bg-brand border-x border-brand-foreground/30 px-6 py-8">
-        <div className="mx-auto flex max-w-[1120px] flex-col items-center justify-between gap-4 text-center sm:flex-row sm:text-left">
+      <footer className="border-t border-zinc-300 bg-brand px-6 py-8">
+        <div className="flex flex-col items-center justify-between gap-4 text-center sm:flex-row sm:text-left">
           <span className="text-sm text-brand-foreground/80">{t('footerCopyright')}</span>
           <div className="flex gap-6 text-sm text-brand-foreground/80">
             <Link href="/pricing" className="cursor-pointer transition-colors hover:text-brand-foreground">
@@ -103,6 +105,8 @@ export default async function LandingPage({
           </div>
         </div>
       </footer>
+      </div>
+      {/* ── END CONTINUOUS GRID ── */}
 
       {/* ── STRUCTURED DATA ── */}
       <JsonLd data={organizationSchema()} />

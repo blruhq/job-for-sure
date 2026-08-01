@@ -17,8 +17,8 @@ export function InterviewSection() {
   const improvements = [t('interviewImprove1'), t('interviewImprove2')]
 
   return (
-    <section id="interview" className="border-t border-border py-24 md:py-32">
-      <div className="mx-auto max-w-[1120px] overflow-x-clip border-x border-zinc-300 px-6">
+    <section id="interview" className="border-t border-zinc-300 py-24 md:py-32">
+      <div className="overflow-x-clip px-6">
         <div className="grid items-center gap-12 md:grid-cols-[1fr_1.2fr] md:gap-16">
           {/* ── Left: Copy ── */}
           <div className="relative z-10 max-w-lg">

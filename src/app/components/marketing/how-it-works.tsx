@@ -30,8 +30,8 @@ export function HowItWorks() {
   ]
 
   return (
-    <section id="how-it-works" className="border-t border-border bg-muted/30 py-24 md:py-32">
-      <div className="relative mx-auto max-w-[1120px] overflow-x-clip border-x border-zinc-300 px-6">
+    <section id="how-it-works" className="border-t border-zinc-300 bg-muted/30 py-24 md:py-32">
+      <div className="relative overflow-x-clip px-6">
         <div className="relative z-10 max-w-xl">
           <span className="mb-3 block font-mono text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground">
             {t('sectionLabelHow')}
