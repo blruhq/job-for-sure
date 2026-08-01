@@ -18,7 +18,7 @@ export function InterviewSection() {
 
   return (
     <section id="interview" className="border-t border-border py-24 md:py-32">
-      <div className="mx-auto max-w-[1120px] overflow-x-clip px-6">
+      <div className="mx-auto max-w-[1120px] overflow-x-clip border-x border-border px-6">
         <div className="grid items-center gap-12 md:grid-cols-[1fr_1.2fr] md:gap-16">
           {/* ── Left: Copy ── */}
           <div className="relative z-10 max-w-lg">
@@ -70,7 +70,7 @@ export function InterviewSection() {
           </div>
 
           {/* ── Right: Mockup ── */}
-          <div className="relative w-full max-w-lg justify-self-end">
+          <div className="relative w-full max-w-lg justify-self-end md:pl-12 md:border-l md:border-border">
             {/* Preppy mascot — peeks from bottom-right (Sentry-style) */}
             <Mascot
               src="/mascot/preppy.webp"

@@ -31,7 +31,7 @@ export function HowItWorks() {
 
   return (
     <section id="how-it-works" className="border-t border-border bg-muted/30 py-24 md:py-32">
-      <div className="relative mx-auto max-w-[1120px] overflow-x-clip px-6">
+      <div className="relative mx-auto max-w-[1120px] overflow-x-clip border-x border-border px-6">
         <div className="relative z-10 max-w-xl">
           <span className="mb-3 block font-mono text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground">
             {t('sectionLabelHow')}
@@ -48,7 +48,7 @@ export function HowItWorks() {
           {STEPS.map((step, i) => {
             const Icon = step.icon
             return (
-              <div key={step.title} className="relative">
+              <div key={step.title} className="relative md:pl-10 md:border-l md:border-border md:first:border-l-0 md:first:pl-0">
                 {i < STEPS.length - 1 && (
                   <div className="absolute -right-5 top-8 hidden h-px w-10 border-t border-dashed border-border/40 md:block" />
                 )}
