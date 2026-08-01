@@ -61,132 +61,77 @@
    Mascot-true palette: suit (navy) + tie stripe (amber) + eyes (lemon)
    ═══════════════════════════════════════════════════════════════ */
 :root {
-  /* ── shadcn semantic tokens ── */
-  --background: #F7F8FA;           /* cool off-white */
-  --foreground: #101828;           /* cool near-black */
-  --card: #FFFFFF;                 /* pure white */
-  --card-foreground: #101828;
+  /* ── Swiss semantic tokens (mapped to Tailwind utilities) ── */
+  --background: #FFFFFF;          /* --bg-app: canvas */
+  --foreground: #09090B;          /* --text-primary: headings, body */
+  --card: #FAFAFA;               /* --bg-surface: card/panel */
+  --card-foreground: #09090B;
   --popover: #FFFFFF;
-  --popover-foreground: #101828;
-  --primary: #D97706;                 /* was #E6CD2A — now amber-600, AA contrast on white (4.5:1+) */
-  --primary-foreground: #FFFFFF;      /* white text on amber (amber-600 is dark enough) */
-  --primary-hover: #B45309;
-  --brand: #F59E0B;                /* fresh yellow for brand fills */
-  --brand-foreground: #1A1A1A;
+  --popover-foreground: #09090B;
+  --primary: #2563EB;            /* --accent-primary: Swiss Sapphire */
+  --primary-foreground: #FFFFFF;
+  --primary-hover: #1D4ED8;      /* --accent-hover */
+  --brand: #2563EB;              /* same as primary — Swiss Sapphire */
+  --brand-foreground: #FFFFFF;
 
-  /* ── Teal action/CTA scale (primary action color) ── */
-  --teal-50: #F0FDFA;
-  --teal-100: #CCFBF1;
-  --teal-200: #99F6E4;
-  --teal-300: #5EEAD4;
-  --teal-400: #2DD4BF;
-  --teal-500: #14B8A6;
-  --teal-600: #0D9488;   /* = --primary */
-  --teal-700: #0F766E;   /* = --primary-hover */
-  --teal-800: #115E59;
-  --teal-900: #134E4A;
-  --teal-950: #042F2E;
-
-  --secondary: #F1F3F6;            /* cool gray */
-  --secondary-foreground: #101828;
-  --muted: #F1F3F6;                /* subtle cool divider bg */
-  --muted-foreground: #667085;     /* cool gray secondary text */
-  --accent: rgba(245, 158, 11, 0.12); /* amber soft */
-  --accent-foreground: #D97706;
-  --destructive: #D92D20;          /* slightly cooler red */
+  --secondary: #F4F4F5;          /* --bg-subtle: inputs, hovered rows */
+  --secondary-foreground: #09090B;
+  --muted: #F4F4F5;              /* same as secondary */
+  --muted-foreground: #71717A;   /* --text-secondary */
+  --accent: #EFF6FF;             /* --accent-subtle: selected bg, badge fills */
+  --accent-foreground: #2563EB;
+  --destructive: #DC2626;
   --destructive-foreground: #FFFFFF;
-  --border: #E4E7EC;               /* cool border */
-  --input: #D0D5DD;
-  --ring: #D97706;
-  --radius: 0.5rem;                /* 8px base radius */
+  --border: #E4E4E7;            /* --border-hairline: 1px visible dividers */
+  --input: #E4E7EC;
+  --ring: #2563EB;              /* focus ring = accent */
+  --radius: 0.375rem;           /* 6px — Swiss button radius */
 
-  /* ── Chart / status tokens ── */
-  --chart-1: #D97706;
-  --chart-2: #2E3856;
-  --chart-3: #F59E0B;
-  --chart-4: #D92D20;
-  --chart-5: #93979C;
+  /* ── Chart/status tokens (monochrome + accent) ── */
+  --chart-1: #2563EB;
+  --chart-2: #71717A;
+  --chart-3: #A1A1AA;
+  --chart-4: #DC2626;
+  --chart-5: #E4E4E7;
 
   /* ── Sidebar tokens ── */
-  --sidebar: #F7F8FA;
-  --sidebar-foreground: #101828;
-  --sidebar-hover: #F1F3F6;
-  --sidebar-active: #ECEEF2;
-  --sidebar-border: #E4E7EC;
-  --sidebar-accent: #D97706;
+  --sidebar: #FFFFFF;
+  --sidebar-foreground: #09090B;
+  --sidebar-hover: #F4F4F5;
+  --sidebar-active: #EFF6FF;
+  --sidebar-border: #E4E4E7;
+  --sidebar-accent: #2563EB;
 
-  /* ── Extended palette ── */
-  --success: #067647;
-  --success-soft: rgba(6, 118, 71, 0.10);
-  --warn: #B54708;
-  --warn-soft: rgba(180, 83, 9, 0.10);
-  --danger-soft: rgba(217, 45, 32, 0.10);
-  --accent-soft: rgba(245, 158, 11, 0.12);
-  --accent-blueprint: rgba(245, 158, 11, 0.08);
+  /* ── Status tokens ── */
+  --success: #16A34A;
+  --success-soft: rgba(22, 163, 74, 0.08);
+  --warn: #CA8A04;
+  --warn-soft: rgba(202, 138, 4, 0.08);
+  --danger-soft: rgba(220, 38, 38, 0.08);
+  --accent-soft: #EFF6FF;       /* solid, not rgba — cleaner Swiss look */
+  --accent-blueprint: rgba(37, 99, 235, 0.04);
 
-  /* ── Mascot palette: Navy + Amber + Lemon ── */
-  --navy: #4E5368;                    /* suit jacket — structural */
-  --navy-deep: #2E3856;               /* tie — deep accent */
-  --navy-soft: rgba(78, 83, 104, 0.08);
-  --gold: #C4A56D;                    /* tie stripe — mascot gold */
-  --gold-hover: #D4B67E;
-  --gold-deep: #B8923C;               /* AA-contrast gold for white bg */
-  --gold-soft: rgba(196, 165, 109, 0.14);
-  --gold-glow: rgba(196, 165, 109, 0.32);
-  --lemon: #FBF7C8;                   /* mascot eyes — AI glow ONLY */
-  --lemon-glow: rgba(251, 247, 200, 0.32);
-  --cream: #F3F0E8;                   /* shirt — paper texture */
-
-  /* ── Amber/Yellow accent scale ── */
-  --amber: #F59E0B;                   /* fresh yellow — primary brand */
-  --amber-hover: #D97706;             /* deeper for hover + AA text on white */
-  --amber-deep: #B45309;              /* deepest — AA contrast for text */
-  --amber-soft: rgba(245, 158, 11, 0.14);
-  --amber-glow: rgba(245, 158, 11, 0.35);
-  --pale-glow: #FDF9D3;               /* ultra-soft yellow for AI glow panels */
-  --pale-glow-soft: rgba(253, 249, 211, 0.32);
-
-  /* ── Neumorphic surface (light mode only; dark mode neutralizes via .dark .neuro-* rules) ── */
-  --neuro-surface: #ECEEF2;
-  /* Lighter surface for inset/recessed elements (gives shadows tonal contrast) */
-  --neuro-surface-raised: #F5F6F8;
-  /* Slightly lighter than --neuro-surface for raised/extruded cards */
-  --neuro-surface-card: #F1F3F6;
-  /* Lightest tone — for cards that sit inside inset/recessed containers */
-  --neuro-surface-card-raised: #F7F8FA;
-
-  /* ── Neumorphic shadow colors (Apple Vision Pro profile) ── */
-  /* Dark shadow = cool slate tone, Light highlight = pure white glow */
-  /* Calibrated to Apple VP: white 0.15-0.20, dark 0.15-0.25 */
-  --neuro-dark-card: rgba(16, 24, 40, 0.18);
-  --neuro-dark-card-hover: rgba(16, 24, 40, 0.22);
-  --neuro-dark-inset: rgba(16, 24, 40, 0.15);
-  --neuro-dark-pill: rgba(16, 24, 40, 0.15);
-  --neuro-dark-pill-hover: rgba(16, 24, 40, 0.18);
-  --neuro-dark-pill-active: rgba(16, 24, 40, 0.12);
-  --neuro-dark-modal: rgba(16, 24, 40, 0.20);
-  --neuro-dark-chat: rgba(16, 24, 40, 0.12);
-  --neuro-dark-chat-hover: rgba(16, 24, 40, 0.14);
-  --neuro-light-base: rgba(255, 255, 255, 0.18);
-  --neuro-light-hover: rgba(255, 255, 255, 0.22);
-
-  /* ── Form control borders — WCAG 1.4.11 compliant (≥3:1 on neuro surfaces) ── */
-  /* --neuro-surface #ECEEF2 has L=0.844 → border needs L ≤ 0.248 for 3:1.     */
-  /* #6B7280 (gray-500): L≈0.18 → ~3.8:1 ✓. Navy-tinted to match mascot theme. */
-  --input-border: #6B7280;            /* replaces failing #D0D5DD (~1.3:1)        */
-  --input-border-soft: #9499A8;       /* lighter variant for dark-mode surfaces   */
-  --input-border-focus: var(--ring);  /* #D97706 amber-600 — L≈0.20 → ~3.5:1 ✓   */
-
-  /* Softer inset used INSIDE bordered controls (border carries the contrast)    */
-  --neuro-dark-input: rgba(16, 24, 40, 0.06);
-  --neuro-light-input: rgba(255, 255, 255, 0.10);
+  /* ── Swiss-specific tokens (for wiring motif + direct use) ── */
+  --bg-app: #FFFFFF;
+  --bg-surface: #FAFAFA;
+  --bg-subtle: #F4F4F5;
+  --border-hairline: #E4E4E7;
+  --border-strong: #A1A1AA;
+  --text-primary: #09090B;
+  --text-secondary: #71717A;
+  --text-tertiary: #A1A1AA;
+  --accent-primary: #2563EB;
+  --accent-hover: #1D4ED8;
+  --accent-subtle: #EFF6FF;
+  --signal-dot: #2563EB;
+  --signal-line: #93C5FD;
 
   /* ── Typography ── */
-  --font-sans: var(--font-inter, 'Inter Variable'), 'Inter', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-  --font-display: 'Instrument Serif', Georgia, 'Times New Roman', serif;
-  --font-mono: 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, Monaco, Consolas, monospace;
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-display: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
 
-  /* ── Text scale (rem-based, Cloudflare-standard) ── */
+  /* ── Text scale ── */
   --text-xs: 0.75rem;
   --text-sm: 0.875rem;
   --text-base: 1rem;
@@ -209,44 +154,45 @@
   /* ── Motion ── */
   --motion-fast: 120ms;
   --motion-base: 200ms;
-  --ease: cubic-bezier(0.2, 0, 0, 1);
+  --ease: cubic-bezier(0.16, 1, 0.3, 1);  /* Swiss: precise ease-out */
 
-  /* ── Shadows ── */
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.03);
-  --shadow-md: 0 1px 3px rgba(0, 0, 0, 0.04);
-  --shadow-lg: 0 2px 8px rgba(0, 0, 0, 0.06);
+  /* ── Shadows — minimal, flat ── */
+  --shadow-sm: none;
+  --shadow-md: 0 0 0 1px var(--border);
+  --shadow-lg: 0 0 0 1px var(--border);
   --shadow-paper: 0 0 0 1px var(--border);
 
-  /* ── Agent Elements overrides (match our amber-accent design system) ── */
-  --an-border-radius: 6px;              /* enterprise, not 16px pills */
+  /* ── Agent Elements overrides — Swiss ── */
+  --an-border-radius: 6px;
   --an-message-border-radius: 6px;
   --an-input-border-radius: 6px;
   --an-tool-border-radius: 6px;
   --an-message-radius-inner-offset: 2px;
-  --an-max-width: 680px;                /* match our chat container */
-  --an-background: var(--background);   /* #F7F8FA cool off-white */
+  --an-max-width: 680px;
+  --an-background: var(--background);
   --an-background-secondary: var(--secondary);
   --an-background-tertiary: var(--muted);
-  --an-foreground: var(--foreground);   /* #101828 cool near-black */
+  --an-foreground: var(--foreground);
   --an-foreground-muted: var(--muted-foreground);
-  --an-foreground-subtle: #9F9E98;
-  --an-border-color: var(--border);     /* #E4E7EC cool border */
-  --an-primary-color: var(--primary);   /* #D97706 deep amber */
-  --an-user-message-bg: var(--accent-soft);  /* soft amber tint */
+  --an-foreground-subtle: var(--text-tertiary);
+  --an-border-color: var(--border);
+  --an-primary-color: var(--primary);
+  --an-user-message-bg: var(--accent-soft);
   --an-user-message-text: var(--foreground);
-  --an-input-background: var(--card);   /* white surface */
+  --an-input-background: var(--card);
   --an-input-border-color: var(--border);
   --an-input-color: var(--foreground);
   --an-input-placeholder-color: var(--muted-foreground);
   --an-input-focus-outline: transparent;
   --an-context-padding: 10px;
-  --an-send-button-bg: var(--primary);  /* amber */
+  --an-send-button-bg: var(--primary);
   --an-send-button-color: #ffffff;
   --an-tool-background: var(--card);
   --an-tool-border-color: var(--border);
   --an-tool-color: var(--foreground);
   --an-tool-color-muted: var(--muted-foreground);
 }
+
 
 /* ── Thai locale — use Kanit font ── */
 html[lang="th"] {
@@ -255,569 +201,302 @@ html[lang="th"] {
 
 /* ── Dark mode ── */
 .dark {
-  --background: #0E1116;
-  --foreground: #F2F4F8;
-  --card: #1C2230;
-  --card-foreground: #F2F4F8;
-  --popover: #232938;
-  --popover-foreground: #F2F4F8;
-  --primary: #F59E0B;               /* fresh yellow — action/CTA in dark mode */
-  --primary-foreground: #0E1116;    /* dark text on yellow */
-  --brand: #F59E0B;                  /* fresh yellow for dark mode */
-  --brand-foreground: #0E1116;
-  --secondary: #252B39;
-  --secondary-foreground: #F2F4F8;
-  --muted: #232936;
-  --muted-foreground: #87909F;
-  --accent: rgba(245, 158, 11, 0.14);
-  --accent-foreground: #FBBF24;       /* amber-400 for dark mode text accents */
+  --background: #09090B;          /* --bg-app dark */
+  --foreground: #F4F4F5;          /* --text-primary dark */
+  --card: #121215;               /* --bg-surface dark */
+  --card-foreground: #F4F4F5;
+  --popover: #121215;
+  --popover-foreground: #F4F4F5;
+  --primary: #3B82F6;            /* --accent-primary dark */
+  --primary-foreground: #FFFFFF;
+  --primary-hover: #60A5FA;      /* --accent-hover dark */
+  --brand: #3B82F6;
+  --brand-foreground: #FFFFFF;
+  --secondary: #18181B;          /* --bg-subtle dark */
+  --secondary-foreground: #F4F4F5;
+  --muted: #18181B;
+  --muted-foreground: #A1A1AA;   /* --text-secondary dark */
+  --accent: #1E293B;             /* --accent-subtle dark */
+  --accent-foreground: #60A5FA;
   --destructive: #F85149;
   --destructive-foreground: #FFFFFF;
-  --border: rgba(255, 255, 255, 0.15);
-  --input: rgba(255, 255, 255, 0.10);
-  --ring: #F59E0B;
-  --primary-hover: #D97706;
-  --input-border: rgba(255, 255, 255, 0.15);
+  --border: #27272A;            /* --border-hairline dark */
+  --input: #27272A;
+  --ring: #3B82F6;
 
-  --chart-1: #F59E0B;
-  --chart-2: #5A6BA0;
-  --chart-3: #FBBF24;
+  --chart-1: #3B82F6;
+  --chart-2: #A1A1AA;
+  --chart-3: #71717A;
   --chart-4: #F85149;
-  --chart-5: #87909F;
+  --chart-5: #27272A;
 
-  --sidebar: #11151E;
-  --sidebar-foreground: #F2F4F8;
-  --sidebar-hover: #232936;
-  --sidebar-active: #2D3444;
-  --sidebar-border: rgba(255, 255, 255, 0.15);
-  --sidebar-accent: #F59E0B;
+  --sidebar: #09090B;
+  --sidebar-foreground: #F4F4F5;
+  --sidebar-hover: #18181B;
+  --sidebar-active: #1E293B;
+  --sidebar-border: #27272A;
+  --sidebar-accent: #3B82F6;
 
   --success: #3FB950;
   --success-soft: rgba(63, 185, 80, 0.12);
   --warn: #F5A623;
   --warn-soft: rgba(245, 166, 35, 0.12);
   --danger-soft: rgba(248, 81, 73, 0.12);
-  --accent-soft: rgba(245, 158, 11, 0.14);
-  --accent-blueprint: rgba(245, 158, 11, 0.08);
+  --accent-soft: #1E293B;
+  --accent-blueprint: rgba(59, 130, 246, 0.04);
 
-  --neuro-surface: var(--background);
-  --neuro-surface-raised: var(--card);
-  --neuro-surface-card: var(--card);
-  --neuro-surface-card-raised: var(--card);
+  /* Swiss-specific dark tokens */
+  --bg-app: #09090B;
+  --bg-surface: #121215;
+  --bg-subtle: #18181B;
+  --border-hairline: #27272A;
+  --border-strong: #52525B;
+  --text-primary: #F4F4F5;
+  --text-secondary: #A1A1AA;
+  --text-tertiary: #71717A;
+  --accent-primary: #3B82F6;
+  --accent-hover: #60A5FA;
+  --accent-subtle: #1E293B;
+  --signal-dot: #60A5FA;
+  --signal-line: #1D4ED8;
 
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.2);
-  --shadow-md: 0 1px 2px rgba(0, 0, 0, 0.2);
-  --shadow-lg: 0 4px 12px rgba(0, 0, 0, 0.4);
+  --shadow-sm: none;
+  --shadow-md: 0 0 0 1px var(--border);
+  --shadow-lg: 0 0 0 1px var(--border);
   --shadow-paper: 0 0 0 1px var(--border);
 
-  /* ── Agent Elements dark overrides ── */
-  --an-background: #0E1116;
-  --an-background-secondary: #232936;
-  --an-background-tertiary: #181D27;
-  --an-foreground: #F2F4F8;
-  --an-foreground-muted: #87909F;
-  --an-foreground-subtle: #7D7C76;
-  --an-border-color: rgba(255, 255, 255, 0.08);
-  --an-primary-color: #F59E0B;       /* amber */
-  --an-user-message-bg: rgba(245, 158, 11, 0.14);
-  --an-user-message-text: #F2F4F8;
-  --an-input-background: #181D27;
-  --an-input-border-color: rgba(255, 255, 255, 0.10);
-  --an-input-color: #F2F4F8;
-  --an-input-placeholder-color: #7D7C76;
-  --an-send-button-bg: #F59E0B;      /* amber */
-  --an-send-button-color: #0E1116;   /* dark text on yellow */
-  --an-tool-background: #181D27;
-  --an-tool-border-color: rgba(255, 255, 255, 0.08);
-  --an-tool-color: #F2F4F8;
-  --an-tool-color-muted: #87909F;
+  /* Agent Elements dark */
+  --an-background: #09090B;
+  --an-background-secondary: #18181B;
+  --an-background-tertiary: #121215;
+  --an-foreground: #F4F4F5;
+  --an-foreground-muted: #A1A1AA;
+  --an-foreground-subtle: #71717A;
+  --an-border-color: #27272A;
+  --an-primary-color: #3B82F6;
+  --an-user-message-bg: #1E293B;
+  --an-user-message-text: #F4F4F5;
+  --an-input-background: #121215;
+  --an-input-border-color: #27272A;
+  --an-input-color: #F4F4F5;
+  --an-input-placeholder-color: #71717A;
+  --an-send-button-bg: #3B82F6;
+  --an-send-button-color: #09090B;
+  --an-tool-background: #121215;
+  --an-tool-border-color: #27272A;
+  --an-tool-color: #F4F4F5;
+  --an-tool-color-muted: #A1A1AA;
 }
 
-/* ═══════════════════════════════════════════════════════════════
-   BASE LAYER
-   ═══════════════════════════════════════════════════════════════ */
-@layer base {
-  body {
-    scrollbar-gutter: stable;
-  }
-
-  * {
-    border-color: var(--border);
-  }
-
-  body {
-    background-color: var(--background);
-    color: var(--foreground);
-    font-family: var(--font-sans);
-    font-size: var(--text-base);
-    line-height: 1.5;
-    letter-spacing: -0.005em;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-  }
-
-  /* Monospace label utility */
-  .label-mono {
-    font-family: var(--font-mono);
-    font-size: 0.625rem;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    color: var(--muted-foreground);
-    font-weight: 600;
-  }
-
-  /* Bracket label utility — Greptile style */
-  .label-bracket {
-    font-family: var(--font-mono);
-    font-size: 0.6875rem;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    color: var(--muted-foreground);
-    font-weight: 500;
-  }
-  .label-bracket::before { content: "[ "; }
-  .label-bracket::after { content: " ]"; }
-
-  /* Display serif for headings */
-  h1.display, h2.display, .font-display {
-    font-family: var(--font-display);
-    font-weight: 400;
-    letter-spacing: -0.01em;
-  }
-
-  /* Tabular nums for scores */
-  .tabular-nums {
-    font-variant-numeric: tabular-nums;
-  }
+html[lang="th"] {
+  --font-sans: var(--font-kanit, 'Kanit'), var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-kanit, 'Kanit'), var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-kanit, 'Kanit'), var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
 }
 
-/* ── Blueprint grid backgrounds ── */
-/* Page/app background — subtle */
-.bg-grid-blueprint {
-  background-image: radial-gradient(var(--accent-blueprint) 1px, transparent 1px);
-  background-size: 20px 20px;
-}
-
-/* Card interior — even subtler */
-.bg-grid-card {
-  background-image: radial-gradient(var(--accent-blueprint) 0.8px, transparent 0.8px);
-  background-size: 16px 16px;
-}
-
-/* Dark mode variants — brighter dots on dark */
-.dark .bg-grid-blueprint {
-  background-image: radial-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px);
-  background-size: 20px 20px;
-}
-.dark .bg-grid-card {
-  background-image: radial-gradient(rgba(255, 255, 255, 0.025) 0.8px, transparent 0.8px);
-  background-size: 16px 16px;
-}
-
-.hero-glow {
-  background-image:
-    radial-gradient(circle at 70% 40%, rgba(245,158,11,0.3) 0%, transparent 50%),
-    radial-gradient(circle at 30% 80%, rgba(245,158,11,0.15) 0%, transparent 40%);
-}
-
-.dark .hero-glow {
-  background-image:
-    radial-gradient(circle at 70% 40%, rgba(245,158,11,0.2) 0%, transparent 50%),
-    radial-gradient(circle at 30% 80%, rgba(245,158,11,0.10) 0%, transparent 40%);
-}
-
-/* ═══════════════════════════════════════════════════════════════
-   ANIMATIONS
-   ═══════════════════════════════════════════════════════════════ */
-@keyframes fade-up {
-  from { opacity: 0; transform: translateY(8px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-
-@keyframes scale-in {
-  from { opacity: 0; transform: scale(0.96); }
-  to   { opacity: 1; transform: scale(1); }
-}
-
-@keyframes slide-in {
-  from { opacity: 0; transform: translateX(-8px); }
-  to   { opacity: 1; transform: translateX(0); }
-}
-
-@keyframes typing-dot {
-  0%, 100% { opacity: 0.2; transform: translateY(0); }
-  50%      { opacity: 1; transform: translateY(-2px); }
-}
-
-/* NEW — Breathing animation (subtle scale, not bounce) */
-@keyframes mascot-breathe {
-  0%, 100% { transform: scale(1); }
-  50%      { transform: scale(1.02); }
-}
-
-.animate-mascot-breathe {
-  animation: mascot-breathe 5s var(--ease) infinite;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .animate-mascot-breathe {
-    animation: none;
-  }
-}
-
-
-
-.animate-fade-up { animation: fade-up 0.25s var(--ease); }
-.animate-scale-in { animation: scale-in 0.2s var(--ease); }
-.animate-slide-in { animation: slide-in 0.2s var(--ease); }
-
-/* ── AgentElements chat container fade ── */
-.chat-fade-in { animation: fade-up 0.3s var(--ease) both; }
-
-/* ── Scrollbar ── */
-::-webkit-scrollbar { width: 6px; height: 6px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: var(--muted-foreground); }
-
-/* ═══════════════════════════════════════════════════════════════
-   RESPONSIVE / TOUCH ADAPTATION
-   ═══════════════════════════════════════════════════════════════ */
-
-/* Touch target minimum — applied to interactive controls on touch devices */
-@media (pointer: coarse) {
-  .touch-target,
-  button:not(.touch-exempt),
-  input:not(.touch-exempt),
-  select:not(.touch-exempt),
-  [role="button"]:not(.touch-exempt) {
-    min-height: 44px;
-    min-width: 44px;
-  }
-  /* Active state feedback for tactile response */
-  .touch-active:active {
-    transform: scale(0.96);
-  }
-  /* Suppress sticky hover on touch devices — only show hover on fine pointers */
-  @media (hover: none) {
-    .hover-only {
-      display: none;
-    }
-  }
-}
-
-/* Fine pointer hover restoration — scoped so touch never inherits sticky bg */
-@media (pointer: fine) {
-  .hover-visible:hover {
-    background-color: var(--accent-soft);
-  }
-}
-
-/* Dynamic viewport height utility for interactive workspaces */
-.min-h-dynamic {
-  min-height: 100dvh;
-}
-.h-dynamic {
-  height: 100dvh;
-}
-
-/* Container width standards */
-.container-app {
-  max-width: 80rem; /* 7xl */
-  margin-left: auto;
-  margin-right: auto;
-  padding-left: 1rem;
-  padding-right: 1rem;
-}
-@media (width >= 480px) {
-  .container-app { padding-left: 1.5rem; padding-right: 1.5rem; }
-}
-@media (width >= 1024px) {
-  .container-app { padding-left: 2rem; padding-right: 2rem; }
-}
-
-.container-fullbleed {
-  width: 100%;
-  max-width: 100%;
-  padding-left: 0.5rem;
-  padding-right: 0.5rem;
-}
-@media (width >= 480px) {
-  .container-fullbleed { padding-left: 1rem; padding-right: 1rem; }
-}
-
-/* ── Resume paper base (all templates) ── */
-.resume-paper {
-  background: #FFFFFF;
-  color: #2D2D2A;
+/* Swiss eyebrow label — replaces both .label-mono and .label-bracket */
+/* NO monospace. Uses Geist Sans with uppercase tracking. */
+.label-mono,
+.label-bracket {
   font-family: var(--font-sans);
-  font-size: 11px;
-  line-height: 1.5;
-  box-shadow: var(--shadow-paper);
-}
-.dark .resume-paper {
-  background: #1C1B18;
-  color: #D5D4D0;
+  font-size: 0.6875rem;          /* 11px */
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--muted-foreground);
+  font-weight: 500;
 }
 
-/* ── Focus-visible ring for keyboard accessibility ── */
-/* Textareas now get the same focus ring as everything else (WCAG 2.4.7).
-   The chat inputbar (.neuro-chat) keeps its non-ring focus style. */
-*:focus-visible:not(textarea) {
-  outline: 2px solid var(--ring);
-  outline-offset: 2px;
-  border-radius: 4px;
-}
+/* Remove bracket pseudo-elements — Swiss style is clean, no [ ] decorations */
+.label-bracket::before { content: none; }
+.label-bracket::after { content: none; }
 
-/* Textarea focus: WAS global (textarea:focus-visible:not(.neuro-inset) { outline: none !important }),
-   which violated WCAG 2.4.7. Now scoped to the chat inputbar only.
-   All other textareas (forms, editors) get the global *:focus-visible ring. */
-.neuro-chat textarea:focus-visible {
-  outline: none !important;
-  box-shadow: none !important;
-}
+/* ══ SWISS FLAT SURFACES (replaces neumorphic system) ══ */
 
-/* ── Sidebar: focus ring now uses global *:focus-visible ring ── */
-
-/* ── Command palette: exempt from global focus-visible ring ── */
-[data-cmdk-root]:focus,
-[data-cmdk-root]:focus-visible,
-[cmdk-root]:focus,
-[cmdk-root]:focus-visible {
-  outline: none !important;
-}
-
-/* ═══════════════════════════════════════════════════════════════
-   NEUMORPHISM / SOFT UI UTILITY CLASSES
-   Light-mode only. Dark mode neutralizes back to flat shadows.
-   Surface color: var(--neuro-surface) (darker than --background #F7F8FA)
-   ═══════════════════════════════════════════════════════════════ */
-
-/* Surface — just the background color, no shadow */
+/* Surface — transparent, inherits parent bg */
 .neuro-surface {
-  background-color: var(--neuro-surface);
-}
-
-/* Divider — transparent in light mode, visible in dark mode */
-.neuro-divider {
   background-color: transparent;
 }
-.dark .neuro-divider {
+
+/* Divider — visible 1px hairline */
+.neuro-divider {
   background-color: var(--border);
 }
 
-/* Card — raised/extruded dual shadow + subtle border for continuous edge */
+/* Card — flat with 1px hairline border, NO shadow */
 .neuro-card {
-  background-color: var(--neuro-surface-card);
+  background-color: var(--card);
   border: 1px solid var(--border);
-  box-shadow: 0 0 16px rgba(16, 24, 40, 0.03), 4px 4px 10px var(--neuro-dark-card), -4px -4px 10px var(--neuro-light-base);
+  border-radius: var(--radius-md);
+  box-shadow: none;
+  transition: border-color 150ms ease-out;
 }
 .neuro-card:hover {
-  box-shadow: 0 0 20px rgba(16, 24, 40, 0.04), 8px 8px 16px var(--neuro-dark-card-hover), -8px -8px 16px var(--neuro-light-hover);
+  border-color: var(--border-strong);
+  box-shadow: none;
 }
 
-/* Inset / pressed — recessed into surface */
+/* Inset — subtle bg for pressed/recessed areas */
 .neuro-inset {
-  background-color: var(--neuro-surface-raised);
-  box-shadow: inset 4px 4px 8px var(--neuro-dark-inset), inset -4px -4px 8px var(--neuro-light-base);
+  background-color: var(--secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  box-shadow: none;
 }
-
-/* Focus state — keep inset shadow only, no focus ring.
-   IMPORTANT: `.neuro-inset` is for CONTAINERS only (cards, columns, panels).
-   Form controls use `.neuro-input` instead, which does NOT suppress the ring. */
 .neuro-inset:focus-visible,
 .neuro-inset:focus-within {
-  box-shadow:
-    inset 4px 4px 8px var(--neuro-dark-inset),
-    inset -4px -4px 8px var(--neuro-light-base);
+  box-shadow: none;
+  border-color: var(--ring);
 }
 
-/* Container variant — no focus ring on :focus-within (use on cards, columns, panels) */
 .neuro-inset-container:focus-visible,
 .neuro-inset-container:focus-within {
-  box-shadow:
-    inset 4px 4px 8px var(--neuro-dark-inset),
-    inset -4px -4px 8px var(--neuro-light-base);
+  box-shadow: none;
 }
 
-/* ═══════════════════════════════════════════════════════════════
-   NEURO-INPUT — hybrid control treatment for form controls
-   Crisp 3:1 border + softened inset for tactility.
-   Use on inputs/textareas/tag-fields that live on neumorphic surfaces.
-
-   LAYERED in `components` so that Tailwind's focus-visible:ring-3 utility
-   (in the `utilities` layer) can override box-shadow on focus per the
-   cascade-layers spec: unlayered < components < utilities.
-   ═══════════════════════════════════════════════════════════════ */
-
-@layer components {
-  /* Hybrid neumorphic control: crisp 3:1 border + softened inset for tactility.
-     Use on inputs/textareas/tag-fields that live on neumorphic surfaces. */
-  .neuro-input {
-    background-color: var(--neuro-surface-raised);
-    border: 1px solid var(--input-border);
-    box-shadow: inset 2px 2px 5px var(--neuro-dark-input),
-                inset -2px -2px 5px var(--neuro-light-input);
-    transition: border-color var(--motion-fast) var(--ease),
-                box-shadow var(--motion-fast) var(--ease);
-  }
-  .neuro-input::placeholder { color: var(--muted-foreground); }
-  .neuro-input:hover { border-color: var(--input-border-focus); }
-  /* Focus: the visible ring comes from the `focus-visible:ring-3 focus-visible:ring-ring/50`
-     utilities on the component (see input.tsx / textarea.tsx) — do NOT declare a ring here.
-     This rule only shifts the border color to amber so the field "responds" on focus. */
-  .neuro-input:focus-visible {
-    border-color: var(--input-border-focus);
-    /* INTENTIONALLY no box-shadow — let the ring utility (utilities layer) handle it */
-  }
-  /* Focus-within: mirrors focus-visible for composite fields (e.g. TagInput)
-     where the outer container gets focus styling when an inner input is focused. */
-  .neuro-input:focus-within {
-    border-color: var(--input-border-focus);
-    /* INTENTIONALLY no box-shadow — let the ring utility (utilities layer) handle it */
-  }
-  .neuro-input:disabled { opacity: 0.5; cursor: not-allowed; }
-  .neuro-input[aria-invalid="true"] { border-color: var(--destructive); }
-
-  /* Dark mode: drop the inset (already neutralized globally), keep the border */
-  .dark .neuro-input {
-    background-color: var(--card);
-    border-color: var(--input-border-soft);
-    box-shadow: none;
-  }
-  .dark .neuro-input:focus-visible { border-color: var(--ring); }
-  .dark .neuro-input:focus-within { border-color: var(--ring); }
-
-  /* Reduced motion: drop transitions */
-  @media (prefers-reduced-motion: reduce) {
-    .neuro-input { transition: none; }
-  }
-}
-
-/* Icon well — smaller inset for icon containers */
-.neuro-icon-well {
-  background-color: var(--neuro-surface-raised);
-  box-shadow: inset 3px 3px 6px var(--neuro-dark-inset), inset -3px -3px 6px var(--neuro-light-base);
-}
-
-/* Pill / raised button — extruded with active press-down */
-.neuro-pill {
-  background-color: var(--neuro-surface-card);
+/* Input — Swiss form control: bg-subtle, hairline border, focus accent */
+.neuro-input {
+  background-color: var(--secondary);
   border: 1px solid var(--border);
-  box-shadow: 0 0 8px rgba(16, 24, 40, 0.03), 3px 3px 6px var(--neuro-dark-pill), -3px -3px 6px var(--neuro-light-base);
+  border-radius: var(--radius-sm);
+  box-shadow: none;
+  transition: border-color var(--motion-fast) var(--ease);
+}
+.neuro-input::placeholder { color: var(--muted-foreground); }
+.neuro-input:hover { border-color: var(--border-strong); }
+.neuro-input:focus-visible {
+  border-color: var(--ring);
+  box-shadow: none;
+}
+.neuro-input:focus-within {
+  border-color: var(--ring);
+  box-shadow: none;
+}
+.neuro-input:disabled { opacity: 0.5; cursor: not-allowed; }
+.neuro-input[aria-invalid="true"] { border-color: var(--destructive); }
+
+/* Dark mode — same flat treatment */
+.dark .neuro-input {
+  background-color: var(--card);
+  border-color: var(--border);
+  box-shadow: none;
+}
+.dark .neuro-input:focus-visible { border-color: var(--ring); }
+.dark .neuro-input:focus-within { border-color: var(--ring); }
+
+/* Icon well — subtle bg circle/square for icons */
+.neuro-icon-well {
+  background-color: var(--secondary);
+  border: 1px solid var(--border);
+  box-shadow: none;
+}
+
+/* Pill — becomes Swiss secondary button (NOT rounded-full) */
+.neuro-pill {
+  background-color: var(--secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  box-shadow: none;
+  transition: border-color 150ms ease-out, background-color 150ms ease-out;
 }
 .neuro-pill:hover {
-  box-shadow: 4px 4px 8px var(--neuro-dark-pill-hover), -4px -4px 8px var(--neuro-light-hover);
+  background-color: var(--muted);
+  border-color: var(--border-strong);
+  box-shadow: none;
 }
 .neuro-pill:active {
-  box-shadow: inset 2px 2px 4px var(--neuro-dark-pill-active), inset -2px -2px 4px var(--neuro-light-base);
+  transform: scale(0.98);
+  box-shadow: none;
 }
 
-/* Modal surface — larger, softer shadow for dialog overlays */
+/* Modal — flat with hairline border */
 .neuro-modal {
-  background-color: var(--neuro-surface-card);
+  background-color: var(--card);
   border: 1px solid var(--border);
-  box-shadow: 0 0 24px rgba(16, 24, 40, 0.04), 8px 8px 24px var(--neuro-dark-modal), -8px -8px 24px var(--neuro-light-base);
+  border-radius: var(--radius-lg);
+  box-shadow: none;
 }
 
-/* Title text — softer than --foreground (#101828) for neumorphic context */
+/* Title text — uses --text-primary */
 .neuro-title {
-  color: #4E5368;
+  color: var(--foreground);
 }
 
 /* ── Scoped overrides for agent-elements InputBar ── */
-/* The InputBar is from agent-elements and styled via CSS variables.
-   We scope overrides via .neuro-chat parent class. */
 .neuro-chat {
-  background-color: var(--neuro-surface);
-  --an-input-background: var(--neuro-surface);
-  --an-input-border-color: transparent;
-  --an-input-border-radius: 16px;
-  --an-border-radius: 16px;
-  --an-message-border-radius: 16px;
-  --an-background: var(--neuro-surface);
+  background-color: var(--background);
+  --an-input-background: var(--card);
+  --an-input-border-color: var(--border);
+  --an-input-border-radius: 6px;
+  --an-border-radius: 6px;
+  --an-message-border-radius: 6px;
+  --an-background: var(--background);
 }
-
-/* Input bar container — pressed/recessed inset shadow */
 .neuro-chat .bg-an-input-background {
-  background-color: var(--neuro-surface-raised);
-  border-color: transparent;
-  box-shadow: inset 4px 4px 8px var(--neuro-dark-chat), inset -4px -4px 8px var(--neuro-light-base);
+  background-color: var(--card);
+  border: 1px solid var(--border);
+  box-shadow: none;
 }
-
-/* Send button — extruded raised */
 .neuro-chat .bg-an-send-button-bg {
-  box-shadow: 3px 3px 6px var(--neuro-dark-chat), -3px -3px 6px var(--neuro-light-base);
+  box-shadow: none;
 }
-
-/* Cards inside chat (upload card, job previews) — softer than global .neuro-card */
 .neuro-chat .neuro-card {
-  background-color: var(--neuro-surface-card);
-  box-shadow: 0 0 14px rgba(16, 24, 40, 0.03), 4px 4px 10px var(--neuro-dark-chat), -4px -4px 10px var(--neuro-light-base);
+  background-color: var(--card);
+  border: 1px solid var(--border);
+  box-shadow: none;
 }
 .neuro-chat .neuro-card:hover {
-  box-shadow: 0 0 18px rgba(16, 24, 40, 0.04), 6px 6px 14px var(--neuro-dark-chat-hover), -6px -6px 14px var(--neuro-light-hover);
+  border-color: var(--border-strong);
+  box-shadow: none;
 }
-
-/* Suggestions bar in InputBar — match surface */
 .neuro-chat .bg-an-background-secondary {
-  background-color: var(--neuro-surface);
+  background-color: var(--secondary);
 }
 
-/* Cards nested inside inset containers (e.g. kanban columns) — lighter tone so they float above inset */
+/* Nested cards inside insets */
 .neuro-inset .neuro-card,
 .neuro-inset-container .neuro-card {
-  background-color: var(--neuro-surface-card-raised);
-  box-shadow:
-    0 0 14px rgba(16, 24, 40, 0.04),
-    4px 4px 10px var(--neuro-dark-card),
-    -4px -4px 10px var(--neuro-light-base);
+  background-color: var(--card);
+  border: 1px solid var(--border);
+  box-shadow: none;
 }
 .neuro-inset .neuro-card:hover,
 .neuro-inset-container .neuro-card:hover {
-  box-shadow:
-    0 0 18px rgba(16, 24, 40, 0.05),
-    6px 6px 14px var(--neuro-dark-card-hover),
-    -6px -6px 14px var(--neuro-light-hover);
+  border-color: var(--border-strong);
+  box-shadow: none;
 }
 
-/* ── Dark mode: neutralize all neumorphic effects ── */
+/* Dark mode — all flat */
 .dark .neuro-surface,
 .dark .neuro-chat {
   background-color: var(--background);
 }
-
 .dark .neuro-card,
 .dark .neuro-inset,
 .dark .neuro-icon-well,
 .dark .neuro-pill {
   background-color: var(--card);
-  box-shadow: var(--shadow-md);
+  border: 1px solid var(--border);
+  box-shadow: none;
 }
-
 .dark .neuro-modal {
   background-color: var(--popover);
-  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.5);
+  box-shadow: none;
 }
-
 .dark .neuro-card:hover,
 .dark .neuro-pill:hover {
-  box-shadow: var(--shadow-lg);
+  border-color: var(--border-strong);
+  box-shadow: none;
 }
-
 .dark .neuro-pill:active {
-  box-shadow: var(--shadow-sm);
+  box-shadow: none;
 }
-
 .dark .neuro-inset:focus-visible,
 .dark .neuro-inset:focus-within {
-  box-shadow: var(--shadow-md);
+  box-shadow: none;
 }
-
 .dark .neuro-title {
   color: var(--foreground);
 }
-
 .dark .neuro-chat {
   --an-input-background: var(--card);
   --an-input-border-color: var(--border);
@@ -826,17 +505,14 @@ html[lang="th"] {
   --an-message-border-radius: 6px;
   --an-background: var(--background);
 }
-
 .dark .neuro-chat .bg-an-input-background {
   background-color: var(--card);
   border-color: var(--border);
   box-shadow: none;
 }
-
 .dark .neuro-chat .bg-an-send-button-bg {
   box-shadow: none;
 }
-
 .dark .neuro-chat .bg-an-background-secondary {
   background-color: var(--secondary);
 }

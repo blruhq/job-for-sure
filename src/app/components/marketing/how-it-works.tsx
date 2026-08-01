@@ -2,72 +2,63 @@ import { Upload, Search, FileCheck, LayoutDashboard } from 'lucide-react'
 import { Link } from '~/i18n/routing'
 import { ArrowRight } from 'lucide-react'
 import { useTranslations } from 'next-intl'
+import { WiringDiagram } from './wiring-diagram'
 
 export function HowItWorks() {
   const t = useTranslations('landing')
 
   const STEPS = [
-    {
-      icon: Upload,
-      title: t('step1Title'),
-      desc: t('step1Desc'),
-    },
-    {
-      icon: Search,
-      title: t('step2Title'),
-      desc: t('step2Desc'),
-    },
-    {
-      icon: FileCheck,
-      title: t('step3Title'),
-      desc: t('step3Desc'),
-    },
-    {
-      icon: LayoutDashboard,
-      title: t('step4Title'),
-      desc: t('step4Desc'),
-    },
+    { icon: Upload, title: t('step1Title'), desc: t('step1Desc') },
+    { icon: Search, title: t('step2Title'), desc: t('step2Desc') },
+    { icon: FileCheck, title: t('step3Title'), desc: t('step3Desc') },
+    { icon: LayoutDashboard, title: t('step4Title'), desc: t('step4Desc') },
   ]
 
   return (
-    <section id="how-it-works" className="border-t border-border bg-muted/30 py-24 md:py-32">
-      <div className="relative mx-auto max-w-[1120px] overflow-x-clip px-6">
-        <div className="relative z-10 max-w-xl">
-          <span className="mb-3 block font-mono text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground">
+    <section id="how-it-works" className="border-t border-border bg-background py-24 md:py-32">
+      <div className="mx-auto max-w-[1120px] px-6">
+        <div className="max-w-xl mb-16">
+          <span className="text-xs uppercase tracking-[0.1em] text-muted-foreground">
             {t('sectionLabelHow')}
           </span>
-          <h2 className="text-4xl font-semibold tracking-tighter text-foreground md:text-5xl">
+          <h2 className="mt-3 text-4xl font-semibold tracking-tighter text-foreground md:text-5xl">
             {t('howTitle')}
           </h2>
           <p className="mt-5 text-lg leading-relaxed text-muted-foreground">
             {t('howSubtitle')}
           </p>
         </div>
-        {/* Resuby mascot removed — mascots now anchor each step below */}
-        <div className="relative z-10 mt-20 grid gap-10 md:grid-cols-4">
+
+        <div className="grid gap-6 md:grid-cols-4">
           {STEPS.map((step, i) => {
             const Icon = step.icon
             return (
-              <div key={step.title} className="relative">
-                {i < STEPS.length - 1 && (
-                  <div className="absolute -right-5 top-8 hidden h-px w-10 border-t border-dashed border-border/40 md:block" />
-                )}
-                <div className="flex h-14 w-14 items-center justify-center rounded-xl neuro-icon-well text-primary">
-                  <Icon size={24} />
+              <div key={step.title} className="relative border border-border rounded-lg p-6">
+                <div className="flex h-12 w-12 items-center justify-center rounded-md bg-secondary text-primary border border-border mb-6">
+                  <Icon size={24} strokeWidth={1.5} />
                 </div>
-                <div className="mt-5 font-mono text-xs font-semibold uppercase tracking-widest text-muted-foreground">
+                
+                {/* Wiring bridge between steps */}
+                {i < STEPS.length - 1 && (
+                  <div className="absolute -right-3 top-24 hidden md:block z-10">
+                    <WiringDiagram variant="bridge" />
+                  </div>
+                )}
+
+                <div className="text-xs uppercase tracking-[0.1em] text-muted-foreground font-medium mb-3">
                   {t('stepLabel')} {i + 1}
                 </div>
-                <h3 className="mt-3 text-xl font-semibold text-foreground">{step.title}</h3>
-                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{step.desc}</p>
+                <h3 className="text-lg font-semibold text-foreground mb-2">{step.title}</h3>
+                <p className="text-sm leading-relaxed text-muted-foreground">{step.desc}</p>
               </div>
             )
           })}
         </div>
-        <div className="relative z-10 mt-16">
+
+        <div className="mt-16">
           <Link
             href="/register"
-            className="inline-flex cursor-pointer items-center gap-1.5 text-sm font-medium text-primary transition-colors hover:text-primary/80"
+            className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary hover:text-primary-hover transition-colors"
           >
             {t('howCta')} <ArrowRight size={14} />
           </Link>

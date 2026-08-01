@@ -22,13 +22,13 @@ export function InterviewSection() {
         <div className="grid items-center gap-12 md:grid-cols-[1fr_1.2fr] md:gap-16">
           {/* ── Left: Copy ── */}
           <div className="relative z-10 max-w-lg">
-            <span className="mb-3 block font-mono text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground">
+            <span className="mb-3 block text-xs uppercase tracking-[0.1em] text-muted-foreground">
               {t('sectionLabelInterview')}
             </span>
             {/* Badge */}
-            <div className="mb-4 flex w-fit items-center gap-1.5 rounded-full border border-primary/15 bg-primary/5 px-3 py-1">
+            <div className="mb-4 flex w-fit items-center gap-1.5 rounded-md border border-primary/15 bg-primary/5 px-3 py-1">
               <Brain size={13} className="text-primary" />
-              <span className="text-xs font-semibold uppercase tracking-wider text-primary">
+              <span className="text-xs font-semibold uppercase tracking-[0.1em] text-primary">
                 {t('interviewBadge')}
               </span>
             </div>
@@ -56,13 +56,13 @@ export function InterviewSection() {
             <div className="mt-8 flex w-full flex-col gap-3 sm:w-auto sm:flex-row sm:items-center sm:gap-3">
               <Link
                 href="/interview"
-                className="inline-flex min-h-[44px] cursor-pointer items-center justify-center gap-1.5 rounded-lg bg-primary px-6 py-3 text-sm font-medium text-primary-foreground shadow-lg shadow-primary/20 transition-all hover:bg-primary/90 hover:-translate-y-0.5 active:scale-[0.98]"
+                className="inline-flex h-12 cursor-pointer items-center justify-center gap-1.5 rounded-md bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground hover:bg-primary-hover active:scale-[0.98] transition-all"
               >
                 {t('interviewCtaPrimary')} <ArrowRight size={14} />
               </Link>
               <Link
                 href="/chat"
-                className="inline-flex min-h-[44px] cursor-pointer items-center justify-center rounded-lg neuro-pill px-6 py-3 text-sm font-medium text-foreground transition-shadow active:scale-[0.98]"
+                className="inline-flex h-12 cursor-pointer items-center justify-center rounded-md border border-border bg-secondary px-6 py-3 text-sm font-semibold text-foreground hover:border-border-strong active:scale-[0.98] transition-all"
               >
                 {t('interviewCtaSecondary')}
               </Link>
@@ -79,7 +79,7 @@ export function InterviewSection() {
               variant="breathe"
               className="pointer-events-none absolute -bottom-6 -right-4 z-20 hidden sm:block drop-shadow-2xl"
             />
-            <div className="relative z-10 overflow-hidden rounded-2xl neuro-card">
+            <div className="relative z-10 overflow-hidden rounded-lg border border-border bg-card">
               {/* Window chrome */}
               <div className="flex items-center gap-1.5 border-b border-border px-4 py-2.5">
                 <span className="h-2.5 w-2.5 rounded-full bg-[#FF5F57]" />

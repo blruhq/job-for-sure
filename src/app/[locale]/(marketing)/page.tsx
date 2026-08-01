@@ -67,7 +67,7 @@ export default async function LandingPage({
       <section className="bg-brand">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-20 md:py-28">
           <div className="max-w-2xl">
-            <span className="mb-3 block font-mono text-xs font-medium uppercase tracking-[0.2em] text-brand-foreground/80">
+            <span className="mb-3 block text-xs uppercase tracking-[0.1em] text-brand-foreground/80">
               {t('sectionLabelCta')}
             </span>
             <h2 className="text-3xl font-bold tracking-tighter text-brand-foreground md:text-4xl">
@@ -78,7 +78,7 @@ export default async function LandingPage({
             </p>
             <Link
               href="/register"
-              className="mt-8 inline-flex cursor-pointer items-center gap-1.5 rounded-lg bg-brand-foreground px-6 py-3 text-sm font-medium text-brand shadow-lg shadow-black/10 transition-all hover:bg-brand-foreground/90 hover:-translate-y-0.5 active:scale-[0.98]"
+              className="mt-8 inline-flex cursor-pointer items-center gap-1.5 rounded-md bg-brand-foreground px-6 py-3 text-sm font-medium text-brand transition-all hover:bg-brand-foreground/90 active:scale-[0.98]"
             >
               {t('getStarted')} <ArrowRight size={14} />
             </Link>
@@ -87,17 +87,17 @@ export default async function LandingPage({
       </section>
 
       {/* ── FOOTER ── */}
-      <footer className="border-t border-brand-foreground/10 bg-brand px-6 py-8">
+      <footer className="border-t border-border bg-background px-6 py-8">
         <div className="mx-auto flex max-w-[1120px] flex-col items-center justify-between gap-4 text-center sm:flex-row sm:text-left">
-          <span className="text-sm text-brand-foreground/80">{t('footerCopyright')}</span>
-          <div className="flex gap-6 text-sm text-brand-foreground/80">
-            <Link href="/pricing" className="cursor-pointer transition-colors hover:text-brand-foreground">
+          <span className="text-xs uppercase tracking-[0.1em] text-muted-foreground">{t('footerCopyright')}</span>
+          <div className="flex gap-6 text-sm text-muted-foreground">
+            <Link href="/pricing" className="cursor-pointer transition-colors hover:text-foreground">
               Pricing
             </Link>
-            <Link href="/login" className="cursor-pointer transition-colors hover:text-brand-foreground">
+            <Link href="/login" className="cursor-pointer transition-colors hover:text-foreground">
               {t('footerSignIn')}
             </Link>
-            <Link href="/register" className="cursor-pointer transition-colors hover:text-brand-foreground">
+            <Link href="/register" className="cursor-pointer transition-colors hover:text-foreground">
               {t('footerGetStarted')}
             </Link>
           </div>

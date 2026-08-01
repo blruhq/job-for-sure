@@ -58,7 +58,7 @@ function NavSection({
             {label}
           </span>
           {showSeparator && (
-            <span className={cn('absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 h-0.5 w-5 bg-muted-foreground/30 transition-opacity duration-150', collapsed ? 'opacity-100' : 'opacity-0')} />
+            <span className={cn('absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 h-px w-5 bg-border transition-opacity duration-150', collapsed ? 'opacity-100' : 'opacity-0')} />
           )}
         </div>
       {items.map((item) => {
@@ -75,22 +75,22 @@ function NavSection({
                   }
                 }}
                 className={cn(
-                'flex items-center gap-2 rounded-sm text-sm font-medium transition-[padding,background-color,color] duration-200 ease-[cubic-bezier(0.2,0,0,1)]',
+                'flex items-center gap-2 rounded-md text-sm font-medium transition-[padding,background-color,color] duration-150 ease-out',
                 isActive
-                  ? 'neuro-inset text-foreground font-semibold'
-                  : 'text-muted-foreground hover:bg-sidebar-hover hover:text-foreground',
+                  ? 'bg-secondary text-foreground font-semibold border border-border'
+                  : 'text-muted-foreground hover:bg-secondary hover:text-foreground',
                 collapsed ? 'pl-[16px] pr-[17px] py-2' : 'pl-[16px] pr-2.5 py-2',
               )}
             >
               <span className="relative shrink-0">
-                <Icon size={15} className={cn(isActive ? 'text-brand' : 'opacity-70')} />
+                <Icon size={15} className={cn(isActive ? 'text-primary' : 'opacity-70')} />
                 {collapsed && 'badge' in item && item.badge && totalPipeline > 0 && (
                   <span className="absolute -top-0.5 -right-0.5 h-1.5 w-1.5 rounded-full bg-red-500 ring-1 ring-sidebar" />
                 )}
               </span>
               <span className={cn('transition-opacity duration-150', collapsed && 'opacity-0')}>{navLabel}</span>
               {'badge' in item && item.badge && totalPipeline > 0 && (
-                <span className={cn('ml-auto rounded-xs bg-accent-soft px-1.5 py-px font-mono text-[10px] font-semibold text-brand transition-opacity duration-150', collapsed && 'opacity-0')}>
+                <span className={cn('ml-auto rounded-md bg-accent-soft px-1.5 py-px text-[10px] font-semibold text-primary transition-opacity duration-150', collapsed && 'opacity-0')}>
                   {totalPipeline}
                 </span>
               )}
@@ -131,13 +131,13 @@ export function Sidebar() {
     <>
       <aside
         className={cn(
-          'flex h-full flex-col neuro-surface overflow-hidden transition-[width] duration-200 ease-[cubic-bezier(0.2,0,0,1)]',
+          'flex h-full flex-col bg-sidebar overflow-hidden transition-[width] duration-200 ease-[cubic-bezier(0.2,0,0,1)]',
           c ? 'w-[var(--sidebar-collapsed-width)]' : 'w-[var(--sidebar-width)]',
         )}
       >
         {isAdmin ? (
           /* ── ADMIN: monitor-only nav — just the Admin link ── */
-          <div className="flex flex-col gap-0.5 p-1">
+            <div className="flex flex-col gap-0.5 p-1">
             <div className="label-bracket px-2.5 pt-3 pb-1">
               {c ? '' : 'Admin'}
             </div>
@@ -145,18 +145,19 @@ export function Sidebar() {
               <Link
                 href="/admin"
                 className={cn(
-                  'flex items-center gap-2 rounded-sm text-xs font-medium transition-[padding,background-color,color] duration-200 ease-[cubic-bezier(0.2,0,0,1)]',
+                  'flex items-center gap-2 rounded-md text-xs font-medium transition-[padding,background-color,color] duration-150 ease-out',
                   pathname === '/admin'
-                    ? 'neuro-inset text-foreground font-semibold'
-                    : 'text-muted-foreground hover:bg-sidebar-hover hover:text-foreground',
+                    ? 'bg-secondary text-foreground font-semibold border border-border'
+                    : 'text-muted-foreground hover:bg-secondary hover:text-foreground',
                   c ? 'pl-[16px] pr-[17px] py-1.5' : 'pl-[16px] pr-2.5 py-1.5',
                 )}
               >
-                <Shield size={15} className={cn('shrink-0', pathname === '/admin' ? 'text-brand' : 'opacity-70')} />
+                <Shield size={15} className={cn('shrink-0', pathname === '/admin' ? 'text-primary' : 'opacity-70')} />
                 <span className={cn('transition-opacity duration-150', c && 'opacity-0')}>Admin Dashboard</span>
               </Link>
             </Tooltip>
           </div>
+
         ) : (
           <>
             {/* ── HOME ── */}
@@ -179,24 +180,25 @@ export function Sidebar() {
                 <span className={cn('absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 h-0.5 w-5 bg-muted-foreground/30 transition-opacity duration-150', c ? 'opacity-100' : 'opacity-0')} />
               </div>
               <Tooltip label={t('resumes')} disabled={!c}>
-                <Link
-                  href="/resumes"
-                  onClick={() => {
-                    if (typeof window !== 'undefined' && window.innerWidth < 1024) {
-                      useUIStore.getState().setSidebarCollapsed(true)
-                    }
-                  }}
-                  className={cn(
-                    'flex items-center gap-2 rounded-sm text-sm font-medium transition-[padding,background-color,color] duration-200 ease-[cubic-bezier(0.2,0,0,1)]',
-                    pathname === '/resumes'
-                      ? 'neuro-inset text-foreground font-semibold'
-                      : 'text-muted-foreground hover:bg-sidebar-hover hover:text-foreground',
-                    c ? 'pl-[16px] pr-[17px] py-2' : 'pl-[16px] pr-2.5 py-2',
-                  )}
-                >
-                  <FileText size={15} className={cn('shrink-0', pathname === '/resumes' ? 'text-brand' : 'opacity-70')} />
-                  <span className={cn('transition-opacity duration-150', c && 'opacity-0')}>{t('resumes')}</span>
-                </Link>
+              <Link
+                href="/resumes"
+                onClick={() => {
+                  if (typeof window !== 'undefined' && window.innerWidth < 1024) {
+                    useUIStore.getState().setSidebarCollapsed(true)
+                  }
+                }}
+                className={cn(
+                  'flex items-center gap-2 rounded-md text-sm font-medium transition-[padding,background-color,color] duration-150 ease-out',
+                  pathname === '/resumes'
+                    ? 'bg-secondary text-foreground font-semibold border border-border'
+                    : 'text-muted-foreground hover:bg-secondary hover:text-foreground',
+                  c ? 'pl-[16px] pr-[17px] py-2' : 'pl-[16px] pr-2.5 py-2',
+                )}
+              >
+                <FileText size={15} className={cn('shrink-0', pathname === '/resumes' ? 'text-primary' : 'opacity-70')} />
+                <span className={cn('transition-opacity duration-150', c && 'opacity-0')}>{t('resumes')}</span>
+              </Link>
+
               </Tooltip>
             </div>
 

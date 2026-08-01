@@ -65,7 +65,7 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
 
   if (isPending || !session) {
     return (
-      <div className="flex h-screen flex-col items-center justify-center gap-4 neuro-surface">
+      <div className="flex h-screen flex-col items-center justify-center gap-4 bg-background">
         <div className="flex items-center gap-2">
           <Skeleton className="h-5 w-5 rounded-[3px]" />
           <Skeleton className="h-4 w-32" />
@@ -75,7 +75,7 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
           <div className="h-1.5 w-1.5 animate-bounce rounded-full bg-primary/60" style={{ animationDelay: '150ms' }} />
           <div className="h-1.5 w-1.5 animate-bounce rounded-full bg-primary/60" style={{ animationDelay: '300ms' }} />
         </div>
-        <span className="font-mono text-[10px] text-muted-foreground">Verifying session…</span>
+        <span className="text-[10px] text-muted-foreground">Verifying session…</span>
       </div>
     )
   }
@@ -114,7 +114,7 @@ function AppShell({ children }: { children: React.ReactNode }) {
   }, [sidebarOpen])
 
   return (
-    <div className="flex h-screen flex-col neuro-surface">
+    <div className="flex h-screen flex-col bg-background">
       <Topbar />
       <div className="relative flex flex-1 overflow-hidden">
         {/* Desktop sidebar — in flow, toggles between 220px and 56px */}
