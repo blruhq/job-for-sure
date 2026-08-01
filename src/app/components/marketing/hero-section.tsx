@@ -122,25 +122,25 @@ export function HeroSection() {
                   <div className="hidden lg:flex flex-col justify-between rounded-xl neuro-inset p-4 border border-border/40 text-xs">
                     <div className="space-y-3">
                       <div className="flex items-center justify-between border-b border-border/40 pb-2">
-                        <span className="font-bold text-foreground">Chat Sessions</span>
-                        <span className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded font-mono font-semibold">New +</span>
+                        <span className="font-bold text-foreground">Chat History</span>
+                        <span className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded font-mono font-semibold">+ New Chat</span>
                       </div>
                       <div className="space-y-2">
                         <div className="rounded-lg bg-background p-2.5 font-semibold text-foreground border border-border/60 shadow-sm flex items-center gap-2">
                           <span className="h-2 w-2 rounded-full bg-primary" />
-                          <span className="truncate">TechCorp ATS Optimization</span>
+                          <span className="truncate">Senior Full-Stack Engineer</span>
                         </div>
                         <div className="rounded-lg p-2.5 text-muted-foreground hover:bg-background/40 transition-colors truncate">
-                          Resume Review — Senior FE
+                          Frontend Developer Application
                         </div>
                         <div className="rounded-lg p-2.5 text-muted-foreground hover:bg-background/40 transition-colors truncate">
-                          Behavioral Interview Prep
+                          General Career Advice
                         </div>
                       </div>
                     </div>
                     <div className="pt-3 border-t border-border/40 text-xs text-muted-foreground flex items-center justify-between">
-                      <span>AI Engine</span>
-                      <span className="font-mono text-primary font-bold">DeepSeek V4</span>
+                      <span>Model</span>
+                      <span className="font-mono text-primary font-bold">DeepSeek V4 Flash</span>
                     </div>
                   </div>
 
@@ -150,7 +150,7 @@ export function HeroSection() {
                       {/* User Message */}
                       <div className="flex items-start justify-end gap-3">
                         <div className="max-w-[85%] rounded-2xl bg-primary text-primary-foreground p-3.5 shadow-sm leading-relaxed">
-                          Can you help me rewrite my Senior Engineer bullet points to highlight GraphQL and Docker for TechCorp?
+                          Can you help me rewrite my Senior Engineer bullet points to highlight GraphQL and Docker for my target role?
                         </div>
                         <div className="h-8 w-8 rounded-full bg-primary/20 text-primary flex items-center justify-center font-bold text-xs shrink-0 mt-0.5">
                           ME
@@ -163,11 +163,11 @@ export function HeroSection() {
                           AI
                         </div>
                         <div className="max-w-[90%] space-y-3 rounded-2xl bg-muted/60 p-4 border border-border/40 text-foreground leading-relaxed">
-                          <p>Here is an optimized bullet point aligned with TechCorp&apos;s job description:</p>
+                          <p>Here is an optimized bullet point tailored to your target job description:</p>
                           <div className="rounded-xl bg-background p-3 border border-border/60 font-medium text-foreground">
                             &ldquo;Architected microservices using <strong>GraphQL</strong> and containerized deployments with <strong>Docker</strong> & Redis, cutting infrastructure latency by 38%.&rdquo;
                           </div>
-                          <p className="text-xs text-muted-foreground">Click below to apply this directly to your resume profile.</p>
+                          <p className="text-xs text-muted-foreground">Would you like to apply this directly to your resume?</p>
                         </div>
                       </div>
                     </div>
@@ -305,28 +305,42 @@ export function HeroSection() {
                 </div>
               )}
 
-              {/* TAB 3: RESUME BUILDER (Matches src/app/[locale]/(app)/resumes/page.tsx) */}
+              {/* TAB 3: RESUME BUILDER (Matches src/app/components/resume/resume-editor-store.ts & ResumeEditor) */}
               {activeTab === 'resume' && (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 animate-fade-in h-full">
                   {/* Editor Inputs */}
                   <div className="space-y-4 rounded-xl neuro-inset p-5 flex flex-col justify-between">
                     <div className="flex items-center justify-between border-b border-border/40 pb-3">
-                      <span className="text-sm font-bold uppercase tracking-wider text-foreground">Interactive Form Fields</span>
-                      <span className="text-xs bg-primary/10 text-primary px-2.5 py-1 rounded-md font-mono font-semibold">Live Sync</span>
+                      <span className="text-sm font-bold uppercase tracking-wider text-foreground">Resume Sections</span>
+                      <span className="text-xs bg-primary/10 text-primary px-2.5 py-1 rounded-md font-mono font-semibold">Editing</span>
                     </div>
-                    <div className="space-y-3.5 text-sm">
-                      <div>
-                        <label className="text-muted-foreground font-medium block mb-1">Full Name</label>
-                        <div className="rounded-lg neuro-input px-3.5 py-2.5 text-foreground font-semibold">Alex Morgan</div>
+                    <div className="space-y-3 text-sm overflow-y-auto pr-1">
+                      <div className="rounded-lg border border-border/60 bg-background p-3 space-y-2">
+                        <span className="text-xs font-bold text-primary uppercase tracking-wider block">Personal Details</span>
+                        <div className="grid grid-cols-2 gap-2 text-xs">
+                          <div>
+                            <span className="text-muted-foreground block text-[10px]">Full Name</span>
+                            <span className="font-semibold text-foreground">Alex Morgan</span>
+                          </div>
+                          <div>
+                            <span className="text-muted-foreground block text-[10px]">Target Role</span>
+                            <span className="font-semibold text-foreground">Senior Full-Stack Engineer</span>
+                          </div>
+                        </div>
                       </div>
-                      <div>
-                        <label className="text-muted-foreground font-medium block mb-1">Target Job Title</label>
-                        <div className="rounded-lg neuro-input px-3.5 py-2.5 text-foreground font-semibold">Senior Full-Stack Engineer</div>
+
+                      <div className="rounded-lg border border-border/60 bg-background p-3 space-y-1.5">
+                        <span className="text-xs font-bold text-foreground uppercase tracking-wider block">Professional Summary</span>
+                        <p className="text-xs text-muted-foreground leading-relaxed line-clamp-2">
+                          Senior Full-Stack Engineer with 5+ years of experience specializing in React 19, TypeScript, and high-throughput Node.js microservices.
+                        </p>
                       </div>
-                      <div>
-                        <label className="text-muted-foreground font-medium block mb-1">AI Tailored Bullet Point</label>
-                        <div className="rounded-lg neuro-input px-3.5 py-2.5 text-foreground leading-relaxed">
-                          Architected high-throughput React dashboard serving 50k+ daily users, cut page load times by 42%.
+
+                      <div className="rounded-lg border border-border/60 bg-background p-3 space-y-1.5">
+                        <span className="text-xs font-bold text-foreground uppercase tracking-wider block">Work Experience</span>
+                        <div className="flex justify-between text-xs font-semibold text-foreground">
+                          <span>Senior Full-Stack Engineer</span>
+                          <span className="text-muted-foreground font-normal">2022 — Present</span>
                         </div>
                       </div>
                     </div>
@@ -366,7 +380,7 @@ export function HeroSection() {
                 </div>
               )}
 
-              {/* TAB 4: MOCK INTERVIEW (Matches src/app/[locale]/(app)/interview/page.tsx) */}
+              {/* TAB 4: MOCK INTERVIEW (Matches src/app/components/interview/interview-session.tsx) */}
               {activeTab === 'interview' && (
                 <div className="space-y-5 animate-fade-in flex flex-col justify-between h-full">
                   {/* Session Bar */}
@@ -389,7 +403,7 @@ export function HeroSection() {
                   {/* Candidate Answer + AI Evaluation */}
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div className="md:col-span-2 rounded-xl neuro-inset p-4 space-y-2">
-                      <span className="text-xs font-bold text-muted-foreground">Your Recorded Answer (STAR Method)</span>
+                      <span className="text-xs font-bold text-muted-foreground">Your Response</span>
                       <p className="text-xs sm:text-sm text-foreground leading-relaxed italic">
                         &ldquo;I stayed calm, isolated the issue to a Redis connection timeout, rolled back the release, and communicated transparently with stakeholders...&rdquo;
                       </p>
@@ -402,11 +416,11 @@ export function HeroSection() {
                           <span className="font-mono text-2xl font-extrabold text-success">9/10</span>
                         </div>
                         <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
-                          Excellent use of STAR method with clear metrics.
+                          Excellent structured response with clear resolution metrics.
                         </p>
                       </div>
                       <span className="text-xs font-semibold text-success bg-success/10 px-2.5 py-1 rounded-md text-center block">
-                        STAR Verified
+                        Feedback Complete
                       </span>
                     </div>
                   </div>
