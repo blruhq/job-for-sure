@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { Link } from '~/i18n/routing'
-import { ArrowRight, CheckCircle2, FileText, Target, Mic, SquareKanban, Sparkles, Wand2, MessageSquare, AlertCircle } from 'lucide-react'
+import { ArrowRight, CheckCircle2, FileText, Target, Mic, SquareKanban, Sparkles, Wand2, MessageSquare, AlertCircle, Upload, ClipboardList } from 'lucide-react'
 import { Mascot } from '~/components/marketing/mascot'
 import { useTranslations } from 'next-intl'
 import { cn } from '~/lib/utils'
@@ -117,35 +117,21 @@ export function HeroSection() {
               
               {/* TAB 1: AI CAREER COACH (Matches src/app/components/chat/chat-view.tsx) */}
               {activeTab === 'chat' && (
-                <div className="grid grid-cols-1 lg:grid-cols-[240px_1fr] gap-4 animate-fade-in h-full">
-                  {/* Real Chat Sidebar */}
-                  <div className="hidden lg:flex flex-col justify-between rounded-xl neuro-inset p-4 border border-border/40 text-xs">
-                    <div className="space-y-3">
-                      <div className="flex items-center justify-between border-b border-border/40 pb-2">
-                        <span className="font-bold text-foreground">Chat History</span>
-                        <span className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded font-mono font-semibold">+ New Chat</span>
-                      </div>
-                      <div className="space-y-2">
-                        <div className="rounded-lg bg-background p-2.5 font-semibold text-foreground border border-border/60 shadow-sm flex items-center gap-2">
-                          <span className="h-2 w-2 rounded-full bg-primary" />
-                          <span className="truncate">Senior Full-Stack Engineer</span>
-                        </div>
-                        <div className="rounded-lg p-2.5 text-muted-foreground hover:bg-background/40 transition-colors truncate">
-                          Frontend Developer Application
-                        </div>
-                        <div className="rounded-lg p-2.5 text-muted-foreground hover:bg-background/40 transition-colors truncate">
-                          General Career Advice
-                        </div>
-                      </div>
+                <div className="flex flex-col animate-fade-in h-full rounded-xl neuro-card border border-border/60 bg-background overflow-hidden">
+                  {/* Status bar — matches real chat-view.tsx */}
+                  <div className="flex items-center justify-between px-4 py-2.5 border-b border-border/40 text-xs shrink-0">
+                    <div className="flex items-center gap-1.5">
+                      <span className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">Profile:</span>
+                      <span className="rounded-xs neuro-inset px-2 py-1 text-sm font-medium">Alex Morgan — Sr. FE Engineer</span>
                     </div>
-                    <div className="pt-3 border-t border-border/40 text-xs text-muted-foreground flex items-center justify-between">
-                      <span>Model</span>
-                      <span className="font-mono text-primary font-bold">DeepSeek V4 Flash</span>
+                    <div className="hidden sm:flex items-center gap-1.5">
+                      <span className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">Target:</span>
+                      <span className="rounded-xs neuro-inset px-2 py-1 text-sm font-medium">General Career Coach</span>
                     </div>
                   </div>
 
-                  {/* Main Desktop Chat Stream */}
-                  <div className="flex flex-col justify-between rounded-xl neuro-card p-4 sm:p-5 border border-border/60 bg-background space-y-4 h-full">
+                  {/* Chat stream */}
+                  <div className="flex flex-col justify-between flex-1 p-4 sm:p-5 space-y-4">
                     <div className="space-y-4 text-sm flex-1 flex flex-col justify-center">
                       {/* User Message */}
                       <div className="flex items-start justify-end gap-3">
@@ -167,17 +153,29 @@ export function HeroSection() {
                           <div className="rounded-xl bg-background p-3 border border-border/60 font-medium text-foreground">
                             &ldquo;Architected microservices using <strong>GraphQL</strong> and containerized deployments with <strong>Docker</strong> & Redis, cutting infrastructure latency by 38%.&rdquo;
                           </div>
-                          <p className="text-xs text-muted-foreground">Would you like to apply this directly to your resume?</p>
+                          <p className="text-xs text-muted-foreground">Want me to suggest two more bullet points for GraphQL and Docker?</p>
                         </div>
                       </div>
                     </div>
 
+                    {/* Action pills — matches real chat-view.tsx */}
+                    <div className="flex items-center gap-1.5 pb-1.5">
+                      <span className="neuro-pill rounded-xl inline-flex items-center gap-1 px-2 py-1 text-xs font-medium">
+                        <Upload size={11} /> Upload Resume
+                      </span>
+                      <span className="neuro-pill rounded-xl inline-flex items-center gap-1 px-2 py-1 text-xs font-medium">
+                        <FileText size={11} /> Build with AI
+                      </span>
+                      <span className="neuro-pill rounded-xl inline-flex items-center gap-1 px-2 py-1 text-xs font-medium">
+                        <ClipboardList size={11} /> Paste Job
+                      </span>
+                    </div>
                     {/* Chat Input Bar */}
                     <div className="flex items-center gap-3 rounded-2xl neuro-input p-3 border border-border/60 bg-muted/20 shrink-0">
                       <input
                         type="text"
                         readOnly
-                        value="Apply this bullet point to my active resume profile..."
+                        value="Ask anything about your resume or job search..."
                         className="w-full bg-transparent text-sm text-foreground outline-none px-2"
                       />
                       <button className="rounded-xl bg-primary px-5 py-2.5 text-xs sm:text-sm font-semibold text-primary-foreground shrink-0 shadow-sm flex items-center gap-1.5">
