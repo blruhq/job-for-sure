@@ -2,12 +2,12 @@
 
 import { useState } from 'react'
 import { Link } from '~/i18n/routing'
-import { ArrowRight, CheckCircle2, FileText, Target, Mic, Sparkles, Wand2, MessageSquare, AlertCircle, Upload, ClipboardList, GripVertical, PlusCircle, X, Brain, User, RotateCcw } from 'lucide-react'
+import { ArrowRight, CheckCircle2, FileText, Target, Mic, SquareKanban, Sparkles, Wand2, MessageSquare, AlertCircle, Upload, ClipboardList, GripVertical, PlusCircle, X, Brain, User, RotateCcw } from 'lucide-react'
 import { Mascot } from '~/components/marketing/mascot'
 import { useTranslations } from 'next-intl'
 import { cn } from '~/lib/utils'
 
-type TabType = 'chat' | 'ats' | 'resume' | 'interview'
+type TabType = 'chat' | 'ats' | 'resume' | 'interview' | 'tracker'
 
 export function HeroSection() {
   const t = useTranslations('landing')
@@ -18,6 +18,7 @@ export function HeroSection() {
     { id: 'ats', label: '🎯 ATS Optimizer (89%)', icon: Target },
     { id: 'resume', label: '📄 Resume Builder', icon: FileText },
     { id: 'interview', label: '🎙️ Mock Interview', icon: Mic },
+    { id: 'tracker', label: '📊 Job Tracker', icon: SquareKanban },
   ]
 
   return (
@@ -76,15 +77,10 @@ export function HeroSection() {
           <div className="relative overflow-hidden rounded-t-2xl sm:rounded-t-3xl neuro-card border border-border/80 shadow-2xl translate-y-3 sm:translate-y-4 bg-background aspect-[16/10] min-h-[480px] md:min-h-[580px] flex flex-col w-full">
             {/* macOS Browser Header */}
             <div className="flex flex-col sm:flex-row items-center justify-between border-b border-border/60 bg-muted/40 px-4 py-3 gap-3 shrink-0">
-              <div className="flex items-center gap-2 w-full sm:w-auto justify-between sm:justify-start">
-                <div className="flex items-center gap-1.5">
-                  <span className="h-3 w-3 rounded-full bg-[#FF5F57] inline-block" />
-                  <span className="h-3 w-3 rounded-full bg-[#FFBD2E] inline-block" />
-                  <span className="h-3 w-3 rounded-full bg-[#27C93F] inline-block" />
-                </div>
-                <span className="text-xs font-mono text-muted-foreground/80 bg-background/50 px-3 py-1 rounded-md border border-border/40">
-                  jobforsure.app/{activeTab === 'ats' ? 'ats' : activeTab === 'chat' ? 'chat' : activeTab === 'resume' ? 'resumes' : 'interview'}
-                </span>
+              <div className="flex items-center gap-1.5">
+                <span className="h-3 w-3 rounded-full bg-[#FF5F57] inline-block" />
+                <span className="h-3 w-3 rounded-full bg-[#FFBD2E] inline-block" />
+                <span className="h-3 w-3 rounded-full bg-[#27C93F] inline-block" />
               </div>
 
               {/* Interactive Tabs Bar */}
@@ -585,6 +581,75 @@ export function HeroSection() {
                         </div>
                       </div>
 
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* TAB 5: JOB TRACKER (Matches src/app/[locale]/(app)/applications/page.tsx) */}
+              {activeTab === 'tracker' && (
+                <div className="space-y-4 animate-fade-in flex flex-col justify-between h-full">
+                  {/* Board header */}
+                  <div className="flex items-center justify-between border-b border-border/40 pb-3">
+                    <div className="flex items-center gap-2">
+                      <SquareKanban size={16} className="text-primary" />
+                      <span className="text-sm font-bold uppercase tracking-wider text-foreground">Application Board</span>
+                    </div>
+                    <span className="text-xs text-muted-foreground font-semibold">4 Active</span>
+                  </div>
+
+                  {/* Kanban Columns */}
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 flex-1">
+                    {/* Bookmarked */}
+                    <div className="rounded-xl neuro-inset p-3 space-y-2.5">
+                      <div className="flex items-center justify-between text-xs font-bold text-muted-foreground">
+                        <span>Bookmarked</span>
+                        <span className="rounded-full bg-muted px-2 py-0.5 text-[10px]">1</span>
+                      </div>
+                      <div className="rounded-xl neuro-card p-3 space-y-1 border border-border/60">
+                        <span className="text-[10px] font-semibold text-primary">Stripe</span>
+                        <h5 className="text-xs font-bold text-foreground">Staff Frontend Dev</h5>
+                        <span className="text-[10px] text-muted-foreground block">San Francisco · Remote</span>
+                      </div>
+                    </div>
+
+                    {/* Applied */}
+                    <div className="rounded-xl neuro-inset p-3 space-y-2.5">
+                      <div className="flex items-center justify-between text-xs font-bold text-warn">
+                        <span>Applied</span>
+                        <span className="rounded-full bg-warn/15 px-2 py-0.5 text-[10px]">1</span>
+                      </div>
+                      <div className="rounded-xl neuro-card p-3 space-y-1 border border-warn/30">
+                        <span className="text-[10px] font-semibold text-warn">Vercel</span>
+                        <h5 className="text-xs font-bold text-foreground">React Engineer</h5>
+                        <span className="text-[10px] text-muted-foreground block">Applied 2d ago</span>
+                      </div>
+                    </div>
+
+                    {/* Interviewing */}
+                    <div className="rounded-xl neuro-inset p-3 space-y-2.5">
+                      <div className="flex items-center justify-between text-xs font-bold text-primary">
+                        <span>Interviewing</span>
+                        <span className="rounded-full bg-primary/15 px-2 py-0.5 text-[10px]">1</span>
+                      </div>
+                      <div className="rounded-xl neuro-card p-3 space-y-1 border border-primary/40 bg-primary/5">
+                        <span className="text-[10px] font-semibold text-primary">OpenAI</span>
+                        <h5 className="text-xs font-bold text-foreground">Product Engineer</h5>
+                        <span className="text-[10px] text-primary font-semibold block">Round 2 · Tomorrow</span>
+                      </div>
+                    </div>
+
+                    {/* Offer */}
+                    <div className="rounded-xl neuro-inset p-3 space-y-2.5">
+                      <div className="flex items-center justify-between text-xs font-bold text-success">
+                        <span>Offer</span>
+                        <span className="rounded-full bg-success/15 px-2 py-0.5 text-[10px]">1</span>
+                      </div>
+                      <div className="rounded-xl neuro-card p-3 space-y-1 border border-success/40 bg-success/5">
+                        <span className="text-[10px] font-semibold text-success">Linear</span>
+                        <h5 className="text-xs font-bold text-foreground">Senior UI Engineer</h5>
+                        <span className="text-[10px] text-success font-bold block">$185k Offer</span>
+                      </div>
                     </div>
                   </div>
                 </div>
