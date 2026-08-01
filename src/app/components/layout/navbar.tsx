@@ -20,7 +20,7 @@ export function Topbar() {
   const toggleSidebar = useUIStore((s) => s.toggleSidebar)
 
   return (
-    <header className="relative flex h-[var(--topbar-height)] shrink-0 items-center bg-background border-b border-border z-50">
+    <header className="relative flex h-[var(--topbar-height)] shrink-0 items-center neuro-surface z-50">
       {/*
         Logo — positioned relative to the HEADER (not the brand area).
         The header never changes size, so left-[16px] is bulletproof.

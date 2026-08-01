@@ -42,7 +42,7 @@ export function FeaturesBento() {
     <section id="features" className="border-t border-border py-24 md:py-32">
       <div className="relative mx-auto max-w-[1120px] overflow-x-clip px-6">
         <div className="relative z-10 max-w-xl">
-          <span className="mb-3 block text-xs uppercase tracking-[0.1em] text-muted-foreground">
+          <span className="mb-3 block font-mono text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground">
             {t('sectionLabelFeatures')}
           </span>
           <h2 className="text-4xl font-semibold tracking-tighter text-foreground md:text-5xl">
@@ -58,13 +58,13 @@ export function FeaturesBento() {
         <div className="relative z-10 mt-20 grid gap-5 md:grid-cols-[1.6fr_1fr] md:grid-rows-[1fr_1fr]">
           {/* Large card — AI Chat Coach */}
           <div
-            className={`${large.bgAccent} ${large.borderAccent} row-span-2 flex flex-col justify-between rounded-lg border p-5 sm:p-8 md:p-10 transition-colors hover:border-border-strong`}
+            className={`${large.bgAccent} ${large.borderAccent} row-span-2 flex flex-col justify-between rounded-2xl border p-5 sm:p-8 md:p-10 shadow-lg shadow-primary/5 transition-shadow hover:shadow-xl hover:shadow-primary/10`}
           >
             <div>
               <div
-                className={`flex h-12 w-12 items-center justify-center rounded-md border border-border bg-background ${large.color}`}
+                className={`flex h-12 w-12 items-center justify-center rounded-xl neuro-icon-well ${large.color}`}
               >
-                <large.icon size={24} strokeWidth={1.5} />
+                <large.icon size={24} />
               </div>
               <h3 className="mt-5 text-2xl font-semibold text-foreground">{large.title}</h3>
               <p className="mt-3 max-w-md text-base leading-relaxed text-muted-foreground">
@@ -135,7 +135,7 @@ export function FeaturesBento() {
             return (
               <div
                 key={f.title}
-                className={`${f.bgAccent} ${f.borderAccent} relative overflow-hidden flex flex-col justify-between rounded-lg border p-5 sm:p-8 transition-colors hover:border-border-strong`}
+                className={`${f.bgAccent} ${f.borderAccent} relative overflow-hidden flex flex-col justify-between rounded-2xl border p-5 sm:p-8 shadow-lg shadow-primary/5 transition-shadow hover:shadow-xl hover:shadow-primary/10`}
               >
                 {isJobSearch && (
                   <Mascot
@@ -148,22 +148,22 @@ export function FeaturesBento() {
                 )}
                 <div className={cn('relative z-10', isJobSearch && 'max-w-[70%]')}>
                   <div
-                    className={`flex h-12 w-12 items-center justify-center rounded-md border border-border bg-background ${f.color}`}
+                    className={`flex h-12 w-12 items-center justify-center rounded-xl neuro-icon-well ${f.color}`}
                   >
-                    <Icon size={24} strokeWidth={1.5} />
+                    <Icon size={24} />
                   </div>
                   <h3 className="mt-5 text-xl font-semibold text-foreground">{f.title}</h3>
                   <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{f.desc}</p>
                 </div>
                 {/* Mini score/tracker mockup */}
-                <div className="mt-6 overflow-hidden rounded-md border border-border bg-background p-4">
+                <div className="mt-6 overflow-hidden rounded-lg neuro-card p-4">
                   {f.title === t('feature2Title') ? (
                     <div>
                       <div className="flex items-center justify-between text-xs">
                         <span className="text-muted-foreground">{t('featuresMatchScore')}</span>
-                        <span className="font-bold text-primary tabular-nums">84%</span>
+                        <span className="font-mono font-bold text-primary">84%</span>
                       </div>
-                      <div className="mt-2 h-2 overflow-hidden rounded-full bg-secondary">
+                      <div className="mt-2 h-2 overflow-hidden rounded-full bg-muted">
                         <div className="h-full w-[84%] rounded-full bg-primary" />
                       </div>
                     </div>

@@ -6,7 +6,7 @@ import { cva, type VariantProps } from "class-variance-authority"
  * Dark mode neutralization is handled in globals.css — no JS needed.
  */
 export const neuroCardVariants = cva(
-  "transition-[border-color,box-shadow] duration-150 ease-out",
+  "transition-shadow duration-200",
   {
     variants: {
       variant: {

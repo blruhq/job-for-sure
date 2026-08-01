@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from 'next'
-import { GeistSans } from 'geist/font/sans'
+import { Inter, JetBrains_Mono, Instrument_Serif, Kanit } from 'next/font/google'
 import { ThemeProvider } from '~/components/layout/theme-provider'
 import '../globals.css'
 import { Toaster } from 'sonner'
@@ -10,9 +10,30 @@ import { notFound } from 'next/navigation'
 import { routing } from '~/i18n/routing'
 import { QueryProvider } from '~/components/layout/query-provider'
 import { SITE_URL, buildAlternates, ogImageUrl } from '~/lib/seo'
-import { Kanit } from 'next/font/google'
 
 // Font definitions (moved from root layout)
+const inter = Inter({
+  variable: '--font-inter',
+  subsets: ['latin'],
+  display: 'swap',
+})
+
+const jetbrainsMono = JetBrains_Mono({
+  variable: '--font-jetbrains-mono',
+  subsets: ['latin'],
+  display: 'swap',
+  preload: false,
+})
+
+const instrumentSerif = Instrument_Serif({
+  variable: '--font-instrument-serif',
+  subsets: ['latin'],
+  weight: ['400'],
+  style: ['normal', 'italic'],
+  display: 'swap',
+  preload: false,
+})
+
 const kanit = Kanit({
   variable: '--font-kanit',
   subsets: ['thai', 'latin-ext'],
@@ -105,7 +126,7 @@ export default async function LocaleLayout({
   return (
     <html
       lang={locale}
-      className={`${GeistSans.variable}${locale === 'th' ? ` ${kanit.variable}` : ''}`}
+      className={`${inter.variable} ${jetbrainsMono.variable} ${instrumentSerif.variable}${locale === 'th' ? ` ${kanit.variable}` : ''}`}
       suppressHydrationWarning
     >
       <head>
