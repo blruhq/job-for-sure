@@ -10,12 +10,19 @@ export default function RegisterPage() {
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [emailSent, setEmailSent] = useState(false)
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault()
+
+    if (password !== confirmPassword) {
+      setError('Passwords do not match')
+      return
+    }
+
     setLoading(true)
     setError('')
 
@@ -146,6 +153,24 @@ export default function RegisterPage() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="At least 8 characters"
+                required
+                minLength={8}
+                className="w-full rounded-md px-3 py-2 text-sm"
+                neumorphic
+              />
+            </div>
+
+            <div>
+              <label htmlFor="reg-confirm-password" className="mb-1.5 block font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
+                Confirm Password
+              </label>
+              <Input
+                id="reg-confirm-password"
+                type="password"
+                autoComplete="new-password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                placeholder="Re-enter your password"
                 required
                 minLength={8}
                 className="w-full rounded-md px-3 py-2 text-sm"
