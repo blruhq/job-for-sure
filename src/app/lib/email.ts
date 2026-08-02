@@ -10,7 +10,7 @@ function escapeHtml(str: string): string {
 }
 
 const resend = new Resend(process.env.RESEND_API_KEY!)
-const FROM = 'Job For Sure <noreply@jobforsure.app>'
+const FROM = 'Job For Sure <noreply@blru.site>'
 
 export async function sendVerificationEmail({
   user,
@@ -39,7 +39,10 @@ export async function sendVerificationEmail({
       </div>
     `,
   })
-  if (error) console.error('[Resend] Verification email failed:', error)
+  if (error) {
+    console.error('[Resend] Verification email failed:', error)
+    throw new Error(`Failed to send verification email: ${error.message}`)
+  }
 }
 
 export async function sendPasswordResetEmail({
@@ -69,5 +72,8 @@ export async function sendPasswordResetEmail({
       </div>
     `,
   })
-  if (error) console.error('[Resend] Password reset email failed:', error)
+  if (error) {
+    console.error('[Resend] Password reset email failed:', error)
+    throw new Error(`Failed to send password reset email: ${error.message}`)
+  }
 }
