@@ -2,7 +2,7 @@ import { betterAuth } from 'better-auth'
 import { drizzleAdapter } from 'better-auth/adapters/drizzle'
 import { admin } from 'better-auth/plugins'
 import { db } from '~/lib/db'
-import { sendVerificationEmail, sendPasswordResetEmail } from '~/lib/email'
+import { sendVerificationEmail, sendPasswordResetEmail, sendExistingAccountEmail } from '~/lib/email'
 
 // Fail-fast: Better Auth silently generates a random secret if unset, which
 // invalidates all sessions on every serverless cold start. Refuse to boot.
@@ -27,6 +27,17 @@ export const auth = betterAuth({
     requireEmailVerification: true,
     sendResetPassword: async ({ user, url }) => {
       await sendPasswordResetEmail({ user, url })
+    },
+    // When someone signs up with an email that already exists, Better Auth
+    // returns a synthetic success (anti-enumeration). Use this callback to
+    // email the user so they know they already have an account.
+    onExistingUserSignUp: async ({ user }) => {
+      const loginUrl = `${process.env.BETTER_AUTH_URL || ''}/login`
+      try {
+        await sendExistingAccountEmail({ email: user.email, loginUrl })
+      } catch (err) {
+        console.error('[auth] Failed to send existing-account email:', err)
+      }
     },
     // Required by admin plugin when requireEmailVerification is on —
     // prevents email enumeration by returning a synthetic user that
