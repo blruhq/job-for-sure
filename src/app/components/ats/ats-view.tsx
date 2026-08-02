@@ -232,7 +232,7 @@ export function AtsView() {
             }}
             disabled={resumes.length === 0}
           >
-            <SelectTrigger className="w-full rounded-sm neuro-inset py-2 pl-3 pr-8 text-sm">
+            <SelectTrigger aria-label="Select target resume" className="w-full rounded-sm neuro-inset py-2 pl-3 pr-8 text-sm">
               <SelectValue placeholder="None (Upload first)" />
             </SelectTrigger>
             <SelectContent>
@@ -328,9 +328,9 @@ export function AtsView() {
             </div>
           </div>
           <div>
-            <h3 className="text-sm font-semibold" style={{ color: analysisResult ? gaugeColor : 'var(--warn)' }}>
+            <h2 className="text-sm font-semibold" style={{ color: analysisResult ? gaugeColor : 'var(--warn)' }}>
               {analysisLoading ? 'Analyzing...' : gaugeHeading}
-            </h3>
+            </h2>
             <p className="text-sm text-muted-foreground">{analysisLoading ? 'AI is processing your resume format and context...' : gaugeDesc}</p>
           </div>
         </div>
@@ -442,7 +442,7 @@ export function AtsView() {
             <div className="flex items-start gap-2.5">
               <Sparkles size={16} className="text-primary shrink-0 mt-0.5" />
               <div>
-                <h4 className="text-sm font-semibold text-foreground">Tailor Resume for this Job</h4>
+                <h3 className="text-sm font-semibold text-foreground">Tailor Resume for this Job</h3>
                 <p className="text-[10px] text-muted-foreground leading-relaxed mt-0.5">
                   AI will adapt your summary, skills order, and experience achievements to align with this job description while preserving all factual data.
                 </p>

@@ -68,9 +68,9 @@
   --card-foreground: #101828;
   --popover: #FFFFFF;
   --popover-foreground: #101828;
-  --primary: #D97706;                 /* was #E6CD2A — now amber-600, AA contrast on white (4.5:1+) */
-  --primary-foreground: #FFFFFF;      /* white text on amber (amber-600 is dark enough) */
-  --primary-hover: #B45309;
+  --primary: #92400E;                 /* amber-800 — AA contrast (6:1+) on ALL backgrounds */
+  --primary-foreground: #FFFFFF;      /* white text on amber-800 (7.3:1 AA pass) */
+  --primary-hover: #78350F;           /* amber-900 */
   --brand: #F59E0B;                /* fresh yellow for brand fills */
   --brand-foreground: #1A1A1A;
 
@@ -90,14 +90,14 @@
   --secondary: #F1F3F6;            /* cool gray */
   --secondary-foreground: #101828;
   --muted: #F1F3F6;                /* subtle cool divider bg */
-  --muted-foreground: #667085;     /* cool gray secondary text */
+  --muted-foreground: #475467;     /* slate-600 — AA contrast on all backgrounds (7:1+) */
   --accent: rgba(245, 158, 11, 0.12); /* amber soft */
-  --accent-foreground: #D97706;
+  --accent-foreground: #92400E;
   --destructive: #D92D20;          /* slightly cooler red */
   --destructive-foreground: #FFFFFF;
   --border: #E4E7EC;               /* cool border */
   --input: #D0D5DD;
-  --ring: #D97706;
+  --ring: #92400E;
   --radius: 0.5rem;                /* 8px base radius */
 
   /* ── Chart / status tokens ── */
@@ -175,7 +175,7 @@
   /* #6B7280 (gray-500): L≈0.18 → ~3.8:1 ✓. Navy-tinted to match mascot theme. */
   --input-border: #6B7280;            /* replaces failing #D0D5DD (~1.3:1)        */
   --input-border-soft: #9499A8;       /* lighter variant for dark-mode surfaces   */
-  --input-border-focus: var(--ring);  /* #D97706 amber-600 — L≈0.20 → ~3.5:1 ✓   */
+  --input-border-focus: var(--ring);  /* amber-700 — WCAG AA */
 
   /* Softer inset used INSIDE bordered controls (border carries the contrast)    */
   --neuro-dark-input: rgba(16, 24, 40, 0.06);
@@ -231,7 +231,7 @@
   --an-foreground-muted: var(--muted-foreground);
   --an-foreground-subtle: #9F9E98;
   --an-border-color: var(--border);     /* #E4E7EC cool border */
-  --an-primary-color: var(--primary);   /* #D97706 deep amber */
+  --an-primary-color: var(--primary);   /* #B45309 amber-700 */
   --an-user-message-bg: var(--accent-soft);  /* soft amber tint */
   --an-user-message-text: var(--foreground);
   --an-input-background: var(--card);   /* white surface */

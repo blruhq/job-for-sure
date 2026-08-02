@@ -4,6 +4,9 @@ import type { NextConfig } from 'next'
 const withNextIntl = createNextIntlPlugin('./src/app/i18n/request.ts');
 
 const nextConfig: NextConfig = {
+  experimental: {
+    optimizePackageImports: ['lucide-react', '@tabler/icons-react', '@dnd-kit/core', '@dnd-kit/sortable'],
+  },
   serverExternalPackages: ['mammoth', '@react-pdf/renderer', 'unpdf'],
   async headers() {
     const isProd = process.env.NODE_ENV === 'production'

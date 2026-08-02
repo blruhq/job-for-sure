@@ -249,6 +249,7 @@ export default function StandaloneCoverLetterPage() {
             <label className="label-mono block">{t('selectProfile')}</label>
             <div className="flex gap-2 flex-wrap">
               <select
+                aria-label={t('selectProfile')}
                 value={selectedResumeId}
                 onChange={(e) => {
                   setSelectedResumeId(e.target.value)
@@ -489,7 +490,7 @@ export default function StandaloneCoverLetterPage() {
                   <FileText size={24} />
                 </div>
               }
-              title={<h3 className="mb-1 text-sm font-semibold text-foreground">No Cover Letter Generated</h3>}
+              title={<h2 className="mb-1 text-sm font-semibold text-foreground">No Cover Letter Generated</h2>}
               description={
                 <p className="text-sm text-muted-foreground">
                   Select or upload a resume on the left, type the target company and position details, and click Generate to write your letter.

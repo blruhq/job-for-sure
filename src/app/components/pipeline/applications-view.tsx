@@ -417,11 +417,11 @@ export function ApplicationsView() {
               {total} {t('bookmark').toLowerCase() === 'bookmark' ? 'Jobs' : 'งาน'}
             </h1>
             <div className="flex items-center gap-1.5">
-              <span className="text-[10px] text-muted-foreground font-mono">
+              <span className="text-[11px] text-muted-foreground font-mono">
                 {t('resume')}
               </span>
               <Select value={filter} onValueChange={(v) => setFilter(v || 'all')}>
-                <SelectTrigger className="w-full rounded-xs neuro-inset px-2 py-1 text-xs">
+                <SelectTrigger aria-label="Filter by resume" className="w-full rounded-xs neuro-inset px-2 py-1 text-xs">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -513,7 +513,7 @@ export function ApplicationsView() {
                 <div className="flex flex-1 min-h-0 min-w-0 flex-col gap-3 overflow-y-auto overflow-x-hidden px-4 pb-3 pt-4">
                   {jobs.length === 0 && !(addingToCol === col.id) && (
                     <div className="px-2 py-6 text-center">
-                      <p className="text-[10px] text-muted-foreground/50">
+                      <p className="text-[11px] text-muted-foreground/70">
                         {t('noApplications')}
                       </p>
                     </div>

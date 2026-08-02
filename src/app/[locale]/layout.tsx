@@ -9,6 +9,7 @@ import { setRequestLocale } from 'next-intl/server'
 import { notFound } from 'next/navigation'
 import { routing } from '~/i18n/routing'
 import { QueryProvider } from '~/components/layout/query-provider'
+import { ReactScan } from '~/components/dev/react-scan'
 import { SITE_URL, buildAlternates, ogImageUrl } from '~/lib/seo'
 
 // Font definitions (moved from root layout)
@@ -136,6 +137,7 @@ export default async function LocaleLayout({
         <NextIntlClientProvider messages={messages}>
           <ThemeProvider>
             <QueryProvider>
+              <ReactScan />
               {children}
             </QueryProvider>
             <Toaster position="bottom-center" richColors />

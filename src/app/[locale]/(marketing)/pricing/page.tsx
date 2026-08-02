@@ -78,7 +78,7 @@ export default function PricingPage() {
   }
 
   return (
-    <div className="min-h-screen neuro-surface">
+    <main className="min-h-screen neuro-surface">
       <div className="mx-auto max-w-4xl px-4 py-16 sm:px-6 sm:py-24">
         {/* Header */}
         <div className="text-center">
@@ -112,7 +112,7 @@ export default function PricingPage() {
                 <span className="text-3xl font-bold text-foreground">{plan.price}</span>
                 <span className="text-sm font-normal text-muted-foreground">{plan.period}</span>
                 {plan.discount && (
-                  <span className="rounded-full bg-success px-2 py-0.5 text-[10px] font-semibold text-white">{plan.discount}</span>
+                  <span className="rounded-full bg-success px-2 py-0.5 text-xs font-bold text-white">{plan.discount}</span>
                 )}
               </p>
               <p className="mt-1 text-xs text-muted-foreground">{plan.description}</p>
@@ -168,6 +168,6 @@ export default function PricingPage() {
           Cancel anytime. All plans include a 30-day grace period after non-payment.
         </p>
       </div>
-    </div>
+      </main>
   )
 }

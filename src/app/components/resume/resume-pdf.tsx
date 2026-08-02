@@ -1,6 +1,7 @@
 import React from 'react'
 import type { Resume } from '~/types/resume'
 import { DEFAULT_TEMPLATE } from './templates/registry'
+
 import { MinimalistPDF } from './templates/minimalist-pdf'
 import { ModernPDF } from './templates/modern-pdf'
 import { ClassicPDF } from './templates/classic-pdf'

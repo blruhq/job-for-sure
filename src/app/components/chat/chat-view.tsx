@@ -654,7 +654,7 @@ export function ChatView() {
             }}
             disabled={resumes.length === 0}
           >
-            <SelectTrigger className="h-auto rounded-xs neuro-inset px-2 py-1 text-sm">
+            <SelectTrigger aria-label="Select profile resume" className="h-auto rounded-xs neuro-inset px-2 py-1 text-sm">
               <SelectValue placeholder={resumes.length === 0 ? 'None (Upload first)' : undefined} />
             </SelectTrigger>
             <SelectContent className="min-w-56">
@@ -675,7 +675,7 @@ export function ChatView() {
             onValueChange={(val) => { if (val) setTargetCompanyKey(val) }}
             disabled={(applications?.bookmark?.length ?? 0) === 0}
           >
-            <SelectTrigger className="h-auto rounded-xs neuro-inset px-2 py-1 text-sm">
+            <SelectTrigger aria-label="Select target company" className="h-auto rounded-xs neuro-inset px-2 py-1 text-sm">
               <SelectValue placeholder="General Career Coach" />
             </SelectTrigger>
             <SelectContent className="min-w-56">

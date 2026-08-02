@@ -76,6 +76,7 @@
     "drizzle-kit": "^0.30.0",
     "eslint": "^9.39.5",
     "eslint-plugin-react-hooks": "^5.2.0",
+    "react-scan": "^0.5.7",
     "typescript": "^5.8.0",
     "typescript-eslint": "^8.63.0",
     "vitest": "^4.1.10"
