@@ -83,7 +83,10 @@ export default function RegisterPage() {
               Click the link to activate your account.
             </p>
             <p className="mt-4 text-sm text-muted-foreground/60">
-              Didn&apos;t get an email? Check your spam folder.
+              Didn&apos;t get an email? Check your spam folder, or you may already have an account —{' '}
+              <Link href="/login" className="cursor-pointer font-medium text-primary hover:opacity-80">
+                sign in
+              </Link>.
             </p>
             <Link
               href="/login"
