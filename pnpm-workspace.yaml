@@ -7,3 +7,4 @@ allowBuilds:
 
 overrides:
   sharp: ^0.35.3
+  postcss: '>=8.5.18'
