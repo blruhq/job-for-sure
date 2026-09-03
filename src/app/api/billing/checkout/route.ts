@@ -20,7 +20,6 @@ export const POST = withAuth(async (req, { user }) => {
 
   const session = await stripe.checkout.sessions.create({
     mode: 'subscription',
-    integration_identifier: `jfs-checkout-${Math.random().toString(36).slice(2, 10)}`,
     line_items: [{ price: priceId, quantity: 1 }],
     client_reference_id: user.id,
     customer_email: user.email,

@@ -1,9 +1,11 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { useSearchParams } from 'next/navigation'
 import { useRouter } from '~/i18n/routing'
 import { Skeleton } from '~/components/ui/skeleton'
 import { Button } from '~/components/ui/button'
+import { toast } from 'sonner'
 
 type UsageData = {
   allowed: boolean
@@ -37,6 +39,7 @@ const FEATURE_LABELS: Record<string, string> = {
 
 export default function BillingPage() {
   const router = useRouter()
+  const searchParams = useSearchParams()
   const [data, setData] = useState<SubResponse | null>(null)
   const [loading, setLoading] = useState(true)
   const [canceling, setCanceling] = useState(false)
@@ -56,6 +59,44 @@ export default function BillingPage() {
     }
     load()
   }, [])
+
+  useEffect(() => {
+    const checkout = searchParams.get('checkout')
+    const sessionId = searchParams.get('session_id')
+    if (checkout === 'canceled') {
+      toast.info('Checkout canceled')
+      router.replace('/settings/billing')
+      return
+    }
+    if (checkout !== 'success' || !sessionId) return
+
+    let cancelled = false
+    ;(async () => {
+      try {
+        const res = await fetch('/api/billing/verify', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ sessionId }),
+        })
+        const json = await res.json()
+        if (!cancelled && res.ok && json.verified) {
+          toast.success('Upgraded to Pro!')
+          const updated = await fetch('/api/billing/subscription').then((r) => r.json())
+          setData(updated)
+        }
+      } catch {
+        // ignore
+      } finally {
+        if (!cancelled) {
+          router.replace('/settings/billing') // clean query
+        }
+      }
+    })()
+
+    return () => {
+      cancelled = true
+    }
+  }, [searchParams, router])
 
   async function handlePortal() {
     const res = await fetch('/api/billing/portal', { method: 'POST' })

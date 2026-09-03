@@ -1,9 +1,10 @@
 import { NextResponse } from 'next/server'
 import type Stripe from 'stripe'
-import { stripe, STRIPE_WEBHOOK_SECRET, PRO_PRICE_IDS } from '~/lib/stripe'
+import { stripe, STRIPE_WEBHOOK_SECRET } from '~/lib/stripe'
 import { db } from '~/lib/db'
 import { user, subscriptions } from '~/lib/schema'
 import { eq } from 'drizzle-orm'
+import { extractPeriodEnd, resolvePlan } from '~/lib/billing-sync'
 
 export const dynamic = 'force-dynamic'
 export const maxDuration = 30
@@ -86,20 +87,15 @@ export async function POST(req: Request) {
           return NextResponse.json({ error: 'No userId' }, { status: 200 })
         }
 
-        // Determine plan: only known price IDs (or explicit metadata.plan=pro) grant Pro.
-        // Fail-closed — unknown/misconfigured prices default to 'free'.
-        const priceId = sub.items?.data?.[0]?.price?.id
-        const priceMeta = sub.items?.data?.[0]?.price?.metadata?.plan
-        const plan =
-          (priceId && PRO_PRICE_IDS.has(priceId)) || priceMeta === 'pro' ? 'pro' : 'free'
-        const interval = sub.items?.data?.[0]?.price?.recurring?.interval || null
-        // Stripe SDK 2026 exposes current_period_end as camelCase in TS but the
-        // runtime payload uses snake_case; tolerate both.
-        const periodEndSeconds =
-          (sub as unknown as { current_period_end?: number }).current_period_end ??
-          (sub as unknown as { currentPeriodEnd?: number }).currentPeriodEnd ??
-          0
-        const periodEnd = periodEndSeconds > 0 ? new Date(periodEndSeconds * 1000) : new Date(0)
+        // Use shared helper for plan resolution and period end extraction
+        const { plan, interval } = resolvePlan(sub)
+        const periodEndSeconds = extractPeriodEnd(sub)
+        if (periodEndSeconds <= 0) {
+          console.error('[webhook] missing current_period_end for sub', sub.id, JSON.stringify(sub.items?.data?.[0]).slice(0,500))
+          // Return 500 to trigger Stripe retry rather than storing epoch
+          return NextResponse.json({ error: 'Missing period end' }, { status: 500 })
+        }
+        const periodEnd = new Date(periodEndSeconds * 1000)
 
         // UPSERT subscription
         await db
