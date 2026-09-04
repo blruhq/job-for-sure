@@ -68,9 +68,9 @@
   --card-foreground: #101828;
   --popover: #FFFFFF;
   --popover-foreground: #101828;
-  --primary: #92400E;                 /* amber-800 — AA contrast (6:1+) on ALL backgrounds */
-  --primary-foreground: #FFFFFF;      /* white text on amber-800 (7.3:1 AA pass) */
-  --primary-hover: #78350F;           /* amber-900 */
+  --primary: #F59E0B;                 /* warm CTA orange — matches landing page */
+  --primary-foreground: #1A1A1A;      /* dark text on warm orange (10:1+ contrast) */
+  --primary-hover: #D97706;           /* amber-hover for visual continuity */
   --brand: #F59E0B;                /* fresh yellow for brand fills */
   --brand-foreground: #1A1A1A;
 
