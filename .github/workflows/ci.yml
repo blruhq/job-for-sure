@@ -79,7 +79,12 @@ jobs:
       - name: Build
         run: pnpm build
         env:
-          # Next.js build needs these at build time for static analysis
+          # Next.js build evaluates route/lib modules at build time for page data collection
           # Use dummy values — real secrets are injected at runtime
+          DATABASE_URL: postgres://ci:ci@localhost:5432/ci
+          BETTER_AUTH_SECRET: ci-dummy-auth-secret-for-build-at-least-32-chars
+          BETTER_AUTH_URL: http://localhost:3000
+          RESEND_API_KEY: re_ci_dummy_key
+          STRIPE_SECRET_KEY: sk_test_dummy_key
           NEXT_PUBLIC_POSTHOG_KEY: ci-placeholder
           NEXT_PUBLIC_APP_URL: http://localhost:3000
