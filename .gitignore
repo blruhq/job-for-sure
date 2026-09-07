@@ -5,7 +5,53 @@ dist/
 *.tsbuildinfo
 test-results/
 playwright-report/
+coverage/
 
 # Env files — ignore everything except the example
 .env*
 !.env.example
+
+# macOS
+.DS_Store
+
+# IDEs and editors (like sst/opencode, Reactive-Resume)
+.idea/
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+*~
+*.swp
+*.swo
+
+# pnpm / build caches
+.pnpm-store/
+.turbo/
+tmp/
+temp/
+.cache/
+
+# Logs
+*.log
+.logs/
+
+# Local screenshots & scratch notes (not for the public repo)
+.screenshots/
+desktop-*.png
+mobile-*.png
+og-image-test.png
+.worklog.md
+.typo-files.txt
+
+# Local agent / dev tooling state
+.worktrees/
+
+# AI assistant working dirs — skills live globally in ~/.agents/skills,
+# shared project instructions stay tracked in opencode.json
+.agents/
+.claude/
+.codex/
+.cursor/
+.opencode/
+skills-lock.json

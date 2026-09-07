@@ -2,12 +2,13 @@
 
 **AI-powered job application helper.** Upload and tailor resumes, check ATS compatibility, generate cover letters, practice with mock interviews, and discover tech jobs across 13+ boards — all in one place.
 
-> **Status**: Pre-release (v0.2.0) — active development.
+> **Status**: Pre-release (v2.0.0) — active development.
 
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.8-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![Next.js](https://img.shields.io/badge/Next.js-16.2-000000?logo=next.js&logoColor=white)](https://nextjs.org/)
 [![pnpm](https://img.shields.io/badge/pnpm-11-F69220?logo=pnpm&logoColor=white)](https://pnpm.io/)
-[![Build](https://img.shields.io/badge/build-passing-brightgreen)](https://github.com/)
+[![CI](https://github.com/blruhq/job-for-sure/actions/workflows/ci.yml/badge.svg)](https://github.com/blruhq/job-for-sure/actions)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 ---
 
@@ -58,7 +59,7 @@
 
 ```bash
 # Clone the repository
-git clone <repo-url>
+git clone https://github.com/blruhq/job-for-sure.git
 cd job-for-sure
 
 # Install dependencies
@@ -115,7 +116,7 @@ All optional services are fail-open — if they are unavailable, the app continu
 | `pnpm build` | Create a production build |
 | `pnpm start` | Start the production server |
 | `pnpm lint` | Run ESLint across the codebase |
-| `pnpm typecheck` | Run TypeScript type checking (`npx tsc --noEmit`) |
+| `pnpm typecheck` | Run TypeScript type checking |
 | `pnpm test` | Run all unit tests (Vitest) |
 | `pnpm test:watch` | Run unit tests in watch mode |
 | `pnpm test:e2e` | Run Playwright end-to-end tests |
@@ -151,6 +152,9 @@ job-for-sure/
 ├── tests/
 │   ├── unit/                    Vitest unit tests
 │   └── e2e/                     Playwright end-to-end tests
+├── messages/                    i18n message catalogs (en, th)
+├── scripts/                     One-off scripts (e.g. Stripe product setup)
+├── public/                      Static assets (fonts, logo, mascots)
 ├── docs/                        Architecture, ADRs, flow specs, glossary
 ├── AGENTS.md                    AI context and coding rules
 ├── drizzle.config.ts            Drizzle Kit configuration
@@ -237,6 +241,24 @@ Key guidelines for contributors (see `AGENTS.md` for the full list):
 - **AI calls must use failover wrappers** — never call the AI SDK directly.
 - **PDF is server-only** — `@react-pdf/renderer` never runs in the browser.
 - **Middleware is `proxy.ts`** — Next.js 16 renamed middleware to proxy.
+
+---
+
+## Contributing
+
+Contributions are welcome! Please read [`CONTRIBUTING.md`](CONTRIBUTING.md) first — it covers setup, the branch naming CI expects (`feat/*`, `fix/*`), the checks to run before pushing (`pnpm lint`, `pnpm typecheck`, `pnpm test`, `pnpm build`), and the ground rules from `AGENTS.md`.
+
+---
+
+## Support
+
+Found a bug or have a feature idea? [Open an issue](https://github.com/blruhq/job-for-sure/issues) with steps to reproduce and your environment.
+
+---
+
+## Acknowledgments
+
+Built with [Next.js](https://nextjs.org/), [Better Auth](https://www.better-auth.com/), [Drizzle ORM](https://orm.drizzle.team/), [Vercel AI SDK](https://sdk.vercel.ai/), and resume-PDF rendering inspired by [Reactive Resume](https://github.com/Reactive-Resume/Reactive-Resume) and [OpenResume](https://github.com/xitanggg/openresume).
 
 ---
 

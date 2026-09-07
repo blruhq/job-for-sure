@@ -8,3 +8,7 @@ allowBuilds:
 overrides:
   sharp: ^0.35.3
   postcss: '>=8.5.18'
+  # Security audit fixes (GHSA-67mh-4wv8-2f99, GHSA-6gmq-8vp8-gcm6, GHSA-px8p-9vwx-vf98)
+  'esbuild@<0.24.3': 0.25.4
+  '@xmldom/xmldom@<0.8.15': 0.8.15
+  'fflate@<0.4.9': 0.4.9
